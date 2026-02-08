@@ -12,14 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4ecdad67285e4111b58296d98da9caa, type: 3}
   m_Name: Kendi
   m_EditorClassIdentifier: 
-  artifactName: Kendi
-  code: CH0329
-  history: Made from gold, this handle-less, spouted pouring vessel originated from
-    8th to early 9th century Central Javanese period in Java, Indonesia.
-  artefacts:
-  - fragment: {fileID: 7262281596309485387, guid: 4f066100c2fb64d599e158e295541b30,
-      type: 3}
-    correctPosition: {fileID: 0}
-  finishRotation: {x: -52.647, y: -105.902, z: -70.283}
-  finishPosition: {x: 0.05, y: -0.78, z: -0.54}
-  isSmallSized: 0
+  baseData:
+    id: Kendi
+    itemName: Kendi
+    itemDescription: 
+    itemIcon: {fileID: 0}
+    exclude: 0
+  unlockedByDefault: 0
+  artefactAge: 0
+  allowedToolTypes: -1
+  artefactFragmentDatas: []
+  finishTransform:
+    rotation: {x: 0, y: 0, z: 0}
+    position: {x: 0, y: 0, z: 0}

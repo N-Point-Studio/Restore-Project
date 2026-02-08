@@ -12,16 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4ecdad67285e4111b58296d98da9caa, type: 3}
   m_Name: Horse
   m_EditorClassIdentifier: 
-  artifactName: Paperweight in the shape of a horse
-  code: CH0420
-  history: "This silver standing horse very likely functioned as a paperweight on
-    a scholar\u2019s desk. The horse\u2019s combination of naturalistic details and
-    archaistic pose matches archaeologically recovered depictions in bronze and stone
-    dating to the late thirteenth century."
-  artefacts:
-  - fragment: {fileID: 2023501092284782827, guid: 0352e65ac67094ab1a361be75b37ad8f,
-      type: 3}
-    correctPosition: {fileID: 0}
-  finishRotation: {x: -159.794, y: -179.673, z: 44.131}
-  finishPosition: {x: 0.3333753, y: -0.3721576, z: -0.01796973}
-  isSmallSized: 0
+  baseData:
+    id: Horse
+    itemName: Horse
+    itemDescription: 
+    itemIcon: {fileID: 0}
+    exclude: 0
+  unlockedByDefault: 0
+  artefactAge: 0
+  allowedToolTypes: -1
+  artefactFragmentDatas: []
+  finishTransform:
+    rotation: {x: 0, y: 0, z: 0}
+    position: {x: 0, y: 0, z: 0}
