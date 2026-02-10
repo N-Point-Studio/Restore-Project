@@ -3,10 +3,10 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class TouchManager : MonoBehaviour, InputSystem.IInputActions
+public class TouchManager : MonoBehaviour, GameInput.IPlayerActions
 {
     public static TouchManager Instance { get; private set; }
-    public InputSystem inputSystem;
+    public GameInput inputSystem;
     public Vector3 curScreenPos;
     private Camera mainCamera;
     public bool isInteracting = false;
@@ -40,8 +40,8 @@ public class TouchManager : MonoBehaviour, InputSystem.IInputActions
         Instance = this;
 
         mainCamera = Camera.main;
-        inputSystem = new InputSystem();
-        inputSystem.Input.SetCallbacks(this);
+        inputSystem = new GameInput();
+        inputSystem.Player.SetCallbacks(this);
 
         screenWidth = Screen.width;
         screenHeight = Screen.height;
@@ -77,14 +77,14 @@ public class TouchManager : MonoBehaviour, InputSystem.IInputActions
     void OnEnable()
     {
         if (inputSystem != null)
-            inputSystem.Input.Enable();
+            inputSystem.Player.Enable();
     }
 
     void OnDisable()
     {
         // Add null check to prevent NullReferenceException during scene cleanup
         if (inputSystem != null)
-            inputSystem.Input.Disable();
+            inputSystem.Player.Disable();
     }
 
     private void OnDestroy()
@@ -229,7 +229,7 @@ public class TouchManager : MonoBehaviour, InputSystem.IInputActions
     {
         if (status)
         {
-            inputSystem.Input.Disable();
+            inputSystem.Player.Disable();
 
             curScreenPos = Vector3.zero;
             curSecondaryPos = Vector3.zero;
@@ -248,7 +248,7 @@ public class TouchManager : MonoBehaviour, InputSystem.IInputActions
         }
         else
         {
-            inputSystem.Input.Enable();
+            inputSystem.Player.Enable();
             Debug.Log("All Touch Enabled");
         }
     }
