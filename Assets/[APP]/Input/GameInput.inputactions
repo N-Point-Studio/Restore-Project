@@ -77,6 +77,17 @@
                 },
                 {
                     "name": "",
+                    "id": "3a67b1ff-a867-4eb5-94e8-a460a0b9cda9",
+                    "path": "<Pointer>/press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Press",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "ff5dd3f7-a9a6-42ec-baca-c9a2561fbc72",
                     "path": "<Mouse>/position",
                     "interactions": "",
@@ -90,6 +101,17 @@
                     "name": "",
                     "id": "2d20ac25-11e1-4cb5-8cb0-8c9aa797ab8c",
                     "path": "<Touchscreen>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ScreenPos",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "16e14f29-ce0e-407c-baee-db8c1dc59de1",
+                    "path": "<Pointer>/position",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -127,6 +149,34 @@
                     "processors": "",
                     "groups": "",
                     "action": "SecondaryFingerPos",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "UI",
+            "id": "496491a5-091b-453e-955c-b6c4adde0d80",
+            "actions": [
+                {
+                    "name": "New action",
+                    "type": "Button",
+                    "id": "ec6feda2-678d-4269-a74f-b4ac1dd133a2",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "85434685-32e6-4e9f-86a1-82832275515e",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "New action",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

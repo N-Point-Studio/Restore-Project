@@ -12,27 +12,30 @@ public class ProjectLifetimeScope : LifetimeScope
 
     // Databases
     [SerializeField] private ArtefactDatabase artefactDatabase;
-    
+
     protected override void Configure(IContainerBuilder builder)
     {
         // Core systems
         Instantiate(soundSystem, transform);
         builder.RegisterComponentInHierarchy<SoundSystem>().AsSelf();
 
-         // Haptic manager
-        #if UNITY_IOS
+        // Haptic manager
+#if UNITY_IOS
             HapticManager hapticInstance = Instantiate(hapticManager, transform);
             builder.RegisterComponentInHierarchy<HapticManager>().AsSelf();
             hapticInstance.SetActiveHaptic(true);
-        #endif
+#endif
 
         // Active Container (runtime state - all Singleton)
         builder.Register<ActiveArtefactData>(Lifetime.Singleton).AsSelf().WithParameter(artefactDatabase);
 
         // Saving System
         builder.RegisterEntryPoint<ProjectSavingSystem>(Lifetime.Singleton).AsSelf();
-        
+
         // Loading Service
         builder.RegisterEntryPoint<LoadingService>(Lifetime.Singleton).AsSelf().WithParameter(loadingPrefab);
+
+        // Input System
+        builder.RegisterEntryPoint<PlayerInputSystem>(Lifetime.Singleton).AsSelf();
     }
 }
