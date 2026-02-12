@@ -3,25 +3,25 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using VContainer.Unity;
 
-public class TouchService : IInitializable, IDisposable
+public class DragService : IInitializable, IDisposable
 {
     private readonly PlayerInputSystem inputSystem;
     private GameInput Input => inputSystem.Input;
-    private Camera cam;
-    private IDraggable current;
+    private readonly PointerService pointer;
+    private IDraggable currentDrag;
     private float depth;
     private Vector3 offset;
 
-    public TouchService(PlayerInputSystem inputSystem)
+    public DragService(PlayerInputSystem inputSystem, PointerService pointer)
     {
+        Debug.Log("Drag constructor");
         this.inputSystem = inputSystem;
+        this.pointer = pointer;
     }
 
     public void Initialize()
     {
-        cam = Camera.main;
         inputSystem.ChangeInputState(InputStateType.Player);
-
         Input.Player.Press.performed += OnPress;
         Input.Player.Press.canceled += OnRelease;
         Input.Player.ScreenPos.performed += OnDrag;
@@ -37,37 +37,33 @@ public class TouchService : IInitializable, IDisposable
     private void OnPress(InputAction.CallbackContext context)
     {
         Vector2 screen = Input.Player.ScreenPos.ReadValue<Vector2>();
-        Ray ray = cam.ScreenPointToRay(screen);
 
-        if (!Physics.Raycast(ray, out var hit)) return;
+        if (!pointer.TryRaycast(screen, out var hit)) return;
         if (!hit.collider.TryGetComponent(out IDraggable draggable)) return;
 
-        current = draggable;
+        currentDrag = draggable;
 
-        depth = cam.WorldToScreenPoint(hit.transform.position).z;
-        offset = hit.transform.position - ScreenToWorld(screen);
+        depth = pointer.GetDepth(hit.transform.position);
+        offset = hit.transform.position - pointer.ScreenToWorld(screen, depth);
 
-        current.OnDragStart(hit.point);
+        currentDrag.OnDragStart(hit.point);
     }
 
     private void OnDrag(InputAction.CallbackContext context)
     {
-        if (current == null) return;
+        if (currentDrag == null) return;
 
         Vector2 screen = context.ReadValue<Vector2>();
-        current.OnDrag(ScreenToWorld(screen) + offset);
+        Vector3 world = pointer.ScreenToWorld(screen, depth) + offset;
+
+        currentDrag.OnDragPerformed(world);
     }
 
     private void OnRelease(InputAction.CallbackContext context)
     {
-        if (current == null) return;
+        if (currentDrag == null) return;
 
-        current.OnDragEnd();
-        current = null;
-    }
-
-    private Vector3 ScreenToWorld(Vector2 screen)
-    {
-        return cam.ScreenToWorldPoint(new Vector3(screen.x, screen.y, depth));
+        currentDrag.OnDragEnd();
+        currentDrag = null;
     }
 }
