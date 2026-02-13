@@ -25,15 +25,6 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Tap",
-                    "type": "Button",
-                    "id": "c2c09c30-262b-4803-affe-da7b8ec27583",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "Tap",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "SecondaryFingerPos",
                     "type": "Value",
                     "id": "b0c5cd94-2409-4f42-9714-fc49d1071c75",
@@ -49,6 +40,24 @@
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "Hold",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Tap",
+                    "type": "Button",
+                    "id": "99404de8-2ad0-475c-8b6c-2b12eb485264",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "Tap",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SecondaryFingerPress",
+                    "type": "Button",
+                    "id": "cfe54ebe-93c9-4b36-98e9-ef80a03b0e24",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "Press",
                     "initialStateCheck": false
                 }
             ],
@@ -132,12 +141,23 @@
                 },
                 {
                     "name": "",
-                    "id": "77ce9fe7-64c4-4c6a-8b5a-28f7f555cd65",
-                    "path": "<Touchscreen>/primaryTouch/tap",
+                    "id": "cd26b41e-5284-4a3b-8f59-d36e40eda146",
+                    "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Tap",
+                    "action": "Hold",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "60eb93ba-397d-43f1-b399-a404536e9c65",
+                    "path": "<Pointer>/press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Hold",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -149,6 +169,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "SecondaryFingerPos",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bdf1720f-e5ad-4e8a-b99f-9774e8b557ca",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Tap",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "eabbeacc-4e1d-4351-8293-d10f3a471c53",
+                    "path": "<Touchscreen>/touch1/press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SecondaryFingerPress",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

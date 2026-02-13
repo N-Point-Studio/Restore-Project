@@ -25,6 +25,7 @@ public class ArtefactDatabase : BaseDatabase<ArtefactData>
 
     private readonly Dictionary<string, ArtefactData> lookup = new Dictionary<string, ArtefactData>();
 
+#if UNITY_EDITOR
     public override void Setup()
     {
         Clear();
@@ -46,7 +47,7 @@ public class ArtefactDatabase : BaseDatabase<ArtefactData>
 
         Sort();
     }
-
+#endif
     public override ArtefactData[] GetAllItems()
     {
         ArtefactData[] arr = new ArtefactData[items.Count];

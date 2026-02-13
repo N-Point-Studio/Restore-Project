@@ -111,15 +111,6 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""Tap"",
-                    ""type"": ""Button"",
-                    ""id"": ""c2c09c30-262b-4803-affe-da7b8ec27583"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": ""Tap"",
-                    ""initialStateCheck"": false
-                },
-                {
                     ""name"": ""SecondaryFingerPos"",
                     ""type"": ""Value"",
                     ""id"": ""b0c5cd94-2409-4f42-9714-fc49d1071c75"",
@@ -135,6 +126,24 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": ""Hold"",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Tap"",
+                    ""type"": ""Button"",
+                    ""id"": ""99404de8-2ad0-475c-8b6c-2b12eb485264"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": ""Tap"",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SecondaryFingerPress"",
+                    ""type"": ""Button"",
+                    ""id"": ""cfe54ebe-93c9-4b36-98e9-ef80a03b0e24"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": ""Press"",
                     ""initialStateCheck"": false
                 }
             ],
@@ -218,12 +227,23 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""77ce9fe7-64c4-4c6a-8b5a-28f7f555cd65"",
-                    ""path"": ""<Touchscreen>/primaryTouch/tap"",
+                    ""id"": ""cd26b41e-5284-4a3b-8f59-d36e40eda146"",
+                    ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Tap"",
+                    ""action"": ""Hold"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""60eb93ba-397d-43f1-b399-a404536e9c65"",
+                    ""path"": ""<Pointer>/press"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Hold"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -235,6 +255,28 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""SecondaryFingerPos"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bdf1720f-e5ad-4e8a-b99f-9774e8b557ca"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Tap"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""eabbeacc-4e1d-4351-8293-d10f3a471c53"",
+                    ""path"": ""<Touchscreen>/touch1/press"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SecondaryFingerPress"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -275,9 +317,10 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Press = m_Player.FindAction("Press", throwIfNotFound: true);
         m_Player_ScreenPos = m_Player.FindAction("ScreenPos", throwIfNotFound: true);
-        m_Player_Tap = m_Player.FindAction("Tap", throwIfNotFound: true);
         m_Player_SecondaryFingerPos = m_Player.FindAction("SecondaryFingerPos", throwIfNotFound: true);
         m_Player_Hold = m_Player.FindAction("Hold", throwIfNotFound: true);
+        m_Player_Tap = m_Player.FindAction("Tap", throwIfNotFound: true);
+        m_Player_SecondaryFingerPress = m_Player.FindAction("SecondaryFingerPress", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Newaction = m_UI.FindAction("New action", throwIfNotFound: true);
@@ -364,9 +407,10 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
     private readonly InputAction m_Player_Press;
     private readonly InputAction m_Player_ScreenPos;
-    private readonly InputAction m_Player_Tap;
     private readonly InputAction m_Player_SecondaryFingerPos;
     private readonly InputAction m_Player_Hold;
+    private readonly InputAction m_Player_Tap;
+    private readonly InputAction m_Player_SecondaryFingerPress;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -387,10 +431,6 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @ScreenPos => m_Wrapper.m_Player_ScreenPos;
         /// <summary>
-        /// Provides access to the underlying input action "Player/Tap".
-        /// </summary>
-        public InputAction @Tap => m_Wrapper.m_Player_Tap;
-        /// <summary>
         /// Provides access to the underlying input action "Player/SecondaryFingerPos".
         /// </summary>
         public InputAction @SecondaryFingerPos => m_Wrapper.m_Player_SecondaryFingerPos;
@@ -398,6 +438,14 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Hold".
         /// </summary>
         public InputAction @Hold => m_Wrapper.m_Player_Hold;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Tap".
+        /// </summary>
+        public InputAction @Tap => m_Wrapper.m_Player_Tap;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/SecondaryFingerPress".
+        /// </summary>
+        public InputAction @SecondaryFingerPress => m_Wrapper.m_Player_SecondaryFingerPress;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -430,15 +478,18 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @ScreenPos.started += instance.OnScreenPos;
             @ScreenPos.performed += instance.OnScreenPos;
             @ScreenPos.canceled += instance.OnScreenPos;
-            @Tap.started += instance.OnTap;
-            @Tap.performed += instance.OnTap;
-            @Tap.canceled += instance.OnTap;
             @SecondaryFingerPos.started += instance.OnSecondaryFingerPos;
             @SecondaryFingerPos.performed += instance.OnSecondaryFingerPos;
             @SecondaryFingerPos.canceled += instance.OnSecondaryFingerPos;
             @Hold.started += instance.OnHold;
             @Hold.performed += instance.OnHold;
             @Hold.canceled += instance.OnHold;
+            @Tap.started += instance.OnTap;
+            @Tap.performed += instance.OnTap;
+            @Tap.canceled += instance.OnTap;
+            @SecondaryFingerPress.started += instance.OnSecondaryFingerPress;
+            @SecondaryFingerPress.performed += instance.OnSecondaryFingerPress;
+            @SecondaryFingerPress.canceled += instance.OnSecondaryFingerPress;
         }
 
         /// <summary>
@@ -456,15 +507,18 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @ScreenPos.started -= instance.OnScreenPos;
             @ScreenPos.performed -= instance.OnScreenPos;
             @ScreenPos.canceled -= instance.OnScreenPos;
-            @Tap.started -= instance.OnTap;
-            @Tap.performed -= instance.OnTap;
-            @Tap.canceled -= instance.OnTap;
             @SecondaryFingerPos.started -= instance.OnSecondaryFingerPos;
             @SecondaryFingerPos.performed -= instance.OnSecondaryFingerPos;
             @SecondaryFingerPos.canceled -= instance.OnSecondaryFingerPos;
             @Hold.started -= instance.OnHold;
             @Hold.performed -= instance.OnHold;
             @Hold.canceled -= instance.OnHold;
+            @Tap.started -= instance.OnTap;
+            @Tap.performed -= instance.OnTap;
+            @Tap.canceled -= instance.OnTap;
+            @SecondaryFingerPress.started -= instance.OnSecondaryFingerPress;
+            @SecondaryFingerPress.performed -= instance.OnSecondaryFingerPress;
+            @SecondaryFingerPress.canceled -= instance.OnSecondaryFingerPress;
         }
 
         /// <summary>
@@ -616,13 +670,6 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnScreenPos(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Tap" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnTap(InputAction.CallbackContext context);
-        /// <summary>
         /// Method invoked when associated input action "SecondaryFingerPos" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
@@ -636,6 +683,20 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnHold(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Tap" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnTap(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SecondaryFingerPress" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSecondaryFingerPress(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

@@ -12,7 +12,6 @@ public class ClickService : IInitializable, IDisposable
 
     public ClickService(PlayerInputSystem inputSystem, PointerService pointer)
     {
-        Debug.Log("Click constructor");
         this.inputSystem = inputSystem;
         this.pointer = pointer;
     }
@@ -31,7 +30,6 @@ public class ClickService : IInitializable, IDisposable
     }
     private void OnPress(InputAction.CallbackContext context)
     {
-        Debug.Log("Pres");
         Vector2 screen = Input.Player.ScreenPos.ReadValue<Vector2>();
 
         if (!pointer.TryRaycast(screen, out var hit)) return;
@@ -43,8 +41,6 @@ public class ClickService : IInitializable, IDisposable
 
     private void OnRelease(InputAction.CallbackContext context)
     {
-        Debug.Log("Tap end");
-
         if (currentClicked == null) return;
         currentClicked.OnClickedEnd();
         currentClicked = null;

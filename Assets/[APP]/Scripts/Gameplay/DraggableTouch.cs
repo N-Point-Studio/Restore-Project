@@ -1,19 +1,29 @@
-using UnityEngine;
+// using UnityEngine;
 
-public class DraggableTouch : MonoBehaviour, IDraggable
-{
-    public void OnDragStart(Vector3 worldPosition)
-    {
-        Debug.Log($"{name} Start Drag");
-    }
+// public class DraggableTouch : MonoBehaviour, IDraggable
+// {
+//     public void OnDragStart(Vector3 worldPosition)
+//     {
+//         Debug.Log($"{name} Start Drag");
+//     }
 
-    public void OnDragPerformed(Vector3 worldPosition)
-    {
-        transform.position = worldPosition;
-    }
+//     public void OnDragPerformed(Vector3 worldPosition)
+//     {
+//         transform.position = worldPosition;
+//     }
 
-    public void OnDragEnd()
-    {
-        Debug.Log($"{name} End Drag");
-    }
-}
+//     public void OnDragEnd()
+//     {
+//         Debug.Log($"{name} End Drag");
+//     }
+
+//     public void OnClickedPerformed()
+//     {
+//         throw new System.NotImplementedException();
+//     }
+
+//     public void OnClickedEnd()
+//     {
+//         throw new System.NotImplementedException();
+//     }
+// }

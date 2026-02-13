@@ -1,6 +1,8 @@
 using UnityEngine;
 
-public class IZoomable
+public interface IZoomable
 {
-    
+    void OnZoomStart();
+    void OnZoomPerformed(float zoomDelta);
+    void OnZoomEnd();
 }

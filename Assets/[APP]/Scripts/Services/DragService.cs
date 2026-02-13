@@ -14,7 +14,6 @@ public class DragService : IInitializable, IDisposable
 
     public DragService(PlayerInputSystem inputSystem, PointerService pointer)
     {
-        Debug.Log("Drag constructor");
         this.inputSystem = inputSystem;
         this.pointer = pointer;
     }
@@ -63,7 +62,8 @@ public class DragService : IInitializable, IDisposable
     {
         if (currentDrag == null) return;
 
-        currentDrag.OnDragEnd();
+        Vector2 screen = context.ReadValue<Vector2>();
+        currentDrag.OnDragEnd(screen);
         currentDrag = null;
     }
 }

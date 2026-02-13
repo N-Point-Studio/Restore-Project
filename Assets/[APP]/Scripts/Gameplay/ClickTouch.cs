@@ -1,14 +1,14 @@
 using UnityEngine;
 
-public class ClickTouch : MonoBehaviour, IClickable
+public class ClickTouch : MonoBehaviour, IHoldable
 {
-    public void OnClickedEnd()
+    public void OnHoldEnd()
     {
-        Debug.Log("Click ended");
+        Debug.Log("hold end");
     }
 
-    public void OnClickedPerformed()
+    public void OnHoldPerformed()
     {
-        Debug.Log("Click performed");
+        Debug.Log("hold");
     }
 }

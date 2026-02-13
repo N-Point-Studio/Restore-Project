@@ -253,4 +253,8 @@ public class TouchManager : MonoBehaviour, GameInput.IPlayerActions
         }
     }
 
+    public void OnSecondaryFingerPress(InputAction.CallbackContext context)
+    {
+        throw new NotImplementedException();
+    }
 }

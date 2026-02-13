@@ -11,5 +11,8 @@ public class GameplayLifetimeScope : LifetimeScope
 
         builder.RegisterEntryPoint<DragService>(Lifetime.Scoped);
         builder.RegisterEntryPoint<ClickService>(Lifetime.Scoped);
+        builder.RegisterEntryPoint<HoldService>(Lifetime.Scoped);
+        builder.RegisterEntryPoint<RotateService>(Lifetime.Scoped);
+        builder.RegisterEntryPoint<ZoomService>(Lifetime.Scoped);
     }
 }
