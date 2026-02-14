@@ -8,14 +8,19 @@ public class DragService : IInitializable, IDisposable
     private readonly PlayerInputSystem inputSystem;
     private GameInput Input => inputSystem.Input;
     private readonly PointerService pointer;
+    private readonly InspectionService inspectService;
     private IDraggable currentDrag;
+    private IInspectable inspectable;
+    private Transform inspectableTransform;
+
     private float depth;
     private Vector3 offset;
 
-    public DragService(PlayerInputSystem inputSystem, PointerService pointer)
+    public DragService(PlayerInputSystem inputSystem, PointerService pointer, InspectionService inspectService)
     {
         this.inputSystem = inputSystem;
         this.pointer = pointer;
+        this.inspectService = inspectService;
     }
 
     public void Initialize()
@@ -39,6 +44,11 @@ public class DragService : IInitializable, IDisposable
 
         if (!pointer.TryRaycast(screen, out var hit)) return;
         if (!hit.collider.TryGetComponent(out IDraggable draggable)) return;
+        if (hit.collider.TryGetComponent(out IInspectable inspectable))
+        {
+            this.inspectable = inspectable;
+            inspectableTransform = hit.transform;
+        }
 
         currentDrag = draggable;
 
@@ -61,9 +71,13 @@ public class DragService : IInitializable, IDisposable
     private void OnRelease(InputAction.CallbackContext context)
     {
         if (currentDrag == null) return;
+        if (inspectable != null && inspectableTransform != null) { inspectService.Inspect(inspectable, inspectableTransform); }
 
         Vector2 screen = context.ReadValue<Vector2>();
         currentDrag.OnDragEnd(screen);
         currentDrag = null;
+
+        inspectable = null;
+        inspectableTransform = null;
     }
 }

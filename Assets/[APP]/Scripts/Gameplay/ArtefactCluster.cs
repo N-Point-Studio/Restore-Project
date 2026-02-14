@@ -2,27 +2,20 @@ using System.Collections.Generic;
 
 public class ArtefactCluster
 {
-    public List<IAssemblable> Members = new();
+    private readonly List<IAssemblable> pieces = new();
+    public List<IAssemblable> Pieces => pieces;
 
     public void Add(IAssemblable piece)
     {
-        if (Members.Contains(piece)) return;
-
-        Members.Add(piece);
-        // piece.Cluster = this;
-    }
-
-    public void Merge(ArtefactCluster other)
-    {
-        foreach (var m in other.Members)
-            Add(m);
+        if (pieces.Contains(piece)) return;
+        pieces.Add(piece);
+        piece.SetCluster(this);
     }
 
     public void Remove(IAssemblable piece)
     {
-        Members.Remove(piece);
-
-        var newCluster = new ArtefactCluster();
-        newCluster.Add(piece);
+        if (!pieces.Contains(piece)) return;
+        pieces.Remove(piece);
+        piece.SetCluster(null);
     }
 }

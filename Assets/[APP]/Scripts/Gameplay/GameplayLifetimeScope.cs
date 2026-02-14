@@ -4,10 +4,14 @@ using VContainer.Unity;
 
 public class GameplayLifetimeScope : LifetimeScope
 {
+    [SerializeField] private Transform inspect;
     protected override void Configure(IContainerBuilder builder)
     {
         builder.RegisterInstance(Camera.main);
+        builder.RegisterInstance(inspect);
+
         builder.Register<PointerService>(Lifetime.Scoped);
+        builder.Register<InspectionService>(Lifetime.Scoped);
 
         builder.RegisterEntryPoint<DragService>(Lifetime.Scoped);
         builder.RegisterEntryPoint<ClickService>(Lifetime.Scoped);

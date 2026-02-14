@@ -8,12 +8,17 @@ public class ClickService : IInitializable, IDisposable
     private readonly PlayerInputSystem inputSystem;
     private GameInput Input => inputSystem.Input;
     private readonly PointerService pointer;
-    private IClickable currentClicked;
+    private readonly InspectionService inspectService;
 
-    public ClickService(PlayerInputSystem inputSystem, PointerService pointer)
+    private IClickable currentClicked;
+    private IInspectable inspectable;
+    private Transform inspectableTransform;
+    public ClickService(PlayerInputSystem inputSystem, PointerService pointer, InspectionService inspectService)
     {
+        Debug.Log("click here");
         this.inputSystem = inputSystem;
         this.pointer = pointer;
+        this.inspectService = inspectService;
     }
 
     public void Initialize()
@@ -34,6 +39,12 @@ public class ClickService : IInitializable, IDisposable
 
         if (!pointer.TryRaycast(screen, out var hit)) return;
         if (!hit.collider.TryGetComponent(out IClickable clickable)) return;
+        if (hit.collider.TryGetComponent(out IInspectable inspectable))
+        {
+            this.inspectable = inspectable;
+            inspectableTransform = hit.transform;
+        }
+
 
         currentClicked = clickable;
         currentClicked.OnClickedPerformed();
@@ -42,7 +53,13 @@ public class ClickService : IInitializable, IDisposable
     private void OnRelease(InputAction.CallbackContext context)
     {
         if (currentClicked == null) return;
+
+        if (inspectable != null && inspectableTransform != null) { inspectService.Inspect(inspectable, inspectableTransform); }
+
         currentClicked.OnClickedEnd();
         currentClicked = null;
+
+        inspectable = null;
+        inspectableTransform = null;
     }
 }
