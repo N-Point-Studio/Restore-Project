@@ -14,4 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArtefactDatabase
   searchFolders:
   - Assets/[APP]/ScriptableObjects/Artefacts
-  items: []
+  items:
+  - key: ChinaArtefactData
+    value: {fileID: 11400000, guid: 71648a397ef6f41cfa4e58f322929444, type: 2}
+  - key: IndonesiaArtefactData
+    value: {fileID: 11400000, guid: 3ce73229f23004f22a585312e8b5adc3, type: 2}
+  - key: EgyptArtefactData
+    value: {fileID: 11400000, guid: 61e6e6c4cbaf24e12865803455357188, type: 2}

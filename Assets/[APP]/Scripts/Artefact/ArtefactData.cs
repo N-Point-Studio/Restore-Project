@@ -10,8 +10,8 @@ public class ArtefactData : ScriptableObject
     [SerializeField] private bool unlockedByDefault;
     public bool UnlockedByDefault => unlockedByDefault;
 
-    [SerializeField] private ArtefactAge artefactAge;
-    public ArtefactAge ArtefactAge => artefactAge;
+    [SerializeField] private ArtefactOrigin artefactOrigin;
+    public ArtefactOrigin ArtefactOrigin => artefactOrigin;
 
     [SerializeField] private ToolType allowedToolTypes;
     public ToolType AllowedToolTypes => allowedToolTypes;
@@ -50,10 +50,9 @@ public struct CustomTransform
     public Vector3 Position => position;
 }
 
-public enum ArtefactAge
+public enum ArtefactOrigin
 {
-    Ancient,
-    Medieval,
-    Modern,
-    Futuristic
+    China,
+    Indonesia,
+    Egypt
 }

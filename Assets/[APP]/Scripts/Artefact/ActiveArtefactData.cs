@@ -1,19 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using SimpleJSON;
 using UnityEngine;
 using Modules.SavingSystems;
 
-/// <summary>
-/// Active runtime container for artefact progression and unlock states.
-/// Manages which artefact the player has unlocked.
-/// This is persistent data - NOT reset between runs.
-/// </summary>
 [Serializable]
 public class ActiveArtefactData : ISaveable
 {
     [SerializeField] private List<ArtefactProgressData> artefactProgress = new List<ArtefactProgressData>();
+
+    // Runtime caches for O(1) lookups
+    private HashSet<string> unlockedArtefactIds = new HashSet<string>();
+    private Dictionary<string, ArtefactData> artefactDataCache = new Dictionary<string, ArtefactData>();
 
     private readonly ArtefactDatabase artefactDatabase;
 
@@ -22,34 +20,53 @@ public class ActiveArtefactData : ISaveable
         this.artefactDatabase = artefactDatabase;
     }
 
-    /// <summary>
-    /// Gets the ArtefactDatabase reference (for other services that need it).
-    /// </summary>
     public ArtefactDatabase GetArtefactDatabase() => artefactDatabase;
 
-    /// <summary>
-    /// Initialize with default unlocked content on new game.
-    /// </summary>
     public void Initialize()
     {
-        artefactProgress.Clear();
+        BuildDataCache();
+        RefreshUnlockCache();
 
-        // Unlock default artefacts (their equipment is automatically available)
-        var defaultArtefacts = artefactDatabase.GetDefaultUnlockedArtefacts();
-        foreach (var artefact in defaultArtefacts)
+        var allArtefacts = artefactDatabase.GetAllArtefactDatas();
+        for (int i = 0; i < allArtefacts.Count; i++)
         {
-            UnlockArtefact(artefact.BaseData.Id);
+            if (allArtefacts[i].UnlockedByDefault)
+            {
+                UnlockArtefact(allArtefacts[i].BaseData.Id);
+            }
         }
     }
 
-    #region Artefact Methods
+    private void BuildDataCache()
+    {
+        artefactDataCache.Clear();
+        var allData = artefactDatabase.GetAllArtefactDatas();
+        
+        for (int i = 0; i < allData.Count; i++)
+        {
+            var item = allData[i];
+            if (item != null && !artefactDataCache.ContainsKey(item.BaseData.Id))
+            {
+                artefactDataCache.Add(item.BaseData.Id, item);
+            }
+        }
+    }
 
-    /// <summary>
-    /// Unlocks an artefact for selection.
-    /// </summary>
+    private void RefreshUnlockCache()
+    {
+        unlockedArtefactIds.Clear();
+        for (int i = 0; i < artefactProgress.Count; i++)
+        {
+            if (artefactProgress[i].isUnlocked)
+            {
+                unlockedArtefactIds.Add(artefactProgress[i].artefactId);
+            }
+        }
+    }
+
     public void UnlockArtefact(string artefactId)
     {
-        if (artefactProgress.Any(p => p.artefactId == artefactId))
+        if (unlockedArtefactIds.Contains(artefactId))
             return;
 
         artefactProgress.Add(new ArtefactProgressData
@@ -57,55 +74,45 @@ public class ActiveArtefactData : ISaveable
             artefactId = artefactId,
             isUnlocked = true,
         });
+
+        unlockedArtefactIds.Add(artefactId);
     }
 
-    /// <summary>
-    /// Check if an artefact is unlocked.
-    /// </summary>
     public bool IsArtefactUnlocked(string artefactId)
     {
-        return artefactProgress.Any(p => p.artefactId == artefactId && p.isUnlocked);
+        return unlockedArtefactIds.Contains(artefactId);
     }
 
-    /// <summary>
-    /// Gets all unlocked artefacts with their runtime data.
-    /// </summary>
     public List<ArtefactRuntimeData> GetUnlockedArtefacts()
     {
         var result = new List<ArtefactRuntimeData>();
-        foreach (ArtefactProgressData progress in artefactProgress.Where(p => p.isUnlocked))
+        
+        foreach (string id in unlockedArtefactIds)
         {
-            var artefactData = artefactDatabase.GetArtefact(progress.artefactId);
-            if (artefactData != null)
+            if (artefactDataCache.TryGetValue(id, out ArtefactData data))
             {
                 result.Add(new ArtefactRuntimeData
                 {
-                    ArtefactData = artefactData,
+                    ArtefactData = data,
                 });
             }
         }
         return result;
     }
 
-    #endregion
-
-    #region ISaveable Implementation
-
     public JSONNode AsJSON()
     {
         JSONObject json = new JSONObject();
-
-        // Artefact progress
         JSONArray artefactsArray = new JSONArray();
-        foreach (var progress in artefactProgress)
+        
+        for (int i = 0; i < artefactProgress.Count; i++)
         {
             JSONObject artefactJson = new JSONObject();
-            artefactJson[nameof(ArtefactProgressData.artefactId)] = progress.artefactId;
-            artefactJson[nameof(ArtefactProgressData.isUnlocked)].AsBool = progress.isUnlocked;
+            artefactJson[nameof(ArtefactProgressData.artefactId)] = artefactProgress[i].artefactId;
+            artefactJson[nameof(ArtefactProgressData.isUnlocked)].AsBool = artefactProgress[i].isUnlocked;
             artefactsArray.Add(artefactJson);
         }
         json["artefacts"] = artefactsArray;
-
         return json;
     }
 
@@ -113,7 +120,6 @@ public class ActiveArtefactData : ISaveable
     {
         artefactProgress.Clear();
 
-        // Load artefact progress
         if (json.HasKey("artefacts"))
         {
             JSONArray artefactsArray = json["artefacts"].AsArray;
@@ -127,14 +133,11 @@ public class ActiveArtefactData : ISaveable
                 });
             }
         }
-    }
 
-    #endregion
+        RefreshUnlockCache();
+    }
 }
 
-/// <summary>
-/// Serializable data for individual artefact progression.
-/// </summary>
 [Serializable]
 public class ArtefactProgressData
 {
@@ -142,9 +145,6 @@ public class ArtefactProgressData
     public bool isUnlocked;
 }
 
-/// <summary>
-/// Runtime data combining artefact static data with progression.
-/// </summary>
 public class ArtefactRuntimeData
 {
     public ArtefactData ArtefactData { get; set; }

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d32aa78852a374cf0bfba83731496cd0, type: 3}
+  m_Name: IndonesiaArtefactData
+  m_EditorClassIdentifier: Assembly-CSharp::ArtefactGroupData
+  baseData:
+    id: IndonesiaArtefactData
+    itemName: Indonesia 10D
+    itemDescription: 'No. Reg. : Indonesia 10D
+
+      Conservator: Arkana, Nova'
+    itemIcon: {fileID: 0}
+    exclude: 0
+  pagePrefab: {fileID: 1558920948617044036, guid: 47dea63da8b4541ffba986e6de2e1f12, type: 3}
+  artefactOrigin: 1
+  artefactDatas:
+  - {fileID: 11400000, guid: 0e8f89b3d78714e47b3ec27879c20e78, type: 2}
+  - {fileID: 11400000, guid: e1fd02f44ca454e028dbb6f9a0ed00fe, type: 2}
+  searchFolders:
+  - Assets/[APP]/ScriptableObjects/Artefacts/Data

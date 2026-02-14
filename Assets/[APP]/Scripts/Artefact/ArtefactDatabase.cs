@@ -8,12 +8,12 @@ using UnityEditor;
 #endif
 
 [CreateAssetMenu(fileName = nameof(ArtefactDatabase), menuName = "App/Database/Artefact Database")]
-public class ArtefactDatabase : BaseDatabase<ArtefactData>
+public class ArtefactDatabase : BaseDatabase<ArtefactGroupData>
 {
     [System.Serializable]
-    public class ArtefactSpellPair : DatabaseItemPair<ArtefactData>
+    public class ArtefactGroupPair : DatabaseItemPair<ArtefactGroupData>
     {
-        public ArtefactSpellPair(string key, ArtefactData value)
+        public ArtefactGroupPair(string key, ArtefactGroupData value)
         {
             this.key = key;
             this.value = value;
@@ -21,9 +21,9 @@ public class ArtefactDatabase : BaseDatabase<ArtefactData>
     }
 
     [Header("Artefacts")]
-    [SerializeField] private List<ArtefactSpellPair> items = new List<ArtefactSpellPair>();
+    [SerializeField] private List<ArtefactGroupPair> items = new List<ArtefactGroupPair>();
 
-    private readonly Dictionary<string, ArtefactData> lookup = new Dictionary<string, ArtefactData>();
+    private readonly Dictionary<string, ArtefactGroupData> lookup = new Dictionary<string, ArtefactGroupData>();
 
 #if UNITY_EDITOR
     public override void Setup()
@@ -34,12 +34,9 @@ public class ArtefactDatabase : BaseDatabase<ArtefactData>
         foreach (string guid in guids)
         {
             string path = AssetDatabase.GUIDToAssetPath(guid);
-            ArtefactData item = AssetDatabase.LoadAssetAtPath<ArtefactData>(path);
+            ArtefactGroupData item = AssetDatabase.LoadAssetAtPath<ArtefactGroupData>(path);
 
-            if (item == null)
-                continue;
-
-            if (item.BaseData.Exclude)
+            if (item == null || item.BaseData.Exclude)
                 continue;
 
             Add(item);
@@ -48,9 +45,10 @@ public class ArtefactDatabase : BaseDatabase<ArtefactData>
         Sort();
     }
 #endif
-    public override ArtefactData[] GetAllItems()
+
+    public override ArtefactGroupData[] GetAllItems()
     {
-        ArtefactData[] arr = new ArtefactData[items.Count];
+        ArtefactGroupData[] arr = new ArtefactGroupData[items.Count];
         for (int i = 0; i < items.Count; i++)
         {
             arr[i] = items[i]?.Value;
@@ -58,14 +56,14 @@ public class ArtefactDatabase : BaseDatabase<ArtefactData>
         return arr;
     }
 
-    public override ArtefactData GetItem(int index)
+    public override ArtefactGroupData GetItem(int index)
     {
         if (index < 0 || index >= items.Count)
             return null;
         return items[index]?.Value;
     }
 
-    public override ArtefactData GetItem(string id)
+    public override ArtefactGroupData GetItem(string id)
     {
         if (string.IsNullOrEmpty(id))
             return null;
@@ -77,7 +75,7 @@ public class ArtefactDatabase : BaseDatabase<ArtefactData>
         return null;
     }
 
-    public override ArtefactData GetRandom()
+    public override ArtefactGroupData GetRandom()
     {
         if (items == null || items.Count == 0)
             return null;
@@ -85,40 +83,44 @@ public class ArtefactDatabase : BaseDatabase<ArtefactData>
         return items[idx]?.Value;
     }
 
-    /// <summary>
-    /// Get an artefact by its ID.
-    /// </summary>
-    public ArtefactData GetArtefact(string artefactId)
+    public ArtefactGroupData GetArtefactGroup(string groupId)
     {
-        return GetItem(artefactId);
+        return GetItem(groupId);
     }
 
-    /// <summary>
-    /// Get all artefacts of a specific element type.
-    /// </summary>
-    public List<ArtefactData> GetArtefactsByAge(ArtefactAge artefactAge)
+    public ArtefactData GetArtefactData(string artefactId)
     {
-        return GetAllItems().Where(a => a.ArtefactAge == artefactAge).ToList();
+        foreach (var group in GetAllItems())
+        {
+            if (group == null) continue;
+
+            var item = group.ArtefactDatas.FirstOrDefault(x => x.BaseData.Id == artefactId);
+            if (item != null)
+                return item;
+        }
+        return null;
     }
 
-    /// <summary>
-    /// Get all artefacts that are unlocked by default (starters).
-    /// </summary>
-    public List<ArtefactData> GetDefaultUnlockedArtefacts()
+    public List<ArtefactData> GetAllArtefactDatas()
     {
-        return GetAllItems().Where(a => a.UnlockedByDefault).ToList();
+        var allDatas = new List<ArtefactData>();
+        foreach (var group in GetAllItems())
+        {
+            if (group != null && group.ArtefactDatas != null)
+            {
+                allDatas.AddRange(group.ArtefactDatas);
+            }
+        }
+        return allDatas;
     }
 
-    /// <summary>
-    /// Get all artefacts.
-    /// </summary>
-    public List<ArtefactData> GetAllArtefacts()
+    public List<ArtefactGroupData> GetArtefactGroupsByAge(ArtefactOrigin artefactAge)
     {
-        return GetAllItems().ToList();
+        return GetAllItems().Where(a => a.ArtefactOrigin == artefactAge).ToList();
     }
 
 #if UNITY_EDITOR
-    protected override void Add(ArtefactData value)
+    protected override void Add(ArtefactGroupData value)
     {
         if (value == null)
             return;
@@ -133,7 +135,7 @@ public class ArtefactDatabase : BaseDatabase<ArtefactData>
                 return;
         }
 
-        items.Add(new ArtefactSpellPair(key, value));
+        items.Add(new ArtefactGroupPair(key, value));
         if (!lookup.ContainsKey(key))
             lookup.Add(key, value);
     }
@@ -158,7 +160,7 @@ public class ArtefactDatabase : BaseDatabase<ArtefactData>
     }
 #endif
 
-    private static string GetKey(ArtefactData data)
+    private static string GetKey(ArtefactGroupData data)
     {
         return data != null ? data.BaseData.Id : null;
     }
@@ -206,7 +208,7 @@ public class ArtefactDatabaseEditor : Editor
         serializedObject.Update();
 
         EditorGUILayout.Space();
-        if (GUILayout.Button("Setup"))
+        if (GUILayout.Button("Setup Database"))
         {
             script.Setup();
             EditorUtility.SetDirty(script);
