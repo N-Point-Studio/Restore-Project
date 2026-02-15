@@ -21,9 +21,9 @@ public class ProjectLifetimeScope : LifetimeScope
 
         // Haptic manager
 #if UNITY_IOS
-            HapticManager hapticInstance = Instantiate(hapticManager, transform);
-            builder.RegisterComponentInHierarchy<HapticManager>().AsSelf();
-            hapticInstance.SetActiveHaptic(true);
+        HapticManager hapticInstance = Instantiate(hapticManager, transform);
+        builder.RegisterComponentInHierarchy<HapticManager>().AsSelf();
+        hapticInstance.SetActiveHaptic(true);
 #endif
 
         // Active Container (runtime state - all Singleton)

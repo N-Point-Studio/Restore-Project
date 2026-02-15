@@ -1,11 +1,13 @@
 using UnityEngine;
 using VContainer;
 
-public class ArtefactPieceStateMachine : StateMachine, IDraggable, IInspectable
+public class ArtefactPieceStateMachine : StateMachine, IInteractable, IInspectable
 {
-    public ArtefactCluster Cluster { get; private set; }
+    public float minScale = 3;
+    public float maxScale = 10;
     public Vector3 InitialPosition { get; set; }
     public Quaternion InitialRotation { get; set; }
+    public Transform Transform => transform;
 
     private void Start()
     {
@@ -14,12 +16,16 @@ public class ArtefactPieceStateMachine : StateMachine, IDraggable, IInspectable
         SwitchState(new ArtefactPieceIdleState(this));
     }
 
-    public Transform Transform => transform;
-    public void OnAssembled() => (currentState as IAssemblable)?.OnAssembled();
-    public void OnDragStart(Vector3 worldPosition) => (currentState as IDraggable)?.OnDragStart(worldPosition);
-    public void OnDisassembled() => (currentState as IAssemblable)?.OnDisassembled();
-    public void OnDragPerformed(Vector3 worldPosition) => (currentState as IDraggable)?.OnDragPerformed(worldPosition);
-    public void OnDragEnd(Vector3 worldPosition) => (currentState as IDraggable)?.OnDragEnd(worldPosition);
+    public void OnStart(Vector3 worldPos, Vector2 screenPos) => (currentState as IInteractable)?.OnStart(worldPos, screenPos);
+    public void OnMove(Vector3 worldPos, Vector2 screenPos) => (currentState as IInteractable)?.OnMove(worldPos, screenPos);
+    public void OnEnd(Vector3 worldPos, Vector2 screenPos) => (currentState as IInteractable)?.OnEnd(worldPos, screenPos);
+    public void OnHold() => (currentState as IInteractable)?.OnHold();
+    public void OnZoom(float delta) => (currentState as IInteractable)?.OnZoom(delta);
     public void EnterInspect() => (currentState as IInspectable)?.EnterInspect();
     public void ExitInspect() => (currentState as IInspectable)?.ExitInspect();
+    public void ResetTransform()
+    {
+        transform.position = InitialPosition;
+        transform.rotation = InitialRotation;
+    }
 }

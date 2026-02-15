@@ -1,19 +1,40 @@
+using System;
 using UnityEngine;
+using VContainer;
 using VContainer.Unity;
 
-public class InspectionService
+
+public class InspectionService : IInitializable, IDisposable
 {
-    private readonly Transform inspectRoot;
-
     private IInspectable currentInspectable;
+    public IInspectable CurrentInspected => currentInspectable;
     private Transform currentTransform;
-    private Vector3 originalPosition;
-    private Quaternion originalRotation;
+    private readonly Transform inspectRoot;
+    private readonly IInteractionEvent eventBus;
 
-    public InspectionService(Transform inspectRoot)
+    public InspectionService(IInteractionEvent eventBus, Transform inspectRoot)
     {
-        Debug.Log("Inspect here");
+        Debug.Log("Inspect");
+        this.eventBus = eventBus;
         this.inspectRoot = inspectRoot;
+    }
+    public void Initialize()
+    {
+        eventBus.OnObjectDropped += HandleObjectDropped;
+    }
+    public void Dispose()
+    {
+        eventBus.OnObjectDropped -= HandleObjectDropped;
+    }
+    private void HandleObjectDropped(IInteractable target, Vector3 worldPos, bool isClick)
+    {
+        if (target is IInspectable inspectable)
+        {
+            if (isClick || IsNearInspectZone(inspectable.Transform))
+            {
+                Inspect(inspectable, inspectable.Transform);
+            }
+        }
     }
 
     public void Inspect(IInspectable inspectable, Transform targetTransform)
@@ -23,9 +44,6 @@ public class InspectionService
 
         currentInspectable = inspectable;
         currentTransform = targetTransform;
-
-        originalPosition = targetTransform.position;
-        originalRotation = targetTransform.rotation;
 
         targetTransform.SetParent(inspectRoot);
         targetTransform.localPosition = Vector3.zero;
@@ -39,12 +57,15 @@ public class InspectionService
         if (currentInspectable == null) return;
 
         currentTransform.SetParent(null);
-        currentTransform.position = originalPosition;
-        currentTransform.rotation = originalRotation;
-
         currentInspectable.ExitInspect();
 
         currentInspectable = null;
         currentTransform = null;
+    }
+
+    public bool IsNearInspectZone(Transform target)
+    {
+        float distance = Vector3.Distance(target.position, inspectRoot.position);
+        return distance < 1.5f;
     }
 }

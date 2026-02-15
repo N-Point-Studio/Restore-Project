@@ -9,14 +9,10 @@ public class GameplayLifetimeScope : LifetimeScope
     {
         builder.RegisterInstance(Camera.main);
         builder.RegisterInstance(inspect);
+        builder.Register<InteractionEventBus>(Lifetime.Scoped).AsImplementedInterfaces();
 
-        builder.Register<PointerService>(Lifetime.Scoped);
-        builder.Register<InspectionService>(Lifetime.Scoped);
-
-        builder.RegisterEntryPoint<DragService>(Lifetime.Scoped);
-        builder.RegisterEntryPoint<ClickService>(Lifetime.Scoped);
-        builder.RegisterEntryPoint<HoldService>(Lifetime.Scoped);
-        builder.RegisterEntryPoint<RotateService>(Lifetime.Scoped);
-        builder.RegisterEntryPoint<ZoomService>(Lifetime.Scoped);
+        builder.Register<PointerService>(Lifetime.Scoped).AsSelf();
+        builder.RegisterEntryPoint<InspectionService>(Lifetime.Scoped).AsSelf();
+        builder.RegisterEntryPoint<InteractionManager>(Lifetime.Scoped);
     }
 }
