@@ -9,8 +9,8 @@ public class ActiveArtefactData : ISaveable
 {
     [SerializeField] private List<ArtefactProgressData> artefactProgress = new List<ArtefactProgressData>();
 
-    // Runtime caches for O(1) lookups
     private HashSet<string> unlockedArtefactIds = new HashSet<string>();
+    private HashSet<string> completedArtefactIds = new HashSet<string>();
     private Dictionary<string, ArtefactData> artefactDataCache = new Dictionary<string, ArtefactData>();
 
     private readonly ArtefactDatabase artefactDatabase;
@@ -25,7 +25,7 @@ public class ActiveArtefactData : ISaveable
     public void Initialize()
     {
         BuildDataCache();
-        RefreshUnlockCache();
+        RefreshStateCache();
 
         var allArtefacts = artefactDatabase.GetAllArtefactDatas();
         for (int i = 0; i < allArtefacts.Count; i++)
@@ -52,14 +52,21 @@ public class ActiveArtefactData : ISaveable
         }
     }
 
-    private void RefreshUnlockCache()
+    private void RefreshStateCache()
     {
         unlockedArtefactIds.Clear();
+        completedArtefactIds.Clear();
+
         for (int i = 0; i < artefactProgress.Count; i++)
         {
             if (artefactProgress[i].isUnlocked)
             {
                 unlockedArtefactIds.Add(artefactProgress[i].artefactId);
+            }
+
+            if (artefactProgress[i].isCompleted)
+            {
+                completedArtefactIds.Add(artefactProgress[i].artefactId);
             }
         }
     }
@@ -73,14 +80,50 @@ public class ActiveArtefactData : ISaveable
         {
             artefactId = artefactId,
             isUnlocked = true,
+            isCompleted = false
         });
 
         unlockedArtefactIds.Add(artefactId);
     }
 
+    public void CompleteArtefact(string artefactId)
+    {
+        if (completedArtefactIds.Contains(artefactId))
+            return;
+
+        completedArtefactIds.Add(artefactId);
+        
+        var data = artefactProgress.Find(x => x.artefactId == artefactId);
+        
+        if (data != null)
+        {
+            data.isCompleted = true;
+            if (!data.isUnlocked)
+            {
+                data.isUnlocked = true;
+                unlockedArtefactIds.Add(artefactId);
+            }
+        }
+        else
+        {
+            artefactProgress.Add(new ArtefactProgressData
+            {
+                artefactId = artefactId,
+                isUnlocked = true,
+                isCompleted = true
+            });
+            unlockedArtefactIds.Add(artefactId);
+        }
+    }
+
     public bool IsArtefactUnlocked(string artefactId)
     {
         return unlockedArtefactIds.Contains(artefactId);
+    }
+
+    public bool IsArtefactCompleted(string artefactId)
+    {
+        return completedArtefactIds.Contains(artefactId);
     }
 
     public List<ArtefactRuntimeData> GetUnlockedArtefacts()
@@ -110,6 +153,7 @@ public class ActiveArtefactData : ISaveable
             JSONObject artefactJson = new JSONObject();
             artefactJson[nameof(ArtefactProgressData.artefactId)] = artefactProgress[i].artefactId;
             artefactJson[nameof(ArtefactProgressData.isUnlocked)].AsBool = artefactProgress[i].isUnlocked;
+            artefactJson[nameof(ArtefactProgressData.isCompleted)].AsBool = artefactProgress[i].isCompleted;
             artefactsArray.Add(artefactJson);
         }
         json["artefacts"] = artefactsArray;
@@ -130,11 +174,12 @@ public class ActiveArtefactData : ISaveable
                 {
                     artefactId = artefactJson[nameof(ArtefactProgressData.artefactId)],
                     isUnlocked = artefactJson[nameof(ArtefactProgressData.isUnlocked)].AsBool,
+                    isCompleted = artefactJson[nameof(ArtefactProgressData.isCompleted)].AsBool
                 });
             }
         }
 
-        RefreshUnlockCache();
+        RefreshStateCache();
     }
 }
 
@@ -143,6 +188,7 @@ public class ArtefactProgressData
 {
     public string artefactId;
     public bool isUnlocked;
+    public bool isCompleted;
 }
 
 public class ArtefactRuntimeData

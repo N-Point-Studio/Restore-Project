@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4ecdad67285e4111b58296d98da9caa, type: 3}
+  m_Name: EG-332BC-01
+  m_EditorClassIdentifier: 
+  baseData:
+    id: EG-332BC-01
+    itemName: Winged Scarab Amulet
+    itemDescription: 'This winged scarab consists of three pieces: an actual scarab
+      beetle and two separately made wings. The wings are not those of a beetle,
+      but those of a bird, as is apparent by their shape and the indication of individual
+      feathers. Each piece features several small holes that were used to fasten
+      the winged scarab to the wrappings of a mummy. Winged scarabs, meant to guarantee
+      the rebirth of the deceased, were very popular funerary amulets.'
+    itemIcon: {fileID: 21300006, guid: 595bd02e04d6e8144adc1c0a1a1a0227, type: 3}
+    exclude: 0
+  completedIcon: {fileID: 0}
+  unlockedByDefault: 1
+  artefactOrigin: 2
+  allowedToolTypes: -1
+  artefactFragmentDatas: []
+  finishTransform:
+    rotation: {x: 0, y: 0, z: 0}
+    position: {x: 0, y: 0, z: 0}

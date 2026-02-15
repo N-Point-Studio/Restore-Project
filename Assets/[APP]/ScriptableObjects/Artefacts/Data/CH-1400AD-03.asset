@@ -10,16 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a4ecdad67285e4111b58296d98da9caa, type: 3}
-  m_Name: Horse
+  m_Name: CH-1400AD-03
   m_EditorClassIdentifier: 
   baseData:
-    id: Horse
-    itemName: Horse
-    itemDescription: 
-    itemIcon: {fileID: 0}
+    id: CH-1400AD-03
+    itemName: Paperweight in the shape of a horse
+    itemDescription: "Cast in silver, this elegant standing horse may have served
+      as a paperweight on a scholar\u2019s desk. The figure reflects both the refined
+      metalwork and cultivated aesthetics valued by intellectuals of the period."
+    itemIcon: {fileID: 21300002, guid: 595bd02e04d6e8144adc1c0a1a1a0227, type: 3}
     exclude: 0
+  completedIcon: {fileID: 0}
   unlockedByDefault: 0
-  artefactOrigin: 1
+  artefactOrigin: 0
   allowedToolTypes: -1
   artefactFragmentDatas: []
   finishTransform:

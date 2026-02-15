@@ -62,7 +62,8 @@ public class ArtefactGroupItemUI : MonoBehaviour
                 if (itemInstance != null)
                 {
                     bool isUnlocked = activeArtefactData.IsArtefactUnlocked(data.BaseData.Id);
-                    itemInstance.Initialize(data, !isUnlocked);
+                    bool isCompleted = activeArtefactData.IsArtefactCompleted(data.BaseData.Id);
+                    itemInstance.Initialize(data, !isUnlocked, isCompleted);
                     
                     // Ensure object is active (in case it was pooled/disabled)
                     itemInstance.gameObject.SetActive(true);
@@ -71,7 +72,10 @@ public class ArtefactGroupItemUI : MonoBehaviour
             // Case 2: No data for this slot (Clean up leftover objects from previous page)
             else
             {
-                foreach (Transform child in container) Destroy(child.gameObject);
+                for (int j = 0; j < container.childCount; j++)
+                {
+                    Destroy(container.GetChild(j).gameObject);
+                }
             }
         }
     }

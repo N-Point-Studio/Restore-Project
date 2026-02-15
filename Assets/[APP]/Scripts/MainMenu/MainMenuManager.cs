@@ -1,25 +1,49 @@
 using DanielLochner.Assets.SimpleScrollSnap;
 using UnityEngine;
-using UnityEngine.UI;
 using VContainer;
 
 public class MainMenuManager : MonoBehaviour
 {
-    [SerializeField] private Toggle dotIndicatorPrefab;
-    [SerializeField] private ToggleGroup dotIndicatorToggleGroup;
     [SerializeField] private SimpleScrollSnap scrollSnap;
+    [SerializeField] private PaginationUI paginationUI; 
+    [SerializeField] private ArtefactDetailController artefactDetailController;
+    [SerializeField] private ScrollTargetZoomController scrollZoomController;
 
     private ActiveArtefactData activeArtefactData;
+    private ProjectSavingSystem savingSystem;
+    
+    private int currentPanelIndex = 0;
 
     [Inject]
-    public void Construct(ActiveArtefactData activeArtefactData)
+    public void Construct(ActiveArtefactData activeArtefactData, ProjectSavingSystem savingSystem)
     {
         this.activeArtefactData = activeArtefactData;
+        this.savingSystem = savingSystem;
+        // TODO: nanti ini panggil nya pas user baru atau pas user manual reset (sementara di sini dulu buat test)
+        savingSystem.ClearPreviousData();
+    }
+
+    private void Awake()
+    {
+        MainMenuEvents.OnRequestArtefactPlay += OnRequestArtefactPlay;
+        MainMenuEvents.OnRequestArtefactDetail += OnRequestArtefactDetail;
+        MainMenuEvents.OnCloseArtefactDetail += OnCloseArtefactDetail;
     }
 
     private void Start()
     {
+        scrollSnap.OnPanelCentered.AddListener(OnPanelCentered);
+
         SpawnArtefactGroups();
+    }
+
+    private void OnDestroy()
+    {
+        if (scrollSnap) scrollSnap.OnPanelCentered.RemoveListener(OnPanelCentered);
+
+        MainMenuEvents.OnRequestArtefactPlay -= OnRequestArtefactPlay;
+        MainMenuEvents.OnRequestArtefactDetail -= OnRequestArtefactDetail;
+        MainMenuEvents.OnCloseArtefactDetail -= OnCloseArtefactDetail;
     }
 
     private void SpawnArtefactGroups()
@@ -29,11 +53,12 @@ public class MainMenuManager : MonoBehaviour
 
         ArtefactGroupData[] allGroups = database.GetAllItems();
 
+        if (paginationUI) paginationUI.ClearAll(); 
+
         for (int i = 0; i < allGroups.Length; i++)
         {
             ArtefactGroupData group = allGroups[i];
 
-            // Validate to ensure the group and its prefab exist
             if (group == null || group.PagePrefab == null)
             {
                 Debug.LogWarning($"Group index {i} is null or missing PagePrefab!");
@@ -42,38 +67,28 @@ public class MainMenuManager : MonoBehaviour
 
             AddArtifactGroupItem(group, i);
         }
+
+        OnPanelCentered(0, 0);
     }
 
     private void AddArtifactGroupItem(ArtefactGroupData groupData, int index)
     {
-        // 1. Setup Pagination (Dot Indicator)
-        if (dotIndicatorPrefab != null && scrollSnap.Pagination != null)
+        if (paginationUI != null)
         {
-            Toggle toggle = Instantiate(dotIndicatorPrefab, scrollSnap.Pagination.transform);
-            toggle.group = dotIndicatorToggleGroup;
-            toggle.transform.localScale = Vector3.one; 
+            paginationUI.AddIndicator();
         }
 
-        // 2. Add to ScrollSnap
-        // We pass the .gameObject because the data holds the Component reference
         scrollSnap.Add(groupData.PagePrefab.gameObject, index);
 
-        // 3. Retrieve Instance & Inject Data
-        // Access the newly created panel from SimpleScrollSnap's panel array
         if (index < scrollSnap.Panels.Length)
         {
             RectTransform panelInstance = scrollSnap.Panels[index];
             if (panelInstance != null)
             {
-                var groupUI = panelInstance.GetComponent<ArtefactGroupItemUI>();
+                ArtefactGroupItemUI groupUI = panelInstance.GetComponent<ArtefactGroupItemUI>();
                 if (groupUI != null)
                 {
-                    // Pass the data and the active state handler
                     groupUI.Initialize(groupData, activeArtefactData);
-                }
-                else
-                {
-                    Debug.LogError($"Prefab in Group '{groupData.name}' is missing ArtefactGroupItemUI component!");
                 }
             }
         }
@@ -83,14 +98,75 @@ public class MainMenuManager : MonoBehaviour
     {
         if (scrollSnap.NumberOfPanels > 0)
         {
-            // Remove Pagination Dot safely
-            if (scrollSnap.Pagination != null && scrollSnap.Pagination.transform.childCount > index)
+            if (paginationUI != null)
             {
-                Destroy(scrollSnap.Pagination.transform.GetChild(index).gameObject);
+                paginationUI.RemoveIndicator(index);
             }
 
-            // Remove Panel
             scrollSnap.Remove(index);
+            
+            int safeIndex = Mathf.Clamp(currentPanelIndex, 0, scrollSnap.NumberOfPanels - 1);
+            OnPanelCentered(safeIndex, safeIndex);
         }
+    }
+
+    private void UpdateNavigationButtons()
+    {
+        if (scrollSnap.NumberOfPanels == 0)
+        {
+            if (scrollSnap.PreviousButton) scrollSnap.PreviousButton.gameObject.SetActive(false);
+            if (scrollSnap.NextButton) scrollSnap.NextButton.gameObject.SetActive(false);
+            return;
+        }
+        
+        if (scrollSnap.PreviousButton != null)
+        {
+            bool shouldShow = currentPanelIndex > 0;
+            if (scrollSnap.PreviousButton.gameObject.activeSelf != shouldShow)
+                scrollSnap.PreviousButton.gameObject.SetActive(shouldShow);
+        }
+
+        if (scrollSnap.NextButton != null)
+        {
+            bool shouldShow = currentPanelIndex < scrollSnap.NumberOfPanels - 1;
+            if (scrollSnap.NextButton.gameObject.activeSelf != shouldShow)
+                scrollSnap.NextButton.gameObject.SetActive(shouldShow);
+        }
+    }
+
+    private void OnPanelCentered(int newIndex, int oldIndex)
+    {
+        currentPanelIndex = newIndex;
+
+        UpdateNavigationButtons();
+    }
+
+    private void OnRequestArtefactPlay(ArtefactData data)
+    {
+        // TODO: show Loading Service later and pass the data to playerprogressiondata to initizlie the ebject and start playing on gameplay scene
+    }
+
+    private void OnRequestArtefactDetail(ArtefactItemUI itemUI)
+    {        
+        bool isCompleted = activeArtefactData.IsArtefactCompleted(itemUI.ArtefactData.BaseData.Id);
+        Sprite bgSprite = activeArtefactData.GetArtefactDatabase().GetArtefactGroup(itemUI.ArtefactData.ArtefactGroupId).BaseData.ItemIcon;
+        RectTransform sourceRect = itemUI.TargetIconRect;
+
+        artefactDetailController.OpenDetail(itemUI.ArtefactData, bgSprite, isCompleted); 
+        artefactDetailController.HideContentInstant();
+
+        RectTransform targetRef = artefactDetailController.TargetIconRect;
+
+        scrollZoomController.ZoomToMatchTarget(sourceRect, targetRef, () => 
+        {
+            artefactDetailController.ShowContentFadeIn(); 
+        });
+    }
+
+    private void OnCloseArtefactDetail()
+    {
+        artefactDetailController.CloseDetail(); 
+        
+        scrollZoomController.ZoomOut();
     }
 }

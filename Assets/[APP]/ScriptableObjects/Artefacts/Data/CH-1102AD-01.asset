@@ -10,14 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a4ecdad67285e4111b58296d98da9caa, type: 3}
-  m_Name: Coin
+  m_Name: CH-1102AD-01
   m_EditorClassIdentifier: 
   baseData:
-    id: Coin
-    itemName: 'Coin inscribed "Chong Ning Tong Bao" '
-    itemDescription: Deskripsi nya mana nih
-    itemIcon: {fileID: 21300000, guid: 1ab479bcbeaf548dfba98fb09f74fbc2, type: 3}
+    id: CH-1102AD-01
+    itemName: "Coin inscribed \u201CChong Ning Tong Bao\u201D"
+    itemDescription: "The characters on this coin exhibit Emperor Huizong\u2019s
+      distinctive calligraphic style, known as \u201Cslender gold\u201D because it
+      resembled finely spun filaments of the precious metal. Huizong made an effort
+      to present himself as a man of cultivated tastes through various means. His
+      writings were often carved in stone or metal, as here, and circulated widely
+      among the public."
+    itemIcon: {fileID: 21300000, guid: 595bd02e04d6e8144adc1c0a1a1a0227, type: 3}
     exclude: 0
+  completedIcon: {fileID: 0}
   unlockedByDefault: 1
   artefactOrigin: 0
   allowedToolTypes: -1

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public static class MainMenuEvents
 {
-    public static Action<ArtefactData> OnRequestArtefactDetail;
+    public static Action<ArtefactItemUI> OnRequestArtefactDetail;
     public static Action<ArtefactData> OnRequestArtefactPlay;
     public static Action OnCloseArtefactDetail;
 

@@ -7,6 +7,9 @@ public class ArtefactData : ScriptableObject
     [SerializeField] private BaseData baseData;
     public BaseData BaseData => baseData;
 
+    [SerializeField] private Sprite completedIcon;
+    public Sprite CompletedIcon => completedIcon;
+
     [SerializeField] private bool unlockedByDefault;
     public bool UnlockedByDefault => unlockedByDefault;
 
@@ -18,9 +21,12 @@ public class ArtefactData : ScriptableObject
 
     [SerializeField] private List<ArtefactFragmentData> artefactFragmentDatas;
     public List<ArtefactFragmentData> ArtefactFragmentDatas => artefactFragmentDatas;
-    
+
     [SerializeField] private CustomTransform finishTransform;
     public CustomTransform FinishTransform => finishTransform;
+
+    private string artefactGroupId;
+    public string ArtefactGroupId => artefactGroupId;
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -28,6 +34,11 @@ public class ArtefactData : ScriptableObject
         baseData.SetId(this.name);
     }
 #endif
+
+    public void SetArtefactGroupId(string artefactGroupId)
+    {
+        this.artefactGroupId = artefactGroupId;
+    }
 }
 
 [System.Serializable]
