@@ -1,13 +1,12 @@
 using UnityEngine;
 using VContainer;
 
-public class ArtefactPieceStateMachine : StateMachine, IInteractable, IInspectable
+public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IRotate, IHold, IZoom
 {
     public float minScale = 3;
     public float maxScale = 10;
     public Vector3 InitialPosition { get; set; }
     public Quaternion InitialRotation { get; set; }
-    public Transform Transform => transform;
 
     private void Start()
     {
@@ -16,16 +15,22 @@ public class ArtefactPieceStateMachine : StateMachine, IInteractable, IInspectab
         SwitchState(new ArtefactPieceIdleState(this));
     }
 
-    public void OnStart(Vector3 worldPos, Vector2 screenPos) => (currentState as IInteractable)?.OnStart(worldPos, screenPos);
-    public void OnMove(Vector3 worldPos, Vector2 screenPos) => (currentState as IInteractable)?.OnMove(worldPos, screenPos);
-    public void OnEnd(Vector3 worldPos, Vector2 screenPos) => (currentState as IInteractable)?.OnEnd(worldPos, screenPos);
-    public void OnHold() => (currentState as IInteractable)?.OnHold();
-    public void OnZoom(float delta) => (currentState as IInteractable)?.OnZoom(delta);
-    public void EnterInspect() => (currentState as IInspectable)?.EnterInspect();
-    public void ExitInspect() => (currentState as IInspectable)?.ExitInspect();
     public void ResetTransform()
     {
         transform.position = InitialPosition;
         transform.rotation = InitialRotation;
     }
+
+    public bool IsInspectable => currentState is IInspectable;
+    public IInspectable GetInspectable() => currentState as IInspectable;
+
+    public void OnClick() => (currentState as IClick)?.OnClick();
+    public void OnStart() => (currentState as IInteract)?.OnStart();
+    public void OnEnd() => (currentState as IInteract)?.OnEnd();
+    public void OnDragPerformed(Vector3 worldPos) => (currentState as IDrag)?.OnDragPerformed(worldPos);
+    public void OnRotatePerformed(Vector2 delta) => (currentState as IRotate)?.OnRotatePerformed(delta);
+    public void OnHoldPerformed() => (currentState as IHold)?.OnHoldPerformed();
+    public void OnZoomPerformed() => (currentState as IZoom)?.OnZoomPerformed();
+    // public void EnterInspect() => (currentState as IInspectable)?.EnterInspect();
+    // public void ExitInspect() => (currentState as IInspectable)?.ExitInspect();
 }

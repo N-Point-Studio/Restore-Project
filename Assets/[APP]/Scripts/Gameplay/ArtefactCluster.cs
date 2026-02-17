@@ -1,21 +1,28 @@
-// using System.Collections.Generic;
+using System.Collections.Generic;
+using UnityEngine;
 
-// public class ArtefactCluster
-// {
-//     private readonly List<IAssemblable> pieces = new();
-//     public List<IAssemblable> Pieces => pieces;
+public class AssemblyGroup
+{
+    public Transform Root { get; private set; }
+    private List<IAssemblable> members = new();
 
-//     public void Add(IAssemblable piece)
-//     {
-//         if (pieces.Contains(piece)) return;
-//         pieces.Add(piece);
-//         piece.SetCluster(this);
-//     }
+    public AssemblyGroup(Transform root)
+    {
+        Root = root;
+    }
 
-//     public void Remove(IAssemblable piece)
-//     {
-//         if (!pieces.Contains(piece)) return;
-//         pieces.Remove(piece);
-//         piece.SetCluster(null);
-//     }
-// }
+    public void AddMember(IAssemblable piece)
+    {
+        members.Add(piece);
+        piece.CurrentGroup = this;
+        piece.Transform.SetParent(Root);
+    }
+
+    public void Merge(AssemblyGroup otherGroup)
+    {
+        foreach (var member in otherGroup.members)
+        {
+            AddMember(member);
+        }
+    }
+}
