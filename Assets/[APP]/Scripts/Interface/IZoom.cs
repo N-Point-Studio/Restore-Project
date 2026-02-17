@@ -2,5 +2,5 @@ using UnityEngine;
 
 public interface IZoom : IInteract
 {
-    void OnZoomPerformed();
+    void OnZoomPerformed(float zoomDelta);
 }

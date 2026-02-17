@@ -10,7 +10,6 @@ public class GameplayLifetimeScope : LifetimeScope
         builder.RegisterInstance(Camera.main);
         builder.RegisterInstance(inspect);
 
-        builder.Register<PointerService>(Lifetime.Scoped).AsSelf();
         builder.RegisterEntryPoint<InspectService>(Lifetime.Scoped);
 
         builder.RegisterEntryPoint<PointService>(Lifetime.Scoped).AsSelf();

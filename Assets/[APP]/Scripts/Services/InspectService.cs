@@ -6,10 +6,10 @@ using VContainer.Unity;
 public class InspectService : IInitializable, IDisposable
 {
     private readonly InteractionService interaction;
-    private IInspectable currentInspectable;
     private readonly Transform inspectPoint;
-    public IInspectable CurrentInspected => currentInspectable;
-    private Transform currentTransform;
+
+    private ArtefactPieceStateMachine currentSM;
+    private Transform originalParent;
 
     [Inject]
     public InspectService(Transform inspectPoint, InteractionService interaction)
@@ -34,77 +34,71 @@ public class InspectService : IInitializable, IDisposable
 
     private void OnClickPerformed(IInteract interact)
     {
-        var inspectable = TryGetInspectable(interact);
-        if (inspectable != null)
+        if (interact is not ArtefactPieceStateMachine sm)
+            return;
+
+        if (!sm.IsInspectable)
+            return;
+
+        Inspect(sm);
+    }
+
+    private void OnDragPerformed(IInteract interact, Vector3 worldPos)
+    {
+        if (interact is not ArtefactPieceStateMachine sm) return;
+        if (sm == currentSM) return;
+
+        float distance = Vector3.Distance(sm.transform.position, inspectPoint.position);
+        if (distance < 1.5f)
         {
-            Inspect(inspectable, inspectable.Transform);
+            Inspect(sm);
         }
     }
 
     private void OnHoldPerformed(IInteract interact)
     {
-        var inspectable = TryGetInspectable(interact);
-        if (inspectable == null || currentInspectable == null) return;
-        if (inspectable.Transform == currentInspectable.Transform)
+        if (interact is not ArtefactPieceStateMachine sm)
+            return;
+
+        if (sm == currentSM)
         {
-            currentInspectable = inspectable;
             ExitInspect();
         }
     }
 
-    private void OnDragPerformed(IInteract interact, Vector3 vector)
+    private void Inspect(ArtefactPieceStateMachine sm)
     {
-        var inspectable = TryGetInspectable(interact);
-        if (inspectable == null) return;
+        if (currentSM == sm)
+            return;
 
-        if (IsNearInspectZone(inspectable.Transform))
-        {
-            Inspect(inspectable, inspectable.Transform);
-        }
-    }
+        if (currentSM != null)
+            ExitInspect();
 
-    private IInspectable TryGetInspectable(IInteract interact)
-    {
-        if (interact is ArtefactPieceStateMachine sm)
-            return sm.GetInspectable();
+        currentSM = sm;
 
-        return null;
-    }
+        originalParent = sm.transform.parent;
 
-    public void Inspect(IInspectable inspectable, Transform targetTransform)
-    {
-        if (currentTransform == targetTransform) return;
+        sm.transform.SetParent(inspectPoint);
+        sm.transform.localPosition = Vector3.zero;
+        sm.transform.localRotation = Quaternion.identity;
 
-        if (currentInspectable != null) ExitInspect();
-
-        currentInspectable = inspectable;
-        currentTransform = targetTransform;
-
-        targetTransform.SetParent(inspectPoint);
-        targetTransform.localPosition = Vector3.zero;
-        targetTransform.localRotation = Quaternion.identity;
-
-        inspectable.EnterInspect();
+        sm.GetInspectable()?.EnterInspect();
     }
 
     public void ExitInspect()
     {
-        if (currentInspectable == null)
+        if (currentSM == null)
             return;
 
-        currentTransform.SetParent(null);
+        var sm = currentSM;
 
-        var temp = currentInspectable;
+        // Kembalikan parent dulu
+        sm.transform.SetParent(originalParent, true);
 
-        currentInspectable = null;
-        currentTransform = null;
+        // Beritahu state machine
+        sm.GetInspectable()?.ExitInspect();
 
-        temp.ExitInspect();
-    }
-
-    public bool IsNearInspectZone(Transform target)
-    {
-        float distance = Vector3.Distance(target.position, inspectPoint.position);
-        return distance < 1.5f;
+        currentSM = null;
+        originalParent = null;
     }
 }

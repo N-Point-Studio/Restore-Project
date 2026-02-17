@@ -28,5 +28,5 @@ public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IRotate, I
     public void OnDragPerformed(Vector3 worldPos) => (currentState as IDrag)?.OnDragPerformed(worldPos);
     public void OnRotatePerformed(Vector2 delta) => (currentState as IRotate)?.OnRotatePerformed(delta);
     public void OnHoldPerformed() => (currentState as IHold)?.OnHoldPerformed();
-    public void OnZoomPerformed() => (currentState as IZoom)?.OnZoomPerformed();
+    public void OnZoomPerformed(float zoomDelta) => (currentState as IZoom)?.OnZoomPerformed(zoomDelta);
 }
