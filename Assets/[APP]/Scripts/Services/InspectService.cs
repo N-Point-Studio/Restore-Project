@@ -37,7 +37,6 @@ public class InspectService : IInitializable, IDisposable
         var inspectable = TryGetInspectable(interact);
         if (inspectable != null)
         {
-            // if (inspectable is IClick)
             Inspect(inspectable, inspectable.Transform);
         }
     }
@@ -45,14 +44,14 @@ public class InspectService : IInitializable, IDisposable
     private void OnHoldPerformed(IInteract interact)
     {
         var inspectable = TryGetInspectable(interact);
-        if (inspectable == null) return;
-
-        // Exit hanya kalau object yang dihold adalah yang sedang diinspect
-        if (inspectable == currentInspectable)
+        if (inspectable == null || currentInspectable == null) return;
+        if (inspectable.Transform == currentInspectable.Transform)
         {
+            currentInspectable = inspectable;
             ExitInspect();
         }
     }
+
     private void OnDragPerformed(IInteract interact, Vector3 vector)
     {
         var inspectable = TryGetInspectable(interact);
@@ -74,13 +73,9 @@ public class InspectService : IInitializable, IDisposable
 
     public void Inspect(IInspectable inspectable, Transform targetTransform)
     {
-        // Kalau yang diinspect sama dengan yang sekarang → jangan apa-apa
-        if (currentInspectable == inspectable)
-            return;
+        if (currentTransform == targetTransform) return;
 
-        // Kalau ada object lain yang sedang diinspect → exit dulu
-        if (currentInspectable != null)
-            ExitInspect();
+        if (currentInspectable != null) ExitInspect();
 
         currentInspectable = inspectable;
         currentTransform = targetTransform;

@@ -12,27 +12,19 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDrag, IIn
     }
     public override void Tick(float deltaTime) { }
     public override void Exit() { }
-
-    public void OnClick()
-    {
-        // Debug.Log($"{stateMachine.name} Click");
-        stateMachine.SwitchState(new ArtefactPieceInspectState(stateMachine));
-    }
-
+    public void OnClick() { }
     public void OnStart()
     {
-        // Debug.Log($"{stateMachine.name} Start");
+        stateMachine.ResetTransform();
     }
     public void OnDragPerformed(Vector3 worldPos)
     {
         stateMachine.transform.position = worldPos;
-        // Debug.Log($"{stateMachine.name} Drag");
     }
     public void OnEnd()
     {
-        // Debug.Log($"{stateMachine.name} End");
+        stateMachine.ResetTransform();
     }
-
     public void EnterInspect() { stateMachine.SwitchState(new ArtefactPieceInspectState(stateMachine)); }
     public void ExitInspect() { }
 }

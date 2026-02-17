@@ -3,8 +3,6 @@ using VContainer;
 
 public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IRotate, IHold, IZoom
 {
-    public float minScale = 3;
-    public float maxScale = 10;
     public Vector3 InitialPosition { get; set; }
     public Quaternion InitialRotation { get; set; }
 
@@ -31,6 +29,4 @@ public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IRotate, I
     public void OnRotatePerformed(Vector2 delta) => (currentState as IRotate)?.OnRotatePerformed(delta);
     public void OnHoldPerformed() => (currentState as IHold)?.OnHoldPerformed();
     public void OnZoomPerformed() => (currentState as IZoom)?.OnZoomPerformed();
-    // public void EnterInspect() => (currentState as IInspectable)?.EnterInspect();
-    // public void ExitInspect() => (currentState as IInspectable)?.ExitInspect();
 }
