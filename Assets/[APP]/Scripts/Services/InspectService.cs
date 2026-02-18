@@ -6,16 +6,17 @@ using VContainer.Unity;
 public class InspectService : IInitializable, IDisposable
 {
     private readonly InteractionService interaction;
+    private readonly AssemblyService assemble;
     private readonly Transform inspectPoint;
-
     private ArtefactPieceStateMachine currentSM;
     private Transform originalParent;
 
     [Inject]
-    public InspectService(Transform inspectPoint, InteractionService interaction)
+    public InspectService(Transform inspectPoint, InteractionService interaction, AssemblyService assemble)
     {
         this.inspectPoint = inspectPoint;
         this.interaction = interaction;
+        this.assemble = assemble;
     }
 
     public void Initialize()
@@ -47,9 +48,13 @@ public class InspectService : IInitializable, IDisposable
     {
         if (interact is not ArtefactPieceStateMachine sm) return;
         if (sm == currentSM) return;
-
         float distance = Vector3.Distance(sm.transform.position, inspectPoint.position);
-        if (distance < 1.5f)
+
+        if (currentSM != null && distance < 1.5f)
+        {
+            if (!assemble.TryAssemble(currentSM, sm)) Inspect(sm);
+        }
+        else if (distance < 1.5f)
         {
             Inspect(sm);
         }

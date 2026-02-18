@@ -1,11 +1,20 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
-using VContainer;
 
-public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IRotate, IHold, IZoom
+public class ArtefactPieceStateMachine : StateMachine,
+IClick, IDrag, IRotate, IHold, IZoom, IAssembled
 {
+    public string pieceId;
+    public List<ConnectionSocket> sockets;
     public Vector3 InitialPosition { get; set; }
     public Quaternion InitialRotation { get; set; }
+    public static event Action<ArtefactPieceStateMachine> OnCreated;
 
+    private void Awake()
+    {
+        OnCreated?.Invoke(this);
+    }
     private void Start()
     {
         InitialPosition = transform.position;
@@ -19,6 +28,11 @@ public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IRotate, I
         transform.rotation = InitialRotation;
     }
 
+    public ConnectionSocket GetAvailableSocketFor(string otherId)
+    {
+        return sockets.Find(s => s.targetPieceId == otherId && !s.isOccupied);
+    }
+
     public bool IsInspectable => currentState is IInspectable;
     public IInspectable GetInspectable() => currentState as IInspectable;
 
@@ -29,4 +43,7 @@ public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IRotate, I
     public void OnRotatePerformed(Vector2 delta) => (currentState as IRotate)?.OnRotatePerformed(delta);
     public void OnHoldPerformed() => (currentState as IHold)?.OnHoldPerformed();
     public void OnZoomPerformed(float zoomDelta) => (currentState as IZoom)?.OnZoomPerformed(zoomDelta);
+    public void OnAssembled(Transform parent) { }
+    public void OnDetached() { }
+    public State GetCurrentState() { return currentState; }
 }

@@ -18,6 +18,8 @@ public class InteractionService : IInitializable, IDisposable, ITickable
     private bool holdTriggered;
     private bool isPressing;
     private bool isEnd;
+    private bool isZooming;
+    private float lastPinchDistance;
 
     public event Action<IInteract> OnClick;
     public event Action<IInteract, Vector3> OnDrag;
@@ -33,7 +35,7 @@ public class InteractionService : IInitializable, IDisposable, ITickable
 
     public void Initialize()
     {
-        Debug.Log("Interaction Service Initialized");
+        // Debug.Log("Interaction Service Initialized");
 
         gesture.OnPrimaryStarted += PressStart;
         gesture.OnPrimaryEnded += PressEnd;
@@ -57,7 +59,7 @@ public class InteractionService : IInitializable, IDisposable, ITickable
 
     public void Tick()
     {
-        if (isPressing && !isDragging && !holdTriggered)
+        if (isPressing && !isDragging && !holdTriggered && !isZooming)
         {
             float duration = Time.time - startTime;
 
@@ -66,7 +68,7 @@ public class InteractionService : IInitializable, IDisposable, ITickable
                 var interactable = point.GetInteractObject();
                 if (interactable is IHold holdable)
                 {
-                    Debug.Log("Hold Triggered via Tick");
+                    // Debug.Log("Hold Triggered via Tick");
                     holdTriggered = true;
                     holdable.OnHoldPerformed();
                     OnHold?.Invoke(point.GetInteractObject());
@@ -91,7 +93,7 @@ public class InteractionService : IInitializable, IDisposable, ITickable
 
     private void PressMove(Vector2 position)
     {
-        if (isEnd) return;
+        if (isEnd || isZooming) return;
         float distance = Vector2.Distance(startPosition, position);
         var interactable = point.GetInteractObject();
         if (interactable == null) return;
@@ -107,7 +109,6 @@ public class InteractionService : IInitializable, IDisposable, ITickable
         {
             if (interactable is IRotate rotatable)
             {
-                Debug.Log($"emang rotate yak? {isRotating}");
                 rotatable.OnRotatePerformed(deltaPosition);
                 isRotating = true;
             }
@@ -127,7 +128,7 @@ public class InteractionService : IInitializable, IDisposable, ITickable
         float distance = Vector2.Distance(startPosition, position);
         float duration = Time.time - startTime;
 
-        Debug.Log($"isDragging {isDragging} && isRotating {isRotating}");
+        // Debug.Log($"isDragging {isDragging} && isRotating {isRotating}");
         if (isDragging)
         {
             Vector3 worldPos = point.ScreenToWorld(position, point.GetInteractObject());
@@ -149,16 +150,37 @@ public class InteractionService : IInitializable, IDisposable, ITickable
 
     private void SecondPressStart(Vector2 position)
     {
+        var interactable = point.GetInteractObject();
+        if (interactable is not IZoom zoomable) return;
 
+        isZooming = true;
+        isDragging = false;
+        isRotating = false;
+        holdTriggered = false;
+
+        Vector2 primaryPos = gesture.GetPrimaryPos();
+        lastPinchDistance = Vector2.Distance(primaryPos, position);
     }
 
     private void SecondPressMove(Vector2 position)
     {
+        if (!isZooming) return;
 
+        var interactable = point.GetInteractObject();
+        if (interactable is not IZoom zoomable) return;
+
+        Vector2 primaryPos = gesture.GetPrimaryPos();
+        float currentDistance = Vector2.Distance(primaryPos, position);
+
+        float delta = currentDistance - lastPinchDistance;
+
+        lastPinchDistance = currentDistance;
+
+        zoomable.OnZoomPerformed(delta);
     }
 
     private void SecondPressEnd(Vector2 position)
     {
-
+        isZooming = false;
     }
 }
