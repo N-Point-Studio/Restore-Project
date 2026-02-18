@@ -43,7 +43,7 @@ IClick, IDrag, IRotate, IHold, IZoom, IAssembled
     public void OnRotatePerformed(Vector2 delta) => (currentState as IRotate)?.OnRotatePerformed(delta);
     public void OnHoldPerformed() => (currentState as IHold)?.OnHoldPerformed();
     public void OnZoomPerformed(float zoomDelta) => (currentState as IZoom)?.OnZoomPerformed(zoomDelta);
-    public void OnAssembled(Transform parent) { }
-    public void OnDetached() { }
+    public void OnAssembled() => (currentState as IAssembled)?.OnAssembled();
+    public void OnDetached() => (currentState as IAssembled)?.OnDetached();
     public State GetCurrentState() { return currentState; }
 }

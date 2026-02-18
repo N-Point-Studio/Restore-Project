@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDrag, IInspectable
+public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDrag, IInspectable, IAssembled
 {
     public Transform Transform => stateMachine.transform;
 
@@ -27,4 +27,13 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDrag, IIn
     }
     public void EnterInspect() { stateMachine.SwitchState(new ArtefactPieceInspectState(stateMachine)); }
     public void ExitInspect() { }
+
+    public void OnAssembled()
+    {
+        stateMachine.SwitchState(new ArtefactPieceAssembledState(stateMachine));
+    }
+
+    public void OnDetached()
+    {
+    }
 }

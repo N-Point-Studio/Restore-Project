@@ -48,7 +48,7 @@ public class AssemblyService
 
         socket.isOccupied = true;
 
-        piece.OnAssembled(parent.transform);
+        piece.OnAssembled();
         piece.GetInspectable()?.EnterInspect();
 
         Debug.Log($"Assembled: {piece.pieceId} attached to {parent.pieceId}");

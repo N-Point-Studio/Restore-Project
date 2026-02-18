@@ -52,6 +52,7 @@ public class InspectService : IInitializable, IDisposable
 
         if (currentSM != null && distance < 1.5f)
         {
+            Debug.Log("ada yg diinspect");
             if (!assemble.TryAssemble(currentSM, sm)) Inspect(sm);
         }
         else if (distance < 1.5f)

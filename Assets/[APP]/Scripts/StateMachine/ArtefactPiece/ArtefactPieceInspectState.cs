@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ArtefactPieceInspectState : ArtefactPieceBaseState, IRotate, IHold, IZoom, IInspectable
+public class ArtefactPieceInspectState : ArtefactPieceBaseState, IRotate, IHold, IZoom, IInspectable, IAssembled
 {
     private float rotateSpeed = .5f;
     private float zoomSpeed = 0.01f; // kecil karena delta pinch biasanya besar
@@ -53,5 +53,14 @@ public class ArtefactPieceInspectState : ArtefactPieceBaseState, IRotate, IHold,
     {
         Debug.Log("Exit state");
         stateMachine.SwitchState(new ArtefactPieceIdleState(stateMachine));
+    }
+
+    public void OnAssembled()
+    {
+        Debug.Log($"{stateMachine.name} Masuk assembled state");
+    }
+
+    public void OnDetached()
+    {
     }
 }
