@@ -46,7 +46,6 @@ public class ArtefactGroupData : ScriptableObject
             if (artefactDatas.Contains(item)) continue;
             if (item.ArtefactOrigin != artefactOrigin) continue;
 
-            item.SetArtefactGroupId(baseData.Id);
             artefactDatas.Add(item);
         }
 

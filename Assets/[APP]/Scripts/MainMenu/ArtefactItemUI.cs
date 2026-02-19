@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,6 +12,7 @@ public class ArtefactItemUI : MonoBehaviour
     private ArtefactData artefactData;
     public ArtefactData ArtefactData => artefactData;
     public RectTransform TargetIconRect => targetIconRect; 
+    private Action<ArtefactItemUI> onClickCallback;
 
     private void Awake()
     {
@@ -22,9 +24,11 @@ public class ArtefactItemUI : MonoBehaviour
         button.onClick.RemoveListener(HandleOnButtonClick);
     }
 
-    public void Initialize(ArtefactData artefactData, bool isLocked, bool isCompleted)
+    public void Initialize(ArtefactData artefactData, bool isLocked, bool isCompleted, Action<ArtefactItemUI> onClick)
     {
         this.artefactData = artefactData;
+        this.onClickCallback = onClick;
+        
         if (imageIcon)
         {
             if (isCompleted)
@@ -47,7 +51,6 @@ public class ArtefactItemUI : MonoBehaviour
     private void HandleOnButtonClick()
     {
         if (artefactData == null) return;
-
-        MainMenuEvents.OnRequestArtefactDetail?.Invoke(this);
+        onClickCallback?.Invoke(this);
     }
 }

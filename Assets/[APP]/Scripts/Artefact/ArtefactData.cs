@@ -34,11 +34,6 @@ public class ArtefactData : ScriptableObject
         baseData.SetId(this.name);
     }
 #endif
-
-    public void SetArtefactGroupId(string artefactGroupId)
-    {
-        this.artefactGroupId = artefactGroupId;
-    }
 }
 
 [System.Serializable]

@@ -146,10 +146,10 @@ public class MainMenuManager : MonoBehaviour
         // TODO: show Loading Service later and pass the data to playerprogressiondata to initizlie the ebject and start playing on gameplay scene
     }
 
-    private void OnRequestArtefactDetail(ArtefactItemUI itemUI)
+    private void OnRequestArtefactDetail(ArtefactItemUI itemUI, ArtefactGroupData groupData)
     {        
         bool isCompleted = activeArtefactData.IsArtefactCompleted(itemUI.ArtefactData.BaseData.Id);
-        Sprite bgSprite = activeArtefactData.GetArtefactDatabase().GetArtefactGroup(itemUI.ArtefactData.ArtefactGroupId).BaseData.ItemIcon;
+        Sprite bgSprite = groupData.BaseData.ItemIcon;
         RectTransform sourceRect = itemUI.TargetIconRect;
 
         artefactDetailController.OpenDetail(itemUI.ArtefactData, bgSprite, isCompleted); 

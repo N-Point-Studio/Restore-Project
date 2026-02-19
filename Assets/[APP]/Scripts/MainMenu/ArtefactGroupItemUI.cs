@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class ArtefactGroupItemUI : MonoBehaviour
 {
@@ -63,7 +62,13 @@ public class ArtefactGroupItemUI : MonoBehaviour
                 {
                     bool isUnlocked = activeArtefactData.IsArtefactUnlocked(data.BaseData.Id);
                     bool isCompleted = activeArtefactData.IsArtefactCompleted(data.BaseData.Id);
-                    itemInstance.Initialize(data, !isUnlocked, isCompleted);
+                    
+                    itemInstance.Initialize(
+                        data, 
+                        !isUnlocked, 
+                        isCompleted,
+                        (clickedItem) => OnItemClicked(clickedItem)
+                    );
                     
                     // Ensure object is active (in case it was pooled/disabled)
                     itemInstance.gameObject.SetActive(true);
@@ -78,5 +83,10 @@ public class ArtefactGroupItemUI : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void OnItemClicked(ArtefactItemUI itemUI)
+    {
+        MainMenuEvents.OnRequestArtefactDetail?.Invoke(itemUI, artefactGroupData);
     }
 }
