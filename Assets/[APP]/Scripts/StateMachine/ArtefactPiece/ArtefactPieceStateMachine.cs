@@ -10,6 +10,7 @@ IClick, IDrag, IRotate, IHold, IZoom, IAssembled
     public Vector3 InitialPosition { get; set; }
     public Quaternion InitialRotation { get; set; }
     public static event Action<ArtefactPieceStateMachine> OnCreated;
+    public ArtefactPieceStateMachine parent;
 
     private void Awake()
     {
@@ -35,7 +36,6 @@ IClick, IDrag, IRotate, IHold, IZoom, IAssembled
 
     public bool IsInspectable => currentState is IInspectable;
     public IInspectable GetInspectable() => currentState as IInspectable;
-
     public void OnClick() => (currentState as IClick)?.OnClick();
     public void OnStart() => (currentState as IInteract)?.OnStart();
     public void OnEnd() => (currentState as IInteract)?.OnEnd();
@@ -43,7 +43,7 @@ IClick, IDrag, IRotate, IHold, IZoom, IAssembled
     public void OnRotatePerformed(Vector2 delta) => (currentState as IRotate)?.OnRotatePerformed(delta);
     public void OnHoldPerformed() => (currentState as IHold)?.OnHoldPerformed();
     public void OnZoomPerformed(float zoomDelta) => (currentState as IZoom)?.OnZoomPerformed(zoomDelta);
-    public void OnAssembled() => (currentState as IAssembled)?.OnAssembled();
+    public void OnAssembled(ArtefactPieceStateMachine parent) => (currentState as IAssembled)?.OnAssembled(parent);
     public void OnDetached() => (currentState as IAssembled)?.OnDetached();
     public State GetCurrentState() { return currentState; }
 }

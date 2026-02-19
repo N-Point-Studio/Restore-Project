@@ -28,8 +28,10 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDrag, IIn
     public void EnterInspect() { stateMachine.SwitchState(new ArtefactPieceInspectState(stateMachine)); }
     public void ExitInspect() { }
 
-    public void OnAssembled()
+    public void OnAssembled(ArtefactPieceStateMachine parent)
     {
+        Debug.Log($"di idle masuk ke {parent.name}");
+        stateMachine.parent = parent;
         stateMachine.SwitchState(new ArtefactPieceAssembledState(stateMachine));
     }
 

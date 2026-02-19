@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IHold
+public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IHold, IDrag, IRotate
 {
     public ArtefactPieceAssembledState(ArtefactPieceStateMachine stateMachine) : base(stateMachine) { }
 
@@ -15,10 +15,40 @@ public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IHold
     }
     public void OnEnd()
     {
+        if (stateMachine.parent.GetCurrentState() is IDrag dragable)
+        {
+            dragable.OnEnd();
+        }
     }
     public void OnHoldPerformed()
     {
-        stateMachine.SwitchState(new ArtefactPieceIdleState(stateMachine));
+        if (CanPerformDetach())
+        {
+            stateMachine.SwitchState(new ArtefactPieceIdleState(stateMachine));
+            stateMachine.parent = null;
+        }
+    }
+    public bool CanPerformDetach()
+    {
+        return stateMachine.parent.GetCurrentState() is ArtefactPieceInspectState;
+    }
+    public void OnDragPerformed(Vector3 worldPos)
+    {
+        // var isDraggable = 
+        if (stateMachine.parent.GetCurrentState() is IDrag dragable)
+        {
+            dragable.OnDragPerformed(worldPos);
+        }
+        // Debug.Log($"[Assemble] Drag {stateMachine.GetRoot().name} is draggable {isDraggable}");
     }
 
+    public void OnRotatePerformed(Vector2 delta)
+    {
+        if (stateMachine.parent.GetCurrentState() is IRotate rotate)
+        {
+            rotate.OnRotatePerformed(delta);
+        }
+
+        // Debug.Log($"[Assemble] Rotate {stateMachine.parent.name} is rotatable {isRotatable}");
+    }
 }

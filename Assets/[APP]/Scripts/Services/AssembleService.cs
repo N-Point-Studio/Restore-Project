@@ -47,7 +47,7 @@ public class AssemblyService
         socket.isOccupied = true;
         parentSocket.isOccupied = true;
 
-        piece.OnAssembled();
+        piece.OnAssembled(parent);
         piece.GetInspectable()?.EnterInspect();
         Debug.Log($"Assembled: {piece.pieceId} attached to {parent.pieceId}, progress: {registry.GetAssemblyProgress()}");
     }
@@ -59,6 +59,12 @@ public class AssemblyService
 
         var parentPiece = parentTransform.GetComponent<ArtefactPieceStateMachine>();
         if (parentPiece == null) return;
+
+        if (!(parentPiece.GetCurrentState() is ArtefactPieceInspectState))
+        {
+            Debug.Log("Detach blocked: Parent not in Inspect state");
+            return;
+        }
 
         var parentSocket = parentPiece.sockets.Find(s => s.targetPieceId == piece.pieceId);
         if (parentSocket != null) parentSocket.isOccupied = false;

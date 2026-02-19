@@ -2,6 +2,6 @@ using UnityEngine;
 
 public interface IAssembled
 {
-    void OnAssembled();
+    void OnAssembled(ArtefactPieceStateMachine parent);
     void OnDetached();
 }

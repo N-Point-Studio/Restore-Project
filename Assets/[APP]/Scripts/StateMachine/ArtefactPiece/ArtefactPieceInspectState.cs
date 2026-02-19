@@ -3,16 +3,6 @@ using UnityEngine;
 public class ArtefactPieceInspectState : ArtefactPieceBaseState, IRotate, IHold, IZoom, IInspectable, IAssembled
 {
     private float rotateSpeed = .5f;
-    private float zoomSpeed = 0.01f; // kecil karena delta pinch biasanya besar
-    private float minDistance = 0.5f;
-    private float maxDistance = 5f;
-    private float zoomSmoothSpeed = 10f;
-
-    private float currentDistance;
-    private float targetDistance;
-
-    private Camera mainCam;
-
     public Transform Transform => stateMachine.transform;
 
     public ArtefactPieceInspectState(ArtefactPieceStateMachine stateMachine)
@@ -55,7 +45,7 @@ public class ArtefactPieceInspectState : ArtefactPieceBaseState, IRotate, IHold,
         stateMachine.SwitchState(new ArtefactPieceIdleState(stateMachine));
     }
 
-    public void OnAssembled()
+    public void OnAssembled(ArtefactPieceStateMachine parent)
     {
         Debug.Log($"{stateMachine.name} Masuk assembled state");
     }

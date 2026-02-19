@@ -50,14 +50,19 @@ public class InspectService : IInitializable, IDisposable
         if (sm == currentSM) return;
         float distance = Vector3.Distance(sm.transform.position, inspectPoint.position);
 
-        if (currentSM != null && distance < 1.5f)
+        if (distance < 1.5f)
         {
-            Debug.Log("ada yg diinspect");
-            if (!assemble.TryAssemble(currentSM, sm)) Inspect(sm);
-        }
-        else if (distance < 1.5f)
-        {
-            Inspect(sm);
+            if (currentSM == null)
+            {
+                if (sm.parent == null)
+                    Inspect(sm);
+                else
+                    Inspect(sm.parent);
+            }
+            else if (currentSM != null)
+            {
+                if (!assemble.TryAssemble(currentSM, sm)) Inspect(sm);
+            }
         }
     }
 
@@ -72,8 +77,15 @@ public class InspectService : IInitializable, IDisposable
         }
     }
 
+    private void HandleHierarchy(ArtefactPieceStateMachine sm)
+    {
+
+    }
+
     private void Inspect(ArtefactPieceStateMachine sm)
     {
+
+        if (sm.GetCurrentState() is not IAssembled) return;
         if (currentSM == sm)
             return;
 
@@ -106,5 +118,19 @@ public class InspectService : IInitializable, IDisposable
 
         currentSM = null;
         originalParent = null;
+    }
+
+    public ArtefactPieceStateMachine CheckParent(IInteract interact)
+    {
+        if (interact is not ArtefactPieceStateMachine sm) return null;
+
+        if (sm.GetCurrentState() is IAssembled)
+        {
+            return sm.parent;
+        }
+        else
+        {
+            return sm;
+        }
     }
 }
