@@ -18,13 +18,17 @@ MonoBehaviour:
     itemDescription: "Cast in silver, this elegant standing horse may have served
       as a paperweight on a scholar\u2019s desk. The figure reflects both the refined
       metalwork and cultivated aesthetics valued by intellectuals of the period."
-    itemIcon: {fileID: 21300002, guid: 595bd02e04d6e8144adc1c0a1a1a0227, type: 3}
+    itemIcon: {fileID: 21300000, guid: 0abd31fb384d64b42912f3299d32114f, type: 3}
     exclude: 0
-  completedIcon: {fileID: 0}
+  completedIcon: {fileID: 21300000, guid: 45c3c6044eda0e0498a389893bb681fb, type: 3}
   unlockedByDefault: 0
   artefactOrigin: 0
   allowedToolTypes: -1
-  artefactFragmentDatas: []
+  artefactFragmentDatas:
+  - prefab: {fileID: 2023501092284782827, guid: 0352e65ac67094ab1a361be75b37ad8f, type: 3}
+    correctTransform:
+      rotation: {x: 0, y: 0, z: 0}
+      position: {x: 0, y: 0, z: 0}
   finishTransform:
     rotation: {x: 0, y: 0, z: 0}
     position: {x: 0, y: 0, z: 0}
