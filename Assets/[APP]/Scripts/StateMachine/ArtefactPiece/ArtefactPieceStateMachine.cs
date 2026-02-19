@@ -2,9 +2,19 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
+public enum ArtefactPieceState
+{
+    None,
+    Idle,
+    Inspect,
+    Assembled
+}
+
 public class ArtefactPieceStateMachine : StateMachine,
 IClick, IDrag, IRotate, IHold, IZoom, IAssembled
 {
+    public ArtefactPieceState state = ArtefactPieceState.None;
     public string pieceId;
     public List<ConnectionSocket> sockets;
     public Vector3 InitialPosition { get; set; }

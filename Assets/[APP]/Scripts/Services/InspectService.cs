@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -61,7 +62,12 @@ public class InspectService : IInitializable, IDisposable
             }
             else if (currentSM != null)
             {
-                if (!assemble.TryAssemble(currentSM, sm)) Inspect(sm);
+                var smChild = sm.GetComponentsInChildren<ArtefactPieceStateMachine>();
+                foreach (ArtefactPieceStateMachine sem in smChild)
+                {
+                    if (!assemble.TryAssemble(currentSM, sem)) Inspect(sem);
+                }
+
             }
         }
     }
@@ -75,11 +81,6 @@ public class InspectService : IInitializable, IDisposable
         {
             ExitInspect();
         }
-    }
-
-    private void HandleHierarchy(ArtefactPieceStateMachine sm)
-    {
-
     }
 
     private void Inspect(ArtefactPieceStateMachine sm)

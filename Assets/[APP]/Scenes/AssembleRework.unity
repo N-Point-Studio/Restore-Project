@@ -1189,6 +1189,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: BrushTool
       objectReference: {fileID: 0}
+    - target: {fileID: 331214327129073858, guid: ea7bf4a3b9c6f4d9a9f2c8a039b0edef, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3711390095325784904, guid: ea7bf4a3b9c6f4d9a9f2c8a039b0edef, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.12
@@ -1266,11 +1270,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 331214327129073858, guid: ea7bf4a3b9c6f4d9a9f2c8a039b0edef, type: 3}
   m_PrefabInstance: {fileID: 1476171975}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &1476171977 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7265869737423573505, guid: ea7bf4a3b9c6f4d9a9f2c8a039b0edef, type: 3}
-  m_PrefabInstance: {fileID: 1476171975}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1476171978
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1283,8 +1282,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03480466bd46a483a8ce66c982e1730c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ToolObject
-  GrabPosition: {fileID: 1476171977}
-  surface: {fileID: 0}
 --- !u!1 &1500324965
 GameObject:
   m_ObjectHideFlags: 0

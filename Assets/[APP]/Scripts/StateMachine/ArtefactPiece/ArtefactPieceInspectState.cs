@@ -10,6 +10,8 @@ public class ArtefactPieceInspectState : ArtefactPieceBaseState, IRotate, IHold,
 
     public override void Enter()
     {
+        stateMachine.state = ArtefactPieceState.Inspect;
+
         Debug.Log($"{stateMachine.name} Entered Inspect State");
     }
 

@@ -8,7 +8,8 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDrag, IIn
     public override void Enter()
     {
         stateMachine.ResetTransform();
-        Debug.Log($"{stateMachine.name} Entered Idle State");
+        stateMachine.state = ArtefactPieceState.Idle;
+        // Debug.Log($"{stateMachine.name} Entered Idle State");
     }
     public override void Tick(float deltaTime) { }
     public override void Exit() { }

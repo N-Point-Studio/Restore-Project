@@ -1,11 +1,12 @@
 using UnityEngine;
 
-public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IHold, IDrag, IRotate
+public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IHold, IDrag, IRotate, IAssembled
 {
     public ArtefactPieceAssembledState(ArtefactPieceStateMachine stateMachine) : base(stateMachine) { }
 
     public override void Enter()
     {
+        stateMachine.state = ArtefactPieceState.Assembled;
         Debug.Log($"{stateMachine.name} Entered Assembled State");
     }
     public override void Tick(float deltaTime) { }
@@ -50,5 +51,15 @@ public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IHold, IDrag,
         }
 
         // Debug.Log($"[Assemble] Rotate {stateMachine.parent.name} is rotatable {isRotatable}");
+    }
+
+    public void OnAssembled(ArtefactPieceStateMachine parent)
+    {
+        stateMachine.parent = parent;
+    }
+
+    public void OnDetached()
+    {
+
     }
 }

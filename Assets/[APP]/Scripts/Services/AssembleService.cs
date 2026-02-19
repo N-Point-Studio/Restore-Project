@@ -41,15 +41,26 @@ public class AssemblyService
     private void PerformAssembly(ArtefactPieceStateMachine parent, ArtefactPieceStateMachine piece, ConnectionSocket socket, ConnectionSocket parentSocket)
     {
         piece.transform.SetParent(parent.transform);
-        piece.transform.localPosition = socket.transform.localPosition;
-        piece.transform.localRotation = socket.transform.localRotation;
 
-        socket.isOccupied = true;
-        parentSocket.isOccupied = true;
+        foreach (ConnectionSocket availableSocket in piece.sockets)
+        {
+            if (availableSocket.targetPieceId == parent.pieceId)
+            {
+                piece.transform.localPosition = socket.transform.localPosition;
+                piece.transform.localRotation = socket.transform.localRotation;
 
-        piece.OnAssembled(parent);
-        piece.GetInspectable()?.EnterInspect();
-        Debug.Log($"Assembled: {piece.pieceId} attached to {parent.pieceId}, progress: {registry.GetAssemblyProgress()}");
+                socket.isOccupied = true;
+                parentSocket.isOccupied = true;
+
+                piece.OnAssembled(parent);
+                piece.GetInspectable()?.EnterInspect();
+                Debug.Log($"Assembled: {piece.pieceId} attached to {parent.pieceId}, progress: {registry.GetAssemblyProgress()}");
+            }
+            else
+            {
+                availableSocket.isOccupied = false;
+            }
+        }
     }
 
     public void Detach(ArtefactPieceStateMachine piece)
