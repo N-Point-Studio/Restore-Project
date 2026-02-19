@@ -7,6 +7,7 @@ public class InteractionService : IInitializable, IDisposable, ITickable
 {
     private readonly GestureService gesture;
     private readonly PointService point;
+    private readonly AssemblyService assemble;
     private const float ClickThreshold = 20f;
     private const float ClickDuration = 0.2f;
     private const float HoldDuration = 0.5f;
@@ -26,11 +27,12 @@ public class InteractionService : IInitializable, IDisposable, ITickable
     public event Action<IInteract> OnHold;
 
     [Inject]
-    public InteractionService(GestureService gesture, PointService point)
+    public InteractionService(GestureService gesture, PointService point, AssemblyService assemble)
     {
         Debug.Log("Interaction Service Constructed");
         this.gesture = gesture;
         this.point = point;
+        this.assemble = assemble;
     }
 
     public void Initialize()
@@ -72,6 +74,10 @@ public class InteractionService : IInitializable, IDisposable, ITickable
                     holdTriggered = true;
                     holdable.OnHoldPerformed();
                     OnHold?.Invoke(point.GetInteractObject());
+                    if (interactable is ArtefactPieceStateMachine sm)
+                    {
+                        assemble.Detach(sm);
+                    }
                 }
             }
         }

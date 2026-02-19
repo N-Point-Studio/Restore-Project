@@ -38,7 +38,21 @@ public class FragmentService : IInitializable, IDisposable
         }
     }
 
-    // public float GetProgressPercentage()
-    // {
-    // }
+    public float GetAssemblyProgress()
+    {
+        if (totalFragments <= 1) return 1f;
+
+        int connectedCount = 0;
+
+        foreach (var piece in registry.Keys)
+        {
+            if (piece.transform.parent != null)
+            {
+                connectedCount++;
+                Debug.Log($"{piece.name} di dalem parent kok {connectedCount}/{totalFragments} = {(float)connectedCount / totalFragments}");
+            }
+        }
+
+        return (float)connectedCount / totalFragments;
+    }
 }
