@@ -21,12 +21,16 @@ public class InspectService : IInitializable, IDisposable
     {
         GestureEvents.OnDropPerformed += OnDropPerformed;
         GestureEvents.OnClickPerformed += OnClickPerformed;
+        GestureEvents.OnHoldPerformed += OnHoldPerformed;
     }
     public void Dispose()
     {
         GestureEvents.OnDropPerformed -= OnDropPerformed;
         GestureEvents.OnClickPerformed -= OnClickPerformed;
+        GestureEvents.OnHoldPerformed -= OnHoldPerformed;
     }
+
+    public void ResetInspectPoint() { inspectPoint.SetPositionAndRotation(Vector3.zero, Quaternion.identity); }
 
     private void OnClickPerformed(IInspectable inspectable, Vector2 vector)
     {
@@ -44,24 +48,24 @@ public class InspectService : IInitializable, IDisposable
 
         if (distance < 1.5f)
         {
-            if (currentSM == null)
-            {
-                // if (sm.parent == null)
-                Inspect(sm);
-                // else
-                //     Inspect(sm.parent);
-            }
-            else if (currentSM != null)
-            {
-                Inspect(sm);
+            Inspect(sm);
+            // if (currentSM == null)
+            // {
+            //     // if (sm.parent == null)
+            //     // else
+            //     //     Inspect(sm.parent);
+            // }
+            // else if (currentSM != null)
+            // {
+            //     Inspect(sm);
 
-                // var smChild = sm.GetComponentsInChildren<ArtefactPieceStateMachine>();
-                // foreach (ArtefactPieceStateMachine sem in smChild)
-                // {
-                //     if (!assemble.TryAssemble(currentSM, sem)) Inspect(sem);
-                // }
+            //     // var smChild = sm.GetComponentsInChildren<ArtefactPieceStateMachine>();
+            //     // foreach (ArtefactPieceStateMachine sem in smChild)
+            //     // {
+            //     //     if (!assemble.TryAssemble(currentSM, sem)) Inspect(sem);
+            //     // }
 
-            }
+            // }
         }
     }
 
@@ -70,7 +74,7 @@ public class InspectService : IInitializable, IDisposable
         if (interact is not ArtefactPieceStateMachine sm)
             return;
 
-        assemble.Detach(sm);
+        // assemble.Detach(sm);
 
         if (sm == currentSM)
         {
@@ -95,7 +99,7 @@ public class InspectService : IInitializable, IDisposable
         sm.transform.SetParent(inspectPoint);
         sm.transform.localPosition = Vector3.zero;
         sm.transform.localRotation = Quaternion.identity;
-
+        ResetInspectPoint();
         sm.GetInspectable()?.EnterInspect();
     }
 
@@ -114,19 +118,5 @@ public class InspectService : IInitializable, IDisposable
 
         currentSM = null;
         originalParent = null;
-    }
-
-    public ArtefactPieceStateMachine CheckParent(IInteract interact)
-    {
-        if (interact is not ArtefactPieceStateMachine sm) return null;
-
-        if (sm.GetCurrentState() is IAssembled)
-        {
-            return sm.parent;
-        }
-        else
-        {
-            return sm;
-        }
     }
 }

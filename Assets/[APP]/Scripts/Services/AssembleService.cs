@@ -6,7 +6,6 @@ using VContainer;
 public class AssemblyService
 {
     private readonly FragmentService registry;
-    public event Action<ArtefactPieceStateMachine[]> ChildInspect;
 
     [Inject]
     public AssemblyService(FragmentService registry)
