@@ -24,13 +24,15 @@ public class ArtefactPieceInspectState : ArtefactPieceBaseState, IRotate, IHold,
     public void OnStart() { }
     public void OnHoldPerformed() { }
 
-    public void OnRotatePerformed(Vector2 delta)
+    public bool OnRotatePerformed(Vector2 delta)
     {
         float rotateY = -delta.x * rotateSpeed;
         float rotateX = delta.y * rotateSpeed;
 
         stateMachine.transform.Rotate(Vector3.up, rotateY, Space.World);
         stateMachine.transform.Rotate(Vector3.right, rotateX, Space.World);
+
+        return true;
     }
 
     public void OnZoomPerformed(float zoomDelta)
@@ -54,5 +56,7 @@ public class ArtefactPieceInspectState : ArtefactPieceBaseState, IRotate, IHold,
 
     public void OnDetached()
     {
+        Debug.Log("Detached");
+        stateMachine.SwitchState(new ArtefactPieceIdleState(stateMachine));
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -76,6 +75,8 @@ public class InspectService : IInitializable, IDisposable
     {
         if (interact is not ArtefactPieceStateMachine sm)
             return;
+
+        assemble.Detach(sm);
 
         if (sm == currentSM)
         {

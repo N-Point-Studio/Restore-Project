@@ -5,12 +5,12 @@ using VContainer.Unity;
 
 public class PointService : IInitializable, IDisposable
 {
-    private readonly GestureService gesture;
+    private readonly InputService gesture;
     private readonly Camera cam;
     private IInteract interactable;
 
     [Inject]
-    public PointService(GestureService gesture, Camera cam)
+    public PointService(InputService gesture, Camera cam)
     {
         Debug.Log("Point Service");
         this.gesture = gesture;

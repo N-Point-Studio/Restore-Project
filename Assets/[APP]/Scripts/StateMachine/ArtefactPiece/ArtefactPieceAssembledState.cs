@@ -16,10 +16,10 @@ public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IHold, IDrag,
     }
     public void OnEnd()
     {
-        if (stateMachine.parent.GetCurrentState() is IDrag dragable)
-        {
-            dragable.OnEnd();
-        }
+        // if (stateMachine.parent.GetCurrentState() is IDrag dragable)
+        // {
+        //     dragable.OnEnd();
+        // }
     }
     public void OnHoldPerformed()
     {
@@ -33,22 +33,24 @@ public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IHold, IDrag,
     {
         return stateMachine.parent.GetCurrentState() is ArtefactPieceInspectState;
     }
-    public void OnDragPerformed(Vector3 worldPos)
+    public bool OnDragPerformed(Vector3 worldPos)
     {
+        return false;
         // var isDraggable = 
-        if (stateMachine.parent.GetCurrentState() is IDrag dragable)
-        {
-            dragable.OnDragPerformed(worldPos);
-        }
+        // if (stateMachine.parent.GetCurrentState() is IDrag dragable)
+        // {
+        //     dragable.OnDragPerformed(worldPos);
+        // }
         // Debug.Log($"[Assemble] Drag {stateMachine.GetRoot().name} is draggable {isDraggable}");
     }
 
-    public void OnRotatePerformed(Vector2 delta)
+    public bool OnRotatePerformed(Vector2 delta)
     {
-        if (stateMachine.parent.GetCurrentState() is IRotate rotate)
-        {
-            rotate.OnRotatePerformed(delta);
-        }
+        return false;
+        // if (stateMachine.parent.GetCurrentState() is IRotate rotate)
+        // {
+        //     rotate.OnRotatePerformed(delta);
+        // }
 
         // Debug.Log($"[Assemble] Rotate {stateMachine.parent.name} is rotatable {isRotatable}");
     }

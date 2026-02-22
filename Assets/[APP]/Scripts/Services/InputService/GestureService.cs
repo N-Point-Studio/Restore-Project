@@ -1,79 +1,187 @@
 using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using VContainer;
 using VContainer.Unity;
 
-public class GestureService : IInitializable, IDisposable
+public class GestureService : IInitializable, IDisposable, ITickable
 {
-    private readonly PlayerInputSystem inputSystem;
-    private GameInput Input => inputSystem.Input;
+    private readonly InputService gesture;
+    private readonly PointService point;
+    private readonly RectTransform inspectZone;
+    private const float ClickThreshold = 20f;
+    private const float ClickDuration = 0.2f;
+    private const float HoldDuration = 0.5f;
+    private Vector2 startPosition;
+    private Vector2 lastPosition;
+    private float startTime;
+    private bool isDragging;
+    private bool isRotating;
+    private bool holdTriggered;
+    private bool isPressing;
+    private bool isEnd;
+    private bool isZooming;
+    private float lastPinchDistance;
 
-    public event Action<Vector2> OnPrimaryStarted;
-    public event Action<Vector2> OnPrimaryMoved;
-    public event Action<Vector2> OnPrimaryEnded;
-    public event Action<Vector2> OnSecondaryStarted;
-    public event Action<Vector2> OnSecondaryMoved;
-    public event Action<Vector2> OnSecondaryEnded;
+    public event Action<IInteract> OnClick;
+    public event Action<IInteract, Vector3> OnDrag;
+    public event Action<IInteract> OnHold;
 
     [Inject]
-    public GestureService(PlayerInputSystem inputSystem)
+    public GestureService(InputService gesture, PointService point, RectTransform inspectZone)
     {
-        this.inputSystem = inputSystem;
+        Debug.Log("Interaction Service Constructed");
+        this.gesture = gesture;
+        this.point = point;
+        this.inspectZone = inspectZone;
     }
 
     public void Initialize()
     {
-        inputSystem.ChangeInputState(InputStateType.Player);
-        Input.Player.Press.started += OnPressStarted;
-        Input.Player.Press.canceled += OnPressEnded;
-        Input.Player.ScreenPos.performed += OnPressMoved;
-        Input.Player.SecondaryFingerPress.started += OnSecondaryPressStarted;
-        Input.Player.SecondaryFingerPress.canceled += OnSecondaryPressEnded;
-        Input.Player.SecondaryFingerPos.performed += OnSecondaryPressMoved;
+        // Debug.Log("Interaction Service Initialized");
+
+        gesture.OnPrimaryStarted += PressStart;
+        gesture.OnPrimaryEnded += PressEnd;
+        gesture.OnPrimaryMoved += PressMove;
+
+        gesture.OnSecondaryStarted += SecondPressStart;
+        gesture.OnSecondaryEnded += SecondPressEnd;
+        gesture.OnSecondaryMoved += SecondPressMove;
     }
 
     public void Dispose()
     {
-        Input.Player.Press.started -= OnPressStarted;
-        Input.Player.Press.canceled -= OnPressEnded;
-        Input.Player.ScreenPos.performed -= OnPressMoved;
-        Input.Player.SecondaryFingerPress.started -= OnSecondaryPressStarted;
-        Input.Player.SecondaryFingerPress.canceled -= OnSecondaryPressEnded;
-        Input.Player.SecondaryFingerPos.performed -= OnSecondaryPressMoved;
+        gesture.OnPrimaryStarted -= PressStart;
+        gesture.OnPrimaryEnded -= PressEnd;
+        gesture.OnPrimaryMoved -= PressMove;
+
+        gesture.OnSecondaryStarted -= SecondPressStart;
+        gesture.OnSecondaryEnded -= SecondPressEnd;
+        gesture.OnSecondaryMoved -= SecondPressMove;
     }
 
-    private void OnPressStarted(InputAction.CallbackContext context)
+    public void Tick()
     {
-        OnPrimaryStarted?.Invoke(GetPrimaryPos());
+        if (isPressing && !isDragging && !holdTriggered && !isZooming)
+        {
+            float duration = Time.time - startTime;
+
+            if (duration >= HoldDuration)
+            {
+                var interactable = point.GetInteractObject();
+                if (interactable is IHold holdable)
+                {
+                    holdTriggered = true;
+                    holdable.OnHoldPerformed();
+                    OnHold?.Invoke(point.GetInteractObject());
+                }
+            }
+        }
     }
 
-    private void OnPressMoved(InputAction.CallbackContext context)
+    private void PressStart(Vector2 position)
     {
-        Vector2 pos = context.ReadValue<Vector2>();
-        OnPrimaryMoved?.Invoke(GetPrimaryPos());
+        startPosition = position;
+        lastPosition = position;
+        startTime = Time.time;
+        isDragging = false;
+        holdTriggered = false;
+        isPressing = true;
+        isRotating = false;
+        isEnd = false;
+
+        point.GetInteractObject()?.OnStart();
     }
 
-    private void OnPressEnded(InputAction.CallbackContext context)
+    private void PressMove(Vector2 position)
     {
-        OnPrimaryEnded?.Invoke(GetPrimaryPos());
+        if (isEnd || isZooming) return;
+        float distance = Vector2.Distance(startPosition, position);
+        var interactable = point.GetInteractObject();
+        if (interactable == null) return;
+        Vector2 deltaPosition = position - lastPosition;
+        lastPosition = position;
+
+        if (!isDragging && distance > ClickThreshold)
+        {
+            isDragging = true;
+        }
+
+        if (isDragging)
+        {
+            if (interactable is IRotate rotatable)
+            {
+                rotatable.OnRotatePerformed(deltaPosition);
+                isRotating = true;
+            }
+
+            if (interactable is IDrag draggabe)
+            {
+                Vector3 worldPos = point.ScreenToWorld(position, interactable);
+                draggabe.OnDragPerformed(worldPos);
+            }
+        }
     }
 
-    private void OnSecondaryPressStarted(InputAction.CallbackContext context)
+    private void PressEnd(Vector2 position)
     {
-        OnSecondaryStarted?.Invoke(GetSecondaryPos());
+        isEnd = true;
+        isPressing = false;
+        float distance = Vector2.Distance(startPosition, position);
+        float duration = Time.time - startTime;
+
+        // Debug.Log($"isDragging {isDragging} && isRotating {isRotating}");
+        if (isDragging)
+        {
+            Vector3 worldPos = point.ScreenToWorld(position, point.GetInteractObject());
+            OnDrag?.Invoke(point.GetInteractObject(), worldPos);
+        }
+
+        if (!isDragging && !holdTriggered && distance <= ClickThreshold && duration <= ClickDuration)
+        {
+            (point.GetInteractObject() as IClick)?.OnClick();
+            OnClick?.Invoke(point.GetInteractObject());
+        }
+
+        point.GetInteractObject()?.OnEnd();
+
+        isRotating = false;
+        isDragging = false;
+        holdTriggered = false;
     }
 
-    private void OnSecondaryPressMoved(InputAction.CallbackContext context)
+    private void SecondPressStart(Vector2 position)
     {
-        OnSecondaryMoved?.Invoke(GetSecondaryPos());
+        var interactable = point.GetInteractObject();
+        if (interactable is not IZoom zoomable) return;
+
+        isZooming = true;
+        isDragging = false;
+        isRotating = false;
+        holdTriggered = false;
+
+        Vector2 primaryPos = gesture.GetPrimaryPos();
+        lastPinchDistance = Vector2.Distance(primaryPos, position);
     }
 
-    private void OnSecondaryPressEnded(InputAction.CallbackContext context)
+    private void SecondPressMove(Vector2 position)
     {
-        OnSecondaryEnded?.Invoke(GetSecondaryPos());
-    }
-    public Vector2 GetPrimaryPos() { return Input.Player.ScreenPos.ReadValue<Vector2>(); }
-    public Vector2 GetSecondaryPos() { return Input.Player.SecondaryFingerPos.ReadValue<Vector2>(); }
+        if (!isZooming) return;
 
+        var interactable = point.GetInteractObject();
+        if (interactable is not IZoom zoomable) return;
+
+        Vector2 primaryPos = gesture.GetPrimaryPos();
+        float currentDistance = Vector2.Distance(primaryPos, position);
+
+        float delta = currentDistance - lastPinchDistance;
+
+        lastPinchDistance = currentDistance;
+
+        zoomable.OnZoomPerformed(delta);
+    }
+
+    private void SecondPressEnd(Vector2 position)
+    {
+        isZooming = false;
+    }
 }

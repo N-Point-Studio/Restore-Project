@@ -11,8 +11,7 @@ public enum ArtefactPieceState
     Assembled
 }
 
-public class ArtefactPieceStateMachine : StateMachine,
-IClick, IDrag, IRotate, IHold, IZoom, IAssembled
+public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IRotate, IHold, IZoom, IAssembled
 {
     public ArtefactPieceState state = ArtefactPieceState.None;
     public string pieceId;
@@ -49,8 +48,8 @@ IClick, IDrag, IRotate, IHold, IZoom, IAssembled
     public void OnClick() => (currentState as IClick)?.OnClick();
     public void OnStart() => (currentState as IInteract)?.OnStart();
     public void OnEnd() => (currentState as IInteract)?.OnEnd();
-    public void OnDragPerformed(Vector3 worldPos) => (currentState as IDrag)?.OnDragPerformed(worldPos);
-    public void OnRotatePerformed(Vector2 delta) => (currentState as IRotate)?.OnRotatePerformed(delta);
+    public bool OnDragPerformed(Vector3 worldPos) => (currentState as IDrag).OnDragPerformed(worldPos);
+    public bool OnRotatePerformed(Vector2 delta) => (currentState as IRotate).OnRotatePerformed(delta);
     public void OnHoldPerformed() => (currentState as IHold)?.OnHoldPerformed();
     public void OnZoomPerformed(float zoomDelta) => (currentState as IZoom)?.OnZoomPerformed(zoomDelta);
     public void OnAssembled(ArtefactPieceStateMachine parent) => (currentState as IAssembled)?.OnAssembled(parent);

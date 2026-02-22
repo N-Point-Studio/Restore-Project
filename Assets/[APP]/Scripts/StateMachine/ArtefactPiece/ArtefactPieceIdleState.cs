@@ -18,14 +18,18 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDrag, IIn
     {
         stateMachine.ResetTransform();
     }
-    public void OnDragPerformed(Vector3 worldPos)
+
+    public bool OnDragPerformed(Vector3 worldPos)
     {
         stateMachine.transform.position = worldPos;
+        return true;
     }
+
     public void OnEnd()
     {
         stateMachine.ResetTransform();
     }
+
     public void EnterInspect() { stateMachine.SwitchState(new ArtefactPieceInspectState(stateMachine)); }
     public void ExitInspect() { }
 
@@ -39,4 +43,5 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDrag, IIn
     public void OnDetached()
     {
     }
+
 }

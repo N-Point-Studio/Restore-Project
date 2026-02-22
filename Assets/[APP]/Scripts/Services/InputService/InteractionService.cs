@@ -5,9 +5,9 @@ using VContainer.Unity;
 
 public class InteractionService : IInitializable, IDisposable, ITickable
 {
-    private readonly GestureService gesture;
+    private readonly InputService gesture;
     private readonly PointService point;
-    private readonly AssemblyService assemble;
+    private readonly RectTransform inspectZone;
     private const float ClickThreshold = 20f;
     private const float ClickDuration = 0.2f;
     private const float HoldDuration = 0.5f;
@@ -27,12 +27,12 @@ public class InteractionService : IInitializable, IDisposable, ITickable
     public event Action<IInteract> OnHold;
 
     [Inject]
-    public InteractionService(GestureService gesture, PointService point, AssemblyService assemble)
+    public InteractionService(InputService gesture, PointService point, RectTransform inspectZone)
     {
         Debug.Log("Interaction Service Constructed");
         this.gesture = gesture;
         this.point = point;
-        this.assemble = assemble;
+        this.inspectZone = inspectZone;
     }
 
     public void Initialize()
@@ -70,14 +70,9 @@ public class InteractionService : IInitializable, IDisposable, ITickable
                 var interactable = point.GetInteractObject();
                 if (interactable is IHold holdable)
                 {
-                    // Debug.Log("Hold Triggered via Tick");
                     holdTriggered = true;
                     holdable.OnHoldPerformed();
                     OnHold?.Invoke(point.GetInteractObject());
-                    if (interactable is ArtefactPieceStateMachine sm)
-                    {
-                        assemble.Detach(sm);
-                    }
                 }
             }
         }
