@@ -2,6 +2,6 @@ using UnityEngine;
 
 public interface IInteract
 {
-    void OnStart();
-    void OnEnd();
+    void OnInteractStart();
+    void OnInteractEnd();
 }

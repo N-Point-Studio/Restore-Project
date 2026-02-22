@@ -9,25 +9,19 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDrag, IIn
     {
         stateMachine.ResetTransform();
         stateMachine.state = ArtefactPieceState.Idle;
-        // Debug.Log($"{stateMachine.name} Entered Idle State");
     }
     public override void Tick(float deltaTime) { }
     public override void Exit() { }
+
+    public void OnInteractStart() { stateMachine.ResetTransform(); }
+    public void OnInteractEnd() { stateMachine.ResetTransform(); }
+
     public void OnClick() { }
-    public void OnStart()
-    {
-        stateMachine.ResetTransform();
-    }
 
     public bool OnDragPerformed(Vector3 worldPos)
     {
         stateMachine.transform.position = worldPos;
         return true;
-    }
-
-    public void OnEnd()
-    {
-        stateMachine.ResetTransform();
     }
 
     public void EnterInspect() { stateMachine.SwitchState(new ArtefactPieceInspectState(stateMachine)); }
@@ -40,8 +34,5 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDrag, IIn
         stateMachine.SwitchState(new ArtefactPieceAssembledState(stateMachine));
     }
 
-    public void OnDetached()
-    {
-    }
-
+    public void OnDetached() { }
 }

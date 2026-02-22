@@ -5,7 +5,6 @@ using VContainer.Unity;
 
 public class InspectService : IInitializable, IDisposable
 {
-    // private readonly InteractionService interaction;
     private readonly AssemblyService assemble;
     private readonly Transform inspectPoint;
     private ArtefactPieceStateMachine currentSM;
@@ -20,51 +19,47 @@ public class InspectService : IInitializable, IDisposable
 
     public void Initialize()
     {
-        // interaction.OnClick += OnClickPerformed;
-        // interaction.OnHold += OnHoldPerformed;
-        // interaction.OnDrag += OnDragPerformed;
+        GestureEvents.OnDropPerformed += OnDropPerformed;
+        GestureEvents.OnClickPerformed += OnClickPerformed;
     }
-
     public void Dispose()
     {
-        // interaction.OnClick -= OnClickPerformed;
-        // interaction.OnHold -= OnHoldPerformed;
-        // interaction.OnDrag -= OnDragPerformed;
+        GestureEvents.OnDropPerformed -= OnDropPerformed;
+        GestureEvents.OnClickPerformed -= OnClickPerformed;
     }
 
-    private void OnClickPerformed(IInteract interact)
+    private void OnClickPerformed(IInspectable inspectable, Vector2 vector)
     {
-        if (interact is not ArtefactPieceStateMachine sm)
-            return;
-
-        if (!sm.IsInspectable)
-            return;
-
+        if (inspectable is not ArtefactPieceStateMachine sm) return;
+        if (sm == currentSM) return;
         Inspect(sm);
     }
 
-    private void OnDragPerformed(IInteract interact, Vector3 worldPos)
+    private void OnDropPerformed(IInspectable inspectable, Vector3 worldPos)
     {
-        if (interact is not ArtefactPieceStateMachine sm) return;
+        Debug.Log("Drop performed on " + inspectable);
+        if (inspectable is not ArtefactPieceStateMachine sm) return;
         if (sm == currentSM) return;
-        float distance = Vector3.Distance(sm.transform.position, inspectPoint.position);
+        float distance = Vector3.Distance(worldPos, inspectPoint.position);
 
         if (distance < 1.5f)
         {
             if (currentSM == null)
             {
-                if (sm.parent == null)
-                    Inspect(sm);
-                else
-                    Inspect(sm.parent);
+                // if (sm.parent == null)
+                Inspect(sm);
+                // else
+                //     Inspect(sm.parent);
             }
             else if (currentSM != null)
             {
-                var smChild = sm.GetComponentsInChildren<ArtefactPieceStateMachine>();
-                foreach (ArtefactPieceStateMachine sem in smChild)
-                {
-                    if (!assemble.TryAssemble(currentSM, sem)) Inspect(sem);
-                }
+                Inspect(sm);
+
+                // var smChild = sm.GetComponentsInChildren<ArtefactPieceStateMachine>();
+                // foreach (ArtefactPieceStateMachine sem in smChild)
+                // {
+                //     if (!assemble.TryAssemble(currentSM, sem)) Inspect(sem);
+                // }
 
             }
         }

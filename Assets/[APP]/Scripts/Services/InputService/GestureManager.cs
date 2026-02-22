@@ -16,14 +16,8 @@ public class GestureManager : IInitializable, IDisposable
     private readonly ZoomService zoomService;
 
     [Inject]
-    public GestureManager(
-        PointService point,
-        InputService input,
-        ClickService click,
-        RectTransform inspectZone,
-        SwipeService swipe,
-        HoldService hold,
-        ZoomService zoom)
+    public GestureManager(PointService point, InputService input, ClickService click,
+        RectTransform inspectZone, SwipeService swipe, HoldService hold, ZoomService zoom)
     {
         this.point = point;
         this.input = input;
@@ -59,12 +53,17 @@ public class GestureManager : IInitializable, IDisposable
     private void HandleInteractionStart()
     {
         currentState = GestureState.Idle;
-        point.GetInteractObject()?.OnStart();
+        point.GetInteractObject()?.OnInteractStart();
     }
 
     private void HandleInteractionEnd()
     {
-        point.GetInteractObject()?.OnEnd();
+        if (point.GetInteractObject() is ArtefactPieceStateMachine sm)
+        {
+            GestureEvents.OnDropPerformed?.Invoke(sm, point.ScreenToWorld(input.GetPrimaryPos(), point.GetInteractObject()));
+        }
+
+        point.GetInteractObject()?.OnInteractEnd();
         currentState = GestureState.Idle;
     }
 
@@ -79,6 +78,7 @@ public class GestureManager : IInitializable, IDisposable
         if (target is IClick clicker)
         {
             currentState = GestureState.InteractingWithObject;
+            GestureEvents.OnClickPerformed?.Invoke(target as IInspectable, screenPos);
             clicker.OnClick();
         }
     }

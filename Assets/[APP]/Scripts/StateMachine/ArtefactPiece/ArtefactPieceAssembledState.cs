@@ -11,10 +11,10 @@ public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IHold, IDrag,
     }
     public override void Tick(float deltaTime) { }
     public override void Exit() { }
-    public void OnStart()
+    public void OnInteractStart()
     {
     }
-    public void OnEnd()
+    public void OnInteractEnd()
     {
         // if (stateMachine.parent.GetCurrentState() is IDrag dragable)
         // {

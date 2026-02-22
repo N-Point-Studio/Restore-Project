@@ -21,7 +21,7 @@ public class ArtefactPieceInspectState : ArtefactPieceBaseState, IRotate, IHold,
 
     public override void Exit() { }
 
-    public void OnStart() { }
+    public void OnInteractStart() { }
     public void OnHoldPerformed() { }
 
     public bool OnRotatePerformed(Vector2 delta)
@@ -39,7 +39,7 @@ public class ArtefactPieceInspectState : ArtefactPieceBaseState, IRotate, IHold,
     {
     }
 
-    public void OnEnd() { }
+    public void OnInteractEnd() { }
 
     public void EnterInspect() { }
 

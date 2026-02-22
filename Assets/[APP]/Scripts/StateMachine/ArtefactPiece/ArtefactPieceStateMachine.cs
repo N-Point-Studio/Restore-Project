@@ -11,7 +11,7 @@ public enum ArtefactPieceState
     Assembled
 }
 
-public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IHold, IAssembled
+public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IHold, IAssembled, IInspectable
 {
     public ArtefactPieceState state = ArtefactPieceState.None;
     public string pieceId;
@@ -33,10 +33,11 @@ public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IHold, IAs
         SwitchState(new ArtefactPieceIdleState(this));
     }
 
+    public State GetCurrentState() { return currentState; }
+
     public void ResetTransform()
     {
-        transform.position = InitialPosition;
-        transform.rotation = InitialRotation;
+        transform.SetPositionAndRotation(InitialPosition, InitialRotation);
     }
 
     public ConnectionSocket GetAvailableSocketFor(string otherId)
@@ -44,14 +45,19 @@ public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IHold, IAs
         return sockets.Find(s => s.targetPieceId == otherId && !s.isOccupied);
     }
 
-    public bool IsInspectable => currentState is IInspectable;
-    public IInspectable GetInspectable() => currentState as IInspectable;
-    public void OnStart() => (currentState as IInteract)?.OnStart();
-    public void OnEnd() => (currentState as IInteract)?.OnEnd();
+    public void OnInteractStart() => (currentState as IInteract)?.OnInteractStart();
+    public void OnInteractEnd() => (currentState as IInteract)?.OnInteractEnd();
     public void OnClick() => (currentState as IClick)?.OnClick();
     public bool OnDragPerformed(Vector3 worldPos) => (currentState as IDrag).OnDragPerformed(worldPos);
     public void OnHoldPerformed() => (currentState as IHold)?.OnHoldPerformed();
+
+    public bool IsInspectable => currentState is IInspectable;
+    public Transform Transform => transform;
+    public IInspectable GetInspectable() => currentState as IInspectable;
+
     public void OnAssembled(ArtefactPieceStateMachine parent) => (currentState as IAssembled)?.OnAssembled(parent);
     public void OnDetached() => (currentState as IAssembled)?.OnDetached();
-    public State GetCurrentState() { return currentState; }
+
+    public void EnterInspect() => (currentState as IInspectable)?.EnterInspect();
+    public void ExitInspect() => (currentState as IInspectable)?.ExitInspect();
 }
