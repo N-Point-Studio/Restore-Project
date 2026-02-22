@@ -5,32 +5,31 @@ using VContainer.Unity;
 
 public class InspectService : IInitializable, IDisposable
 {
-    private readonly InteractionService interaction;
+    // private readonly InteractionService interaction;
     private readonly AssemblyService assemble;
     private readonly Transform inspectPoint;
     private ArtefactPieceStateMachine currentSM;
     private Transform originalParent;
 
     [Inject]
-    public InspectService(Transform inspectPoint, InteractionService interaction, AssemblyService assemble)
+    public InspectService(Transform inspectPoint, AssemblyService assemble)
     {
         this.inspectPoint = inspectPoint;
-        this.interaction = interaction;
         this.assemble = assemble;
     }
 
     public void Initialize()
     {
-        interaction.OnClick += OnClickPerformed;
-        interaction.OnHold += OnHoldPerformed;
-        interaction.OnDrag += OnDragPerformed;
+        // interaction.OnClick += OnClickPerformed;
+        // interaction.OnHold += OnHoldPerformed;
+        // interaction.OnDrag += OnDragPerformed;
     }
 
     public void Dispose()
     {
-        interaction.OnClick -= OnClickPerformed;
-        interaction.OnHold -= OnHoldPerformed;
-        interaction.OnDrag -= OnDragPerformed;
+        // interaction.OnClick -= OnClickPerformed;
+        // interaction.OnHold -= OnHoldPerformed;
+        // interaction.OnDrag -= OnDragPerformed;
     }
 
     private void OnClickPerformed(IInteract interact)

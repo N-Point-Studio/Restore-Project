@@ -44,7 +44,6 @@ public class ClickService : IInitializable, IDisposable
     {
         float duration = Time.time - startTime;
         float distance = Vector2.Distance(startPos, endPos);
-
         if (duration <= ClickDuration && distance <= ClickThreshold)
         {
             OnClickPerformed?.Invoke(endPos);

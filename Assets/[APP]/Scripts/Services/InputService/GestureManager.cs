@@ -5,6 +5,8 @@ using VContainer.Unity;
 
 public class GestureManager : IInitializable, IDisposable
 {
+    private enum GestureState { Idle, InteractingWithObject, Rotating, Zooming }
+    private GestureState currentState = GestureState.Idle;
     private readonly PointService point;
     private readonly InputService input;
     private readonly RectTransform inspectZone;
@@ -56,12 +58,14 @@ public class GestureManager : IInitializable, IDisposable
 
     private void HandleInteractionStart()
     {
+        currentState = GestureState.Idle;
         point.GetInteractObject()?.OnStart();
     }
 
     private void HandleInteractionEnd()
     {
         point.GetInteractObject()?.OnEnd();
+        currentState = GestureState.Idle;
     }
 
     private bool IsInsideInspectZone(Vector2 screenPos)
@@ -74,6 +78,7 @@ public class GestureManager : IInitializable, IDisposable
         var target = point.GetInteractObject();
         if (target is IClick clicker)
         {
+            currentState = GestureState.InteractingWithObject;
             clicker.OnClick();
         }
     }
@@ -83,15 +88,18 @@ public class GestureManager : IInitializable, IDisposable
         var target = point.GetInteractObject();
         if (target is IHold holdable)
         {
+            currentState = GestureState.InteractingWithObject;
             holdable.OnHoldPerformed();
         }
     }
 
     private void HandleDrag(Vector3 screenPos)
     {
+        if (currentState == GestureState.Rotating) return;
         var target = point.GetInteractObject();
         if (target is IDrag draggable)
         {
+            currentState = GestureState.InteractingWithObject;
             Vector3 worldPos = point.ScreenToWorld(screenPos, target);
             draggable.OnDragPerformed(worldPos);
         }
@@ -99,12 +107,16 @@ public class GestureManager : IInitializable, IDisposable
 
     private void HandleRotate(Vector2 delta)
     {
+        if (currentState == GestureState.InteractingWithObject) return;
         if (!IsInsideInspectZone(input.GetPrimaryPos())) return;
+        currentState = GestureState.Rotating;
+        Debug.Log($"Rotate performed");
         GestureEvents.OnRotatePerformed?.Invoke(delta);
     }
 
     private void HandleZoom(float delta)
     {
+        if (currentState == GestureState.InteractingWithObject) return;
         if (!IsInsideInspectZone(input.GetPrimaryPos())) return;
         GestureEvents.OnZoomPerformed?.Invoke(delta);
     }
