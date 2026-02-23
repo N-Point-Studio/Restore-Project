@@ -127,7 +127,7 @@ public class GestureManager : IInitializable, IDisposable
         {
             current = current.parent;
         }
-
+        Debug.Log("Drag Top parent: " + current.name);
         return current;
     }
 

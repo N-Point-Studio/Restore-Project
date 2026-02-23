@@ -4,55 +4,46 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-
-
 public class FragmentService : IInitializable, IDisposable
 {
-    private readonly Dictionary<ArtefactPieceStateMachine, string> registry = new();
-    private int totalFragments;
+    private readonly HashSet<ArtefactPieceStateMachine> registry = new();
 
-    public int GetTotalCount() => totalFragments;
-
-    public void Initialize()
-    {
-        ArtefactPieceStateMachine.OnCreated += ArtefactCreated;
-    }
-
-    public void Dispose()
-    {
-        ArtefactPieceStateMachine.OnCreated -= ArtefactCreated;
-    }
-
-    private void ArtefactCreated(ArtefactPieceStateMachine machine)
-    {
-        Register(machine);
-    }
+    public void Initialize() => ArtefactPieceStateMachine.OnCreated += Register;
+    public void Dispose() => ArtefactPieceStateMachine.OnCreated -= Register;
 
     public void Register(ArtefactPieceStateMachine sm)
     {
-        if (!registry.ContainsKey(sm))
-        {
-            registry.Add(sm, sm.pieceId);
-            totalFragments++;
-            Debug.Log($"Registered: {sm.name}. Total: {totalFragments}");
-        }
+        if (registry.Add(sm))
+            Debug.Log($"Registered: {sm.name}");
     }
 
     public float GetAssemblyProgress()
     {
-        if (totalFragments <= 1) return 1f;
+        if (registry.Count == 0) return 0f;
 
-        int connectedCount = 0;
+        int connectedPieces = 0;
 
-        foreach (var piece in registry.Keys)
+        foreach (var piece in registry)
         {
-            if (piece.transform.parent != null)
+            bool isAttached = false;
+            foreach (var socket in piece.sockets)
             {
-                connectedCount++;
-                Debug.Log($"{piece.name} di dalem parent kok {connectedCount}/{totalFragments} = {(float)connectedCount / totalFragments}");
+                if (socket.isOccupied)
+                {
+                    isAttached = true;
+                    break;
+                }
+            }
+
+            if (isAttached)
+            {
+                connectedPieces++;
             }
         }
 
-        return (float)connectedCount / totalFragments;
+        float progress = (float)connectedPieces / registry.Count;
+        Debug.Log($"Progress: {connectedPieces}/{registry.Count} = {progress}");
+
+        return progress;
     }
 }

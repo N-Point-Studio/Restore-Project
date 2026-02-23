@@ -31,6 +31,7 @@ public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IHold, IAssem
 
     public void OnDetached()
     {
+        stateMachine.parent = null;
         stateMachine.SwitchState(new ArtefactPieceReturningState(stateMachine));
     }
 }
