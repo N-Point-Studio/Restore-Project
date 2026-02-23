@@ -34,6 +34,7 @@ public class ProjectLifetimeScope : LifetimeScope
 
         // Loading Service
         builder.RegisterEntryPoint<LoadingService>(Lifetime.Singleton).AsSelf().WithParameter(loadingPrefab);
+        builder.Register<SceneLoader>(Lifetime.Singleton);
 
         // Input System
         builder.RegisterEntryPoint<PlayerInputSystem>(Lifetime.Singleton).AsSelf();

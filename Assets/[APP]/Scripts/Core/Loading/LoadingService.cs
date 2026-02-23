@@ -30,9 +30,9 @@ public class LoadingService : IInitializable, IDisposable
     /// <summary>
     /// Displays the loading view with optional text.
     /// </summary>
-    public void ShowLoading(string text = "Loading...")
+    public void ShowLoading(string text, LoadingType type) 
     {
-        loadingView.ShowLoading(text);
+        loadingView.ShowLoading(text, type);
     }
 
     /// <summary>

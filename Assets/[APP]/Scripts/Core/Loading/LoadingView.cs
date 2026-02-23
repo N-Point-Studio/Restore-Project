@@ -3,99 +3,89 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum LoadingType
+{
+    ProgressBar,
+    Music,
+    Home,
+    Camera
+}
+
 public class LoadingView : MonoBehaviour
 {
     [SerializeField] private GameObject loadingPanel;
     [SerializeField] private TMP_Text loadingText;
+    
+    [Header("Progress Bar Group")]
+    [SerializeField] private GameObject progressBarGroup;
     [SerializeField] private Image loadingFill;
     
-    [Header("Loading Text Animation")]
-    [SerializeField] private float dotAnimationSpeed = 0.5f;
-    
-    private Coroutine loadingTextAnimation;
+    [Header("Icon Transition Group")]
+    [SerializeField] private GameObject iconGroup;
+    [SerializeField] private GameObject musicObject;
+    [SerializeField] private GameObject homeObject;
+    [SerializeField] private GameObject cameraObject;
+
     private string baseLoadingText = "Loading";
+    private Coroutine loadingTextAnimation;
 
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
         loadingPanel.SetActive(false);
     }
-    
-    private void OnDestroy()
-    {
-        StopLoadingTextAnimation();
-    }
 
-    public void ShowLoading(string text = "Loading...")
+    public void ShowLoading(string text, LoadingType type)
     {
         loadingPanel.SetActive(true);
+        SetupVisual(type);
         
-        // Extract base text without dots for animation
-        if (text.EndsWith("..."))
-        {
-            baseLoadingText = text.Substring(0, text.Length - 3);
-        }
-        else if (text.EndsWith(".."))
-        {
-            baseLoadingText = text.Substring(0, text.Length - 2);
-        }
-        else if (text.EndsWith("."))
-        {
-            baseLoadingText = text.Substring(0, text.Length - 1);
-        }
-        else
-        {
-            baseLoadingText = text;
-        }
+        if (text.EndsWith("...")) baseLoadingText = text.Substring(0, text.Length - 3);
+        else if (text.EndsWith("..")) baseLoadingText = text.Substring(0, text.Length - 2);
+        else if (text.EndsWith(".")) baseLoadingText = text.Substring(0, text.Length - 1);
+        else baseLoadingText = text;
         
-        // Start animated dots
-        StartLoadingTextAnimation();
-
+        if (loadingTextAnimation != null) StopCoroutine(loadingTextAnimation);
+        loadingTextAnimation = StartCoroutine(AnimateLoadingText());
+        
         LoadingEvents.OnLoadingStarted?.Invoke();
     }
 
-    public void HideLoading()
+    private void SetupVisual(LoadingType type)
     {
-        StopLoadingTextAnimation();
-        loadingPanel.SetActive(false);
+        progressBarGroup.SetActive(type == LoadingType.ProgressBar);
+        iconGroup.SetActive(type != LoadingType.ProgressBar);
 
-        LoadingEvents.OnLoadingFinished?.Invoke();
-    }
+        musicObject.SetActive(false); 
+        homeObject.SetActive(false); 
+        cameraObject.SetActive(false); 
 
-    public void SetProgress(float progress)
-    {
-        loadingFill.fillAmount = progress;
-    }
-    
-    private void StartLoadingTextAnimation()
-    {
-        StopLoadingTextAnimation();
-        loadingTextAnimation = StartCoroutine(AnimateLoadingText());
-    }
-    
-    private void StopLoadingTextAnimation()
-    {
-        if (loadingTextAnimation != null)
+        switch (type)
         {
-            StopCoroutine(loadingTextAnimation);
-            loadingTextAnimation = null;
+            case LoadingType.Music:
+                musicObject.SetActive(true); 
+                break;
+            case LoadingType.Home:
+                homeObject.SetActive(true); 
+                break;
+            case LoadingType.Camera:
+                cameraObject.SetActive(true); 
+                break;
         }
     }
-    
+
+    public void SetProgress(float progress) => loadingFill.fillAmount = progress;
+    public void HideLoading() => loadingPanel.SetActive(false);
+
     private IEnumerator AnimateLoadingText()
     {
         string[] dotStates = { "", ".", "..", "..." };
-        int currentState = 0;
-        
+        int i = 0;
         while (true)
         {
-            if (loadingText != null)
-            {
-                loadingText.text = baseLoadingText + dotStates[currentState];
-            }
-            
-            currentState = (currentState + 1) % dotStates.Length;
-            yield return new WaitForSeconds(dotAnimationSpeed);
+            loadingText.text = baseLoadingText + dotStates[i];
+            i = (i + 1) % dotStates.Length;
+            yield return new WaitForSeconds(0.5f);
         }
     }
 }
