@@ -8,7 +8,8 @@ public enum ArtefactPieceState
     None,
     Idle,
     Inspect,
-    Assembled
+    Assembled,
+    Returning
 }
 
 public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IHold, IAssembled, IInspectable
@@ -20,6 +21,7 @@ public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IHold, IAs
     public Quaternion InitialRotation { get; set; }
     public static event Action<ArtefactPieceStateMachine> OnCreated;
     public ArtefactPieceStateMachine parent;
+    public float returningSpeed = 5f;
 
     private void Awake()
     {
@@ -34,6 +36,7 @@ public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IHold, IAs
     }
 
     public State GetCurrentState() { return currentState; }
+    public ArtefactPieceState GetCurrentStateEnum() { return state; }
 
     public void ResetTransform()
     {
@@ -48,7 +51,7 @@ public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IHold, IAs
     public void OnInteractStart() => (currentState as IInteract)?.OnInteractStart();
     public void OnInteractEnd() => (currentState as IInteract)?.OnInteractEnd();
     public void OnClick() => (currentState as IClick)?.OnClick();
-    public bool OnDragPerformed(Vector3 worldPos) => (currentState as IDrag).OnDragPerformed(worldPos);
+    public void OnDragPerformed(Vector3 worldPos) => (currentState as IDrag)?.OnDragPerformed(worldPos);
     public void OnHoldPerformed() => (currentState as IHold)?.OnHoldPerformed();
 
     public bool IsInspectable => currentState is IInspectable;

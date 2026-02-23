@@ -15,6 +15,8 @@ public class GestureManager : IInitializable, IDisposable
     private readonly HoldService holdService;
     private readonly ZoomService zoomService;
 
+    private IInteract currentInteract;
+
     [Inject]
     public GestureManager(PointService point, InputService input, ClickService click,
         RectTransform inspectZone, SwipeService swipe, HoldService hold, ZoomService zoom)
@@ -37,6 +39,8 @@ public class GestureManager : IInitializable, IDisposable
         holdService.OnHoldPerformed += HandleHold;
         zoomService.OnZoomPerformed += HandleZoom;
         swipeService.OnInteractionEnd += HandleInteractionEnd;
+
+        point.OnInteractDetected += HandleInteract;
     }
 
     public void Dispose()
@@ -48,23 +52,32 @@ public class GestureManager : IInitializable, IDisposable
         holdService.OnHoldPerformed -= HandleHold;
         zoomService.OnZoomPerformed -= HandleZoom;
         swipeService.OnInteractionEnd -= HandleInteractionEnd;
+
+        point.OnInteractDetected -= HandleInteract;
+    }
+
+    private void HandleInteract(IInteract interact)
+    {
+        currentInteract = interact;
+        Debug.Log("Interact detected: " + interact);
     }
 
     private void HandleInteractionStart()
     {
         currentState = GestureState.Idle;
-        point.GetInteractObject()?.OnInteractStart();
+        currentInteract?.OnInteractStart();
     }
 
     private void HandleInteractionEnd()
     {
-        if (point.GetInteractObject() is ArtefactPieceStateMachine sm && currentState == GestureState.InteractingWithObject)
+        if (currentInteract is ArtefactPieceStateMachine sm && currentState == GestureState.InteractingWithObject)
         {
-            GestureEvents.OnDropPerformed?.Invoke(sm, point.ScreenToWorld(input.GetPrimaryPos(), point.GetInteractObject()));
+            GestureEvents.OnDropPerformed?.Invoke(sm, point.ScreenToWorld(input.GetPrimaryPos(), currentInteract));
         }
 
-        point.GetInteractObject()?.OnInteractEnd();
+        currentInteract?.OnInteractEnd();
         currentState = GestureState.Idle;
+        currentInteract = null;
     }
 
     private bool IsInsideInspectZone(Vector2 screenPos)
@@ -74,7 +87,7 @@ public class GestureManager : IInitializable, IDisposable
 
     private void HandleClick(Vector2 screenPos)
     {
-        var target = point.GetInteractObject();
+        var target = currentInteract;
         if (target is IClick clicker)
         {
             currentState = GestureState.InteractingWithObject;
@@ -85,7 +98,7 @@ public class GestureManager : IInitializable, IDisposable
 
     private void HandleHold(Vector2 screenPos)
     {
-        var target = point.GetInteractObject();
+        var target = currentInteract;
         if (target is IHold holdable)
         {
             currentState = GestureState.Hold;
@@ -97,13 +110,25 @@ public class GestureManager : IInitializable, IDisposable
     private void HandleDrag(Vector3 screenPos)
     {
         if (currentState == GestureState.Rotating || currentState == GestureState.Hold) return;
-        var target = point.GetInteractObject();
+        var target = currentInteract;
         if (target is IDrag draggable)
         {
             currentState = GestureState.InteractingWithObject;
-            Vector3 worldPos = point.ScreenToWorld(screenPos, target);
+            var parent = GetTopParent(target as ArtefactPieceStateMachine);
+            currentInteract = parent;
+            Vector3 worldPos = point.ScreenToWorld(screenPos, parent);
             draggable.OnDragPerformed(worldPos);
         }
+    }
+
+    ArtefactPieceStateMachine GetTopParent(ArtefactPieceStateMachine current)
+    {
+        while (current.parent != null)
+        {
+            current = current.parent;
+        }
+
+        return current;
     }
 
     private void HandleRotate(Vector2 delta)

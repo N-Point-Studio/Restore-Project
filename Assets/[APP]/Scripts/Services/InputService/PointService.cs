@@ -9,6 +9,8 @@ public class PointService : IInitializable, IDisposable
     private readonly Camera cam;
     private IInteract interactable;
 
+    public Action<IInteract> OnInteractDetected;
+
     [Inject]
     public PointService(InputService gesture, Camera cam)
     {
@@ -40,6 +42,8 @@ public class PointService : IInitializable, IDisposable
         {
             interactable = null;
         }
+
+        OnInteractDetected?.Invoke(interactable);
     }
 
     private void PressEnd(Vector2 vector)
@@ -50,6 +54,27 @@ public class PointService : IInitializable, IDisposable
     {
         Ray ray = cam.ScreenPointToRay(screenPos);
         return Physics.Raycast(ray, out hit);
+    }
+
+    public IInteract GetTopParent(IInteract current)
+    {
+        if (current is Component currentComp)
+        {
+            Transform currentTransform = currentComp.transform;
+            while (currentTransform.parent != null)
+            {
+                if (currentTransform.parent.TryGetComponent(out IInteract parentInteract))
+                {
+                    current = parentInteract;
+                    currentTransform = currentTransform.parent;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        return current;
     }
 
     public IInteract GetInteractObject()

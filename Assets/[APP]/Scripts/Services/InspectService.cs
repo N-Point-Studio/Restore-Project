@@ -35,38 +35,47 @@ public class InspectService : IInitializable, IDisposable
     private void OnClickPerformed(IInspectable inspectable, Vector2 vector)
     {
         if (inspectable is not ArtefactPieceStateMachine sm) return;
+        // if (sm.GetCurrentState() is not IClick) return;
         if (sm == currentSM) return;
-        Inspect(sm);
+
+        var topParent = GetTopParent(sm);
+        if (topParent.GetCurrentStateEnum() == ArtefactPieceState.Idle)
+        {
+            Debug.Log("Clicked on " + topParent.name);
+            Inspect(topParent);
+        }
     }
 
     private void OnDropPerformed(IInspectable inspectable, Vector3 worldPos)
     {
         Debug.Log("Drop performed on " + inspectable);
         if (inspectable is not ArtefactPieceStateMachine sm) return;
+        if (sm.GetCurrentState() is not IDrag) return;
         if (sm == currentSM) return;
         float distance = Vector3.Distance(worldPos, inspectPoint.position);
 
         if (distance < 1.5f)
         {
-            Inspect(sm);
-            // if (currentSM == null)
-            // {
-            //     // if (sm.parent == null)
-            //     // else
-            //     //     Inspect(sm.parent);
-            // }
-            // else if (currentSM != null)
-            // {
-            //     Inspect(sm);
-
-            //     // var smChild = sm.GetComponentsInChildren<ArtefactPieceStateMachine>();
-            //     // foreach (ArtefactPieceStateMachine sem in smChild)
-            //     // {
-            //     //     if (!assemble.TryAssemble(currentSM, sem)) Inspect(sem);
-            //     // }
-
-            // }
+            if (currentSM == null)
+            {
+                Inspect(sm);
+            }
+            else if (currentSM != null)
+            {
+                Debug.Log("ada yg diinspect");
+                if (!assemble.TryAssemble(currentSM, sm)) Inspect(sm);
+            }
         }
+    }
+
+    ArtefactPieceStateMachine GetTopParent(ArtefactPieceStateMachine current)
+    {
+        while (current.parent != null)
+        {
+            current = current.parent;
+        }
+
+        return current;
     }
 
     private void OnHoldPerformed(IInteract interact)
@@ -74,10 +83,9 @@ public class InspectService : IInitializable, IDisposable
         if (interact is not ArtefactPieceStateMachine sm)
             return;
 
-        // assemble.Detach(sm);
-
         if (sm == currentSM)
         {
+            // if (TryCheckInspect(sm)) { }
             ExitInspect();
         }
     }
@@ -90,6 +98,7 @@ public class InspectService : IInitializable, IDisposable
             return;
 
         if (currentSM != null)
+
             ExitInspect();
 
         currentSM = sm;
@@ -118,5 +127,13 @@ public class InspectService : IInitializable, IDisposable
 
         currentSM = null;
         originalParent = null;
+    }
+
+    public bool TryCheckInspect(ArtefactPieceStateMachine sm)
+    {
+        var children = sm.GetComponentsInChildren<ArtefactPieceStateMachine>();
+        Debug.Log($"Children count: {children.Length}");
+        if (children.Length <= 1) return false;
+        return true;
     }
 }

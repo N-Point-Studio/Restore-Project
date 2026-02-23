@@ -12,7 +12,7 @@ public class GameplayLifetimeScope : LifetimeScope
         builder.RegisterInstance(inspect);
         builder.RegisterInstance(inspectZone);
 
-        builder.Register<AssemblyService>(Lifetime.Scoped);
+        builder.RegisterEntryPoint<AssemblyService>(Lifetime.Scoped).AsSelf();
 
         builder.RegisterEntryPoint<FragmentService>(Lifetime.Scoped).AsSelf();
 

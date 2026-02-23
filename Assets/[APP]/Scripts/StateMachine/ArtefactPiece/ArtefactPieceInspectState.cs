@@ -46,7 +46,7 @@ public class ArtefactPieceInspectState : ArtefactPieceBaseState, IRotate, IHold,
     public void ExitInspect()
     {
         Debug.Log("Exit state");
-        stateMachine.SwitchState(new ArtefactPieceIdleState(stateMachine));
+        stateMachine.SwitchState(new ArtefactPieceReturningState(stateMachine));
     }
 
     public void OnAssembled(ArtefactPieceStateMachine parent)
