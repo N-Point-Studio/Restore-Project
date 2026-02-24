@@ -80,6 +80,13 @@ public class ArtefactManager : IInitializable, IDisposable
 
         if (sm == currentInspect)
         {
+            // Debug.Log("[Test] Hold on current inspect, try to detach or exit inspect");
+            // var assemble = assemblyService.TryAssembleParent(sm);
+            // if (assemble != null)
+            // {
+            // Debug.Log($"[Test] Assembled {assemble.name} as new inspect");
+            // inspectService.InspectNewChild(assemble);
+            // }
             inspectService.ExitInspect();
             return;
         }

@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDrag, IInspectable, IAssembled
 {
-    public Transform Transform => stateMachine.transform;
-
     public ArtefactPieceIdleState(ArtefactPieceStateMachine stateMachine) : base(stateMachine) { }
     public override void Enter()
     {
@@ -19,16 +17,16 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDrag, IIn
     {
         stateMachine.transform.position = worldPos;
     }
+
     public void EnterInspect()
     {
-        Debug.Log("Enter Inspect (from idle): " + stateMachine.name);
         stateMachine.SwitchState(new ArtefactPieceInspectState(stateMachine));
     }
+
     public void ExitInspect() { }
 
     public void OnAssembled(ArtefactPieceStateMachine parent)
     {
-        Debug.Log($"di idle masuk ke {parent.name}");
         stateMachine.parent = parent;
         stateMachine.SwitchState(new ArtefactPieceAssembledState(stateMachine));
     }

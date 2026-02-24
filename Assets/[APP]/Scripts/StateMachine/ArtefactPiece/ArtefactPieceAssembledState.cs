@@ -3,26 +3,15 @@ using UnityEngine;
 public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IHold, IAssembled, IInspectable
 {
     public ArtefactPieceAssembledState(ArtefactPieceStateMachine stateMachine) : base(stateMachine) { }
-    public Transform Transform => stateMachine.transform;
     public override void Enter()
     {
         stateMachine.state = ArtefactPieceState.Assembled;
-        Debug.Log($"{stateMachine.name} Entered Assembled State");
     }
     public override void Tick(float deltaTime) { }
     public override void Exit() { }
-
-    public void OnInteractStart()
-    {
-    }
-
-    public void OnInteractEnd()
-    {
-    }
-
-    public void OnHoldPerformed()
-    {
-    }
+    public void OnInteractStart() { }
+    public void OnInteractEnd() { }
+    public void OnHoldPerformed() { }
 
     public void OnAssembled(ArtefactPieceStateMachine parent)
     {
@@ -37,12 +26,8 @@ public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IHold, IAssem
 
     public void EnterInspect()
     {
-        Debug.Log("Enter Inspect (from assembled): " + stateMachine.name);
         stateMachine.SwitchState(new ArtefactPieceInspectState(stateMachine));
     }
 
-    public void ExitInspect()
-    {
-        // throw new System.NotImplementedException();
-    }
+    public void ExitInspect() { }
 }

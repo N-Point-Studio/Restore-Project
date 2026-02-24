@@ -6,7 +6,11 @@ public class AssemblyService
     private readonly FragmentService registry;
 
     [Inject]
-    public AssemblyService(FragmentService registry) => this.registry = registry;
+    public AssemblyService(FragmentService registry)
+    {
+        this.registry = registry;
+    }
+
     public ArtefactPieceStateMachine GetTopParent(ArtefactPieceStateMachine current)
     {
         var walker = current;
@@ -32,45 +36,18 @@ public class AssemblyService
 
                 if (pSocket != null && iSocket != null)
                 {
-                    // Aturan Re-parenting: Jika iPart punya bapak lain, lepaskan dulu
                     if (iPart.parent != null && iPart.parent != pPart)
                     {
                         ForceDetachFromCurrentParent(iPart);
                     }
 
                     PerformAssembly(pPart, iPart, pSocket, iSocket);
-
-                    // Rekursif: Cek apakah teman-teman iPart lainnya bisa ikut nempel ke struktur baru
                     RecursiveCheckReassembly(iPart, incomingParts);
                     return true;
                 }
             }
         }
         return false;
-    }
-
-    public ArtefactPieceStateMachine RebuildChildrenHierarchy(ArtefactPieceStateMachine parent)
-    {
-        var children = parent.GetComponentsInChildren<ArtefactPieceStateMachine>();
-        if (children.Length <= 1) return null;
-
-        var childList = new List<ArtefactPieceStateMachine>();
-        foreach (var c in children) if (c != parent) childList.Add(c);
-
-        // Putus hubungan dari bapak lama agar bebas mencari pasangan baru
-        foreach (var child in childList) ForceDetachFromCurrentParent(child);
-
-        bool anyConnectionMade = false;
-        foreach (var c1 in childList)
-        {
-            foreach (var c2 in childList)
-            {
-                if (c1 == c2) continue;
-                if (TryAssemble(c1, c2)) anyConnectionMade = true;
-            }
-        }
-
-        return anyConnectionMade ? GetTopParent(childList[0]) : null;
     }
 
     public void Detach(ArtefactPieceStateMachine piece)
@@ -122,6 +99,72 @@ public class AssemblyService
                 RecursiveCheckReassembly(child, potentialChildren);
             }
         }
+    }
+
+    public ArtefactPieceStateMachine TryAssembleParent(ArtefactPieceStateMachine parent)
+    {
+        // 1. Ambil semua anak (kecuali parent itu sendiri)
+        var children = new List<ArtefactPieceStateMachine>(parent.GetComponentsInChildren<ArtefactPieceStateMachine>());
+        children.Remove(parent);
+        // Debug.Log($"TryAssembleParent: Found {children.Count} children for {parent.name}");
+        // Debug.Log($"TryAssembleParent: children 0 is {children[0].name}");
+
+        // Jika anaknya cuma satu, langsung return anak tersebut
+        if (children.Count == 1) return children[0];
+        // Jika tidak ada anak, return null
+        if (children.Count == 0) return null;
+
+        // 2. Detach semua anak dari parent agar bersih (logic & hierarchy)
+        foreach (var child in children)
+        {
+            ForceDetachFromCurrentParent(child);
+        }
+
+        bool anyAssembled = false;
+
+        // 3. Cek hubungan antar anak (Nested Loop)
+        // Kita gunakan perulangan yang bisa di-reset karena hierarki berubah saat PerformAssembly
+        for (int i = 0; i < children.Count; i++)
+        {
+            for (int j = 0; j < children.Count; j++)
+            {
+                if (i == j) continue;
+
+                var childA = children[i];
+                var childB = children[j];
+
+                // Cek apakah childB sudah punya parent? Kalau sudah, jangan di-assemble lagi
+                if (childB.parent != null) continue;
+
+                var socketA = childA.GetAvailableSocketFor(childB.pieceId);
+                var socketB = childB.GetAvailableSocketFor(childA.pieceId);
+
+                if (socketA != null && socketB != null)
+                {
+                    PerformAssembly(childA, childB, socketA, socketB);
+                    anyAssembled = true;
+
+                    // Reset pencarian karena struktur sudah berubah
+                    i = 0;
+                    j = 0;
+                }
+            }
+        }
+
+        // 4. Final Check: Jika ada yang berhasil digabung, return "anak pertama" 
+        // (yang sekarang kemungkinan sudah menjadi root dari sub-tree baru)
+        if (anyAssembled)
+        {
+            return children[0];
+        }
+
+        // 5. Jika tidak ada yang saling berhubungan, pastikan semua benar-benar ter-detach
+        foreach (var child in children)
+        {
+            ForceDetachFromCurrentParent(child);
+        }
+
+        return null;
     }
 
     private void LogProgress(string action, string id)

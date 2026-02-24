@@ -101,7 +101,7 @@ public class GestureManager : IInitializable, IDisposable
         var target = currentInteract;
         if (target is IHold holdable)
         {
-            currentState = GestureState.Hold;
+            // currentState = GestureState.Hold;
             GestureEvents.OnHoldPerformed?.Invoke(target as IInteract);
             holdable.OnHoldPerformed();
         }

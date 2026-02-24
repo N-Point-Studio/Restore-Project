@@ -17,6 +17,21 @@ public class InspectService
     public void ResetInspectPoint() { inspectPoint.SetPositionAndRotation(Vector3.zero, Quaternion.identity); }
     public Transform GetInspectPoint() => inspectPoint;
 
+    public void InspectNewChild(ArtefactPieceStateMachine child)
+    {
+        ExitInspect();
+
+        currentSM = child;
+        originalParent = child.transform;
+
+        Debug.Log($"[Test] InspectNewChild: {child.name}");
+        child.transform.SetParent(inspectPoint);
+        child.transform.localPosition = Vector3.zero;
+        child.transform.localRotation = Quaternion.identity;
+        ResetInspectPoint();
+        child.GetInspectable()?.EnterInspect();
+    }
+
     public void Inspect(ArtefactPieceStateMachine sm)
     {
 

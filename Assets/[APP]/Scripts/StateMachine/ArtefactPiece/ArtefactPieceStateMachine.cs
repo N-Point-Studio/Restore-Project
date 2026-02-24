@@ -22,6 +22,7 @@ public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IHold, IAs
     public static event Action<ArtefactPieceStateMachine> OnCreated;
     public ArtefactPieceStateMachine parent;
     public float returningSpeed = 5f;
+    public Transform centerTransform;
 
     private void Awake()
     {
@@ -55,7 +56,6 @@ public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IHold, IAs
     public void OnHoldPerformed() => (currentState as IHold)?.OnHoldPerformed();
 
     public bool IsInspectable => currentState is IInspectable;
-    public Transform Transform => transform;
     public IInspectable GetInspectable() => currentState as IInspectable;
 
     public void OnAssembled(ArtefactPieceStateMachine parent) => (currentState as IAssembled)?.OnAssembled(parent);
