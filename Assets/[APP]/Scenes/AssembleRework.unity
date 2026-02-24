@@ -817,6 +817,7 @@ MonoBehaviour:
     transform: {fileID: 809826322}
     isOccupied: 0
   parent: {fileID: 0}
+  returningSpeed: 5
 --- !u!65 &834063106
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -953,6 +954,7 @@ MonoBehaviour:
     transform: {fileID: 815778095}
     isOccupied: 0
   parent: {fileID: 0}
+  returningSpeed: 5
 --- !u!65 &930540045
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1430,6 +1432,7 @@ MonoBehaviour:
     transform: {fileID: 442264718}
     isOccupied: 0
   parent: {fileID: 0}
+  returningSpeed: 5
 --- !u!1 &1564772631
 GameObject:
   m_ObjectHideFlags: 0
@@ -1719,8 +1722,8 @@ SceneRoots:
   - {fileID: 1271145303}
   - {fileID: 1993123494}
   - {fileID: 309445237}
+  - {fileID: 1783207670}
   - {fileID: 240419234}
   - {fileID: 1500324969}
   - {fileID: 930540048}
   - {fileID: 834063109}
-  - {fileID: 1783207670}

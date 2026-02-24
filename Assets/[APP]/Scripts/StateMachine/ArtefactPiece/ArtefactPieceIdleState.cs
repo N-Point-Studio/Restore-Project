@@ -19,7 +19,11 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDrag, IIn
     {
         stateMachine.transform.position = worldPos;
     }
-    public void EnterInspect() { stateMachine.SwitchState(new ArtefactPieceInspectState(stateMachine)); }
+    public void EnterInspect()
+    {
+        Debug.Log("Enter Inspect (from idle): " + stateMachine.name);
+        stateMachine.SwitchState(new ArtefactPieceInspectState(stateMachine));
+    }
     public void ExitInspect() { }
 
     public void OnAssembled(ArtefactPieceStateMachine parent)

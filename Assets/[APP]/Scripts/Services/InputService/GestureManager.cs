@@ -59,7 +59,7 @@ public class GestureManager : IInitializable, IDisposable
     private void HandleInteract(IInteract interact)
     {
         currentInteract = interact;
-        Debug.Log("Interact detected: " + interact);
+        // Debug.Log("Interact detected: " + interact);
     }
 
     private void HandleInteractionStart()
@@ -127,7 +127,7 @@ public class GestureManager : IInitializable, IDisposable
         {
             current = current.parent;
         }
-        Debug.Log("Drag Top parent: " + current.name);
+        // Debug.Log("Drag Top parent: " + current.name);
         return current;
     }
 
@@ -136,7 +136,7 @@ public class GestureManager : IInitializable, IDisposable
         if (currentState == GestureState.InteractingWithObject || currentState == GestureState.Hold) return;
         if (!IsInsideInspectZone(input.GetPrimaryPos())) return;
         currentState = GestureState.Rotating;
-        Debug.Log($"Rotate performed");
+        // Debug.Log($"Rotate performed");
         GestureEvents.OnRotatePerformed?.Invoke(delta);
     }
 

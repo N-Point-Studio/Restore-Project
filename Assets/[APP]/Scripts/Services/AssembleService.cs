@@ -1,106 +1,132 @@
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
-using VContainer.Unity;
-public class AssemblyService : IInitializable, IDisposable
+public class AssemblyService
 {
     private readonly FragmentService registry;
 
     [Inject]
-    public AssemblyService(FragmentService registry)
+    public AssemblyService(FragmentService registry) => this.registry = registry;
+    public ArtefactPieceStateMachine GetTopParent(ArtefactPieceStateMachine current)
     {
-        this.registry = registry;
-    }
-
-    public void Initialize()
-    {
-        GestureEvents.OnHoldPerformed += OnHoldPerformed;
-    }
-
-    private void OnHoldPerformed(IInteract interact)
-    {
-        if (interact is not ArtefactPieceStateMachine piece) return;
-        if (piece.GetCurrentState() is not IAssembled) return;
-        var topParent = GetTopParent(piece);
-
-        if (topParent.GetCurrentStateEnum() == ArtefactPieceState.Inspect)
+        var walker = current;
+        while (walker.transform.parent != null &&
+               walker.transform.parent.GetComponent<ArtefactPieceStateMachine>() != null)
         {
-            Detach(piece);
+            walker = walker.transform.parent.GetComponent<ArtefactPieceStateMachine>();
         }
-    }
-
-    public void Dispose()
-    {
-        GestureEvents.OnHoldPerformed -= OnHoldPerformed;
-    }
-
-    ArtefactPieceStateMachine GetTopParent(ArtefactPieceStateMachine current)
-    {
-        while (current.parent != null)
-        {
-            current = current.parent;
-        }
-
-        return current;
+        return walker;
     }
 
     public bool TryAssemble(ArtefactPieceStateMachine root, ArtefactPieceStateMachine incoming)
     {
-        var parentSocket = root.GetAvailableSocketFor(incoming.pieceId);
-        var childSocket = incoming.GetAvailableSocketFor(root.pieceId);
+        var rootParts = root.GetComponentsInChildren<ArtefactPieceStateMachine>();
+        var incomingParts = incoming.GetComponentsInChildren<ArtefactPieceStateMachine>();
 
-        if (parentSocket != null && childSocket != null)
+        foreach (var pPart in rootParts)
         {
-            PerformAssembly(root, incoming, parentSocket, childSocket);
-            return true;
-        }
-
-        var potentialParents = root.GetComponentsInChildren<ArtefactPieceStateMachine>();
-        foreach (var parentPart in potentialParents)
-        {
-            if (parentPart == root) continue;
-            var pSocket = parentPart.GetAvailableSocketFor(incoming.pieceId);
-            var cSocket = incoming.GetAvailableSocketFor(parentPart.pieceId);
-            if (pSocket != null && cSocket != null)
+            foreach (var iPart in incomingParts)
             {
-                PerformAssembly(parentPart, incoming, pSocket, cSocket);
-                return true;
+                var pSocket = pPart.GetAvailableSocketFor(iPart.pieceId);
+                var iSocket = iPart.GetAvailableSocketFor(pPart.pieceId);
+
+                if (pSocket != null && iSocket != null)
+                {
+                    // Aturan Re-parenting: Jika iPart punya bapak lain, lepaskan dulu
+                    if (iPart.parent != null && iPart.parent != pPart)
+                    {
+                        ForceDetachFromCurrentParent(iPart);
+                    }
+
+                    PerformAssembly(pPart, iPart, pSocket, iSocket);
+
+                    // Rekursif: Cek apakah teman-teman iPart lainnya bisa ikut nempel ke struktur baru
+                    RecursiveCheckReassembly(iPart, incomingParts);
+                    return true;
+                }
             }
         }
-
         return false;
     }
 
-    private void PerformAssembly(ArtefactPieceStateMachine parent, ArtefactPieceStateMachine piece, ConnectionSocket socket, ConnectionSocket parentSocket)
+    public ArtefactPieceStateMachine RebuildChildrenHierarchy(ArtefactPieceStateMachine parent)
     {
-        piece.transform.SetParent(parent.transform);
-        piece.transform.localPosition = socket.transform.localPosition;
-        piece.transform.localRotation = socket.transform.localRotation;
+        var children = parent.GetComponentsInChildren<ArtefactPieceStateMachine>();
+        if (children.Length <= 1) return null;
 
-        socket.isOccupied = true;
-        parentSocket.isOccupied = true;
+        var childList = new List<ArtefactPieceStateMachine>();
+        foreach (var c in children) if (c != parent) childList.Add(c);
 
-        piece.OnAssembled(parent);
-        piece.GetInspectable()?.EnterInspect();
-        Debug.Log($"Assembled: {piece.pieceId} attached to {parent.pieceId}, progress: {registry.GetAssemblyProgress()}");
+        // Putus hubungan dari bapak lama agar bebas mencari pasangan baru
+        foreach (var child in childList) ForceDetachFromCurrentParent(child);
+
+        bool anyConnectionMade = false;
+        foreach (var c1 in childList)
+        {
+            foreach (var c2 in childList)
+            {
+                if (c1 == c2) continue;
+                if (TryAssemble(c1, c2)) anyConnectionMade = true;
+            }
+        }
+
+        return anyConnectionMade ? GetTopParent(childList[0]) : null;
     }
 
     public void Detach(ArtefactPieceStateMachine piece)
     {
-        var parentTransform = piece.transform.parent;
-        if (parentTransform == null) return;
+        if (piece.parent == null) return;
+        ForceDetachFromCurrentParent(piece);
+        piece.OnDetached();
+        LogProgress("Detached", piece.pieceId);
+    }
 
-        var parentPiece = parentTransform.GetComponent<ArtefactPieceStateMachine>();
-        if (parentPiece == null) return;
+    private void ForceDetachFromCurrentParent(ArtefactPieceStateMachine piece)
+    {
+        var oldParent = piece.parent;
+        if (oldParent == null) return;
 
-        var parentSocket = parentPiece.sockets.Find(s => s.targetPieceId == piece.pieceId);
-        if (parentSocket != null) parentSocket.isOccupied = false;
-
-        var childSocket = piece.sockets.Find(s => s.targetPieceId == parentPiece.pieceId);
-        if (childSocket != null) childSocket.isOccupied = false;
+        oldParent.sockets.Find(s => s.targetPieceId == piece.pieceId && s.isOccupied).isOccupied = false;
+        piece.sockets.Find(s => s.targetPieceId == oldParent.pieceId && s.isOccupied).isOccupied = false;
 
         piece.transform.SetParent(null);
-        piece.OnDetached();
-        Debug.Log($"Detached: {piece.pieceId} attached to {parentPiece.pieceId}, progress: {registry.GetAssemblyProgress()}");
+        piece.parent = null;
+    }
+
+    private void PerformAssembly(ArtefactPieceStateMachine parent, ArtefactPieceStateMachine piece, ConnectionSocket pSocket, ConnectionSocket iSocket)
+    {
+        piece.transform.SetParent(parent.transform);
+        piece.transform.localPosition = pSocket.transform.localPosition;
+        piece.transform.localRotation = pSocket.transform.localRotation;
+
+        pSocket.isOccupied = true;
+        iSocket.isOccupied = true;
+        piece.parent = parent;
+
+        piece.OnAssembled(parent);
+        LogProgress("Assembled", piece.pieceId);
+    }
+
+    private void RecursiveCheckReassembly(ArtefactPieceStateMachine newParent, ArtefactPieceStateMachine[] potentialChildren)
+    {
+        foreach (var child in potentialChildren)
+        {
+            if (child == newParent || child.parent != null) continue;
+
+            var pSocket = newParent.GetAvailableSocketFor(child.pieceId);
+            var iSocket = child.GetAvailableSocketFor(newParent.pieceId);
+
+            if (pSocket != null && iSocket != null)
+            {
+                PerformAssembly(newParent, child, pSocket, iSocket);
+                RecursiveCheckReassembly(child, potentialChildren);
+            }
+        }
+    }
+
+    private void LogProgress(string action, string id)
+    {
+        float progress = registry.GetAssemblyProgress();
+        Debug.Log($"<color=cyan>[{action}]</color> {id}. Progress: {progress * 100:F0}%");
     }
 }

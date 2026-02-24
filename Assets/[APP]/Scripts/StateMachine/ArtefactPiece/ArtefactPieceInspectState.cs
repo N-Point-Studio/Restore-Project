@@ -41,7 +41,10 @@ public class ArtefactPieceInspectState : ArtefactPieceBaseState, IRotate, IHold,
 
     public void OnInteractEnd() { }
 
-    public void EnterInspect() { }
+    public void EnterInspect()
+    {
+        Debug.Log("Enter Inspect (from inspect): " + stateMachine.name);
+    }
 
     public void ExitInspect()
     {
