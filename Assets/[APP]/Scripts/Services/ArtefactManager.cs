@@ -21,6 +21,7 @@ public class ArtefactManager : IInitializable, IDisposable
         GestureEvents.OnDropPerformed += HandleDrop;
         GestureEvents.OnHoldPerformed += HandleHold;
         GestureEvents.OnClickPerformed += HandleClick;
+        GestureEvents.OnDragPerformed += HandleDrag;
     }
 
     public void Dispose()
@@ -28,13 +29,15 @@ public class ArtefactManager : IInitializable, IDisposable
         GestureEvents.OnDropPerformed -= HandleDrop;
         GestureEvents.OnHoldPerformed -= HandleHold;
         GestureEvents.OnClickPerformed -= HandleClick;
+        GestureEvents.OnDragPerformed -= HandleDrag;
     }
+
 
     ArtefactPieceStateMachine GetTopParent(ArtefactPieceStateMachine current)
     {
         while (current.parent != null)
         {
-            current = current.parent;
+            // current = current.parent;
         }
         return current;
     }
@@ -42,6 +45,7 @@ public class ArtefactManager : IInitializable, IDisposable
     private void HandleClick(IInspectable inspectable, Vector2 pos)
     {
         if (inspectable is not ArtefactPieceStateMachine sm) return;
+
         var topParent = GetTopParent(sm);
         if (topParent.GetCurrentStateEnum() == ArtefactPieceState.Idle)
         {
@@ -49,24 +53,31 @@ public class ArtefactManager : IInitializable, IDisposable
         }
     }
 
+    private void HandleDrag(IInteract interact, Vector3? nullable)
+    {
+        if (interact is not ArtefactPieceStateMachine sm) return;
+        if (inspectService.GetCurrentInspected() == null) return;
+    }
+
     private void HandleDrop(IInspectable inspectable, Vector3 worldPos)
     {
-        if (inspectable is not ArtefactPieceStateMachine incoming) return;
-        if (incoming.GetCurrentState() is not IDrag) return;
-        if (incoming == inspectService.GetCurrentInspected()) return;
+        // if (inspectable is not ArtefactPieceStateMachine incoming) return;
+        // if (incoming.GetCurrentState() is not IDrag) return;
+        // if (incoming == inspectService.GetCurrentInspected()) return;
 
         float distance = Vector3.Distance(worldPos, inspectService.GetInspectPoint().position);
         if (distance < 1.5f)
         {
             if (inspectService.GetCurrentInspected() == null)
             {
-                inspectService.Inspect(GetTopParent(incoming));
+                inspectService.Inspect(inspectable);
             }
             else
             {
-                if (!assemblyService.TryAssemble(inspectService.GetCurrentInspected(), incoming))
+                if (!assemblyService.TryAssemble(inspectService.GetCurrentInspected() as IAssembled, inspectable as IAssembled))
                 {
-                    inspectService.Inspect(GetTopParent(incoming));
+                    inspectService.Inspect(inspectable);
+                    // inspectService.Inspect(GetTopParent(inspectable as ArtefactPieceStateMachine));
                 }
             }
         }
@@ -78,22 +89,14 @@ public class ArtefactManager : IInitializable, IDisposable
 
         var currentInspect = inspectService.GetCurrentInspected();
 
-        if (sm == currentInspect)
+        if (sm as IInspectable == currentInspect)
         {
-            // Debug.Log("[Test] Hold on current inspect, try to detach or exit inspect");
-            // var assemble = assemblyService.TryAssembleParent(sm);
-            // if (assemble != null)
-            // {
-            // Debug.Log($"[Test] Assembled {assemble.name} as new inspect");
-            // inspectService.InspectNewChild(assemble);
-            // }
             inspectService.ExitInspect();
             return;
         }
-        else if (sm.parent != null && assemblyService.GetTopParent(sm) == currentInspect)
+        else if (sm.parent != null)
         {
             assemblyService.Detach(sm);
-            inspectService.Inspect(sm);
         }
     }
 }

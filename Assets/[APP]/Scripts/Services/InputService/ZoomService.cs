@@ -9,6 +9,8 @@ public class ZoomService : IInitializable, IDisposable
     private float lastPinchDistance;
     private bool isZooming;
 
+    private const float ScrollSensitivity = 10f;
+
     public event Action<float> OnZoomPerformed;
 
     [Inject]
@@ -19,36 +21,52 @@ public class ZoomService : IInitializable, IDisposable
 
     public void Initialize()
     {
-        input.OnSecondaryStarted += OnSecondaryStarted;
-        input.OnSecondaryMoved += OnSecondaryMoved;
-        input.OnSecondaryEnded += OnSecondaryEnded;
+        input.OnSecondaryFingerStarted += OnPinchStarted;
+        input.OnSecondaryFingerMoved += OnPinchMoved;
+        input.OnSecondaryFingerEnded += OnPinchEnded;
+
+        input.OnScrollPerformed += OnScrollPerformed;
     }
 
     public void Dispose()
     {
-        input.OnSecondaryStarted -= OnSecondaryStarted;
-        input.OnSecondaryMoved -= OnSecondaryMoved;
-        input.OnSecondaryEnded -= OnSecondaryEnded;
+        input.OnSecondaryFingerStarted -= OnPinchStarted;
+        input.OnSecondaryFingerMoved -= OnPinchMoved;
+        input.OnSecondaryFingerEnded -= OnPinchEnded;
+
+        input.OnScrollPerformed -= OnScrollPerformed;
     }
 
-    private void OnSecondaryStarted(Vector2 pos)
+    #region Mobile Pinch Logic
+    private void OnPinchStarted(Vector2 secondaryPos)
     {
         isZooming = true;
-        lastPinchDistance = Vector2.Distance(input.GetPrimaryPos(), pos);
+        lastPinchDistance = Vector2.Distance(input.GetPrimaryPos(), secondaryPos);
     }
 
-    private void OnSecondaryMoved(Vector2 pos)
+    private void OnPinchMoved(Vector2 secondaryPos)
     {
         if (!isZooming) return;
 
-        float currentDistance = Vector2.Distance(input.GetPrimaryPos(), pos);
+        float currentDistance = Vector2.Distance(input.GetPrimaryPos(), secondaryPos);
         float delta = currentDistance - lastPinchDistance;
         lastPinchDistance = currentDistance;
         OnZoomPerformed?.Invoke(delta);
     }
 
-    private void OnSecondaryEnded(Vector2 pos)
+    private void OnPinchEnded(Vector2 secondaryPos)
     {
         isZooming = false;
     }
+    #endregion
+
+    #region PC Scroll Logic
+    private void OnScrollPerformed(float scrollValue)
+    {
+        Debug.Log($"Scroll Value: {scrollValue}");
+        float zoomDelta = scrollValue * ScrollSensitivity;
+
+        OnZoomPerformed?.Invoke(zoomDelta);
+    }
+    #endregion
 }

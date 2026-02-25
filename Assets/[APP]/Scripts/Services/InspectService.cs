@@ -4,7 +4,7 @@ using VContainer;
 public class InspectService
 {
     private readonly Transform inspectPoint;
-    private ArtefactPieceStateMachine currentSM;
+    private IInspectable currentInspect;
     private Transform originalParent;
 
     [Inject]
@@ -13,62 +13,32 @@ public class InspectService
         this.inspectPoint = inspectPoint;
     }
 
-    public ArtefactPieceStateMachine GetCurrentInspected() => currentSM;
-    public void ResetInspectPoint() { inspectPoint.SetPositionAndRotation(Vector3.zero, Quaternion.identity); }
+    public IInspectable GetCurrentInspected() => currentInspect;
     public Transform GetInspectPoint() => inspectPoint;
-
-    public void InspectNewChild(ArtefactPieceStateMachine child)
+    public void ResetInspectPoint() { inspectPoint.SetPositionAndRotation(Vector3.zero, Quaternion.identity); }
+    public void Inspect(IInspectable inspectable)
     {
-        ExitInspect();
-
-        currentSM = child;
-        originalParent = child.transform;
-
-        Debug.Log($"[Test] InspectNewChild: {child.name}");
-        child.transform.SetParent(inspectPoint);
-        child.transform.localPosition = Vector3.zero;
-        child.transform.localRotation = Quaternion.identity;
-        ResetInspectPoint();
-        child.GetInspectable()?.EnterInspect();
-    }
-
-    public void Inspect(ArtefactPieceStateMachine sm)
-    {
-
-        if (sm.GetCurrentState() is not IAssembled) return;
-        if (currentSM == sm)
+        if (currentInspect == inspectable)
             return;
 
-        if (currentSM != null)
-
+        if (currentInspect != null)
             ExitInspect();
 
-        currentSM = sm;
-
-        originalParent = sm.transform.parent;
-
-        sm.transform.SetParent(inspectPoint);
-        sm.transform.localPosition = Vector3.zero;
-        sm.transform.localRotation = Quaternion.identity;
+        currentInspect = inspectable;
+        originalParent = inspectable.GetTransform();
+        inspectable.GetTransform().SetParent(inspectPoint);
+        inspectable.EnterInspect(inspectPoint.transform.position);
         ResetInspectPoint();
-        sm.GetInspectable()?.EnterInspect();
     }
 
     public void ExitInspect()
     {
-        if (currentSM == null)
-            return;
+        if (currentInspect == null) return;
 
-        var sm = currentSM;
+        currentInspect.GetTransform().SetParent(originalParent, true);
+        currentInspect.ExitInspect();
 
-        // Kembalikan parent dulu
-        sm.transform.SetParent(originalParent, true);
-
-        // Beritahu state machine
-        Debug.Log("Exit Inspect: " + sm.name);
-        sm.GetInspectable()?.ExitInspect();
-
-        currentSM = null;
+        currentInspect = null;
         originalParent = null;
     }
 }

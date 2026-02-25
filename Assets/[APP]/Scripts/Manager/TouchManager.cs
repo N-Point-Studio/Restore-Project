@@ -257,4 +257,14 @@ public class TouchManager : MonoBehaviour, GameInput.IPlayerActions
     {
         throw new NotImplementedException();
     }
+
+    public void OnSecondaryPress(InputAction.CallbackContext context)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnScroll(InputAction.CallbackContext context)
+    {
+        throw new NotImplementedException();
+    }
 }

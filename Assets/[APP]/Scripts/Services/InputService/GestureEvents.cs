@@ -11,6 +11,7 @@ public static class GestureEvents
     public static Action<IInspectable, Vector3> OnDropPerformed;
     public static Action<IInspectable, Vector2> OnClickPerformed;
     public static Action<IInteract> OnHoldPerformed;
+    public static Action<IInteract, Vector3?> OnDragPerformed;
 
     public static Action<Vector2> OnRotatePerformed;
     public static Action<float> OnZoomPerformed;

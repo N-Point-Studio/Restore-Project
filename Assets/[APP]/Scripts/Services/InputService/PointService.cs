@@ -46,40 +46,12 @@ public class PointService : IInitializable, IDisposable
         OnInteractDetected?.Invoke(interactable);
     }
 
-    private void PressEnd(Vector2 vector)
-    {
-    }
+    private void PressEnd(Vector2 vector) { interactable = null; }
 
     public bool TryRaycast(Vector2 screenPos, out RaycastHit hit)
     {
         Ray ray = cam.ScreenPointToRay(screenPos);
         return Physics.Raycast(ray, out hit);
-    }
-
-    public IInteract GetTopParent(IInteract current)
-    {
-        if (current is Component currentComp)
-        {
-            Transform currentTransform = currentComp.transform;
-            while (currentTransform.parent != null)
-            {
-                if (currentTransform.parent.TryGetComponent(out IInteract parentInteract))
-                {
-                    current = parentInteract;
-                    currentTransform = currentTransform.parent;
-                }
-                else
-                {
-                    break;
-                }
-            }
-        }
-        return current;
-    }
-
-    public IInteract GetInteractObject()
-    {
-        return interactable;
     }
 
     public Vector3 ScreenToWorld(Vector2 screenPos, IInteract target)

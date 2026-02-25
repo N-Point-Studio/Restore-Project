@@ -2,27 +2,16 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public enum ArtefactPieceState
-{
-    None,
-    Idle,
-    Inspect,
-    Assembled,
-    Returning
-}
-
 public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IHold, IAssembled, IInspectable
 {
     public ArtefactPieceState state = ArtefactPieceState.None;
     public string pieceId;
+    public string PieceId => pieceId;
     public List<ConnectionSocket> sockets;
     public Vector3 InitialPosition { get; set; }
     public Quaternion InitialRotation { get; set; }
     public static event Action<ArtefactPieceStateMachine> OnCreated;
-    public ArtefactPieceStateMachine parent;
-    public float returningSpeed = 5f;
-    public Transform centerTransform;
+    public IAssembled parent;
 
     private void Awake()
     {
@@ -36,7 +25,6 @@ public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IHold, IAs
         SwitchState(new ArtefactPieceIdleState(this));
     }
 
-    public State GetCurrentState() { return currentState; }
     public ArtefactPieceState GetCurrentStateEnum() { return state; }
 
     public void ResetTransform()
@@ -54,13 +42,21 @@ public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IHold, IAs
     public void OnClick() => (currentState as IClick)?.OnClick();
     public void OnDragPerformed(Vector3 worldPos) => (currentState as IDrag)?.OnDragPerformed(worldPos);
     public void OnHoldPerformed() => (currentState as IHold)?.OnHoldPerformed();
-
-    public bool IsInspectable => currentState is IInspectable;
-    public IInspectable GetInspectable() => currentState as IInspectable;
-
-    public void OnAssembled(ArtefactPieceStateMachine parent) => (currentState as IAssembled)?.OnAssembled(parent);
+    public void OnAssembled(IAssembled parent) => (currentState as IAssembled)?.OnAssembled(parent);
     public void OnDetached() => (currentState as IAssembled)?.OnDetached();
 
-    public void EnterInspect() => (currentState as IInspectable)?.EnterInspect();
+    public void EnterInspect(Vector3 targetPosition) => (currentState as IInspectable)?.EnterInspect(targetPosition);
     public void ExitInspect() => (currentState as IInspectable)?.ExitInspect();
+
+    public Transform GetTransform() => transform;
+    public IAssembled GetAssembleParrent() => parent;
+
+    public void ReleaseSocketWith(string otherId)
+    {
+        var socket = sockets.Find(s => s.targetPieceId == otherId && s.isOccupied);
+        if (socket != null)
+        {
+            socket.isOccupied = false;
+        }
+    }
 }

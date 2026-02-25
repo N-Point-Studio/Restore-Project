@@ -5,7 +5,7 @@ using VContainer.Unity;
 
 public class HoldService : IInitializable, IDisposable, ITickable
 {
-    private readonly InputService input;
+    private readonly PressService pressService;
     private const float HoldDuration = 0.5f;
     private const float HoldThreshold = 20f;
 
@@ -17,43 +17,40 @@ public class HoldService : IInitializable, IDisposable, ITickable
     public event Action<Vector2> OnHoldPerformed;
 
     [Inject]
-    public HoldService(InputService input)
+    public HoldService(PressService pressService)
     {
-        this.input = input;
+        this.pressService = pressService;
     }
 
     public void Initialize()
     {
-        input.OnPrimaryStarted += OnPrimaryStarted;
-        input.OnPrimaryEnded += OnPrimaryEnded;
+        pressService.OnPressStarted += OnHoldStart;
+        pressService.OnPressEnded += OnHoldEnd;
     }
 
     public void Dispose()
     {
-        input.OnPrimaryStarted -= OnPrimaryStarted;
-        input.OnPrimaryEnded -= OnPrimaryEnded;
+        pressService.OnPressStarted -= OnHoldStart;
+        pressService.OnPressEnded -= OnHoldEnd;
     }
 
     public void Tick()
     {
-        if (isPressing && !holdTriggered)
+        if (!isPressing || holdTriggered) return;
+        if (Vector2.Distance(startPos, pressService.GetCurrentPos()) > HoldThreshold)
         {
-            if (Vector2.Distance(startPos, input.GetPrimaryPos()) > HoldThreshold)
-            {
-                isPressing = false;
-                return;
-            }
+            isPressing = false;
+            return;
+        }
 
-            if (Time.time - startTime >= HoldDuration)
-            {
-                holdTriggered = true;
-                OnHoldPerformed?.Invoke(startPos);
-                Debug.Log("Hold Detected");
-            }
+        if (Time.time - startTime >= HoldDuration)
+        {
+            holdTriggered = true;
+            OnHoldPerformed?.Invoke(startPos);
         }
     }
 
-    private void OnPrimaryStarted(Vector2 pos)
+    private void OnHoldStart(Vector2 pos)
     {
         startPos = pos;
         startTime = Time.time;
@@ -61,7 +58,7 @@ public class HoldService : IInitializable, IDisposable, ITickable
         holdTriggered = false;
     }
 
-    private void OnPrimaryEnded(Vector2 pos)
+    private void OnHoldEnd(Vector2 pos)
     {
         isPressing = false;
     }
