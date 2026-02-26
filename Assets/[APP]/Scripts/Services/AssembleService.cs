@@ -74,11 +74,11 @@ public class AssemblyService
     private void PerformAssembly(IAssembled parent, IAssembled incoming, ConnectionSocket parentSocket, ConnectionSocket incomingSocket)
     {
         incoming.GetTransform().SetParent(parent.GetTransform());
-        incoming.GetTransform().SetLocalPositionAndRotation(parentSocket.transform.localPosition, parentSocket.transform.localRotation);
+        // incoming.GetTransform().SetLocalPositionAndRotation(parentSocket.transform.localPosition, parentSocket.transform.localRotation);
         parentSocket.isOccupied = true;
         incomingSocket.isOccupied = true;
 
-        incoming.OnAssembled(parent);
+        incoming.OnAssembled(parent, parentSocket.transform);
     }
 
     private void RecursiveCheckReassembly(IAssembled newParent, IAssembled[] potentialChildren)

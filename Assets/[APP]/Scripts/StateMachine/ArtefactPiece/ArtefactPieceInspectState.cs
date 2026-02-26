@@ -18,10 +18,10 @@ public class ArtefactPieceInspectState : ArtefactPieceBaseState, IHold, IInspect
     public void OnHoldPerformed() { }
     public void OnInteractEnd() { }
 
-    public void EnterInspect(Vector3 targetPosition) { }
+    public void EnterInspect(Transform targetPosition) { }
     public void ExitInspect() { stateMachine.SwitchState(new ArtefactPieceReturningState(stateMachine)); }
 
-    public void OnAssembled(IAssembled parent) { }
+    public void OnAssembled(IAssembled parent, Transform transform) { }
     public void OnDetached() { stateMachine.SwitchState(new ArtefactPieceIdleState(stateMachine)); }
     public IAssembled GetAssembleParrent() => stateMachine.parent;
 

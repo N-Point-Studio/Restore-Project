@@ -42,10 +42,10 @@ public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IHold, IAs
     public void OnClick() => (currentState as IClick)?.OnClick();
     public void OnDragPerformed(Vector3 worldPos) => (currentState as IDrag)?.OnDragPerformed(worldPos);
     public void OnHoldPerformed() => (currentState as IHold)?.OnHoldPerformed();
-    public void OnAssembled(IAssembled parent) => (currentState as IAssembled)?.OnAssembled(parent);
+    public void OnAssembled(IAssembled parent, Transform transform) => (currentState as IAssembled)?.OnAssembled(parent, transform);
     public void OnDetached() => (currentState as IAssembled)?.OnDetached();
 
-    public void EnterInspect(Vector3 targetPosition) => (currentState as IInspectable)?.EnterInspect(targetPosition);
+    public void EnterInspect(Transform targetPosition) => (currentState as IInspectable)?.EnterInspect(targetPosition);
     public void ExitInspect() => (currentState as IInspectable)?.ExitInspect();
 
     public Transform GetTransform() => transform;

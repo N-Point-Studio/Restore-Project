@@ -19,13 +19,13 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDrag, IIn
     public void OnClick() { }
     public void OnDragPerformed(Vector3 worldPos) { stateMachine.transform.position = worldPos; }
 
-    public void EnterInspect(Vector3 targetPosition) { stateMachine.SwitchState(new ArtefactPieceMoveState(stateMachine, targetPosition)); }
+    public void EnterInspect(Transform targetTransform) { stateMachine.SwitchState(new ArtefactPieceMoveState(stateMachine, targetTransform, ArtefactPieceState.Inspect)); }
     public void ExitInspect() { }
 
-    public void OnAssembled(IAssembled parent)
+    public void OnAssembled(IAssembled parent, Transform transform)
     {
         stateMachine.parent = parent;
-        stateMachine.SwitchState(new ArtefactPieceAssembledState(stateMachine));
+        stateMachine.SwitchState(new ArtefactPieceMoveState(stateMachine, transform, ArtefactPieceState.Assembled));
     }
     public void OnDetached() { }
     public Transform GetTransform() => stateMachine.transform;

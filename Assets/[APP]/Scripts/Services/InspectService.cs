@@ -27,7 +27,7 @@ public class InspectService
         currentInspect = inspectable;
         originalParent = inspectable.GetTransform();
         inspectable.GetTransform().SetParent(inspectPoint);
-        inspectable.EnterInspect(inspectPoint.transform.position);
+        inspectable.EnterInspect(inspectPoint.transform);
         ResetInspectPoint();
     }
 

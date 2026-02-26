@@ -2,7 +2,7 @@ using UnityEngine;
 
 public interface IInspectable
 {
-    void EnterInspect(Vector3 targetPosition);
+    void EnterInspect(Transform targetPosition);
     void ExitInspect();
     Transform GetTransform();
 }

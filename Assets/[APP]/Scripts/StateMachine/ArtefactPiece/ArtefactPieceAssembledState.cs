@@ -22,13 +22,14 @@ public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IHold, IAssem
     public void OnInteractEnd() { }
     public void OnHoldPerformed() { }
 
-    public void EnterInspect(Vector3 targetPosition)
+    public void EnterInspect(Transform targetPosition)
     {
-        stateMachine.SwitchState(new ArtefactPieceInspectState(stateMachine));
+        // stateMachine.SwitchState(new ArtefactPieceInspectState(stateMachine));
+        stateMachine.SwitchState(new ArtefactPieceMoveState(stateMachine, targetPosition, ArtefactPieceState.Inspect));
     }
     public void ExitInspect() { }
 
-    public void OnAssembled(IAssembled parent) { stateMachine.parent = parent; }
+    public void OnAssembled(IAssembled parent, Transform transform) { stateMachine.parent = parent; }
     public void OnDetached()
     {
         stateMachine.parent = null;

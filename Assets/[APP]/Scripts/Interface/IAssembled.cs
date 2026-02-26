@@ -7,6 +7,6 @@ public interface IAssembled
     IAssembled GetAssembleParrent();
     ConnectionSocket GetAvailableSocketFor(string id);
     void ReleaseSocketWith(string otherId);
-    void OnAssembled(IAssembled parent);
+    void OnAssembled(IAssembled parent, Transform transform);
     void OnDetached();
 }
