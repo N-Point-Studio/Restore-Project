@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
@@ -6,6 +7,8 @@ public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IHold, IAssem
     public Transform GetTransform() => stateMachine.transform;
     public IAssembled GetAssembleParrent() => stateMachine.parent;
     public string PieceId => stateMachine.pieceId;
+    public bool IsInspected => stateMachine.isInspected;
+    public List<ConnectionSocket> GetSockets() => stateMachine.sockets;
 
     public ArtefactPieceAssembledState(ArtefactPieceStateMachine stateMachine) : base(stateMachine) { }
 
@@ -29,7 +32,11 @@ public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IHold, IAssem
     }
     public void ExitInspect() { }
 
-    public void OnAssembled(IAssembled parent, Transform transform) { stateMachine.parent = parent; }
+    public void OnAssembled(IAssembled parent, Transform transform)
+    {
+        stateMachine.parent = parent;
+        stateMachine.SwitchState(new ArtefactPieceMoveState(stateMachine, transform, ArtefactPieceState.Assembled));
+    }
     public void OnDetached()
     {
         stateMachine.parent = null;

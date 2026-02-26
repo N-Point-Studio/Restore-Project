@@ -8,8 +8,13 @@ public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IHold, IAs
     public string pieceId;
     public string PieceId => pieceId;
     public List<ConnectionSocket> sockets;
+    public List<ConnectionSocket> GetSockets() => sockets;
     public Vector3 InitialPosition { get; set; }
     public Quaternion InitialRotation { get; set; }
+
+    public bool isInspected;
+    public bool IsInspected => this.isInspected;
+
     public static event Action<ArtefactPieceStateMachine> OnCreated;
     public IAssembled parent;
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 
@@ -74,10 +75,9 @@ public class AssemblyService
     private void PerformAssembly(IAssembled parent, IAssembled incoming, ConnectionSocket parentSocket, ConnectionSocket incomingSocket)
     {
         incoming.GetTransform().SetParent(parent.GetTransform());
-        // incoming.GetTransform().SetLocalPositionAndRotation(parentSocket.transform.localPosition, parentSocket.transform.localRotation);
         parentSocket.isOccupied = true;
         incomingSocket.isOccupied = true;
-
+        Debug.Log($"slot untuk {incoming} di {parent} adalah {parentSocket.transform.position}");
         incoming.OnAssembled(parent, parentSocket.transform);
     }
 
@@ -85,11 +85,14 @@ public class AssemblyService
     {
         foreach (var child in potentialChildren)
         {
-            if (child == newParent || child.GetAssembleParrent() != null) continue;
+            if (child == newParent) continue;
+
             var parentSocket = newParent.GetAvailableSocketFor(child.PieceId);
             var incomingSocket = child.GetAvailableSocketFor(newParent.PieceId);
+
             if (parentSocket != null && incomingSocket != null)
             {
+                Debug.Log($"{child} ditempel ke {newParent}");
                 PerformAssembly(newParent, child, parentSocket, incomingSocket);
                 RecursiveCheckReassembly(child, potentialChildren);
             }

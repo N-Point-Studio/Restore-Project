@@ -6,6 +6,8 @@ public class ArtefactPieceMoveState : ArtefactPieceBaseState, IInspectable
     private readonly Transform targetTransform;
     private Sequence moveSequence;
     private ArtefactPieceState temporaryState;
+
+    public bool IsInspected => stateMachine.isInspected;
     public Transform GetTransform() => stateMachine.transform;
     public ArtefactPieceMoveState(ArtefactPieceStateMachine stateMachine, Transform targetPos, ArtefactPieceState state) : base(stateMachine)
     {
@@ -45,6 +47,7 @@ public class ArtefactPieceMoveState : ArtefactPieceBaseState, IInspectable
     public void EnterInspect(Transform targetPosition) { }
     public void ExitInspect()
     {
+        stateMachine.isInspected = false;
         moveSequence?.Kill();
         stateMachine.SwitchState(new ArtefactPieceReturningState(stateMachine));
     }

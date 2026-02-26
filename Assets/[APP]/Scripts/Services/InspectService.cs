@@ -18,14 +18,12 @@ public class InspectService
     public void ResetInspectPoint() { inspectPoint.SetPositionAndRotation(Vector3.zero, Quaternion.identity); }
     public void Inspect(IInspectable inspectable)
     {
-        if (currentInspect == inspectable)
-            return;
+        if (currentInspect == inspectable) return;
 
-        if (currentInspect != null)
-            ExitInspect();
+        if (currentInspect != null) ExitInspect();
 
         currentInspect = inspectable;
-        originalParent = inspectable.GetTransform();
+        originalParent = inspectable.GetTransform().parent;
         inspectable.GetTransform().SetParent(inspectPoint);
         inspectable.EnterInspect(inspectPoint.transform);
         ResetInspectPoint();

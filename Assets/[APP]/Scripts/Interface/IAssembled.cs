@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public interface IAssembled
@@ -6,6 +7,7 @@ public interface IAssembled
     Transform GetTransform();
     IAssembled GetAssembleParrent();
     ConnectionSocket GetAvailableSocketFor(string id);
+    List<ConnectionSocket> GetSockets();
     void ReleaseSocketWith(string otherId);
     void OnAssembled(IAssembled parent, Transform transform);
     void OnDetached();

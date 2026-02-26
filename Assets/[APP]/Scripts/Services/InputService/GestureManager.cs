@@ -85,15 +85,15 @@ public class GestureManager : IInitializable, IDisposable
 
     private void HandleClick(Vector2 screenPos)
     {
-        var target = currentInteract;
-        Debug.Log($"Click performed on {target}");
+        if (currentInteract == null) return;
 
-        if (target is IClick click)
-        {
-            currentState = GestureState.InteractingWithObject;
-            GestureEvents.OnClickPerformed?.Invoke(target as IInspectable, screenPos);
-            click.OnClick();
-        }
+        currentState = GestureState.InteractingWithObject;
+        GestureEvents.OnClickPerformed?.Invoke(currentInteract, screenPos);
+
+        // if (target is IClick click)
+        // {
+        //     click.OnClick();
+        // }
     }
 
     private void HandleHold(Vector2 screenPos)
@@ -110,27 +110,10 @@ public class GestureManager : IInitializable, IDisposable
     private void HandleDrag(Vector3 screenPos)
     {
         if (currentState == GestureState.Rotating || currentState == GestureState.Hold) return;
-        var target = currentInteract;
-        if (target is IDrag draggable)
-        {
-            currentState = GestureState.InteractingWithObject;
-            var parent = GetTopParent(target as ArtefactPieceStateMachine);
-            currentInteract = parent;
-            Vector3 worldPos = point.ScreenToWorld(screenPos, parent);
+        currentState = GestureState.InteractingWithObject;
 
-            draggable.OnDragPerformed(worldPos);
-            GestureEvents.OnDragPerformed?.Invoke(draggable, worldPos);
-        }
-    }
-
-    ArtefactPieceStateMachine GetTopParent(ArtefactPieceStateMachine current)
-    {
-        while (current.parent != null)
-        {
-            // current = current.parent;
-        }
-        // Debug.Log("Drag Top parent: " + current.name);
-        return current;
+        Vector3 worldPos = point.ScreenToWorld(screenPos, currentInteract);
+        GestureEvents.OnDragPerformed?.Invoke(currentInteract, worldPos);
     }
 
     private void HandleRotate(Vector2 delta)

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -32,31 +31,29 @@ public class ArtefactManager : IInitializable, IDisposable
         GestureEvents.OnDragPerformed -= HandleDrag;
     }
 
-
-    ArtefactPieceStateMachine GetTopParent(ArtefactPieceStateMachine current)
-    {
-        while (current.parent != null)
-        {
-            // current = current.parent;
-        }
-        return current;
-    }
-
-    private void HandleClick(IInspectable inspectable, Vector2 pos)
-    {
-        if (inspectable is not ArtefactPieceStateMachine sm) return;
-
-        var topParent = GetTopParent(sm);
-        if (topParent.GetCurrentStateEnum() == ArtefactPieceState.Idle)
-        {
-            inspectService.Inspect(topParent);
-        }
-    }
-
-    private void HandleDrag(IInteract interact, Vector3? nullable)
+    private void HandleClick(IInteract interact, Vector2 pos)
     {
         if (interact is not ArtefactPieceStateMachine sm) return;
-        if (inspectService.GetCurrentInspected() == null) return;
+
+        if (interact is IAssembled assembled)
+        {
+            var parent = assemblyService.GetAssembledRoot(assembled);
+            if (parent is IInspectable inspect)
+            {
+                if (!inspect.IsInspected) inspectService.Inspect(inspect);
+            }
+        }
+    }
+
+    private void HandleDrag(IInteract interact, Vector3 worldPos)
+    {
+        if (interact is not ArtefactPieceStateMachine sm) return;
+
+        if (interact is IAssembled assembled)
+        {
+            var parent = assemblyService.GetAssembledRoot(assembled);
+            if (parent is IDrag drag) { drag.OnDragPerformed(worldPos); }
+        }
     }
 
     private void HandleDrop(IInspectable inspectable, Vector3 worldPos)
