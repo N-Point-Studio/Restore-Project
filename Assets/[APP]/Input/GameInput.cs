@@ -99,7 +99,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": false
+                    ""initialStateCheck"": true
                 },
                 {
                     ""name"": ""ScreenPos"",
@@ -109,6 +109,24 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""SecondaryPress"",
+                    ""type"": ""Button"",
+                    ""id"": ""4ea9d7c1-58fc-46a7-a976-4f38cbac5a7b"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Scroll"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""0d6b1926-78c7-49ac-81b6-b0ed59359533"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 },
                 {
                     ""name"": ""SecondaryFingerPos"",
@@ -162,18 +180,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""c6c39a5e-1119-4322-8fbf-6c32afcd54b9"",
-                    ""path"": ""<Touchscreen>/Press"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Press"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""3a67b1ff-a867-4eb5-94e8-a460a0b9cda9"",
-                    ""path"": ""<Pointer>/press"",
+                    ""path"": ""<Touchscreen>/touch0/press"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -195,18 +202,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""2d20ac25-11e1-4cb5-8cb0-8c9aa797ab8c"",
-                    ""path"": ""<Touchscreen>/position"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""ScreenPos"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""16e14f29-ce0e-407c-baee-db8c1dc59de1"",
-                    ""path"": ""<Pointer>/position"",
+                    ""path"": ""<Touchscreen>/touch0/position"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -279,6 +275,39 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""action"": ""SecondaryFingerPress"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ba7df135-93eb-4a9d-943a-5e7e47e6d427"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SecondaryPress"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7c221b52-8902-4752-80a6-3fd45827f7ab"",
+                    ""path"": ""<Mouse>/scroll/y"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Scroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""00b8e05e-4b9b-4548-9c5c-fb8102e4d785"",
+                    ""path"": ""<VirtualMouse>/scroll/y"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Scroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -317,6 +346,8 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Press = m_Player.FindAction("Press", throwIfNotFound: true);
         m_Player_ScreenPos = m_Player.FindAction("ScreenPos", throwIfNotFound: true);
+        m_Player_SecondaryPress = m_Player.FindAction("SecondaryPress", throwIfNotFound: true);
+        m_Player_Scroll = m_Player.FindAction("Scroll", throwIfNotFound: true);
         m_Player_SecondaryFingerPos = m_Player.FindAction("SecondaryFingerPos", throwIfNotFound: true);
         m_Player_Hold = m_Player.FindAction("Hold", throwIfNotFound: true);
         m_Player_Tap = m_Player.FindAction("Tap", throwIfNotFound: true);
@@ -407,6 +438,8 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
     private readonly InputAction m_Player_Press;
     private readonly InputAction m_Player_ScreenPos;
+    private readonly InputAction m_Player_SecondaryPress;
+    private readonly InputAction m_Player_Scroll;
     private readonly InputAction m_Player_SecondaryFingerPos;
     private readonly InputAction m_Player_Hold;
     private readonly InputAction m_Player_Tap;
@@ -430,6 +463,14 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/ScreenPos".
         /// </summary>
         public InputAction @ScreenPos => m_Wrapper.m_Player_ScreenPos;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/SecondaryPress".
+        /// </summary>
+        public InputAction @SecondaryPress => m_Wrapper.m_Player_SecondaryPress;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Scroll".
+        /// </summary>
+        public InputAction @Scroll => m_Wrapper.m_Player_Scroll;
         /// <summary>
         /// Provides access to the underlying input action "Player/SecondaryFingerPos".
         /// </summary>
@@ -478,6 +519,12 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @ScreenPos.started += instance.OnScreenPos;
             @ScreenPos.performed += instance.OnScreenPos;
             @ScreenPos.canceled += instance.OnScreenPos;
+            @SecondaryPress.started += instance.OnSecondaryPress;
+            @SecondaryPress.performed += instance.OnSecondaryPress;
+            @SecondaryPress.canceled += instance.OnSecondaryPress;
+            @Scroll.started += instance.OnScroll;
+            @Scroll.performed += instance.OnScroll;
+            @Scroll.canceled += instance.OnScroll;
             @SecondaryFingerPos.started += instance.OnSecondaryFingerPos;
             @SecondaryFingerPos.performed += instance.OnSecondaryFingerPos;
             @SecondaryFingerPos.canceled += instance.OnSecondaryFingerPos;
@@ -507,6 +554,12 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @ScreenPos.started -= instance.OnScreenPos;
             @ScreenPos.performed -= instance.OnScreenPos;
             @ScreenPos.canceled -= instance.OnScreenPos;
+            @SecondaryPress.started -= instance.OnSecondaryPress;
+            @SecondaryPress.performed -= instance.OnSecondaryPress;
+            @SecondaryPress.canceled -= instance.OnSecondaryPress;
+            @Scroll.started -= instance.OnScroll;
+            @Scroll.performed -= instance.OnScroll;
+            @Scroll.canceled -= instance.OnScroll;
             @SecondaryFingerPos.started -= instance.OnSecondaryFingerPos;
             @SecondaryFingerPos.performed -= instance.OnSecondaryFingerPos;
             @SecondaryFingerPos.canceled -= instance.OnSecondaryFingerPos;
@@ -669,6 +722,20 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnScreenPos(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SecondaryPress" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSecondaryPress(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Scroll" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnScroll(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "SecondaryFingerPos" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
