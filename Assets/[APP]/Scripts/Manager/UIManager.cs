@@ -311,14 +311,14 @@ public class UIManager : MonoBehaviour
         // Inform TransitionScreenController to use back-to-menu visuals
         stm.SetBackToMenuFlag(true);
 
-        stm.StartStagedTransition(
-            "TransitionScreen",
-            "New Start Game Sandy",
-            0f,
-            null,
-            false, // do not force entering visuals; allow controller to pick exiting mode
-            true   // use back-to-menu visuals
-        );
+        // stm.StartStagedTransition(
+        //     "TransitionScreen",
+        //     "New Start Game Sandy",
+        //     0f,
+        //     null,
+        //     false, // do not force entering visuals; allow controller to pick exiting mode
+        //     true   // use back-to-menu visuals
+        // );
     }
 
     public void AlertNoInteract()
