@@ -15,8 +15,8 @@ public class DragService : IInitializable, IDisposable
     private bool isPressing;
     private bool isDragging;
 
-    public event Action OnDragStarted;
-    public event Action OnDragEnded;
+    public event Action<Vector2> OnDragStarted;
+    public event Action<Vector2> OnDragEnded;
     public event Action<Vector2> OnDragPerformed;
 
     [Inject]
@@ -39,7 +39,7 @@ public class DragService : IInitializable, IDisposable
         inputSystemService.OnLeftPressEnded -= HandlePressEnded;
     }
 
-    private void HandlePressStarted()
+    private void HandlePressStarted(Vector2 currentPos)
     {
         isPressing = true;
         isDragging = false;
@@ -57,7 +57,7 @@ public class DragService : IInitializable, IDisposable
         if (!isDragging && Vector2.Distance(startPos, currentPos) > DragThreshold)
         {
             isDragging = true;
-            OnDragStarted?.Invoke();
+            OnDragStarted?.Invoke(currentPos);
         }
 
         if (!isDragging) return;
@@ -65,14 +65,14 @@ public class DragService : IInitializable, IDisposable
         Vector2 delta = currentPos - lastPos;
         lastPos = currentPos;
 
-        OnDragPerformed?.Invoke(delta);
+        OnDragPerformed?.Invoke(currentPos);
     }
 
-    private void HandlePressEnded()
+    private void HandlePressEnded(Vector2 currentPos)
     {
         if (isDragging)
         {
-            OnDragEnded?.Invoke();
+            OnDragEnded?.Invoke(currentPos);
         }
 
         isPressing = false;

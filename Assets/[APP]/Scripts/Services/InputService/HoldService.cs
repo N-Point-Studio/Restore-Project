@@ -74,7 +74,7 @@ public class HoldService : IInitializable, IDisposable, ITickable
         }
     }
 
-    private void HandlePressStarted()
+    private void HandlePressStarted(Vector2 currentPos)
     {
         isPressing = true;
         isHolding = false;
@@ -90,7 +90,7 @@ public class HoldService : IInitializable, IDisposable, ITickable
         currentMousePosition = pos;
     }
 
-    private void HandlePressEnded()
+    private void HandlePressEnded(Vector2 currentPos)
     {
         CancelHold();
     }

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IHold, IAssembled, IInspectable
+public class ArtefactPieceStateMachine : StateMachine, IInteractObject, IClick, IDragObject, IHold, IAssembled, IInspectable
 {
     public ArtefactPieceState state = ArtefactPieceState.None;
     public string pieceId;
@@ -45,7 +45,7 @@ public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IHold, IAs
     public void OnInteractStart() => (currentState as IInteract)?.OnInteractStart();
     public void OnInteractEnd() => (currentState as IInteract)?.OnInteractEnd();
     public void OnClick() => (currentState as IClick)?.OnClick();
-    public void OnDragPerformed(Vector3 worldPos) => (currentState as IDrag)?.OnDragPerformed(worldPos);
+    // public void OnDragPerformed(Vector3 worldPos) => (currentState as IDrag)?.OnDragPerformed(worldPos);
     public void OnHoldPerformed() => (currentState as IHold)?.OnHoldPerformed();
     public void OnAssembled(IAssembled parent, Transform transform) => (currentState as IAssembled)?.OnAssembled(parent, transform);
     public void OnDetached() => (currentState as IAssembled)?.OnDetached();
@@ -64,4 +64,21 @@ public class ArtefactPieceStateMachine : StateMachine, IClick, IDrag, IHold, IAs
             socket.isOccupied = false;
         }
     }
+
+    public void OnInteractDetected()
+    {
+        // Debug.Log($"{name} interact detected");
+    }
+
+    public void OnInteractEnded()
+    {
+        // Debug.Log($"{name} interact notdetected");
+    }
+
+
+    //==new
+
+    public void OnDragStarted(Vector3 worldPos) => (currentState as IDragObject)?.OnDragStarted(worldPos);
+    public void OnDragPerformed(Vector3 worldPos) => (currentState as IDragObject)?.OnDragPerformed(worldPos);
+    public void OnDragEnded(Vector3 worldPos) => (currentState as IDragObject)?.OnDragEnded(worldPos);
 }

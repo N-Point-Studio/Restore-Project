@@ -17,50 +17,71 @@ public class ArtefactManager : IInitializable, IDisposable
 
     public void Initialize()
     {
-        GestureEvents.OnDropPerformed += HandleDrop;
+        // GestureEvents.OnDropPerformed += HandleDrop;
         GestureEvents.OnHoldPerformed += HandleHold;
-        GestureEvents.OnClickPerformed += HandleClick;
-        GestureEvents.OnDragPerformed += HandleDrag;
+        // GestureEvents.OnClickPerformed += HandleClick;
+
+        InteractionEvents.OnDragStarted += HandleDragStarted;
+        InteractionEvents.OnDragPerformed += HandleDragPerformed;
+        InteractionEvents.OnDragEnded += HandleDragEnded;
+
     }
 
     public void Dispose()
     {
-        GestureEvents.OnDropPerformed -= HandleDrop;
+        // GestureEvents.OnDropPerformed -= HandleDrop;
         GestureEvents.OnHoldPerformed -= HandleHold;
-        GestureEvents.OnClickPerformed -= HandleClick;
-        GestureEvents.OnDragPerformed -= HandleDrag;
+        // GestureEvents.OnClickPerformed -= HandleClick;
+        InteractionEvents.OnDragStarted -= HandleDragStarted;
+        InteractionEvents.OnDragPerformed -= HandleDragPerformed;
+        InteractionEvents.OnDragEnded -= HandleDragEnded;
+        // InteractionEvents.OnDragPerformed -= HandleDrag;
     }
 
-    private void HandleClick(IInteract interact, Vector2 pos)
+    private void HandleDragStarted(IInteractObject interact, Vector3 worldPos)
+    {
+        Debug.Log("Drag start");
+
+        if (interact is IAssembled assembled)
+        {
+            var parent = assemblyService.GetAssembledRoot(assembled);
+            if (parent is IDragObject drag) { drag.OnDragStarted(worldPos); }
+        }
+    }
+
+    // private void HandleClick(IInteract interact, Vector2 pos)
+    // {
+    //     if (interact is not ArtefactPieceStateMachine sm) return;
+
+    //     if (interact is IAssembled assembled)
+    //     {
+    //         var parent = assemblyService.GetAssembledRoot(assembled);
+    //         if (parent is IInspectable inspect)
+    //         {
+    //             if (!inspect.IsInspected) inspectService.Inspect(inspect);
+    //         }
+    //     }
+    // }
+
+    private void HandleDragPerformed(IInteractObject interact, Vector3 worldPos)
     {
         if (interact is not ArtefactPieceStateMachine sm) return;
 
         if (interact is IAssembled assembled)
         {
             var parent = assemblyService.GetAssembledRoot(assembled);
-            if (parent is IInspectable inspect)
-            {
-                if (!inspect.IsInspected) inspectService.Inspect(inspect);
-            }
+            if (parent is IDragObject drag) { drag.OnDragPerformed(worldPos); }
         }
     }
 
-    private void HandleDrag(IInteract interact, Vector3 worldPos)
+    private void HandleDragEnded(IInteractObject interact, Vector3 worldPos)
     {
-        if (interact is not ArtefactPieceStateMachine sm) return;
+        Debug.Log("Drag end");
 
-        if (interact is IAssembled assembled)
-        {
-            var parent = assemblyService.GetAssembledRoot(assembled);
-            if (parent is IDrag drag) { drag.OnDragPerformed(worldPos); }
-        }
-    }
-
-    private void HandleDrop(IInspectable inspectable, Vector3 worldPos)
-    {
         // if (inspectable is not ArtefactPieceStateMachine incoming) return;
         // if (incoming.GetCurrentState() is not IDrag) return;
         // if (incoming == inspectService.GetCurrentInspected()) return;
+        if (interact is not IInspectable inspectable) return;
 
         float distance = Vector3.Distance(worldPos, inspectService.GetInspectPoint().position);
         if (distance < 1.5f)
@@ -76,6 +97,14 @@ public class ArtefactManager : IInitializable, IDisposable
                     inspectService.Inspect(inspectable);
                     // inspectService.Inspect(GetTopParent(inspectable as ArtefactPieceStateMachine));
                 }
+            }
+        }
+        else
+        {
+            if (interact is IAssembled assembled)
+            {
+                var parent = assemblyService.GetAssembledRoot(assembled);
+                if (parent is IDragObject drag) { drag.OnDragEnded(worldPos); }
             }
         }
     }

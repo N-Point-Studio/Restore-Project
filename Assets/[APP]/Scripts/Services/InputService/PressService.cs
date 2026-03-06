@@ -24,7 +24,7 @@ public class PressService : IInitializable, IDisposable
         inputSystemService.OnLeftPressEnded += HandleLeftPressEnd;
     }
 
-    private void HandleLeftPressStart() => OnPressStarted?.Invoke();
-    private void HandleLeftPressEnd() => OnPressEnded?.Invoke();
+    private void HandleLeftPressStart(Vector2 currentPos) => OnPressStarted?.Invoke();
+    private void HandleLeftPressEnd(Vector2 currentPos) => OnPressEnded?.Invoke();
     public Vector2 GetCurrentPos() => inputSystemService.GetMousePosition();
 }

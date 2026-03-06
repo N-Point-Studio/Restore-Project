@@ -20,12 +20,28 @@ public class PointService : IInitializable, IDisposable
 
     public void Initialize()
     {
+        inputSystemService.OnLeftPressStarted += HandleLeftPressStarted;
         inputSystemService.OnMouseMoved += HandleMouseMove;
+        inputSystemService.OnLeftPressEnded += HandleLeftPressEnded;
+
     }
 
     public void Dispose()
     {
+        inputSystemService.OnLeftPressStarted -= HandleLeftPressStarted;
         inputSystemService.OnMouseMoved -= HandleMouseMove;
+        inputSystemService.OnLeftPressEnded -= HandleLeftPressEnded;
+    }
+
+    private void HandleLeftPressStarted(Vector2 vector)
+    {
+        OnInteractDetected?.Invoke(interactable);
+        Debug.Log("Pressed " + interactable);
+    }
+
+    private void HandleLeftPressEnded(Vector2 vector)
+    {
+        interactable = null;
     }
 
     private void HandleMouseMove(Vector2 screenPos)
@@ -39,9 +55,9 @@ public class PointService : IInitializable, IDisposable
 
         if (newTarget != interactable)
         {
-            OnInteractCanceled?.Invoke();
+            interactable?.OnInteractEnded();
             interactable = newTarget;
-            if (interactable != null) OnInteractDetected?.Invoke(interactable);
+            newTarget?.OnInteractDetected();
         }
     }
 

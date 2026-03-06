@@ -11,8 +11,8 @@ public class InputSystemService : IInitializable, IDisposable
 
     public event Action<Vector2> OnMouseMoved;
 
-    public event Action OnLeftPressStarted;
-    public event Action OnLeftPressEnded;
+    public event Action<Vector2> OnLeftPressStarted;
+    public event Action<Vector2> OnLeftPressEnded;
 
     public event Action OnRightPressStarted;
     public event Action OnRightPressEnded;
@@ -52,8 +52,8 @@ public class InputSystemService : IInitializable, IDisposable
         Input.Player.Scroll.performed -= HandleScrollPerformed;
     }
 
-    private void HandleLeftPressStarted(InputAction.CallbackContext context) => OnLeftPressStarted?.Invoke();
-    private void HandleLeftPressCanceled(InputAction.CallbackContext context) => OnLeftPressEnded?.Invoke();
+    private void HandleLeftPressStarted(InputAction.CallbackContext context) => OnLeftPressStarted?.Invoke(GetMousePosition());
+    private void HandleLeftPressCanceled(InputAction.CallbackContext context) => OnLeftPressEnded?.Invoke(GetMousePosition());
     private void HandleRightPressStarted(InputAction.CallbackContext context) => OnRightPressStarted?.Invoke();
     private void HandleRightPressCanceled(InputAction.CallbackContext context) => OnRightPressEnded?.Invoke();
     private void HandleMouseMoved(InputAction.CallbackContext context) => OnMouseMoved?.Invoke(context.ReadValue<Vector2>());
