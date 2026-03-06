@@ -5,130 +5,132 @@ using VContainer.Unity;
 
 public class GestureManager : IInitializable, IDisposable
 {
-    private enum GestureState { Idle, InteractingWithObject, Hold, Rotating, Zooming }
+    private enum GestureState { Idle, InteractingWithObject }
     private GestureState currentState = GestureState.Idle;
     private readonly PointService point;
-    private readonly InputService input;
-    private readonly RectTransform inspectZone;
-    private readonly ClickService clickService;
-    private readonly SwipeService swipeService;
+
+    private readonly PressService pressService;
+    private readonly DragService dragService;
     private readonly HoldService holdService;
-    private readonly ZoomService zoomService;
-    private IInteract currentInteract;
+    private IInteractObject currentInteract;
 
     [Inject]
-    public GestureManager(PointService point, InputService input, ClickService click,
-        RectTransform inspectZone, SwipeService swipe, HoldService hold, ZoomService zoom)
+    public GestureManager(PointService point, InputService input, PressService press,
+        DragService swipe, HoldService hold, ZoomService zoom)
     {
         this.point = point;
-        this.input = input;
-        this.inspectZone = inspectZone;
-        clickService = click;
-        swipeService = swipe;
+
+        pressService = press;
+        dragService = swipe;
         holdService = hold;
-        zoomService = zoom;
     }
 
     public void Initialize()
     {
-        swipeService.OnInteractionStart += HandleInteractionStart;
-        clickService.OnClickPerformed += HandleClick;
-        swipeService.OnDragPerformed += HandleDrag;
-        swipeService.OnRotatePerformed += HandleRotate;
-        holdService.OnHoldPerformed += HandleHold;
-        zoomService.OnZoomPerformed += HandleZoom;
-        swipeService.OnInteractionEnd += HandleInteractionEnd;
+        point.OnInteractDetected += HandleInteractDetected;
+        point.OnInteractCanceled += HandleInteractCanceled;
 
-        point.OnInteractDetected += HandleInteract;
+        pressService.OnPressStarted += HandlePressStarted;
+        pressService.OnPressEnded += HandlePressEnded;
+
+        dragService.OnDragStarted += HandleDragStart;
+        dragService.OnDragPerformed += HandleDragPerformed;
+        dragService.OnDragEnded += HandleDragEnded;
+
+        holdService.OnHoldPerformed += HandleHoldPerformed;
+        holdService.OnHoldCompleted += HandleHoldCompleted;
+        holdService.OnHoldCanceled += HandleHoldCanceled;
     }
 
     public void Dispose()
     {
-        swipeService.OnInteractionStart -= HandleInteractionStart;
-        clickService.OnClickPerformed -= HandleClick;
-        swipeService.OnDragPerformed -= HandleDrag;
-        swipeService.OnRotatePerformed -= HandleRotate;
-        holdService.OnHoldPerformed -= HandleHold;
-        zoomService.OnZoomPerformed -= HandleZoom;
-        swipeService.OnInteractionEnd -= HandleInteractionEnd;
+        point.OnInteractDetected -= HandleInteractDetected;
+        point.OnInteractCanceled -= HandleInteractCanceled;
 
-        point.OnInteractDetected -= HandleInteract;
+        pressService.OnPressStarted -= HandlePressStarted;
+        pressService.OnPressEnded -= HandlePressEnded;
+
+        dragService.OnDragStarted -= HandleDragStart;
+        dragService.OnDragPerformed -= HandleDragPerformed;
+        dragService.OnDragEnded -= HandleDragEnded;
+
+        holdService.OnHoldPerformed -= HandleHoldPerformed;
+        holdService.OnHoldCompleted -= HandleHoldCompleted;
+        holdService.OnHoldCanceled -= HandleHoldCanceled;
     }
 
-    private void HandleInteract(IInteract interact)
+    private void HandleInteractDetected(IInteractObject interact)
     {
-        currentInteract = interact;
-    }
-
-    private void HandleInteractionStart()
-    {
-        currentState = GestureState.Idle;
-        currentInteract?.OnInteractStart();
-    }
-
-    private void HandleInteractionEnd()
-    {
-        if (currentInteract is IInspectable sm && currentState == GestureState.InteractingWithObject)
+        if (currentState != GestureState.InteractingWithObject)
         {
-            GestureEvents.OnDropPerformed?.Invoke(sm, point.ScreenToWorld(input.GetPrimaryPos(), currentInteract));
+            interact?.OnInteractDetected();
+            currentInteract = interact;
         }
-
-        currentInteract?.OnInteractEnd();
-        currentState = GestureState.Idle;
-        currentInteract = null;
     }
 
-    private bool IsInsideInspectZone(Vector2 screenPos)
+    private void HandleInteractCanceled()
     {
-        return RectTransformUtility.RectangleContainsScreenPoint(inspectZone, screenPos);
+        if (currentState != GestureState.InteractingWithObject)
+        {
+            currentInteract.OnInteractEnded();
+            currentInteract = null;
+        }
     }
 
-    private void HandleClick(Vector2 screenPos)
+    private void HandlePressStarted()
     {
         if (currentInteract == null) return;
-
         currentState = GestureState.InteractingWithObject;
-        GestureEvents.OnClickPerformed?.Invoke(currentInteract, screenPos);
-
-        // if (target is IClick click)
-        // {
-        //     click.OnClick();
-        // }
+        InteractionEvents.OnPressStarted?.Invoke(currentInteract);
     }
 
-    private void HandleHold(Vector2 screenPos)
+    private void HandlePressEnded()
     {
-        var target = currentInteract;
-        if (target is IHold holdable)
-        {
-            // currentState = GestureState.Hold;
-            GestureEvents.OnHoldPerformed?.Invoke(target as IInteract);
-            holdable.OnHoldPerformed();
-        }
+        if (currentInteract == null) return;
+        currentState = GestureState.Idle;
+        InteractionEvents.OnPressEnded?.Invoke(currentInteract);
     }
 
-    private void HandleDrag(Vector3 screenPos)
+    private void HandleDragStart()
     {
-        if (currentState == GestureState.Rotating || currentState == GestureState.Hold) return;
+        if (currentInteract == null) return;
         currentState = GestureState.InteractingWithObject;
-
-        Vector3 worldPos = point.ScreenToWorld(screenPos, currentInteract);
-        GestureEvents.OnDragPerformed?.Invoke(currentInteract, worldPos);
+        InteractionEvents.OnDragStarted?.Invoke(currentInteract);
     }
 
-    private void HandleRotate(Vector2 delta)
+    private void HandleDragPerformed(Vector2 vector)
     {
-        if (currentState == GestureState.InteractingWithObject || currentState == GestureState.Hold) return;
-        // if (!IsInsideInspectZone(input.GetPrimaryPos())) return;
-        currentState = GestureState.Rotating;
-        // Debug.Log($"Rotate performed");
-        GestureEvents.OnRotatePerformed?.Invoke(delta);
+        if (currentInteract == null) return;
+        currentState = GestureState.InteractingWithObject;
+        Vector3 worldPos = point.ScreenToWorld(vector, currentInteract);
+        InteractionEvents.OnDragPerformed?.Invoke(currentInteract, worldPos);
     }
 
-    private void HandleZoom(float delta)
+    private void HandleDragEnded()
     {
-        if (currentState == GestureState.InteractingWithObject || currentState == GestureState.Hold) return;
-        // if (!IsInsideInspectZone(input.GetPrimaryPos())) return;
-        GestureEvents.OnZoomPerformed?.Invoke(delta);
+        if (currentInteract == null) return;
+        currentState = GestureState.Idle;
+        InteractionEvents.OnDragEnded?.Invoke(currentInteract);
+    }
+
+    private void HandleHoldPerformed(float obj)
+    {
+        if (currentInteract == null) return;
+        currentState = GestureState.InteractingWithObject;
+        InteractionEvents.OnHoldPerformed?.Invoke(obj);
+    }
+
+    private void HandleHoldCompleted()
+    {
+        if (currentInteract == null) return;
+        currentState = GestureState.InteractingWithObject;
+        InteractionEvents.OnHoldCompleted?.Invoke();
+    }
+
+    private void HandleHoldCanceled()
+    {
+        if (currentInteract == null) return;
+        currentState = GestureState.Idle;
+        InteractionEvents.OnHoldCanceled?.Invoke();
     }
 }

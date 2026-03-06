@@ -5,48 +5,45 @@ using VContainer.Unity;
 
 public class PointService : IInitializable, IDisposable
 {
-    private readonly InputService gesture;
+    private readonly InputSystemService inputSystemService;
     private readonly Camera cam;
-    private IInteract interactable;
-
-    public Action<IInteract> OnInteractDetected;
+    private IInteractObject interactable;
+    public Action<IInteractObject> OnInteractDetected;
+    public Action OnInteractCanceled;
 
     [Inject]
-    public PointService(InputService gesture, Camera cam)
+    public PointService(InputSystemService inputSystemService, Camera cam)
     {
-        Debug.Log("Point Service");
-        this.gesture = gesture;
+        this.inputSystemService = inputSystemService;
         this.cam = cam;
     }
 
     public void Initialize()
     {
-        gesture.OnPrimaryStarted += PressStart;
-        gesture.OnPrimaryEnded += PressEnd;
+        inputSystemService.OnMouseMoved += HandleMouseMove;
     }
 
     public void Dispose()
     {
-        gesture.OnPrimaryStarted -= PressStart;
-        gesture.OnPrimaryEnded -= PressEnd;
+        inputSystemService.OnMouseMoved -= HandleMouseMove;
     }
 
-    private void PressStart(Vector2 vector)
+    private void HandleMouseMove(Vector2 screenPos)
     {
-        if (TryRaycast(vector, out var hit))
+        IInteractObject newTarget = null;
+
+        if (TryRaycast(screenPos, out var hit))
         {
-            if (!hit.collider.TryGetComponent(out IInteract interactable)) return;
-            this.interactable = interactable;
-        }
-        else
-        {
-            interactable = null;
+            hit.collider.TryGetComponent(out newTarget);
         }
 
-        OnInteractDetected?.Invoke(interactable);
+        if (newTarget != interactable)
+        {
+            OnInteractCanceled?.Invoke();
+            interactable = newTarget;
+            if (interactable != null) OnInteractDetected?.Invoke(interactable);
+        }
     }
-
-    private void PressEnd(Vector2 vector) { interactable = null; }
 
     public bool TryRaycast(Vector2 screenPos, out RaycastHit hit)
     {
@@ -54,7 +51,7 @@ public class PointService : IInitializable, IDisposable
         return Physics.Raycast(ray, out hit);
     }
 
-    public Vector3 ScreenToWorld(Vector2 screenPos, IInteract target)
+    public Vector3 ScreenToWorld(Vector2 screenPos, IInteractObject target)
     {
         if (target is Component targetComp)
         {

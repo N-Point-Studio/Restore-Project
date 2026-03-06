@@ -5,26 +5,26 @@ using VContainer.Unity;
 
 public class PressService : IInitializable, IDisposable
 {
-    private readonly InputService input;
-    public event Action<Vector2> OnPressStarted;
-    public event Action<Vector2> OnPressEnded;
+    private readonly InputSystemService inputSystemService;
+    public event Action OnPressStarted;
+    public event Action OnPressEnded;
 
     [Inject]
-    public PressService(InputService input) { this.input = input; }
+    public PressService(InputSystemService inputSystemService) { this.inputSystemService = inputSystemService; }
 
     public void Initialize()
     {
-        input.OnPrimaryStarted += OnPressStart;
-        input.OnPrimaryEnded += OnPressEnd;
+        inputSystemService.OnLeftPressStarted += HandleLeftPressStart;
+        inputSystemService.OnLeftPressEnded += HandleLeftPressEnd;
     }
 
     public void Dispose()
     {
-        input.OnPrimaryStarted -= OnPressStart;
-        input.OnPrimaryEnded -= OnPressEnd;
+        inputSystemService.OnLeftPressStarted += HandleLeftPressStart;
+        inputSystemService.OnLeftPressEnded += HandleLeftPressEnd;
     }
 
-    private void OnPressStart(Vector2 vector) => OnPressStarted?.Invoke(vector);
-    private void OnPressEnd(Vector2 vector) => OnPressEnded?.Invoke(vector);
-    public Vector2 GetCurrentPos() => input.GetPrimaryPos();
+    private void HandleLeftPressStart() => OnPressStarted?.Invoke();
+    private void HandleLeftPressEnd() => OnPressEnded?.Invoke();
+    public Vector2 GetCurrentPos() => inputSystemService.GetMousePosition();
 }

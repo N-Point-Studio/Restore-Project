@@ -5,61 +5,103 @@ using VContainer.Unity;
 
 public class HoldService : IInitializable, IDisposable, ITickable
 {
-    private readonly PressService pressService;
-    private const float HoldDuration = 0.5f;
-    private const float HoldThreshold = 20f;
+    private readonly InputSystemService inputSystemService;
 
-    private Vector2 startPos;
-    private float startTime;
     private bool isPressing;
-    private bool holdTriggered;
+    private bool isHolding;
 
-    public event Action<Vector2> OnHoldPerformed;
+    private float pressTime;
+
+    private Vector2 pressPosition;
+    private Vector2 currentMousePosition;
+
+    private const float HOLD_DELAY = 0.2f;
+    private const float HOLD_DURATION = 1.5f;
+    private const float MOVE_TOLERANCE = 5f;
+
+    public event Action<float> OnHoldPerformed;
+    public event Action OnHoldCompleted;
+    public event Action OnHoldCanceled;
 
     [Inject]
-    public HoldService(PressService pressService)
+    public HoldService(InputSystemService inputSystemService)
     {
-        this.pressService = pressService;
+        this.inputSystemService = inputSystemService;
     }
 
     public void Initialize()
     {
-        pressService.OnPressStarted += OnHoldStart;
-        pressService.OnPressEnded += OnHoldEnd;
+        inputSystemService.OnLeftPressStarted += HandlePressStarted;
+        inputSystemService.OnMouseMoved += HandleMouseMoved;
+        inputSystemService.OnLeftPressEnded += HandlePressEnded;
     }
 
     public void Dispose()
     {
-        pressService.OnPressStarted -= OnHoldStart;
-        pressService.OnPressEnded -= OnHoldEnd;
+        inputSystemService.OnLeftPressStarted -= HandlePressStarted;
+        inputSystemService.OnMouseMoved -= HandleMouseMoved;
+        inputSystemService.OnLeftPressEnded -= HandlePressEnded;
     }
 
     public void Tick()
     {
-        if (!isPressing || holdTriggered) return;
-        if (Vector2.Distance(startPos, pressService.GetCurrentPos()) > HoldThreshold)
+        if (!isPressing) return;
+
+        if (Vector2.Distance(currentMousePosition, pressPosition) > MOVE_TOLERANCE)
         {
-            isPressing = false;
+            CancelHold();
             return;
         }
 
-        if (Time.time - startTime >= HoldDuration)
+        float heldTime = Time.time - pressTime;
+
+        if (!isHolding && heldTime >= HOLD_DELAY)
         {
-            holdTriggered = true;
-            OnHoldPerformed?.Invoke(startPos);
+            isHolding = true;
+        }
+
+        if (!isHolding) return;
+
+        float holdTime = heldTime - HOLD_DELAY;
+
+        OnHoldPerformed?.Invoke(holdTime);
+        Debug.Log("holding " + holdTime);
+
+        if (holdTime >= HOLD_DURATION)
+        {
+            OnHoldCompleted?.Invoke();
+            CancelHold();
         }
     }
 
-    private void OnHoldStart(Vector2 pos)
+    private void HandlePressStarted()
     {
-        startPos = pos;
-        startTime = Time.time;
         isPressing = true;
-        holdTriggered = false;
+        isHolding = false;
+
+        pressTime = Time.time;
+
+        pressPosition = inputSystemService.GetMousePosition();
+        currentMousePosition = pressPosition;
     }
 
-    private void OnHoldEnd(Vector2 pos)
+    private void HandleMouseMoved(Vector2 pos)
     {
+        currentMousePosition = pos;
+    }
+
+    private void HandlePressEnded()
+    {
+        CancelHold();
+    }
+
+    private void CancelHold()
+    {
+        if (!isPressing) return;
+
         isPressing = false;
+        isHolding = false;
+
+        OnHoldCanceled?.Invoke();
     }
 }
