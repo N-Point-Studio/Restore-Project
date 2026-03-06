@@ -8,7 +8,6 @@ public class GestureManager : IInitializable, IDisposable
     private enum GestureState { Idle, InteractingWithObject }
     private GestureState currentState = GestureState.Idle;
     private readonly PointService point;
-
     private readonly PressService pressService;
     private readonly DragService dragService;
     private readonly HoldService holdService;
@@ -61,16 +60,17 @@ public class GestureManager : IInitializable, IDisposable
 
     private void HandleInteractDetected(IInteractObject interact)
     {
-        if (currentState != GestureState.InteractingWithObject)
-        {
-            interact?.OnInteractDetected();
-            currentInteract = interact;
-        }
+        if (currentState == GestureState.InteractingWithObject) return;
+        if (currentInteract == interact) return;
+
+        currentInteract?.OnInteractEnded();
+        currentInteract = interact;
+        currentInteract?.OnInteractDetected();
     }
 
     private void HandleInteractCanceled()
     {
-        if (currentState != GestureState.InteractingWithObject)
+        if (currentState != GestureState.InteractingWithObject && currentInteract != null)
         {
             currentInteract.OnInteractEnded();
             currentInteract = null;
@@ -101,7 +101,7 @@ public class GestureManager : IInitializable, IDisposable
     private void HandleDragPerformed(Vector2 vector)
     {
         if (currentInteract == null) return;
-        currentState = GestureState.InteractingWithObject;
+        // currentState = GestureState.InteractingWithObject;
         Vector3 worldPos = point.ScreenToWorld(vector, currentInteract);
         InteractionEvents.OnDragPerformed?.Invoke(currentInteract, worldPos);
     }
