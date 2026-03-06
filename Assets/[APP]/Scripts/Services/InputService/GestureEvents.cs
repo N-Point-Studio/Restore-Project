@@ -17,3 +17,9 @@ public static class GestureEvents
     public static Action<float> OnZoomPerformed;
     public static Action<IInteract> OnInteractionEnd;
 }
+
+public static class InteractionEvents
+{
+    public static Action<Vector2> OnRotatePerformed;
+    public static Action<float> OnZoomPerformed;
+}

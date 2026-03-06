@@ -22,7 +22,7 @@ public class Inspection : MonoBehaviour
 
     void OnEnable()
     {
-        GestureEvents.OnRotatePerformed += OnRotatePerformed;
+        InteractionEvents.OnRotatePerformed += OnRotatePerformed;
         GestureEvents.OnZoomPerformed += OnZoomPerformed;
         // Reset target position saat aktif agar tidak ada lonjakan posisi
         _targetPosition = transform.position;
@@ -30,7 +30,7 @@ public class Inspection : MonoBehaviour
 
     void OnDisable()
     {
-        GestureEvents.OnRotatePerformed -= OnRotatePerformed;
+        InteractionEvents.OnRotatePerformed -= OnRotatePerformed;
         GestureEvents.OnZoomPerformed -= OnZoomPerformed;
     }
 
