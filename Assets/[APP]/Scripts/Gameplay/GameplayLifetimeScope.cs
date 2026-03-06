@@ -34,7 +34,7 @@ public class GameplayLifetimeScope : LifetimeScope
         // builder.RegisterEntryPoint<SwipeService>(Lifetime.Scoped).AsSelf();
         builder.RegisterEntryPoint<RotateService>(Lifetime.Scoped).AsSelf();
         // builder.RegisterEntryPoint<HoldService>(Lifetime.Scoped).AsSelf();
-        // builder.RegisterEntryPoint<ZoomService>(Lifetime.Scoped).AsSelf();
+        builder.RegisterEntryPoint<ZoomService>(Lifetime.Scoped).AsSelf();
 
         // builder.RegisterEntryPoint<GestureManager>(Lifetime.Scoped).AsSelf();
     }

@@ -23,7 +23,7 @@ public class Inspection : MonoBehaviour
     void OnEnable()
     {
         InteractionEvents.OnRotatePerformed += OnRotatePerformed;
-        GestureEvents.OnZoomPerformed += OnZoomPerformed;
+        InteractionEvents.OnZoomPerformed += OnZoomPerformed;
         // Reset target position saat aktif agar tidak ada lonjakan posisi
         _targetPosition = transform.position;
     }
@@ -31,7 +31,7 @@ public class Inspection : MonoBehaviour
     void OnDisable()
     {
         InteractionEvents.OnRotatePerformed -= OnRotatePerformed;
-        GestureEvents.OnZoomPerformed -= OnZoomPerformed;
+        InteractionEvents.OnZoomPerformed -= OnZoomPerformed;
     }
 
     void Update()
@@ -57,19 +57,13 @@ public class Inspection : MonoBehaviour
     public void OnZoomPerformed(float zoomDelta)
     {
         if (_mainCamera == null) _mainCamera = Camera.main;
+        Vector3 direction = (_targetPosition - _mainCamera.transform.position).normalized;
 
-        // 1. Dapatkan arah dari kamera ke objek
-        Vector3 direction = (transform.position - _mainCamera.transform.position).normalized;
+        float currentDistance = Vector3.Distance(_mainCamera.transform.position, _targetPosition);
 
-        // 2. Kalkulasi posisi target baru
-        Vector3 nextTarget = _targetPosition + direction * (zoomDelta * zoomSpeed);
+        float targetDistance = currentDistance + (zoomDelta * zoomSpeed);
 
-        // 3. Cek jarak target ke kamera (Clamping)
-        float targetDistance = Vector3.Distance(_mainCamera.transform.position, nextTarget);
-
-        if (targetDistance >= minDistance && targetDistance <= maxDistance)
-        {
-            _targetPosition = nextTarget;
-        }
+        targetDistance = Mathf.Clamp(targetDistance, minDistance, maxDistance);
+        _targetPosition = _mainCamera.transform.position + direction * targetDistance;
     }
 }
