@@ -3,7 +3,7 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class HoldService : IInitializable, IDisposable, ITickable
+public class ObjectHoldService : IInitializable, IDisposable, ITickable
 {
     private readonly InputSystemService inputSystemService;
 
@@ -24,7 +24,7 @@ public class HoldService : IInitializable, IDisposable, ITickable
     public event Action OnHoldCanceled;
 
     [Inject]
-    public HoldService(InputSystemService inputSystemService)
+    public ObjectHoldService(InputSystemService inputSystemService)
     {
         this.inputSystemService = inputSystemService;
     }

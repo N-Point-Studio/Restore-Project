@@ -9,21 +9,21 @@ public interface IGestureState
     void Exit();
 }
 
-public class GestureManager : IInitializable, IDisposable
+public class ObjectInteractionManager : IInitializable, IDisposable
 {
     private enum GestureState { Idle, InteractingWithObject }
     private GestureState currentState = GestureState.Idle;
-    private readonly PointService point;
-    private readonly PressService pressService;
-    private readonly DragService dragService;
-    private readonly HoldService holdService;
+    private readonly ObjectDetectionService detectionService;
+    private readonly ObjectPressService pressService;
+    private readonly ObjectDragService dragService;
+    private readonly ObjectHoldService holdService;
     private IInteractObject currentInteract;
 
     [Inject]
-    public GestureManager(PointService point, InputService input, PressService press,
-        DragService swipe, HoldService hold, ZoomService zoom)
+    public ObjectInteractionManager(ObjectDetectionService detectionService, ObjectPressService press,
+        ObjectDragService swipe, ObjectHoldService hold)
     {
-        this.point = point;
+        this.detectionService = detectionService;
 
         pressService = press;
         dragService = swipe;
@@ -32,7 +32,7 @@ public class GestureManager : IInitializable, IDisposable
 
     public void Initialize()
     {
-        point.OnInteractDetected += HandleInteractDetected;
+        detectionService.OnInteractDetected += HandleInteractDetected;
 
         pressService.OnPressStarted += HandlePressStarted;
         pressService.OnPressEnded += HandlePressEnded;
@@ -48,7 +48,7 @@ public class GestureManager : IInitializable, IDisposable
 
     public void Dispose()
     {
-        point.OnInteractDetected -= HandleInteractDetected;
+        detectionService.OnInteractDetected -= HandleInteractDetected;
 
         pressService.OnPressStarted -= HandlePressStarted;
         pressService.OnPressEnded -= HandlePressEnded;
@@ -92,7 +92,7 @@ public class GestureManager : IInitializable, IDisposable
     {
         if (currentInteract == null) return;
         currentState = GestureState.InteractingWithObject;
-        Vector3 worldPos = point.ScreenToWorld(vector, currentInteract);
+        Vector3 worldPos = detectionService.ScreenToWorld(vector, currentInteract);
         InteractionEvents.OnDragStarted?.Invoke(currentInteract, worldPos);
     }
 
@@ -101,7 +101,7 @@ public class GestureManager : IInitializable, IDisposable
         if (currentInteract == null) return;
         // currentState = GestureState.InteractingWithObject;
         // Debug.Log("Current position " + vector);
-        Vector3 worldPos = point.ScreenToWorld(vector, currentInteract);
+        Vector3 worldPos = detectionService.ScreenToWorld(vector, currentInteract);
         InteractionEvents.OnDragPerformed?.Invoke(currentInteract, worldPos);
     }
 
@@ -110,7 +110,7 @@ public class GestureManager : IInitializable, IDisposable
         if (currentInteract == null) return;
         currentState = GestureState.Idle;
 
-        Vector3 worldPos = point.ScreenToWorld(vector, currentInteract);
+        Vector3 worldPos = detectionService.ScreenToWorld(vector, currentInteract);
         InteractionEvents.OnDragEnded?.Invoke(currentInteract, worldPos);
     }
 

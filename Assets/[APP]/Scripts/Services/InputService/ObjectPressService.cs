@@ -3,14 +3,14 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class PressService : IInitializable, IDisposable
+public class ObjectPressService : IInitializable, IDisposable
 {
     private readonly InputSystemService inputSystemService;
     public event Action OnPressStarted;
     public event Action OnPressEnded;
 
     [Inject]
-    public PressService(InputSystemService inputSystemService) { this.inputSystemService = inputSystemService; }
+    public ObjectPressService(InputSystemService inputSystemService) { this.inputSystemService = inputSystemService; }
 
     public void Initialize()
     {

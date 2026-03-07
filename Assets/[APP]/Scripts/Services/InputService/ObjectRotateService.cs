@@ -3,7 +3,7 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class RotateService : IInitializable, IDisposable
+public class ObjectRotateService : IInitializable, IDisposable
 {
     private readonly InputSystemService inputSystemService;
     private bool isRotating;
@@ -11,7 +11,7 @@ public class RotateService : IInitializable, IDisposable
     private const float RotateSensitivity = 0.2f;
 
     [Inject]
-    public RotateService(InputSystemService inputSystemService)
+    public ObjectRotateService(InputSystemService inputSystemService)
     {
         this.inputSystemService = inputSystemService;
     }

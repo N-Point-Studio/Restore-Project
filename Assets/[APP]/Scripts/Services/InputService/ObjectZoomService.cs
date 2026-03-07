@@ -3,14 +3,14 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class ZoomService : IInitializable, IDisposable
+public class ObjectZoomService : IInitializable, IDisposable
 {
     private readonly InputSystemService inputSystemService;
     private const float ScrollSensitivity = 10f;
     public event Action<float> OnZoomPerformed;
 
     [Inject]
-    public ZoomService(InputSystemService inputSystemService)
+    public ObjectZoomService(InputSystemService inputSystemService)
     {
         this.inputSystemService = inputSystemService;
     }

@@ -3,7 +3,7 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class DragService : IInitializable, IDisposable
+public class ObjectDragService : IInitializable, IDisposable
 {
     private readonly InputSystemService inputSystemService;
 
@@ -20,7 +20,7 @@ public class DragService : IInitializable, IDisposable
     public event Action<Vector2> OnDragPerformed;
 
     [Inject]
-    public DragService(InputSystemService inputSystemService)
+    public ObjectDragService(InputSystemService inputSystemService)
     {
         this.inputSystemService = inputSystemService;
     }

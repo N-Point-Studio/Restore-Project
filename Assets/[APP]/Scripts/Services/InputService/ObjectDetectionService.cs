@@ -3,7 +3,7 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class PointService : IInitializable, IDisposable
+public class ObjectDetectionService : IInitializable, IDisposable
 {
     private readonly InputSystemService inputSystemService;
     private readonly Camera cam;
@@ -12,7 +12,7 @@ public class PointService : IInitializable, IDisposable
     public Action OnInteractCanceled;
 
     [Inject]
-    public PointService(InputSystemService inputSystemService, Camera cam)
+    public ObjectDetectionService(InputSystemService inputSystemService, Camera cam)
     {
         this.inputSystemService = inputSystemService;
         this.cam = cam;
