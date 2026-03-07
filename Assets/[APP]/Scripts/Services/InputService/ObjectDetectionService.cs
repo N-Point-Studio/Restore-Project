@@ -23,7 +23,6 @@ public class ObjectDetectionService : IInitializable, IDisposable
         inputSystemService.OnLeftPressStarted += HandleLeftPressStarted;
         inputSystemService.OnMouseMoved += HandleMouseMove;
         inputSystemService.OnLeftPressEnded += HandleLeftPressEnded;
-
     }
 
     public void Dispose()
@@ -36,7 +35,6 @@ public class ObjectDetectionService : IInitializable, IDisposable
     private void HandleLeftPressStarted(Vector2 vector)
     {
         OnInteractDetected?.Invoke(interactable);
-        Debug.Log("Pressed " + interactable);
     }
 
     private void HandleLeftPressEnded(Vector2 vector)

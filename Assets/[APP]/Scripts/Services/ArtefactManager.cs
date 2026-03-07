@@ -24,7 +24,6 @@ public class ArtefactManager : IInitializable, IDisposable
         InteractionEvents.OnDragStarted += HandleDragStarted;
         InteractionEvents.OnDragPerformed += HandleDragPerformed;
         InteractionEvents.OnDragEnded += HandleDragEnded;
-
     }
 
     public void Dispose()
