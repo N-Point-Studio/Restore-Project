@@ -33,7 +33,7 @@ public class ProjectLifetimeScope : LifetimeScope
         builder.RegisterEntryPoint<ProjectSavingSystem>(Lifetime.Singleton).AsSelf();
 
         // Loading Service
-        builder.RegisterEntryPoint<LoadingService>(Lifetime.Singleton).AsSelf().WithParameter(loadingPrefab);
+        builder.RegisterEntryPoint<ProjectLoadingService>(Lifetime.Singleton).AsSelf().WithParameter(loadingPrefab);
         builder.Register<SceneLoader>(Lifetime.Singleton);
 
         // Input System

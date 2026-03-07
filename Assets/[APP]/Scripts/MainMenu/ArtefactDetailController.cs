@@ -10,38 +10,40 @@ public class ArtefactDetailController : MonoBehaviour
     [SerializeField] private CanvasGroup canvasGroupRoot;
     [SerializeField] private Sprite defaultBgSprite;
     [SerializeField] private Image imageBg;
+    [SerializeField] private Button buttonClean;
+    [SerializeField] private ButtonItemUI buttonBack;
 
-    [Header("Icon Target")]
-    [SerializeField] private Image imageIcon;
-    [SerializeField] private RectTransform imageIconRect;
-
-    [Header("Item Details")]
-    [SerializeField] private string uncompletedLabel = "Unknown Artefact";
+    [Header("Restore Panel")]
+    [SerializeField] private GameObject panelRestore;
+    [SerializeField] private Image imageIconRestore;
+    [SerializeField] private RectTransform imageIconRectRestore;
     [SerializeField] private TMP_Text textTitle;
     [SerializeField] private TMP_Text textDescription;
     [SerializeField] private TMP_Text textFooter;
 
-    [Header("Buttons")]
-    [SerializeField] private Button buttonBack;
-    [SerializeField] private Button buttonClean;
+    [Header("Unrestore Panel")]
+    [SerializeField] private GameObject panelUnrestore;
+    [SerializeField] private Image imageIconUnrestore;
+    [SerializeField] private RectTransform imageIconRectUnrestore;
 
     [Header("Settings")]
     [SerializeField] private float fadeDuration;
 
     private ArtefactData currentArtefactData;
 
-    public RectTransform TargetIconRect => imageIconRect;
+    public RectTransform TargetIconRectRestore => imageIconRectRestore;
+    public RectTransform TargetIconRectUnrestore => imageIconRectUnrestore;
 
     private void Awake()
     {
-        buttonBack.onClick.AddListener(OnClickBack);
+        buttonBack.OnClick += OnClickBack;
         buttonClean.onClick.AddListener(OnClickClean);
         root.SetActive(false);
     }
 
     private void OnDestroy()
     {
-        if (buttonBack) buttonBack.onClick.RemoveListener(OnClickBack);
+        if (buttonBack) buttonBack.OnClick -= OnClickBack;
         if (buttonClean) buttonClean.onClick.RemoveListener(OnClickClean);
         transform.DOKill();
     }
@@ -51,18 +53,22 @@ public class ArtefactDetailController : MonoBehaviour
         currentArtefactData = artefactData;
 
         imageBg.sprite = bgSprite != null ? bgSprite : defaultBgSprite;
+
         if (currentArtefactData == null) return;
-
-        imageIcon.sprite = isCompleted ? currentArtefactData.CompletedIcon : currentArtefactData.BaseData.ItemIcon;
-        textTitle.text = isCompleted ? currentArtefactData.BaseData.ItemName : uncompletedLabel;
-
-        textDescription.gameObject.SetActive(isCompleted);
-        textFooter.gameObject.SetActive(isCompleted);
+        
+        panelRestore.SetActive(isCompleted);
+        panelUnrestore.SetActive(!isCompleted);
 
         if (isCompleted)
         {
+            imageIconRestore.sprite = currentArtefactData.CompletedIcon;
+            textTitle.text = currentArtefactData.BaseData.ItemName;
             textDescription.text = currentArtefactData.BaseData.ItemDescription;
             textFooter.text = $"Code: {currentArtefactData.BaseData.Id}\nConserved by Nova";
+        }
+        else
+        {
+            imageIconUnrestore.sprite = currentArtefactData.BaseData.ItemIcon;
         }
 
         HideContentInstant();
@@ -95,7 +101,7 @@ public class ArtefactDetailController : MonoBehaviour
         }
 
         if (imageBg) SetAlpha(imageBg, 0f);
-        if (imageIcon) SetAlpha(imageIcon, 0f);
+        if (imageIconRestore) SetAlpha(imageIconRestore, 0f);
     }
 
     public void ShowContentFadeIn()
@@ -105,7 +111,7 @@ public class ArtefactDetailController : MonoBehaviour
         if (canvasGroupRoot) canvasGroupRoot.blocksRaycasts = true;
 
         if (imageBg) seq.Join(imageBg.DOFade(1f, fadeDuration));
-        if (imageIcon) seq.Join(imageIcon.DOFade(1f, fadeDuration));
+        if (imageIconRestore) seq.Join(imageIconRestore.DOFade(1f, fadeDuration));
         if (canvasGroupRoot) seq.Join(canvasGroupRoot.DOFade(1f, fadeDuration));
     }
 
@@ -119,12 +125,12 @@ public class ArtefactDetailController : MonoBehaviour
 
     private void OnClickBack()
     {
-        MainMenuEvents.OnCloseArtefactDetail?.Invoke();
+        MainMenuEvents.TriggerCloseArtefactDetail();
     }
 
     private void OnClickClean()
     {
         if (currentArtefactData == null) return;
-        MainMenuEvents.OnRequestArtefactPlay?.Invoke(currentArtefactData);
+        MainMenuEvents.TriggerArtefactPlay(currentArtefactData);
     }
 }

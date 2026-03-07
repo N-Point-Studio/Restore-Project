@@ -87,6 +87,6 @@ public class ArtefactGroupItemUI : MonoBehaviour
 
     private void OnItemClicked(ArtefactItemUI itemUI)
     {
-        MainMenuEvents.OnRequestArtefactDetail?.Invoke(itemUI, artefactGroupData);
+        MainMenuEvents.TriggerOpenArtefactDetail(itemUI, artefactGroupData);
     }
 }

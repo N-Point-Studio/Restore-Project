@@ -4,9 +4,9 @@ using UnityEngine.SceneManagement;
 
 public class SceneLoader
 {
-    private readonly LoadingService _loadingService;
+    private readonly ProjectLoadingService _loadingService;
 
-    public SceneLoader(LoadingService loadingService) => _loadingService = loadingService;
+    public SceneLoader(ProjectLoadingService loadingService) => _loadingService = loadingService;
 
     /// <summary>
     /// <param name="minDuration">Minimum duration in seconds (e.g: 2.0f)</param>
