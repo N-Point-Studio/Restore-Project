@@ -118,20 +118,20 @@ public class GestureManager : IInitializable, IDisposable
     {
         if (currentInteract == null) return;
         currentState = GestureState.InteractingWithObject;
-        InteractionEvents.OnHoldPerformed?.Invoke(obj);
+        InteractionEvents.OnHoldPerformed?.Invoke(currentInteract, obj);
     }
 
     private void HandleHoldCompleted()
     {
         if (currentInteract == null) return;
         currentState = GestureState.InteractingWithObject;
-        InteractionEvents.OnHoldCompleted?.Invoke();
+        InteractionEvents.OnHoldCompleted?.Invoke(currentInteract);
     }
 
     private void HandleHoldCanceled()
     {
         if (currentInteract == null) return;
         currentState = GestureState.Idle;
-        InteractionEvents.OnHoldCanceled?.Invoke();
+        InteractionEvents.OnHoldCanceled?.Invoke(currentInteract);
     }
 }

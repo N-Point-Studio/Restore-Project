@@ -17,9 +17,9 @@ public class ArtefactManager : IInitializable, IDisposable
 
     public void Initialize()
     {
-        // GestureEvents.OnDropPerformed += HandleDrop;
-        GestureEvents.OnHoldPerformed += HandleHold;
-        // GestureEvents.OnClickPerformed += HandleClick;
+        InteractionEvents.OnHoldPerformed += HandleHoldPerformed;
+        InteractionEvents.OnHoldCompleted += HandleHoldCompleted;
+        InteractionEvents.OnHoldCanceled += HandleHoldCanceled;
 
         InteractionEvents.OnDragStarted += HandleDragStarted;
         InteractionEvents.OnDragPerformed += HandleDragPerformed;
@@ -29,19 +29,17 @@ public class ArtefactManager : IInitializable, IDisposable
 
     public void Dispose()
     {
-        // GestureEvents.OnDropPerformed -= HandleDrop;
-        GestureEvents.OnHoldPerformed -= HandleHold;
-        // GestureEvents.OnClickPerformed -= HandleClick;
+        InteractionEvents.OnHoldPerformed -= HandleHoldPerformed;
+        InteractionEvents.OnHoldCompleted -= HandleHoldCompleted;
+        InteractionEvents.OnHoldCanceled -= HandleHoldCanceled;
+
         InteractionEvents.OnDragStarted -= HandleDragStarted;
         InteractionEvents.OnDragPerformed -= HandleDragPerformed;
         InteractionEvents.OnDragEnded -= HandleDragEnded;
-        // InteractionEvents.OnDragPerformed -= HandleDrag;
     }
 
     private void HandleDragStarted(IInteractObject interact, Vector3 worldPos)
     {
-        Debug.Log("Drag start");
-
         if (interact is IAssembled assembled)
         {
             var parent = assemblyService.GetAssembledRoot(assembled);
@@ -49,23 +47,10 @@ public class ArtefactManager : IInitializable, IDisposable
         }
     }
 
-    // private void HandleClick(IInteract interact, Vector2 pos)
-    // {
-    //     if (interact is not ArtefactPieceStateMachine sm) return;
-
-    //     if (interact is IAssembled assembled)
-    //     {
-    //         var parent = assemblyService.GetAssembledRoot(assembled);
-    //         if (parent is IInspectable inspect)
-    //         {
-    //             if (!inspect.IsInspected) inspectService.Inspect(inspect);
-    //         }
-    //     }
-    // }
 
     private void HandleDragPerformed(IInteractObject interact, Vector3 worldPos)
     {
-        if (interact is not ArtefactPieceStateMachine sm) return;
+        if (interact is not ArtefactPieceStateMachine) return;
 
         if (interact is IAssembled assembled)
         {
@@ -76,11 +61,6 @@ public class ArtefactManager : IInitializable, IDisposable
 
     private void HandleDragEnded(IInteractObject interact, Vector3 worldPos)
     {
-        Debug.Log("Drag end");
-
-        // if (inspectable is not ArtefactPieceStateMachine incoming) return;
-        // if (incoming.GetCurrentState() is not IDrag) return;
-        // if (incoming == inspectService.GetCurrentInspected()) return;
         if (interact is not IInspectable inspectable) return;
 
         float distance = Vector3.Distance(worldPos, inspectService.GetInspectPoint().position);
@@ -95,7 +75,6 @@ public class ArtefactManager : IInitializable, IDisposable
                 if (!assemblyService.TryAssemble(inspectService.GetCurrentInspected() as IAssembled, inspectable as IAssembled))
                 {
                     inspectService.Inspect(inspectable);
-                    // inspectService.Inspect(GetTopParent(inspectable as ArtefactPieceStateMachine));
                 }
             }
         }
@@ -109,7 +88,11 @@ public class ArtefactManager : IInitializable, IDisposable
         }
     }
 
-    private void HandleHold(IInteract interact)
+    private void HandleHoldPerformed(IInteractObject interact, float obj)
+    {
+    }
+
+    private void HandleHoldCompleted(IInteractObject interact)
     {
         if (interact is not ArtefactPieceStateMachine sm) return;
 
@@ -125,4 +108,9 @@ public class ArtefactManager : IInitializable, IDisposable
             assemblyService.Detach(sm);
         }
     }
+
+    private void HandleHoldCanceled(IInteractObject interact)
+    {
+    }
+
 }

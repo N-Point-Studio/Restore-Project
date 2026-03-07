@@ -32,7 +32,7 @@ public static class InteractionEvents
     public static Action<Vector2> OnRotatePerformed;
     public static Action<float> OnZoomPerformed;
 
-    public static Action<float> OnHoldPerformed;
-    public static Action OnHoldCanceled;
-    public static Action OnHoldCompleted;
+    public static Action<IInteractObject, float> OnHoldPerformed;
+    public static Action<IInteractObject> OnHoldCanceled;
+    public static Action<IInteractObject> OnHoldCompleted;
 }
