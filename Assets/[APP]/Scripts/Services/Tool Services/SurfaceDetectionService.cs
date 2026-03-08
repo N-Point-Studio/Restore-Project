@@ -1,0 +1,65 @@
+using UnityEngine;
+using VContainer;
+
+public enum ESurfaceDetectionType
+{
+    Texture,
+    Mesh
+}
+
+public class SurfaceDetectionService
+{
+    private float raycastLength = 10f;
+    private Vector3 raycastNormal;
+    private Vector3 raycastPos;
+    private float tipRotation;
+    private Vector2 textureSurface;
+    private bool hasHit;
+    private readonly Camera cam;
+
+    [Inject]
+    public SurfaceDetectionService(Camera cam)
+    {
+        this.cam = cam;
+    }
+
+    public void PerformRaycast(Vector2 screenPos, ESurfaceDetectionType type)
+    {
+        Ray ray = cam.ScreenPointToRay(screenPos);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit))
+        {
+            hasHit = true;
+            EssentialDetecting(hit);
+            // switch (type)
+            // {
+            //     case ESurfaceDetectionType.Texture:
+            //         break;
+            //     case ESurfaceDetectionType.Mesh:
+            //         break;
+            // }
+        }
+        else
+        {
+            hasHit = false;
+            raycastPos = Vector3.positiveInfinity;
+        }
+    }
+
+    public void EssentialDetecting(RaycastHit hit)
+    {
+        raycastNormal = hit.normal;
+        raycastPos = hit.point;
+
+        Vector3 projectedUp = Vector3.ProjectOnPlane(Vector3.up, hit.normal);
+        tipRotation = Vector3.SignedAngle(Vector3.up, projectedUp, hit.normal);
+
+        textureSurface = hit.textureCoord;
+    }
+
+    public Vector3 RaycastNormal => raycastNormal;
+    public Vector3 RaycastPos => raycastPos;
+    public float TipRotation => tipRotation;
+    public Vector2 TextureSurface => textureSurface;
+    public bool HasHit => hasHit;
+}

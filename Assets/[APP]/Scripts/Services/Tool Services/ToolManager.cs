@@ -13,13 +13,15 @@ public class ToolManager : IInitializable, IDisposable
 {
     private readonly InputSystemService inputSystemService;
     private readonly ObjectDetectionService objectDetectionService;
+    private readonly SurfaceDetectionService surfaceDetectionService;
     private ITool currentTool;
 
     [Inject]
-    public ToolManager(InputSystemService inputSystemService, ObjectDetectionService objectDetectionService)
+    public ToolManager(InputSystemService inputSystemService, ObjectDetectionService objectDetectionService, SurfaceDetectionService surfaceDetectionService)
     {
         this.inputSystemService = inputSystemService;
         this.objectDetectionService = objectDetectionService;
+        this.surfaceDetectionService = surfaceDetectionService;
     }
 
     public void Initialize()
@@ -38,7 +40,11 @@ public class ToolManager : IInitializable, IDisposable
 
     private void HandlePressStarted(IInteractObject interact)
     {
-
+        if (interact is not ITool)
+        {
+            currentTool?.Return();
+            currentTool = null;
+        }
     }
 
     private void HandlePressEnded(IInteractObject interact)
@@ -61,7 +67,29 @@ public class ToolManager : IInitializable, IDisposable
         {
             var worldPos = objectDetectionService.ScreenToWorld(vector, interact);
             currentTool.FollowMouse(worldPos);
+
+            surfaceDetectionService.PerformRaycast(vector, ESurfaceDetectionType.Texture);
+            if (surfaceDetectionService.HasHit)
+            {
+                StickToSurface();
+            }
+
+            Debug.Log($"Surface hit? {surfaceDetectionService.HasHit}");
         }
+    }
+
+    public ITool GetCurrentTool()
+    {
+        return currentTool;
+    }
+
+    private void StickToSurface()
+    {
+        Vector3 targetPos = surfaceDetectionService.RaycastPos;
+        Vector3 targetNormal = surfaceDetectionService.RaycastNormal;
+        //up bisa ganti ke forward
+        Quaternion targetRotation = Quaternion.LookRotation(-targetNormal, Vector3.up);
+        currentTool.StickToSurface(targetPos, targetRotation);
     }
 }
 
@@ -70,6 +98,7 @@ public interface ITool
     void FollowMouse(Vector3 worldPos);
     void Use();
     void Return();
+    void StickToSurface(Vector3 position, Quaternion rotation);
 }
 
 // public interface

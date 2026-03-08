@@ -20,6 +20,7 @@ public class GameplayLifetimeScope : LifetimeScope
 
         builder.Register<AssemblyService>(Lifetime.Scoped).AsSelf();
         builder.Register<InspectService>(Lifetime.Scoped);
+        builder.Register<SurfaceDetectionService>(Lifetime.Scoped);
 
         builder.RegisterEntryPoint<ArtefactManager>(Lifetime.Scoped).AsSelf();
 

@@ -43,6 +43,10 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
         if (isReturning) return;
         transform.position = worldPos;
     }
+    public void StickToSurface(Vector3 position, Quaternion rotation)
+    {
+        transform.SetPositionAndRotation(position, rotation);
+    }
 
     public void OnPressEnded() { }
     public void OnPressStarted() { }
