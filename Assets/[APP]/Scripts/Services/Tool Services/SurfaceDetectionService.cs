@@ -26,11 +26,13 @@ public class SurfaceDetectionService
     public void PerformRaycast(Vector2 screenPos, ESurfaceDetectionType type)
     {
         Ray ray = cam.ScreenPointToRay(screenPos);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit))
+        if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            hasHit = true;
-            EssentialDetecting(hit);
+            if (hit.collider.TryGetComponent(out ArtefactPieceStateMachine artefact))
+            {
+                hasHit = artefact.state != ArtefactPieceState.Idle;
+                if (hasHit) EssentialDetecting(hit);
+            }
             // switch (type)
             // {
             //     case ESurfaceDetectionType.Texture:
