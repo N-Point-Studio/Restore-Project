@@ -12,12 +12,14 @@ public interface IPressHandler
 public class ToolManager : IInitializable, IDisposable
 {
     private readonly InputSystemService inputSystemService;
+    private readonly ObjectDetectionService objectDetectionService;
     private ITool currentTool;
 
     [Inject]
-    public ToolManager(InputSystemService inputSystemService)
+    public ToolManager(InputSystemService inputSystemService, ObjectDetectionService objectDetectionService)
     {
         this.inputSystemService = inputSystemService;
+        this.objectDetectionService = objectDetectionService;
     }
 
     public void Initialize()
@@ -36,23 +38,36 @@ public class ToolManager : IInitializable, IDisposable
 
     private void HandlePressStarted(IInteractObject interact)
     {
-        if (interact is ITool tool) currentTool = tool;
+
     }
 
     private void HandlePressEnded(IInteractObject interact)
     {
-
+        if (interact is ITool tool)
+        {
+            if (currentTool != tool)
+            {
+                currentTool?.Return();
+                currentTool = tool;
+                currentTool?.Use();
+            }
+        }
     }
 
     private void HandleMouseMoved(Vector2 vector)
     {
         if (currentTool == null) return;
+        if (currentTool is IInteractObject interact)
+        {
+            var worldPos = objectDetectionService.ScreenToWorld(vector, interact);
+            currentTool.FollowMouse(worldPos);
+        }
     }
 }
 
 public interface ITool
 {
-    void FollowMouse(Vector2 screenPos);
+    void FollowMouse(Vector3 worldPos);
     void Use();
     void Return();
 }

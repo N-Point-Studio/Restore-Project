@@ -545,6 +545,7 @@ GameObject:
   - component: {fileID: 492582584}
   - component: {fileID: 492582583}
   - component: {fileID: 492582582}
+  - component: {fileID: 492582586}
   m_Layer: 0
   m_Name: Tool A
   m_TagString: Untagged
@@ -645,6 +646,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &492582586
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 492582581}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22a52cfb3db9d487fbbea0a37c4377e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ToolObject
 --- !u!1 &502606759
 GameObject:
   m_ObjectHideFlags: 0
@@ -2203,6 +2216,7 @@ GameObject:
   - component: {fileID: 1712798639}
   - component: {fileID: 1712798638}
   - component: {fileID: 1712798637}
+  - component: {fileID: 1712798641}
   m_Layer: 0
   m_Name: Tool B
   m_TagString: Untagged
@@ -2303,6 +2317,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1712798641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1712798636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22a52cfb3db9d487fbbea0a37c4377e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ToolObject
 --- !u!1 &1783207667
 GameObject:
   m_ObjectHideFlags: 0
