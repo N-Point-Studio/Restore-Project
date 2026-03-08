@@ -7,7 +7,8 @@ using System.Collections.Generic;
 
 public class ProjectSavingSystem : SavingSystem, IStartable, ITickable
 {
-    [Inject] private readonly ActiveArtefactData activeArtefactData;
+    [Inject] protected readonly ActiveArtefactData activeArtefactData;
+    [Inject] protected readonly ActiveSettingsData activeSettingsData;
 
     // Player progress tracking
     private bool hasPlayedBefore;
@@ -71,9 +72,8 @@ public class ProjectSavingSystem : SavingSystem, IStartable, ITickable
 
         try
         {
-            SaveToFile($"{slot}/{nameof(activeArtefactData)}", 
-                activeArtefactData.AsJSON(), 
-                () => progress--);
+            SaveToFile($"{slot}/{nameof(activeArtefactData)}", activeArtefactData.AsJSON(), () => progress--);
+            SaveToFile($"{slot}/{nameof(activeSettingsData)}", activeSettingsData.AsJSON(), () => progress--);
                 
             // Save player progress (hasPlayedBefore, etc.)
             JSONNode playerProgressNode = new JSONObject();
@@ -84,9 +84,8 @@ public class ProjectSavingSystem : SavingSystem, IStartable, ITickable
                 tutorialsArray.Add(id);
             }
             playerProgressNode["shownTutorials"] = tutorialsArray;
-            SaveToFile($"{slot}/PlayerProgress", 
-                playerProgressNode, 
-                () => progress--);
+
+            SaveToFile($"{slot}/PlayerProgress", playerProgressNode, () => progress--);
         }
         catch (System.Exception e)
         {
@@ -106,14 +105,16 @@ public class ProjectSavingSystem : SavingSystem, IStartable, ITickable
 
         try
         {
-            LoadFromFile($"{slot}/{nameof(activeArtefactData)}", 
-                result => { 
+            LoadFromFile($"{slot}/{nameof(activeArtefactData)}", result => { 
                     if (result != null && !result.IsNull)
                     {
                         activeArtefactData.LoadFromJSON(result);
                     }
                     progress--; 
                 });
+
+                
+            LoadFromFile($"{slot}/{nameof(activeSettingsData)}", result => { activeSettingsData.LoadFromJSON(result); progress--; });
                 
             // Load player progress
             LoadFromFile($"{slot}/PlayerProgress", 

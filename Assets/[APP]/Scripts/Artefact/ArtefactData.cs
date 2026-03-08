@@ -13,6 +13,9 @@ public class ArtefactData : ScriptableObject
     [SerializeField] private bool unlockedByDefault;
     public bool UnlockedByDefault => unlockedByDefault;
 
+    [SerializeField] private ArtefactData[] unlockRequirements;
+    public ArtefactData[] UnlockRequirements => unlockRequirements;
+
     [SerializeField] private ArtefactOrigin artefactOrigin;
     public ArtefactOrigin ArtefactOrigin => artefactOrigin;
 

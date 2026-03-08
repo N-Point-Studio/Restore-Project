@@ -760,6 +760,11 @@ namespace Modules.SoundSystems
             return audio.AudioID;
         }
 
+        public int PrepareAudio(AudioKey clipKey)
+        {
+            return PrepareAudio(clipKey.ToString());
+        }
+
         #endregion
 
         #region Play Functions
@@ -783,6 +788,11 @@ namespace Modules.SoundSystems
             }
 
             return PlayAudio(item.Type, item.Value, volume, loop, persist, fadeInSeconds, fadeOutSeconds, fadeInSeconds * 2f, sourceTransform);
+        }
+
+        public int PlayAudio(AudioKey clipKey, float volume = 1, bool loop = false, bool ignoreDuplicate = false, bool persist = false, Transform sourceTransform = null, float fadeInSeconds = 0f, float fadeOutSeconds = 0f)
+        {
+            return PlayAudio(clipKey.ToString(), volume, loop, ignoreDuplicate, persist, sourceTransform, fadeInSeconds, fadeOutSeconds);
         }
 
         /// <summary>
@@ -1045,6 +1055,11 @@ namespace Modules.SoundSystems
             {
                 audio.Stop();
             }
+        }
+
+        public void StopAudio(AudioKey clipKey, float fadeOutSeconds = 1)
+        {
+            StopAudio(clipKey.ToString(), fadeOutSeconds);
         }
 
         public void StopAudio(string id, float fadeOutSeconds = 1)

@@ -7,6 +7,6 @@ public class UISoundEffectTriggerSelectable : UISoundEffectTrigger
     public void PlayTriggerSound()
     {
         base.PlaySound();
-        SoundEvents.OnPlayButtonSFX?.Invoke(isConfirm);
+        AudioEvents.OnPlayButtonSFX?.Invoke(isConfirm);
     }
 }

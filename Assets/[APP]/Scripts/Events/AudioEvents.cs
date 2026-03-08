@@ -1,12 +1,14 @@
 using System;
 using UnityEngine;
 
-public static class SoundEvents
+public static class AudioEvents
 {
     public static Action<bool> OnPlayButtonSFX;   
     public static Action OnPlayToggleSFX; 
     public static Action OnPlaySliderSFX;
     public static Action OnPlayUIComponentSelectedSFX;
+    public static Action OnPlayBGMMainMenu;
+    public static Action OnPlayBGMGameplay;
 
     public static void TriggerPlayButtonSFX(bool isConfirm)
     {
@@ -28,6 +30,16 @@ public static class SoundEvents
         OnPlayUIComponentSelectedSFX?.Invoke();
     }
 
+    public static void TriggerPlayBGMMainMenu()
+    {
+        OnPlayBGMMainMenu?.Invoke();
+    }
+
+    public static void TriggerPlayBGMGameplay()
+    {
+        OnPlayBGMGameplay?.Invoke();
+    }
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
@@ -35,5 +47,7 @@ public static class SoundEvents
         OnPlayToggleSFX = null;
         OnPlaySliderSFX = null;
         OnPlayUIComponentSelectedSFX = null;
+        OnPlayBGMMainMenu = null;
+        OnPlayBGMGameplay = null;
     }
 }
