@@ -35,6 +35,8 @@ public class ActiveArtefactData : ISaveable
                 UnlockArtefact(allArtefacts[i].BaseData.Id);
             }
         }
+
+        EvaluateUnlockRequirements();
     }
 
     private void BuildDataCache()
@@ -114,6 +116,50 @@ public class ActiveArtefactData : ISaveable
             });
             unlockedArtefactIds.Add(artefactId);
         }
+
+        EvaluateUnlockRequirements();
+    }
+
+    private void EvaluateUnlockRequirements()
+    {
+        bool hasUnlockedNewArtefact = false;
+
+        foreach (var kvp in artefactDataCache)
+        {
+            string targetId = kvp.Key;
+            ArtefactData targetData = kvp.Value;
+
+            if (IsArtefactUnlocked(targetId))
+                continue;
+
+            if (targetData.UnlockRequirements == null || targetData.UnlockRequirements.Length == 0)
+                continue;
+
+            bool allRequirementsMet = true;
+
+            foreach (var req in targetData.UnlockRequirements)
+            {
+                if (req == null) continue;
+
+                if (!IsArtefactCompleted(req.BaseData.Id))
+                {
+                    allRequirementsMet = false;
+                    break;
+                }
+            }
+
+            if (allRequirementsMet)
+            {
+                UnlockArtefact(targetId);
+                hasUnlockedNewArtefact = true;
+                Debug.Log($"[Artefact System] Unlocked new artefact: {targetData.BaseData.ItemName} because all requirements are met!");
+            }
+        }
+
+        if (hasUnlockedNewArtefact)
+        {
+            EvaluateUnlockRequirements(); 
+        }
     }
 
     public bool IsArtefactUnlocked(string artefactId)
@@ -180,6 +226,8 @@ public class ActiveArtefactData : ISaveable
         }
 
         RefreshStateCache();
+        
+        EvaluateUnlockRequirements();
     }
 }
 

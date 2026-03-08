@@ -1,6 +1,5 @@
 using Modules.StatePatterns;
 using System;
-using System.Reflection;
 using VContainer.Unity;
 
 public class PlayerInputSystem : IInitializable, IStartable, ITickable, IDisposable
@@ -34,6 +33,8 @@ public class PlayerInputSystem : IInitializable, IStartable, ITickable, IDisposa
 
     void ITickable.Tick()
     {
+        if (stateMachine == null || stateMachine.Current == null) return;
+
         stateMachine.Current.Tick();
 
         StateTransition transition = stateMachine.GetTransition();

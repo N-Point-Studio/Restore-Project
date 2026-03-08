@@ -21,7 +21,7 @@ public class SceneTransitionManager : MonoBehaviour
     [SerializeField] private bool enableDebugLogs = true; // Re-enable to debug remaining issue
     [Header("Fallback Transition")]
     [Tooltip("Assign a default TransitionSettings asset here to be used when no other settings are found.")]
-    [SerializeField] private EasyTransition.TransitionSettings fallbackTransitionSettings;
+    // [SerializeField] private EasyTransition.TransitionSettings fallbackTransitionSettings;
 
     // Data to persist across scenes
     private ObjectType currentObjectType;
@@ -52,7 +52,7 @@ public class SceneTransitionManager : MonoBehaviour
     private float stagedDelay;
     private bool isStagedTransition = false;
     private string intermediarySceneName;
-    private EasyTransition.TransitionSettings stagedFinalTransitionSettings; // Renamed for clarity
+    // private EasyTransition.TransitionSettings stagedFinalTransitionSettings; // Renamed for clarity
 
     private void Awake()
     {
@@ -193,7 +193,7 @@ public class SceneTransitionManager : MonoBehaviour
 
     private bool forceEnteringTransitionVisual = false;
 
-    public void StartStagedTransition(string intermediaryScene, string finalDestinationScene, float delay, EasyTransition.TransitionSettings settings, bool forceEnteringVisual = false, bool backToMenu = false)
+    public void StartStagedTransition(string intermediaryScene, string finalDestinationScene, float delay, bool forceEnteringVisual = false, bool backToMenu = false)
     {
         if (isTransitionInProgress)
         {
@@ -214,7 +214,6 @@ public class SceneTransitionManager : MonoBehaviour
         isStagedTransition = true;
         intermediarySceneName = intermediaryScene;
         targetSceneName = intermediaryScene;
-        stagedFinalTransitionSettings = settings; // Store for the final leg
 
         if (enableDebugLogs)
         {
@@ -222,7 +221,7 @@ public class SceneTransitionManager : MonoBehaviour
         }
 
         SaveCameraStateForRestore();
-        StartCoroutine(PerformSceneTransition(settings)); // Use settings for the first leg
+        // StartCoroutine(PerformSceneTransition(settings)); // Use settings for the first leg
     }
 
     /// <summary>
@@ -303,7 +302,7 @@ public class SceneTransitionManager : MonoBehaviour
     /// <summary>
     /// Perform the actual scene transition with proper cleanup
     /// </summary>
-    private IEnumerator PerformSceneTransition(EasyTransition.TransitionSettings settings = null)
+    private IEnumerator PerformSceneTransition()
     {
         isTransitionInProgress = true;
 
@@ -319,12 +318,7 @@ public class SceneTransitionManager : MonoBehaviour
 
         if (useEasyTransition)
         {
-            if (!TryEasyTransition(settings))
-            {
-                if (enableDebugLogs) Debug.Log("EasyTransition failed, using standard scene loading");
-                CleanupCurrentSceneForTransition();
-                SceneManager.LoadScene(targetSceneName);
-            }
+            
         }
         else
         {
@@ -342,268 +336,268 @@ public class SceneTransitionManager : MonoBehaviour
         }
     }
 
-    private IEnumerator ContinueStagedTransition()
-    {
-        if (enableDebugLogs)
-        {
-            Debug.Log($"...continuing staged transition, waiting {stagedDelay}s...");
-        }
+    // private IEnumerator ContinueStagedTransition()
+    // {
+    //     if (enableDebugLogs)
+    //     {
+    //         Debug.Log($"...continuing staged transition, waiting {stagedDelay}s...");
+    //     }
 
-        if (stagedDelay > 0)
-        {
-            yield return new WaitForSeconds(stagedDelay);
-        }
+    //     if (stagedDelay > 0)
+    //     {
+    //         yield return new WaitForSeconds(stagedDelay);
+    //     }
 
-        targetSceneName = stagedFinalDestinationScene;
-        EasyTransition.TransitionSettings finalSettings = stagedFinalTransitionSettings;
+    //     targetSceneName = stagedFinalDestinationScene;
+    //     EasyTransition.TransitionSettings finalSettings = stagedFinalTransitionSettings;
 
-        // Reset staged data before starting next transition
-        isStagedTransition = false;
-        stagedFinalDestinationScene = null;
-        stagedDelay = 0;
-        intermediarySceneName = null;
-        stagedFinalTransitionSettings = null;
-        forceEnteringTransitionVisual = false; // reset override after intermediary leg
+    //     // Reset staged data before starting next transition
+    //     isStagedTransition = false;
+    //     stagedFinalDestinationScene = null;
+    //     stagedDelay = 0;
+    //     intermediarySceneName = null;
+    //     stagedFinalTransitionSettings = null;
+    //     forceEnteringTransitionVisual = false; // reset override after intermediary leg
 
-        if (enableDebugLogs)
-        {
-            Debug.Log($"...wait over, transitioning to final scene: {targetSceneName}");
-        }
-        StartCoroutine(PerformSceneTransition(finalSettings));
-    }
+    //     if (enableDebugLogs)
+    //     {
+    //         Debug.Log($"...wait over, transitioning to final scene: {targetSceneName}");
+    //     }
+    //     StartCoroutine(PerformSceneTransition(finalSettings));
+    // }
 
-    private bool TryEasyTransition(EasyTransition.TransitionSettings settings)
-    {
-        try
-        {
-            // METHOD 1: Try to find EasyTransition.TransitionManager in scene
-            var transitionManager = FindObjectOfType<EasyTransition.TransitionManager>();
-            if (transitionManager == null)
-            {
-                if (enableDebugLogs) Debug.LogWarning("EasyTransition.TransitionManager not found. Using standard scene loading.");
-                return false;
-            }
+    // private bool TryEasyTransition(EasyTransition.TransitionSettings settings)
+    // {
+    //     try
+    //     {
+    //         // METHOD 1: Try to find EasyTransition.TransitionManager in scene
+    //         var transitionManager = FindObjectOfType<EasyTransition.TransitionManager>();
+    //         if (transitionManager == null)
+    //         {
+    //             if (enableDebugLogs) Debug.LogWarning("EasyTransition.TransitionManager not found. Using standard scene loading.");
+    //             return false;
+    //         }
 
-            // CRITICAL FIX: ALWAYS reset runningTransition flag BEFORE attempting transition
-            // This fixes the issue where 2nd and 3rd gameplay transitions fail
-            var runningTransitionField = transitionManager.GetType().GetField("runningTransition", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (runningTransitionField != null)
-            {
-                bool wasRunning = (bool)runningTransitionField.GetValue(transitionManager);
-                if (wasRunning)
-                {
-                    if (enableDebugLogs) Debug.LogWarning("⚠️ Found stuck runningTransition=true flag! Resetting...");
-                }
-                runningTransitionField.SetValue(transitionManager, false);
-                if (enableDebugLogs) Debug.Log("✅ Reset runningTransition flag to false");
-            }
+    //         // CRITICAL FIX: ALWAYS reset runningTransition flag BEFORE attempting transition
+    //         // This fixes the issue where 2nd and 3rd gameplay transitions fail
+    //         var runningTransitionField = transitionManager.GetType().GetField("runningTransition", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+    //         if (runningTransitionField != null)
+    //         {
+    //             bool wasRunning = (bool)runningTransitionField.GetValue(transitionManager);
+    //             if (wasRunning)
+    //             {
+    //                 if (enableDebugLogs) Debug.LogWarning("⚠️ Found stuck runningTransition=true flag! Resetting...");
+    //             }
+    //             runningTransitionField.SetValue(transitionManager, false);
+    //             if (enableDebugLogs) Debug.Log("✅ Reset runningTransition flag to false");
+    //         }
 
-            if (enableDebugLogs)
-            {
-                Debug.Log("=== USING EASY TRANSITION ANIMATION ===");
-                Debug.Log($"Found TransitionManager: {transitionManager.name}");
-            }
+    //         if (enableDebugLogs)
+    //         {
+    //             Debug.Log("=== USING EASY TRANSITION ANIMATION ===");
+    //             Debug.Log($"Found TransitionManager: {transitionManager.name}");
+    //         }
 
-            EasyTransition.TransitionSettings transitionToUse = settings;
+    //         // EasyTransition.TransitionSettings transitionToUse = settings;
 
-            // If no settings are provided via parameters, try to find them from the specific clicked object
-            if (transitionToUse == null && !string.IsNullOrEmpty(clickedObjectName))
-            {
-                Debug.Log($"Attempting to find settings from clicked object: {clickedObjectName}");
-                GameObject clickedGO = GameObject.Find(clickedObjectName);
-                if (clickedGO != null)
-                {
-                    ClickableObject clickable = clickedGO.GetComponent<ClickableObject>();
-                    if (clickable != null)
-                    {
-                        transitionToUse = clickable.GetTransitionSettings();
-                        if (transitionToUse != null)
-                        {
-                            Debug.Log($"✅ Found TransitionSettings '{transitionToUse.name}' on clicked object '{clickedObjectName}'.");
-                        }
-                        else
-                        {
-                            Debug.LogWarning($"⚠️ Clicked object '{clickedObjectName}' found, but it has no TransitionSettings assigned.");
-                        }
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning($"⚠️ Could not find GameObject for clicked object name: '{clickedObjectName}'.");
-                }
-            }
+    //         // If no settings are provided via parameters, try to find them from the specific clicked object
+    //         if (transitionToUse == null && !string.IsNullOrEmpty(clickedObjectName))
+    //         {
+    //             Debug.Log($"Attempting to find settings from clicked object: {clickedObjectName}");
+    //             GameObject clickedGO = GameObject.Find(clickedObjectName);
+    //             if (clickedGO != null)
+    //             {
+    //                 ClickableObject clickable = clickedGO.GetComponent<ClickableObject>();
+    //                 if (clickable != null)
+    //                 {
+    //                     transitionToUse = clickable.GetTransitionSettings();
+    //                     if (transitionToUse != null)
+    //                     {
+    //                         Debug.Log($"✅ Found TransitionSettings '{transitionToUse.name}' on clicked object '{clickedObjectName}'.");
+    //                     }
+    //                     else
+    //                     {
+    //                         Debug.LogWarning($"⚠️ Clicked object '{clickedObjectName}' found, but it has no TransitionSettings assigned.");
+    //                     }
+    //                 }
+    //             }
+    //             else
+    //             {
+    //                 Debug.LogWarning($"⚠️ Could not find GameObject for clicked object name: '{clickedObjectName}'.");
+    //             }
+    //         }
 
-            // If still no settings, use the broader search fallbacks
-            if (transitionToUse == null)
-            {
-                if (enableDebugLogs) Debug.Log("No specific transition settings found, searching for fallbacks in scene...");
-                transitionToUse = FindTransitionSettingsInScene(); // Broader search in scene
-            }
+    //         // If still no settings, use the broader search fallbacks
+    //         if (transitionToUse == null)
+    //         {
+    //             if (enableDebugLogs) Debug.Log("No specific transition settings found, searching for fallbacks in scene...");
+    //             // transitionToUse = FindTransitionSettingsInScene(); // Broader search in scene
+    //         }
 
-            // If still null, try the inspector-assigned fallback on this manager
-            if (transitionToUse == null)
-            {
-                if (fallbackTransitionSettings != null)
-                {
-                    if (enableDebugLogs) Debug.LogWarning("Using fallback transition settings assigned directly on SceneTransitionManager.");
-                    transitionToUse = fallbackTransitionSettings;
-                }
-            }
+    //         // If still null, try the inspector-assigned fallback on this manager
+    //         if (transitionToUse == null)
+    //         {
+    //             // if (fallbackTransitionSettings != null)
+    //             // {
+    //             //     if (enableDebugLogs) Debug.LogWarning("Using fallback transition settings assigned directly on SceneTransitionManager.");
+    //             //     transitionToUse = fallbackTransitionSettings;
+    //             // }
+    //         }
 
-            // Final attempt: search all loaded resources
-            if (transitionToUse == null)
-            {
-                EasyTransition.TransitionSettings[] allTransitionSettings = Resources.FindObjectsOfTypeAll<EasyTransition.TransitionSettings>();
-                if (allTransitionSettings.Length > 0)
-                {
-                    transitionToUse = allTransitionSettings[0];
-                    if (enableDebugLogs) Debug.LogWarning($"Using first available TransitionSettings found in project assets: {transitionToUse.name}");
-                }
-            }
+    //         // Final attempt: search all loaded resources
+    //         if (transitionToUse == null)
+    //         {
+    //             // EasyTransition.TransitionSettings[] allTransitionSettings = Resources.FindObjectsOfTypeAll<EasyTransition.TransitionSettings>();
+    //             // if (allTransitionSettings.Length > 0)
+    //             // {
+    //             //     transitionToUse = allTransitionSettings[0];
+    //             //     if (enableDebugLogs) Debug.LogWarning($"Using first available TransitionSettings found in project assets: {transitionToUse.name}");
+    //             // }
+    //         }
 
-            if (transitionToUse != null)
-            {
-                try
-                {
-                    // Get the transition time from TransitionSettings object using reflection
-                    var transitionTimeField = transitionToUse.GetType().GetField("transitionTime");
-                    float transitionTime = 1f; // default fallback
-                    if (transitionTimeField != null)
-                    {
-                        transitionTime = (float)transitionTimeField.GetValue(transitionToUse);
-                        if (enableDebugLogs) Debug.Log($"Using TransitionSettings transitionTime: {transitionTime}s");
-                    }
+    //         if (transitionToUse != null)
+    //         {
+    //             try
+    //             {
+    //                 // Get the transition time from TransitionSettings object using reflection
+    //                 var transitionTimeField = transitionToUse.GetType().GetField("transitionTime");
+    //                 float transitionTime = 1f; // default fallback
+    //                 if (transitionTimeField != null)
+    //                 {
+    //                     transitionTime = (float)transitionTimeField.GetValue(transitionToUse);
+    //                     if (enableDebugLogs) Debug.Log($"Using TransitionSettings transitionTime: {transitionTime}s");
+    //                 }
 
-                    // Call EasyTransition with proper duration from settings
-                    transitionManager.Transition(targetSceneName, transitionToUse, transitionTime);
+    //                 // Call EasyTransition with proper duration from settings
+    //                 transitionManager.Transition(targetSceneName, transitionToUse, transitionTime);
 
-                    if (enableDebugLogs)
-                    {
-                        Debug.Log($"✅ EasyTransition called successfully with proper settings: Scene '{targetSceneName}', Transition '{transitionToUse.name}', Duration '{transitionTime}s'");
-                    }
+    //                 if (enableDebugLogs)
+    //                 {
+    //                     Debug.Log($"✅ EasyTransition called successfully with proper settings: Scene '{targetSceneName}', Transition '{transitionToUse.name}', Duration '{transitionTime}s'");
+    //                 }
 
-                    return true;
-                }
-                catch (System.Exception ex)
-                {
-                    Debug.LogError($"❌ EasyTransition direct call FAILED: {ex.Message}. Stack Trace: {ex.StackTrace}");
-                    Debug.LogWarning("Trying reflection fallback methods...");
-                }
-            }
-            else
-            {
-                Debug.LogError("❌ No TransitionSettings found anywhere! Cannot perform animated transition. Trying reflection fallback...");
-            }
+    //                 return true;
+    //             }
+    //             catch (System.Exception ex)
+    //             {
+    //                 Debug.LogError($"❌ EasyTransition direct call FAILED: {ex.Message}. Stack Trace: {ex.StackTrace}");
+    //                 Debug.LogWarning("Trying reflection fallback methods...");
+    //             }
+    //         }
+    //         else
+    //         {
+    //             Debug.LogError("❌ No TransitionSettings found anywhere! Cannot perform animated transition. Trying reflection fallback...");
+    //         }
 
-            // Fallback to reflection if settings-based approach failed or wasn't possible
-            if (TryReflectionTransition(transitionManager))
-            {
-                if (enableDebugLogs) Debug.Log("✅ Reflection fallback for transition succeeded!");
-                return true;
-            }
+    //         Fallback to reflection if settings-based approach failed or wasn't possible
+    //         if (TryReflectionTransition(transitionManager))
+    //         {
+    //             if (enableDebugLogs) Debug.Log("✅ Reflection fallback for transition succeeded!");
+    //             return true;
+    //         }
 
-            Debug.LogError("❌ All EasyTransition methods failed!");
-            return false;
-        }
-        catch (System.Exception ex)
-        {
-            if (enableDebugLogs)
-            {
-                Debug.LogWarning($"EasyTransition attempt failed globally: {ex.Message}");
-            }
-            return false;
-        }
-    }
+    //         Debug.LogError("❌ All EasyTransition methods failed!");
+    //         return false;
+    //     }
+    //     catch (System.Exception ex)
+    //     {
+    //         if (enableDebugLogs)
+    //         {
+    //             Debug.LogWarning($"EasyTransition attempt failed globally: {ex.Message}");
+    //         }
+    //         return false;
+    //     }
+    // }
 
     /// <summary>
     /// Try to find TransitionSettings from ClickableObjects or other sources in scene
     /// </summary>
-    private EasyTransition.TransitionSettings FindTransitionSettingsInScene()
-    {
-        Debug.Log("Searching for TransitionSettings in scene...");
+    // private EasyTransition.TransitionSettings FindTransitionSettingsInScene()
+    // {
+    //     Debug.Log("Searching for TransitionSettings in scene...");
 
-        // Method 1: Check all ClickableObjects for TransitionSettings
-        ClickableObject[] clickableObjects = FindObjectsOfType<ClickableObject>();
-        foreach (var clickable in clickableObjects)
-        {
-            var transitionSettings = clickable.GetTransitionSettings();
-            if (transitionSettings != null)
-            {
-                Debug.Log($"Found TransitionSettings in ClickableObject: {clickable.name}");
-                return transitionSettings;
-            }
-        }
+    //     // Method 1: Check all ClickableObjects for TransitionSettings
+    //     ClickableObject[] clickableObjects = FindObjectsOfType<ClickableObject>();
+    //     foreach (var clickable in clickableObjects)
+    //     {
+    //         var transitionSettings = clickable.GetTransitionSettings();
+    //         if (transitionSettings != null)
+    //         {
+    //             Debug.Log($"Found TransitionSettings in ClickableObject: {clickable.name}");
+    //             return transitionSettings;
+    //         }
+    //     }
 
-        // Method 2: Try to find any TransitionSettings assets in scene
-        EasyTransition.TransitionSettings[] allSettings = FindObjectsOfType<EasyTransition.TransitionSettings>();
-        if (allSettings.Length > 0)
-        {
-            Debug.Log($"Found TransitionSettings asset in scene: {allSettings[0].name}");
-            return allSettings[0];
-        }
+    //     // Method 2: Try to find any TransitionSettings assets in scene
+    //     // EasyTransition.TransitionSettings[] allSettings = FindObjectsOfType<EasyTransition.TransitionSettings>();
+    //     // if (allSettings.Length > 0)
+    //     // {
+    //     //     Debug.Log($"Found TransitionSettings asset in scene: {allSettings[0].name}");
+    //     //     return allSettings[0];
+    //     // }
 
-        Debug.LogWarning("No TransitionSettings found in scene");
-        return null;
-    }
+    //     Debug.LogWarning("No TransitionSettings found in scene");
+    //     return null;
+    // }
 
     /// <summary>
     /// Try reflection-based transition methods as fallback
     /// </summary>
-    private bool TryReflectionTransition(EasyTransition.TransitionManager transitionManager)
-    {
-        try
-        {
-            // Method 1: Try simple string-only transition
-            var stringMethod = transitionManager.GetType().GetMethod("Transition", new[] { typeof(string) });
-            if (stringMethod != null)
-            {
-                if (enableDebugLogs)
-                {
-                    Debug.Log("Using reflection: Transition(string)");
-                }
-                stringMethod.Invoke(transitionManager, new object[] { targetSceneName });
-                return true;
-            }
+    // private bool TryReflectionTransition(TransitionManager transitionManager)
+    // {
+    //     try
+    //     {
+    //         // Method 1: Try simple string-only transition
+    //         var stringMethod = transitionManager.GetType().GetMethod("Transition", new[] { typeof(string) });
+    //         if (stringMethod != null)
+    //         {
+    //             if (enableDebugLogs)
+    //             {
+    //                 Debug.Log("Using reflection: Transition(string)");
+    //             }
+    //             stringMethod.Invoke(transitionManager, new object[] { targetSceneName });
+    //             return true;
+    //         }
 
-            // Method 2: Try LoadLevel method if available
-            var loadLevelMethod = transitionManager.GetType().GetMethod("LoadLevel", new[] { typeof(string) });
-            if (loadLevelMethod != null)
-            {
-                if (enableDebugLogs)
-                {
-                    Debug.Log("Using reflection: LoadLevel(string)");
-                }
-                loadLevelMethod.Invoke(transitionManager, new object[] { targetSceneName });
-                return true;
-            }
+    //         // Method 2: Try LoadLevel method if available
+    //         var loadLevelMethod = transitionManager.GetType().GetMethod("LoadLevel", new[] { typeof(string) });
+    //         if (loadLevelMethod != null)
+    //         {
+    //             if (enableDebugLogs)
+    //             {
+    //                 Debug.Log("Using reflection: LoadLevel(string)");
+    //             }
+    //             loadLevelMethod.Invoke(transitionManager, new object[] { targetSceneName });
+    //             return true;
+    //         }
 
-            // Method 3: Try any public methods that take string parameter
-            var allMethods = transitionManager.GetType().GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-            foreach (var method in allMethods)
-            {
-                var parameters = method.GetParameters();
-                if (parameters.Length == 1 && parameters[0].ParameterType == typeof(string) &&
-                    (method.Name.Contains("Transition") || method.Name.Contains("Load")))
-                {
-                    if (enableDebugLogs)
-                    {
-                        Debug.Log($"Using reflection: {method.Name}(string)");
-                    }
-                    method.Invoke(transitionManager, new object[] { targetSceneName });
-                    return true;
-                }
-            }
-        }
-        catch (System.Exception ex)
-        {
-            if (enableDebugLogs)
-            {
-                Debug.LogWarning($"Reflection transition failed: {ex.Message}");
-            }
-        }
+    //         // Method 3: Try any public methods that take string parameter
+    //         var allMethods = transitionManager.GetType().GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+    //         foreach (var method in allMethods)
+    //         {
+    //             var parameters = method.GetParameters();
+    //             if (parameters.Length == 1 && parameters[0].ParameterType == typeof(string) &&
+    //                 (method.Name.Contains("Transition") || method.Name.Contains("Load")))
+    //             {
+    //                 if (enableDebugLogs)
+    //                 {
+    //                     Debug.Log($"Using reflection: {method.Name}(string)");
+    //                 }
+    //                 method.Invoke(transitionManager, new object[] { targetSceneName });
+    //                 return true;
+    //             }
+    //         }
+    //     }
+    //     catch (System.Exception ex)
+    //     {
+    //         if (enableDebugLogs)
+    //         {
+    //             Debug.LogWarning($"Reflection transition failed: {ex.Message}");
+    //         }
+    //     }
 
-        return false;
-    }
+    //     return false;
+    // }
 
 
     /// <summary>
@@ -982,20 +976,20 @@ public class SceneTransitionManager : MonoBehaviour
 
         // ADDITIONAL SAFEGUARD: Reset EasyTransition's runningTransition flag when scene loads
         // This ensures transitions work properly on 2nd, 3rd gameplay entries
-        var transitionManager = FindObjectOfType<EasyTransition.TransitionManager>();
-        if (transitionManager != null)
-        {
-            var runningTransitionField = transitionManager.GetType().GetField("runningTransition", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (runningTransitionField != null)
-            {
-                runningTransitionField.SetValue(transitionManager, false);
-                if (enableDebugLogs) Debug.Log("✅ OnSceneLoaded: Reset EasyTransition runningTransition flag");
-            }
-        }
+        // var transitionManager = FindObjectOfType<EasyTransition.TransitionManager>();
+        // if (transitionManager != null)
+        // {
+        //     var runningTransitionField = transitionManager.GetType().GetField("runningTransition", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        //     if (runningTransitionField != null)
+        //     {
+        //         runningTransitionField.SetValue(transitionManager, false);
+        //         if (enableDebugLogs) Debug.Log("✅ OnSceneLoaded: Reset EasyTransition runningTransition flag");
+        //     }
+        // }
 
         if (isStagedTransition && scene.name == intermediarySceneName)
         {
-            StartCoroutine(ContinueStagedTransition());
+            // StartCoroutine(ContinueStagedTransition());
             return;
         }
 
@@ -1476,7 +1470,7 @@ public class SceneTransitionManager : MonoBehaviour
         clickedObjectName = string.Empty;
         clickedObjectPosition = Vector3.zero;
         stagedFinalDestinationScene = null;
-        stagedFinalTransitionSettings = null;
+        // stagedFinalTransitionSettings = null;
 
         Debug.LogWarning($"[SceneTransitionManager] Force loading scene immediately: {sceneName}");
         SceneManager.LoadScene(sceneName);
@@ -1505,7 +1499,7 @@ public class SceneTransitionManager : MonoBehaviour
         sceneTransitionDelay = other.sceneTransitionDelay;
         useEasyTransition = other.useEasyTransition;
         enableDebugLogs = other.enableDebugLogs;
-        fallbackTransitionSettings = other.fallbackTransitionSettings;
+        // fallbackTransitionSettings = other.fallbackTransitionSettings;
     }
 
     /// <summary>
@@ -1686,7 +1680,6 @@ public class SceneTransitionManager : MonoBehaviour
         {
             // Skip transition-related components
             if (mb == this ||
-                mb is EasyTransition.TransitionManager ||
                 mb.name.Contains("Transition") ||
                 mb.name.Contains("Animation"))
             {

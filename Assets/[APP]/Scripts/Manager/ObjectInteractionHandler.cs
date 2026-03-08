@@ -260,8 +260,7 @@ public class ObjectInteractionHandler : MonoBehaviour
                 SceneTransitionManager.Instance.StartStagedTransition(
                     transitionScreenName,
                     finalSceneName,
-                    0f,
-                    null
+                    0f
                 );
             }
             else

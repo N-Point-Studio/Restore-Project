@@ -178,11 +178,11 @@ public class TransitionFixer : MonoBehaviour
     {
         try
         {
-            if (EasyTransition.TransitionManager.Instance() != null)
-            {
-                EasyTransition.TransitionManager.Instance().onTransitionBegin += OnTransitionStart;
-                Debug.Log("Subscribed to Easy Transitions events");
-            }
+            // if (EasyTransition.TransitionManager.Instance() != null)
+            // {
+            //     EasyTransition.TransitionManager.Instance().onTransitionBegin += OnTransitionStart;
+            //     Debug.Log("Subscribed to Easy Transitions events");
+            // }
         }
         catch (System.Exception e)
         {
@@ -238,10 +238,10 @@ public class TransitionFixer : MonoBehaviour
         // Unsubscribe from events when destroyed
         try
         {
-            if (EasyTransition.TransitionManager.Instance() != null)
-            {
-                EasyTransition.TransitionManager.Instance().onTransitionBegin -= OnTransitionStart;
-            }
+            // if (EasyTransition.TransitionManager.Instance() != null)
+            // {
+            //     EasyTransition.TransitionManager.Instance().onTransitionBegin -= OnTransitionStart;
+            // }
         }
         catch (System.Exception)
         {

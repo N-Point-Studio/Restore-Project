@@ -16,7 +16,7 @@ public class ClickableObject : MonoBehaviour
     [SerializeField] private string targetSceneName = "";
     [SerializeField] private bool canChangeScene = false;
     [SerializeField] private bool useTransitionAnimation = true;
-    [SerializeField] private EasyTransition.TransitionSettings transitionSettings;
+    // [SerializeField] private EasyTransition.TransitionSettings transitionSettings;
 
     [Header("Staged Scene Transition")]
     [Tooltip("Enable this to use a two-stage transition via an intermediary scene.")]
@@ -309,10 +309,10 @@ public class ClickableObject : MonoBehaviour
     /// <summary>
     /// Get the Easy Transition settings for scene change
     /// </summary>
-    public EasyTransition.TransitionSettings GetTransitionSettings()
-    {
-        return transitionSettings;
-    }
+    // public EasyTransition.TransitionSettings GetTransitionSettings()
+    // {
+    //     return transitionSettings;
+    // }
 
     /// <summary>
     /// Check if this object should use a staged scene transition.

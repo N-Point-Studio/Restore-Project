@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using EasyTransition;
 using Unity.Mathematics;
 
 public class GamePlayManager : MonoBehaviour
@@ -18,7 +17,6 @@ public class GamePlayManager : MonoBehaviour
     [SerializeField] private bool useStagedReturnTransition = true;
     [SerializeField] private string returnIntermediaryScene = "TransitionScreen";
     [SerializeField] private float returnIntermediaryDelay = 0.5f;
-    [SerializeField] private TransitionSettings returnTransitionSettings;
 
     public bool isGameFinished = false;
 
@@ -281,8 +279,7 @@ public class GamePlayManager : MonoBehaviour
             SceneTransitionManager.Instance.StartStagedTransition(
                 returnIntermediaryScene,
                 targetScene,
-                returnIntermediaryDelay,
-                returnTransitionSettings
+                returnIntermediaryDelay
             );
         }
         else
