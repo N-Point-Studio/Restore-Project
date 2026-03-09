@@ -17,17 +17,20 @@ public class ObjectInteractionManager : IInitializable, IDisposable
     private readonly ObjectPressService pressService;
     private readonly ObjectDragService dragService;
     private readonly ObjectHoldService holdService;
+    private readonly CleaningService cleaningService;
     private IInteractObject currentInteract;
 
     [Inject]
     public ObjectInteractionManager(ObjectDetectionService detectionService, ObjectPressService press,
-        ObjectDragService swipe, ObjectHoldService hold)
+        ObjectDragService swipe, ObjectHoldService hold, CleaningService cleaningService)
     {
         this.detectionService = detectionService;
 
         pressService = press;
         dragService = swipe;
         holdService = hold;
+
+        this.cleaningService = cleaningService;
     }
 
     public void Initialize()
@@ -116,22 +119,30 @@ public class ObjectInteractionManager : IInitializable, IDisposable
 
     private void HandleHoldPerformed(float obj)
     {
+        if (cleaningService.isCleaning) return;
         if (currentInteract == null) return;
         currentState = GestureState.InteractingWithObject;
         InteractionEvents.OnHoldPerformed?.Invoke(currentInteract, obj);
+        Debug.Log("object interaction hold performed");
     }
 
     private void HandleHoldCompleted()
     {
+        if (cleaningService.isCleaning) return;
         if (currentInteract == null) return;
         currentState = GestureState.InteractingWithObject;
         InteractionEvents.OnHoldCompleted?.Invoke(currentInteract);
+        Debug.Log("object interaction hold completed");
+
     }
 
     private void HandleHoldCanceled()
     {
+        if (cleaningService.isCleaning) return;
         if (currentInteract == null) return;
         currentState = GestureState.Idle;
         InteractionEvents.OnHoldCanceled?.Invoke(currentInteract);
+        Debug.Log("object interaction hold canceled");
+
     }
 }

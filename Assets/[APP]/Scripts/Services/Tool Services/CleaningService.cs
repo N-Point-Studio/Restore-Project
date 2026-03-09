@@ -1,16 +1,23 @@
+using System;
 using UnityEngine;
 
-public class CleaningService : MonoBehaviour
+public class CleaningService
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public event Action OnCleaningPerformed;
+    public event Action OnCleaningEnded;
+
+    public bool isCleaning;
+
+    public void TryCleaning()
     {
-        
+        isCleaning = true;
+        Debug.Log("Cleaning cuy!");
+        // OnCleaningPerformed.Invoke();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void EndClean()
     {
-        
+        isCleaning = false;
+        Debug.Log("Cleaning cuy! false");
     }
 }

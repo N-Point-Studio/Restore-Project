@@ -20,7 +20,9 @@ public class GameplayLifetimeScope : LifetimeScope
 
         builder.Register<AssemblyService>(Lifetime.Scoped).AsSelf();
         builder.Register<InspectService>(Lifetime.Scoped);
+
         builder.Register<SurfaceDetectionService>(Lifetime.Scoped);
+        builder.Register<CleaningService>(Lifetime.Scoped);
 
         builder.RegisterEntryPoint<ArtefactManager>(Lifetime.Scoped).AsSelf();
 
@@ -35,6 +37,6 @@ public class GameplayLifetimeScope : LifetimeScope
 
         builder.RegisterEntryPoint<ObjectInteractionManager>(Lifetime.Scoped).AsSelf();
 
-        builder.RegisterEntryPoint<ToolManager>(Lifetime.Scoped).AsSelf();
+        builder.RegisterEntryPoint<ToolService>(Lifetime.Scoped).AsSelf();
     }
 }

@@ -3,25 +3,22 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public interface IPressHandler
-{
-    void OnPressStart();
-    void OnPressEnd();
-}
-
-public class ToolManager : IInitializable, IDisposable
+public class ToolService : IInitializable, IDisposable
 {
     private readonly InputSystemService inputSystemService;
     private readonly ObjectDetectionService objectDetectionService;
     private readonly SurfaceDetectionService surfaceDetectionService;
+    private readonly CleaningService cleaningService;
     private ITool currentTool;
 
     [Inject]
-    public ToolManager(InputSystemService inputSystemService, ObjectDetectionService objectDetectionService, SurfaceDetectionService surfaceDetectionService)
+    public ToolService(InputSystemService inputSystemService, ObjectDetectionService objectDetectionService,
+    SurfaceDetectionService surfaceDetectionService, CleaningService cleaningService)
     {
         this.inputSystemService = inputSystemService;
         this.objectDetectionService = objectDetectionService;
         this.surfaceDetectionService = surfaceDetectionService;
+        this.cleaningService = cleaningService;
     }
 
     public void Initialize()
@@ -42,8 +39,15 @@ public class ToolManager : IInitializable, IDisposable
     {
         if (interact is not ITool)
         {
-            currentTool?.Return();
-            currentTool = null;
+            if (surfaceDetectionService.HasHit)
+            {
+                cleaningService.TryCleaning();
+            }
+            else
+            {
+                currentTool?.Return();
+                currentTool = null;
+            }
         }
     }
 
@@ -58,6 +62,8 @@ public class ToolManager : IInitializable, IDisposable
                 currentTool?.Use();
             }
         }
+
+        cleaningService.EndClean();
     }
 
     private void HandleMouseMoved(Vector2 vector)
@@ -91,14 +97,7 @@ public class ToolManager : IInitializable, IDisposable
         Quaternion targetRotation = Quaternion.LookRotation(-targetNormal, Vector3.up);
         currentTool.StickToSurface(targetPos, targetRotation);
     }
-}
 
-public interface ITool
-{
-    void FollowMouse(Vector3 worldPos);
-    void Use();
-    void Return();
-    void StickToSurface(Vector3 position, Quaternion rotation);
-}
+    public bool IsOnToolMode => GetCurrentTool() != null;
 
-// public interface
+}

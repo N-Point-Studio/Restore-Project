@@ -65,7 +65,7 @@ public class ObjectHoldService : IInitializable, IDisposable, ITickable
         float holdTime = heldTime - HOLD_DELAY;
 
         OnHoldPerformed?.Invoke(holdTime);
-        Debug.Log("holding " + holdTime);
+        // Debug.Log("holding " + holdTime);
 
         if (holdTime >= HOLD_DURATION)
         {

@@ -20,7 +20,10 @@ public class InspectService
     {
         if (currentInspect == inspectable) return;
 
-        if (currentInspect != null) ExitInspect();
+        if (currentInspect != null)
+        {
+            ExitInspect();
+        }
 
         currentInspect = inspectable;
         originalParent = inspectable.GetTransform().parent;

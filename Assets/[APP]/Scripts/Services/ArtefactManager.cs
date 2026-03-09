@@ -7,12 +7,14 @@ public class ArtefactManager : IInitializable, IDisposable
 {
     private readonly InspectService inspectService;
     private readonly AssemblyService assemblyService;
+    private readonly ToolService toolService;
 
     [Inject]
-    public ArtefactManager(InspectService inspectService, AssemblyService assemblyService)
+    public ArtefactManager(InspectService inspectService, AssemblyService assemblyService, ToolService toolService)
     {
         this.inspectService = inspectService;
         this.assemblyService = assemblyService;
+        this.toolService = toolService;
     }
 
     public void Initialize()
@@ -39,6 +41,8 @@ public class ArtefactManager : IInitializable, IDisposable
 
     private void HandleDragStarted(IInteractObject interact, Vector3 worldPos)
     {
+        // if (tool.IsOnToolMode) return;
+
         if (interact is IAssembled assembled)
         {
             var parent = assemblyService.GetAssembledRoot(assembled);
@@ -46,9 +50,10 @@ public class ArtefactManager : IInitializable, IDisposable
         }
     }
 
-
     private void HandleDragPerformed(IInteractObject interact, Vector3 worldPos)
     {
+        // if (tool.IsOnToolMode) return;
+
         if (interact is not ArtefactPieceStateMachine) return;
 
         if (interact is IAssembled assembled)
@@ -60,6 +65,8 @@ public class ArtefactManager : IInitializable, IDisposable
 
     private void HandleDragEnded(IInteractObject interact, Vector3 worldPos)
     {
+        if (toolService.IsOnToolMode) return;
+
         if (interact is not IInspectable inspectable) return;
 
         float distance = Vector3.Distance(worldPos, inspectService.GetInspectPoint().position);
@@ -67,12 +74,14 @@ public class ArtefactManager : IInitializable, IDisposable
         {
             if (inspectService.GetCurrentInspected() == null)
             {
+                // Debug.Log("A is currently cleaning? " + cleaningService.isCleaning);
                 inspectService.Inspect(inspectable);
             }
             else
             {
                 if (!assemblyService.TryAssemble(inspectService.GetCurrentInspected() as IAssembled, inspectable as IAssembled))
                 {
+                    // Debug.Log("B is currently cleaning? " + cleaningService.isCleaning);
                     inspectService.Inspect(inspectable);
                 }
             }
@@ -93,6 +102,8 @@ public class ArtefactManager : IInitializable, IDisposable
 
     private void HandleHoldCompleted(IInteractObject interact)
     {
+        if (toolService.IsOnToolMode) return;
+
         if (interact is not ArtefactPieceStateMachine sm) return;
 
         var currentInspect = inspectService.GetCurrentInspected();
