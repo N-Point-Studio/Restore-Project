@@ -16,7 +16,7 @@ public class ObjectHoldService : IInitializable, IDisposable, ITickable
     private Vector2 currentMousePosition;
 
     private const float HOLD_DELAY = 0.2f;
-    private const float HOLD_DURATION = 1.5f;
+    private const float HOLD_DURATION = .5f;
     private const float MOVE_TOLERANCE = 5f;
 
     public event Action<float> OnHoldPerformed;

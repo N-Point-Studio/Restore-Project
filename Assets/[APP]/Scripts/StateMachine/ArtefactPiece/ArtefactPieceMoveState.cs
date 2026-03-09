@@ -20,6 +20,9 @@ public class ArtefactPieceMoveState : ArtefactPieceBaseState, IInspectable
         stateMachine.state = ArtefactPieceState.Move;
         moveSequence = DOTween.Sequence();
 
+        Debug.Log($"Enter move from {stateMachine.transform.position} to {targetTransform.position}");
+
+
         moveSequence.Join(
             stateMachine.transform.DOMove(targetTransform.position, 0.5f).SetEase(Ease.OutBack)
         );

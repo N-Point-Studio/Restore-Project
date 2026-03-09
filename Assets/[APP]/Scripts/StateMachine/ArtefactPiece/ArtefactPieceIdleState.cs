@@ -25,8 +25,10 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDragObjec
 
     public void EnterInspect(Transform targetTransform)
     {
+        Debug.Log("Enter inspect from " + stateMachine.transform.position);
         stateMachine.isInspected = true;
         stateMachine.SwitchState(new ArtefactPieceMoveState(stateMachine, targetTransform, ArtefactPieceState.Inspect));
+        // stateMachine.SwitchState(new ArtefactPieceInspectState(stateMachine));
     }
     public void ExitInspect() { }
 
@@ -45,7 +47,7 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDragObjec
     public void OnDragStarted(Vector3 worldPos)
     {
         Debug.Log("Drag started");
-        stateMachine.transform.position = worldPos;
+        // stateMachine.transform.position = worldPos;
     }
 
     public void OnDragPerformed(Vector3 worldPos)
@@ -53,13 +55,16 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDragObjec
         Debug.Log("Drag performed");
 
         stateMachine.transform.position = worldPos;
+        Debug.Log("Enter Drag perform on " + worldPos);
+
     }
 
     public void OnDragEnded(Vector3 worldPos)
     {
-        Debug.Log("Drag ended");
+        Debug.Log("Enter Drag ended on " + worldPos);
+        stateMachine.SwitchState(new ArtefactPieceReturningState(stateMachine));
 
-        stateMachine.transform.position = worldPos;
-        stateMachine.ResetTransform();
+        // stateMachine.transform.position = worldPos;
+        // stateMachine.ResetTransform();
     }
 }

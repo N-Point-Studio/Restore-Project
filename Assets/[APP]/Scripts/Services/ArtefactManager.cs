@@ -74,13 +74,15 @@ public class ArtefactManager : IInitializable, IDisposable
         {
             if (inspectService.GetCurrentInspected() == null)
             {
-                // Debug.Log("A is currently cleaning? " + cleaningService.isCleaning);
+                Debug.Log("A masuk inspect");
                 inspectService.Inspect(inspectable);
             }
             else
             {
                 if (!assemblyService.TryAssemble(inspectService.GetCurrentInspected() as IAssembled, inspectable as IAssembled))
                 {
+                    Debug.Log("B masuk inspect");
+
                     // Debug.Log("B is currently cleaning? " + cleaningService.isCleaning);
                     inspectService.Inspect(inspectable);
                 }

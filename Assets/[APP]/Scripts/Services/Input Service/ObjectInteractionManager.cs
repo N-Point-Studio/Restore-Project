@@ -99,12 +99,20 @@ public class ObjectInteractionManager : IInitializable, IDisposable
         InteractionEvents.OnDragStarted?.Invoke(currentInteract, worldPos);
     }
 
+    // private void HandleDragPerformed(Vector2 vector)
+    // {
+    //     if (currentInteract == null) return;
+    //     // currentState = GestureState.InteractingWithObject;
+    //     // Debug.Log("Current position " + vector);
+    //     Vector3 worldPos = detectionService.ScreenToWorld(vector, currentInteract);
+    //     InteractionEvents.OnDragPerformed?.Invoke(currentInteract, worldPos);
+    // }
+
     private void HandleDragPerformed(Vector2 vector)
     {
         if (currentInteract == null) return;
-        // currentState = GestureState.InteractingWithObject;
-        // Debug.Log("Current position " + vector);
-        Vector3 worldPos = detectionService.ScreenToWorld(vector, currentInteract);
+
+        Vector3 worldPos = detectionService.ScreenToWorld(vector);
         InteractionEvents.OnDragPerformed?.Invoke(currentInteract, worldPos);
     }
 

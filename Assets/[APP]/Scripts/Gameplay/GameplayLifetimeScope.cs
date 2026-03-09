@@ -4,7 +4,7 @@ using VContainer.Unity;
 
 public class GameplayLifetimeScope : LifetimeScope
 {
-    [SerializeField] private Transform inspect;
+    [SerializeField] private Inspection inspect;
     [SerializeField] private RectTransform inspectZone;
     [SerializeField] private Transform planeReference;
     protected override void Configure(IContainerBuilder builder)

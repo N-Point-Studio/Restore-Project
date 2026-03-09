@@ -3,19 +3,19 @@ using VContainer;
 
 public class InspectService
 {
-    private readonly Transform inspectPoint;
+    private readonly Inspection inspectPoint;
     private IInspectable currentInspect;
     private Transform originalParent;
 
     [Inject]
-    public InspectService(Transform inspectPoint)
+    public InspectService(Inspection inspectPoint)
     {
         this.inspectPoint = inspectPoint;
     }
 
     public IInspectable GetCurrentInspected() => currentInspect;
-    public Transform GetInspectPoint() => inspectPoint;
-    public void ResetInspectPoint() { inspectPoint.SetPositionAndRotation(Vector3.zero, Quaternion.identity); }
+    public Transform GetInspectPoint() => inspectPoint.transform;
+
     public void Inspect(IInspectable inspectable)
     {
         if (currentInspect == inspectable) return;
@@ -27,9 +27,12 @@ public class InspectService
 
         currentInspect = inspectable;
         originalParent = inspectable.GetTransform().parent;
-        inspectable.GetTransform().SetParent(inspectPoint);
+
+        inspectPoint.ResetPosition();
+
+        inspectable.GetTransform().SetParent(inspectPoint.transform);
         inspectable.EnterInspect(inspectPoint.transform);
-        ResetInspectPoint();
+
     }
 
     public void ExitInspect()
@@ -41,5 +44,7 @@ public class InspectService
 
         currentInspect = null;
         originalParent = null;
+
+        inspectPoint.ResetPosition();
     }
 }

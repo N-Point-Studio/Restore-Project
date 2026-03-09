@@ -11,11 +11,14 @@ public class ObjectDetectionService : IInitializable, IDisposable
     public Action<IInteractObject> OnInteractDetected;
     public Action OnInteractCanceled;
 
+    private readonly Plane plane;
+
     [Inject]
-    public ObjectDetectionService(InputSystemService inputSystemService, Camera cam)
+    public ObjectDetectionService(InputSystemService inputSystemService, Camera cam, Plane plane)
     {
         this.inputSystemService = inputSystemService;
         this.cam = cam;
+        this.plane = plane;
     }
 
     public void Initialize()
@@ -75,6 +78,18 @@ public class ObjectDetectionService : IInitializable, IDisposable
             Vector3 screenPosWithDepth = new Vector3(screenPos.x, screenPos.y, zDistance);
             return cam.ScreenToWorldPoint(screenPosWithDepth);
         }
+        return Vector3.zero;
+    }
+
+    public Vector3 ScreenToWorld(Vector2 screenPos)
+    {
+        Ray ray = cam.ScreenPointToRay(screenPos);
+
+        if (plane.Raycast(ray, out float distance))
+        {
+            return ray.GetPoint(distance);
+        }
+
         return Vector3.zero;
     }
 }

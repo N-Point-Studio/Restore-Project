@@ -4,28 +4,41 @@ public class Inspection : MonoBehaviour
 {
     public float rotateSpeed = 0.5f;
     public float zoomSpeed = 0.02f;
-    public float smoothTime = 0.1f; // Semakin kecil semakin responsif
+    public float smoothTime = 0.1f;
 
-    [Header("Zoom Limits (Distance from Camera)")]
+    [Header("Zoom Limits")]
     public float minDistance = 2f;
-    public float maxDistance = 10f;
+
+    private float _initialDistance;
 
     private Camera _mainCamera;
     private Vector3 _targetPosition;
     private Vector3 _zoomVelocity = Vector3.zero;
 
+    private Vector3 InitialInspectPosition;
+    private Quaternion InitialInspectRotation;
+
     void Start()
     {
         _mainCamera = Camera.main;
         _targetPosition = transform.position;
+        InitialInspectPosition = transform.position;
+        InitialInspectRotation = transform.rotation;
     }
 
     void OnEnable()
     {
         InteractionEvents.OnRotatePerformed += OnRotatePerformed;
         InteractionEvents.OnZoomPerformed += OnZoomPerformed;
-        // Reset target position saat aktif agar tidak ada lonjakan posisi
+
+        _mainCamera = Camera.main;
+
         _targetPosition = transform.position;
+
+        _initialDistance = Vector3.Distance(
+            _mainCamera.transform.position,
+            transform.position
+        );
     }
 
     void OnDisable()
@@ -36,7 +49,6 @@ public class Inspection : MonoBehaviour
 
     void Update()
     {
-        // Menggerakkan objek ke target position secara smooth
         transform.position = Vector3.SmoothDamp(
             transform.position,
             _targetPosition,
@@ -57,13 +69,28 @@ public class Inspection : MonoBehaviour
     public void OnZoomPerformed(float zoomDelta)
     {
         if (_mainCamera == null) _mainCamera = Camera.main;
+
         Vector3 direction = (_targetPosition - _mainCamera.transform.position).normalized;
 
-        float currentDistance = Vector3.Distance(_mainCamera.transform.position, _targetPosition);
+        float currentDistance = Vector3.Distance(
+            _mainCamera.transform.position,
+            _targetPosition
+        );
 
         float targetDistance = currentDistance + (zoomDelta * zoomSpeed);
 
-        targetDistance = Mathf.Clamp(targetDistance, minDistance, maxDistance);
+        // clamp antara zoom in dan posisi awal
+        targetDistance = Mathf.Clamp(targetDistance, minDistance, _initialDistance);
+
         _targetPosition = _mainCamera.transform.position + direction * targetDistance;
     }
+
+    public void ResetPosition()
+    {
+        transform.SetPositionAndRotation(InitialInspectPosition, InitialInspectRotation);
+
+        _targetPosition = InitialInspectPosition;
+        _zoomVelocity = Vector3.zero;
+    }
+
 }
