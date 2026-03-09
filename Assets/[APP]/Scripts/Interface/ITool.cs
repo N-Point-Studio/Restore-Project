@@ -6,4 +6,5 @@ public interface ITool
     void Use();
     void Return();
     void StickToSurface(Vector3 position, Quaternion rotation);
+    Texture2D GetBrush();
 }

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ArtefactPieceStateMachine : StateMachine, IInteractObject, IClick, IDragObject, IHold, IAssembled, IInspectable
+public class ArtefactPieceStateMachine : StateMachine, IInteractObject, IClick, IDragObject, IHold, IAssembled, IInspectable, ICleanObject
 {
     public ArtefactPieceState state = ArtefactPieceState.None;
     public string pieceId;
@@ -11,6 +11,8 @@ public class ArtefactPieceStateMachine : StateMachine, IInteractObject, IClick, 
     public List<ConnectionSocket> GetSockets() => sockets;
     public Vector3 InitialPosition { get; set; }
     public Quaternion InitialRotation { get; set; }
+
+    [SerializeField] CleaningObject cleaning;
 
     public bool isInspected;
     public bool IsInspected => this.isInspected;
@@ -81,4 +83,10 @@ public class ArtefactPieceStateMachine : StateMachine, IInteractObject, IClick, 
     public void OnDragStarted(Vector3 worldPos) => (currentState as IDragObject)?.OnDragStarted(worldPos);
     public void OnDragPerformed(Vector3 worldPos) => (currentState as IDragObject)?.OnDragPerformed(worldPos);
     public void OnDragEnded(Vector3 worldPos) => (currentState as IDragObject)?.OnDragEnded(worldPos);
+
+    public void TryClean(Vector2 uv, Texture2D brush)
+    {
+        Debug.Log("Cleaning");
+        cleaning.TryClean(uv, brush);
+    }
 }

@@ -47,57 +47,6 @@ public class Clean : MonoBehaviour
     }
 
 
-    public bool CleanAt(Vector2 uv, Texture2D brush, float brushScale, float surfaceRotation)
-    {
-        bool didCleanAnything = false;
-
-        int centerX = (int)(uv.x * _templateDirtMask.width);
-        int centerY = (int)(uv.y * _templateDirtMask.height);
-        int radius = Mathf.RoundToInt((brush.width * brushScale) * 0.5f);
-
-        for (int x = -radius; x < radius; x++)
-        {
-            for (int y = -radius; y < radius; y++)
-            {
-                int px = centerX + x;
-                int py = centerY + y;
-
-                if (px < 0 || px >= _templateDirtMask.width || py < 0 || py >= _templateDirtMask.height)
-                    continue;
-
-                float u = (x + radius) / (radius * 2f);
-                float v = (y + radius) / (radius * 2f);
-
-                Vector2 rotated = RotateUV(u, v, surfaceRotation);
-
-                if (rotated.x < 0 || rotated.x > 1 || rotated.y < 0 || rotated.y > 1)
-                    continue;
-
-                Color brushPixel = brush.GetPixelBilinear(rotated.x, rotated.y);
-                Color dirtPixel = _templateDirtMask.GetPixel(px, py);
-
-                if (brushPixel.g >= 1f) continue;
-                if (dirtPixel.g <= 0.01f) continue;
-
-                float newGreen = dirtPixel.g * brushPixel.g;
-                float removed = dirtPixel.g - newGreen;
-
-                dirtAmount -= removed;
-
-                _templateDirtMask.SetPixel(px, py, new Color(0, newGreen, 0));
-                didCleanAnything = true;
-            }
-        }
-
-        if (didCleanAnything)
-        {
-            _templateDirtMask.Apply();
-            UpdateProgress();
-        }
-
-        return didCleanAnything;
-    }
-
     public bool CleaningAtPoint(Vector2 uv, Texture2D brush)
     {
         bool didCleanAnything = false;
@@ -178,21 +127,5 @@ public class Clean : MonoBehaviour
     {
         UpdateProgress(); // supaya inspector selalu update
         return progress;
-    }
-
-
-    private Vector2 RotateUV(float u, float v, float angleDeg)
-    {
-        float angle = angleDeg * Mathf.Deg2Rad;
-        float cos = Mathf.Cos(angle);
-        float sin = Mathf.Sin(angle);
-
-        float cx = u - 0.5f;
-        float cy = v - 0.5f;
-
-        float rx = cx * cos - cy * sin;
-        float ry = cx * sin + cy * cos;
-
-        return new Vector2(rx + 0.5f, ry + 0.5f);
     }
 }

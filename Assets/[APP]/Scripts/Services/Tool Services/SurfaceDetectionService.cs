@@ -17,6 +17,8 @@ public class SurfaceDetectionService
     private bool hasHit;
     private readonly Camera cam;
 
+    private ICleanObject currentSurfaceDetected;
+
     [Inject]
     public SurfaceDetectionService(Camera cam)
     {
@@ -31,6 +33,7 @@ public class SurfaceDetectionService
             if (hit.collider.TryGetComponent(out ArtefactPieceStateMachine artefact))
             {
                 hasHit = artefact.state != ArtefactPieceState.Idle;
+                if (artefact is ICleanObject clean) currentSurfaceDetected = clean;
                 if (hasHit) EssentialDetecting(hit);
             }
             // switch (type)
@@ -44,6 +47,7 @@ public class SurfaceDetectionService
         else
         {
             hasHit = false;
+            currentSurfaceDetected = null;
             raycastPos = Vector3.positiveInfinity;
         }
     }
@@ -64,4 +68,5 @@ public class SurfaceDetectionService
     public float TipRotation => tipRotation;
     public Vector2 TextureSurface => textureSurface;
     public bool HasHit => hasHit;
+    public ICleanObject CleanObject => currentSurfaceDetected;
 }

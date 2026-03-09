@@ -8,6 +8,7 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
     private Collider col;
     private Sequence returnSequence;
     private bool isReturning;
+    [SerializeField] private Texture2D brush;
 
     private void Awake()
     {
@@ -50,4 +51,9 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
 
     public void OnPressEnded() { }
     public void OnPressStarted() { }
+
+    public Texture2D GetBrush()
+    {
+        return brush;
+    }
 }

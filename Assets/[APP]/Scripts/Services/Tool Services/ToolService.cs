@@ -11,6 +11,8 @@ public class ToolService : IInitializable, IDisposable
     private readonly CleaningService cleaningService;
     private ITool currentTool;
 
+    public bool isCleaning;
+
     [Inject]
     public ToolService(InputSystemService inputSystemService, ObjectDetectionService objectDetectionService,
     SurfaceDetectionService surfaceDetectionService, CleaningService cleaningService)
@@ -41,12 +43,13 @@ public class ToolService : IInitializable, IDisposable
         {
             if (surfaceDetectionService.HasHit)
             {
-                cleaningService.TryCleaning();
+                isCleaning = true;
             }
             else
             {
                 currentTool?.Return();
                 currentTool = null;
+                isCleaning = false;
             }
         }
     }
@@ -64,6 +67,7 @@ public class ToolService : IInitializable, IDisposable
         }
 
         cleaningService.EndClean();
+        isCleaning = false;
     }
 
     private void HandleMouseMoved(Vector2 vector)
@@ -71,16 +75,17 @@ public class ToolService : IInitializable, IDisposable
         if (currentTool == null) return;
         if (currentTool is IInteractObject interact)
         {
+            // Debug.Log($"interact adalah {interact} apakah dia cleanable? {interact is ICleanObject}");
             var worldPos = objectDetectionService.ScreenToWorld(vector, interact);
             currentTool.FollowMouse(worldPos);
 
             surfaceDetectionService.PerformRaycast(vector, ESurfaceDetectionType.Texture);
             if (surfaceDetectionService.HasHit)
             {
-                StickToSurface();
+                StickToSurface(interact);
             }
 
-            Debug.Log($"Surface hit? {surfaceDetectionService.HasHit}");
+            // Debug.Log($"Surface hit? {surfaceDetectionService.HasHit}");
         }
     }
 
@@ -89,13 +94,22 @@ public class ToolService : IInitializable, IDisposable
         return currentTool;
     }
 
-    private void StickToSurface()
+    private void StickToSurface(IInteractObject interact)
     {
         Vector3 targetPos = surfaceDetectionService.RaycastPos;
         Vector3 targetNormal = surfaceDetectionService.RaycastNormal;
-        //up bisa ganti ke forward
+
         Quaternion targetRotation = Quaternion.LookRotation(-targetNormal, Vector3.up);
         currentTool.StickToSurface(targetPos, targetRotation);
+
+        if (isCleaning && surfaceDetectionService.CleanObject != null)
+        {
+            cleaningService.TryCleaning(
+                surfaceDetectionService.CleanObject,
+                surfaceDetectionService.TextureSurface,
+                currentTool.GetBrush()
+            );
+        }
     }
 
     public bool IsOnToolMode => GetCurrentTool() != null;
