@@ -59,7 +59,10 @@ public class ArtefactManager : IInitializable, IDisposable
         if (interact is IAssembled assembled)
         {
             var parent = assemblyService.GetAssembledRoot(assembled);
-            if (parent is IDragObject drag) { drag.OnDragPerformed(worldPos); }
+            if (parent is IDragObject drag)
+            {
+                drag.OnDragPerformed(worldPos);
+            }
         }
     }
 
@@ -82,8 +85,6 @@ public class ArtefactManager : IInitializable, IDisposable
                 if (!assemblyService.TryAssemble(inspectService.GetCurrentInspected() as IAssembled, inspectable as IAssembled))
                 {
                     Debug.Log("B masuk inspect");
-
-                    // Debug.Log("B is currently cleaning? " + cleaningService.isCleaning);
                     inspectService.Inspect(inspectable);
                 }
             }

@@ -41,11 +41,13 @@ public class ProjectLifetimeScope : LifetimeScope
 
         // Settings Service
         builder.RegisterEntryPoint<ProjectSettingsService>(Lifetime.Singleton).AsSelf();
-        
+
         // Audio Service
         builder.RegisterEntryPoint<ProjectAudioService>(Lifetime.Singleton).AsSelf();
 
         // Input System
         builder.RegisterEntryPoint<PlayerInputSystem>(Lifetime.Singleton).AsSelf();
+        builder.RegisterEntryPoint<InputSystemService>(Lifetime.Singleton).AsSelf();
+
     }
 }

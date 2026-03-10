@@ -26,8 +26,6 @@ public class GameplayLifetimeScope : LifetimeScope
 
         builder.RegisterEntryPoint<ArtefactManager>(Lifetime.Scoped).AsSelf();
 
-        builder.RegisterEntryPoint<InputSystemService>(Lifetime.Scoped).AsSelf();
-
         builder.RegisterEntryPoint<ObjectDetectionService>(Lifetime.Scoped).AsSelf();
         builder.RegisterEntryPoint<ObjectPressService>(Lifetime.Scoped).AsSelf();
         builder.RegisterEntryPoint<ObjectDragService>(Lifetime.Scoped).AsSelf();
