@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SimpleJSON;
 using UnityEngine;
 using Modules.SavingSystems;
+using Modules;
 
 [Serializable]
 public class ActiveArtefactData : ISaveable
@@ -14,6 +15,8 @@ public class ActiveArtefactData : ISaveable
     private Dictionary<string, ArtefactData> artefactDataCache = new Dictionary<string, ArtefactData>();
 
     private readonly ArtefactDatabase artefactDatabase;
+
+    public Action OnUpdated;
 
     public ActiveArtefactData(ArtefactDatabase artefactDatabase)
     {
@@ -39,11 +42,18 @@ public class ActiveArtefactData : ISaveable
         EvaluateUnlockRequirements();
     }
 
+    public void ResetData()
+    {
+        artefactProgress.Clear();
+
+        Initialize();
+    }
+
     private void BuildDataCache()
     {
         artefactDataCache.Clear();
         var allData = artefactDatabase.GetAllArtefactDatas();
-        
+
         for (int i = 0; i < allData.Count; i++)
         {
             var item = allData[i];
@@ -82,10 +92,14 @@ public class ActiveArtefactData : ISaveable
         {
             artefactId = artefactId,
             isUnlocked = true,
-            isCompleted = false
+            isCompleted = false,
+            hasSeenUnlockAnim = false,
+            hasSeenCompletionAnim = false
         });
 
         unlockedArtefactIds.Add(artefactId);
+
+        OnUpdated?.Invoke();
     }
 
     public void CompleteArtefact(string artefactId)
@@ -94,9 +108,9 @@ public class ActiveArtefactData : ISaveable
             return;
 
         completedArtefactIds.Add(artefactId);
-        
+
         var data = artefactProgress.Find(x => x.artefactId == artefactId);
-        
+
         if (data != null)
         {
             data.isCompleted = true;
@@ -105,6 +119,7 @@ public class ActiveArtefactData : ISaveable
                 data.isUnlocked = true;
                 unlockedArtefactIds.Add(artefactId);
             }
+            data.hasSeenCompletionAnim = false;
         }
         else
         {
@@ -116,6 +131,8 @@ public class ActiveArtefactData : ISaveable
             });
             unlockedArtefactIds.Add(artefactId);
         }
+
+        OnUpdated?.Invoke();
 
         EvaluateUnlockRequirements();
     }
@@ -152,13 +169,13 @@ public class ActiveArtefactData : ISaveable
             {
                 UnlockArtefact(targetId);
                 hasUnlockedNewArtefact = true;
-                Debug.Log($"[Artefact System] Unlocked new artefact: {targetData.BaseData.ItemName} because all requirements are met!");
+                AppLogger.Log($"[Artefact System] Unlocked new artefact: {targetData.BaseData.ItemName} because all requirements are met!");
             }
         }
 
         if (hasUnlockedNewArtefact)
         {
-            EvaluateUnlockRequirements(); 
+            EvaluateUnlockRequirements();
         }
     }
 
@@ -175,7 +192,7 @@ public class ActiveArtefactData : ISaveable
     public List<ArtefactRuntimeData> GetUnlockedArtefacts()
     {
         var result = new List<ArtefactRuntimeData>();
-        
+
         foreach (string id in unlockedArtefactIds)
         {
             if (artefactDataCache.TryGetValue(id, out ArtefactData data))
@@ -189,11 +206,41 @@ public class ActiveArtefactData : ISaveable
         return result;
     }
 
+    public List<ArtefactProgressData> GetPendingCompletionAnimations()
+    {
+        return artefactProgress.FindAll(x => x.isCompleted && !x.hasSeenCompletionAnim);
+    }
+
+    public List<ArtefactProgressData> GetPendingUnlockAnimations()
+    {
+        return artefactProgress.FindAll(x => x.isUnlocked && !x.hasSeenUnlockAnim);
+    }
+
+    public void MarkCompletionAnimSeen(string artefactId)
+    {
+        ArtefactProgressData data = artefactProgress.Find(x => x.artefactId == artefactId);
+        if (data != null && !data.hasSeenCompletionAnim)
+        {
+            data.hasSeenCompletionAnim = true;
+            OnUpdated?.Invoke();
+        }
+    }
+
+    public void MarkUnlockAnimSeen(string artefactId)
+    {
+        ArtefactProgressData data = artefactProgress.Find(x => x.artefactId == artefactId);
+        if (data != null && !data.hasSeenUnlockAnim)
+        {
+            data.hasSeenUnlockAnim = true;
+            OnUpdated?.Invoke();
+        }
+    }
+
     public JSONNode AsJSON()
     {
         JSONObject json = new JSONObject();
         JSONArray artefactsArray = new JSONArray();
-        
+
         for (int i = 0; i < artefactProgress.Count; i++)
         {
             JSONObject artefactJson = new JSONObject();
@@ -226,7 +273,7 @@ public class ActiveArtefactData : ISaveable
         }
 
         RefreshStateCache();
-        
+
         EvaluateUnlockRequirements();
     }
 }
@@ -237,6 +284,8 @@ public class ArtefactProgressData
     public string artefactId;
     public bool isUnlocked;
     public bool isCompleted;
+    public bool hasSeenUnlockAnim;
+    public bool hasSeenCompletionAnim;
 }
 
 public class ArtefactRuntimeData

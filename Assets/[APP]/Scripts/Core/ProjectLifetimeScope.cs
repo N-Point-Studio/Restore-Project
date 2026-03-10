@@ -28,10 +28,9 @@ public class ProjectLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<HapticManager>().AsSelf();
         hapticInstance.SetActiveHaptic(true);
 #endif
-        // Saving System
-        builder.RegisterEntryPoint<ProjectSavingSystem>(Lifetime.Singleton).AsSelf();
 
         // Active Container (runtime state - all Singleton)
+        builder.Register<PlayerProgressionData>(Lifetime.Singleton).AsSelf();
         builder.Register<ActiveArtefactData>(Lifetime.Singleton).AsSelf().WithParameter(artefactDatabase);
         builder.Register<ActiveSettingsData>(Lifetime.Singleton).WithParameter(defaultSettingsData);
 
@@ -45,9 +44,15 @@ public class ProjectLifetimeScope : LifetimeScope
         // Audio Service
         builder.RegisterEntryPoint<ProjectAudioService>(Lifetime.Singleton).AsSelf();
 
+        // Progression Service
+        builder.RegisterEntryPoint<ProjectProgressionService>(Lifetime.Singleton).AsSelf();
+
         // Input System
         builder.RegisterEntryPoint<PlayerInputSystem>(Lifetime.Singleton).AsSelf();
         builder.RegisterEntryPoint<InputSystemService>(Lifetime.Singleton).AsSelf();
+
+        // Saving System
+        builder.RegisterEntryPoint<ProjectSavingSystem>(Lifetime.Singleton).AsSelf();
 
     }
 }

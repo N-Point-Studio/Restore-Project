@@ -1,5 +1,10 @@
-using System;
 using UnityEngine;
+using VContainer;
+using DG.Tweening;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class MenuController : BaseMenuController
 {
@@ -13,8 +18,19 @@ public class MenuController : BaseMenuController
     [SerializeField] private ButtonItemUI buttonInstagram;
     [SerializeField] private ButtonItemUI buttonWebsite;
 
+    private PlayerProgressionData playerProgressionData;
+
+    private Tween quitTween;
+
+    [Inject]
+    public void Construct(PlayerProgressionData playerProgressionData)
+    {
+        this.playerProgressionData = playerProgressionData;
+    }
+
     protected override void Awake()
     {
+        base.Awake();
         buttonNewGame.OnClick += OnButtonNewGameClick;
         buttonContinue.OnClick += OnButtonContinueClick;
         buttonSettings.OnClick += OnButtonSettingsClick;
@@ -23,30 +39,48 @@ public class MenuController : BaseMenuController
         buttonTwitter.OnClick += OnButtonTwitterClick;
         buttonInstagram.OnClick += OnButtonInstagramClick;
         buttonWebsite.OnClick += OnButtonWebsiteClick;
+    }
+
+    protected override void Start()
+    {
+        base.Start();
+        RefreshButtonVisibility();
     }
 
     protected override void OnDestroy()
     {
-        buttonNewGame.OnClick += OnButtonNewGameClick;
-        buttonContinue.OnClick += OnButtonContinueClick;
-        buttonSettings.OnClick += OnButtonSettingsClick;
-        buttonQuit.OnClick += OnButtonQuitClick;
-        buttonWishlist.OnClick += OnButtonWishlistClick;
-        buttonTwitter.OnClick += OnButtonTwitterClick;
-        buttonInstagram.OnClick += OnButtonInstagramClick;
-        buttonWebsite.OnClick += OnButtonWebsiteClick;
+        base.OnDestroy();
+        buttonNewGame.OnClick -= OnButtonNewGameClick;
+        buttonContinue.OnClick -= OnButtonContinueClick;
+        buttonSettings.OnClick -= OnButtonSettingsClick;
+        buttonQuit.OnClick -= OnButtonQuitClick;
+        buttonWishlist.OnClick -= OnButtonWishlistClick;
+        buttonTwitter.OnClick -= OnButtonTwitterClick;
+        buttonInstagram.OnClick -= OnButtonInstagramClick;
+        buttonWebsite.OnClick -= OnButtonWebsiteClick;
+
+        if (quitTween != null && quitTween.IsActive())
+        {
+            quitTween.Kill();
+        }
+    }
+
+    public void RefreshButtonVisibility()
+    {
+        if (playerProgressionData != null)
+        {
+            bool hasPlayed = playerProgressionData.HasPlayedBefore;
+            buttonContinue.gameObject.SetActive(hasPlayed);
+        }
     }
 
     private void OnButtonNewGameClick()
     {
-        // TODO: Create new ActivePlayerData
-        // Open 
         MainMenuEvents.TriggerNewGame();
     }
 
     private void OnButtonContinueClick()
     {
-        // TODO: Load Save system
         MainMenuEvents.TriggerContinueGame();
     }
 
@@ -57,15 +91,16 @@ public class MenuController : BaseMenuController
 
     private void OnButtonQuitClick()
     {
-        // TODO: Change to DOTTween and properly cleanup the tween
-//         LeanTween.delayedCall(0.05f, () =>
-//         {
-// #if UNITY_EDITOR
-//             EditorApplication.ExitPlaymode();
-// #else
-//             Application.Quit();
-// #endif
-//         });
+        if (quitTween != null && quitTween.IsActive()) return;
+
+        quitTween = DOVirtual.DelayedCall(0.05f, () =>
+        {
+#if UNITY_EDITOR
+            EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        }).SetUpdate(true);
     }
 
     private void OnButtonWishlistClick()

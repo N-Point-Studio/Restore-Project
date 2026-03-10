@@ -13,11 +13,28 @@ namespace Modules.SavingSystems
     {
         protected const string rootFolder = "saves";
         protected const string extension = ".dat";
+        protected readonly List<Saveable> entities = new List<Saveable>();
         protected string rootPath;
 
         public SavingSystem()
         {
             rootPath = Path.Combine(Application.persistentDataPath, rootFolder);
+        }
+
+        public void Register(Saveable entity)
+        {
+            if (!entities.Contains(entity))
+            {
+                entities.Add(entity);
+            }
+        }
+
+        public void Unregister(Saveable entity)
+        {
+            if (entities.Contains(entity))
+            {
+                entities.Remove(entity);
+            }
         }
 
         public void ResetData()
@@ -28,9 +45,38 @@ namespace Modules.SavingSystems
             }
         }
 
+        public async void LoadEntities(System.Action onFinished = null)
+        {
+            for (int i = 0; i < entities.Count; i++)
+            {
+                await LoadEntity(entities[i]);
+            }
+
+            onFinished?.Invoke();
+        }
+
+        public async Task LoadEntity(Saveable entity)
+        {
+            await RestoreFromToken(entity, LoadFromFile(entity.UID));
+        }
+
         public void LoadFromFile(string saveFile, System.Action<JSONNode> onFinished)
         {
             onFinished?.Invoke(LoadFromFile(saveFile));
+        }
+
+        protected async Task RestoreFromToken(Saveable entity, JSONNode obj)
+        {
+            if (obj != null && !string.IsNullOrEmpty(obj.ToString()))
+            {
+                entity.LoadFromJSON(obj);
+            }
+            else
+            {
+                entity.LoadFromJSON("{}");
+            }
+
+            await Task.CompletedTask;
         }
 
         protected JSONNode LoadFromFile(string saveFile)
@@ -55,6 +101,16 @@ namespace Modules.SavingSystems
                     return JSON.Parse(data);
                 }
             }
+        }
+
+        public async void SaveEntities(System.Action onFinished = null)
+        {
+            for (int i = 0; i < entities.Count; i++)
+            {
+                await SaveFileAsJSON(entities[i].UID, entities[i].AsJSON());
+            }
+
+            onFinished?.Invoke();
         }
 
         public async void SaveToFile(string saveFile, JSONNode data, System.Action onFinished = null)

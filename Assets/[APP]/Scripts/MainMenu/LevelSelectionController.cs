@@ -1,5 +1,8 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using DanielLochner.Assets.SimpleScrollSnap;
+using Modules;
 using UnityEngine;
 using VContainer;
 
@@ -11,17 +14,27 @@ public class LevelSelectionController : BaseMenuController
     [SerializeField] private ScrollTargetZoomController scrollZoomController;
     [SerializeField] private ButtonItemUI backButtonItemUI;
 
+    [Header("Target Scene")]
+    [SerializeField] private string targetScene;
+
     private int currentPanelIndex = 0;
 
     private ActiveArtefactData activeArtefactData;
     private ProjectSavingSystem savingSystem;
+    private PlayerProgressionData playerProgressionData;
+    private SceneLoader sceneLoader;
 
     [Inject]
-    public void Construct(ActiveArtefactData activeArtefactData, ProjectSavingSystem savingSystem, IObjectResolver container)
+    public void Construct(
+        ActiveArtefactData activeArtefactData, 
+        ProjectSavingSystem savingSystem, 
+        PlayerProgressionData playerProgressionData,
+        SceneLoader sceneLoader)
     {
         this.activeArtefactData = activeArtefactData;
         this.savingSystem = savingSystem;
-        this.savingSystem.ClearPreviousData();
+        this.playerProgressionData = playerProgressionData;
+        this.sceneLoader = sceneLoader;
     }
 
     protected override void Awake()
@@ -55,11 +68,6 @@ public class LevelSelectionController : BaseMenuController
         backButtonItemUI.OnClick -= OnBackButtonClick;
     }
 
-    public void StartFTUE()
-    {
-        
-    }
-
     public void OpenLevelSelection()
     {
         SetActive(true);
@@ -68,6 +76,13 @@ public class LevelSelectionController : BaseMenuController
     public void CloseLevelSelection()
     {
         SetActive(false);
+    }
+    
+    public void OpenLevelSelectionAndPlayAnimations()
+    {
+        SetActive(true);
+        
+        StartCoroutine(PlayPendingAnimationsSequence());
     }
 
     private void SpawnArtefactGroups()
@@ -85,7 +100,7 @@ public class LevelSelectionController : BaseMenuController
 
             if (group == null || group.PagePrefab == null)
             {
-                Debug.LogWarning($"Group index {i} is null or missing PagePrefab!");
+                AppLogger.LogWarning($"Group index {i} is null or missing PagePrefab!");
                 continue;
             }
 
@@ -118,7 +133,7 @@ public class LevelSelectionController : BaseMenuController
         }
     }
 
-    public void RemoveArtifactGroupItem(int index)
+    private void RemoveArtifactGroupItem(int index)
     {
         if (scrollSnap.NumberOfPanels > 0)
         {
@@ -158,6 +173,78 @@ public class LevelSelectionController : BaseMenuController
         }
     }
 
+    private IEnumerator PlayPendingAnimationsSequence()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        List<ArtefactProgressData> pendingCompletions = activeArtefactData.GetPendingCompletionAnimations();
+
+        for (int i = 0; i < pendingCompletions.Count; i++)
+        {
+            ArtefactProgressData data = pendingCompletions[i];
+            // Optional: scroll the snap to the panel where this artefact is located
+            ScrollToArtefactGroup(data.artefactId);
+            yield return new WaitForSeconds(0.5f);
+
+            AppLogger.Log($"[Animation] Playing REVEAL animation for {data.artefactId}");
+            
+            // TODO: Trigger particle/visual animation on the UI item here
+            
+            yield return new WaitForSeconds(2.0f); 
+            
+            activeArtefactData.MarkCompletionAnimSeen(data.artefactId);
+        }
+
+        List<ArtefactProgressData> pendingUnlocks = activeArtefactData.GetPendingUnlockAnimations();
+
+        for (int i = 0; i < pendingUnlocks.Count; i++)
+        {
+            ArtefactProgressData data = pendingUnlocks[i];
+            // Optional: scroll the snap to the panel of the newly unlocked artefact
+            ScrollToArtefactGroup(data.artefactId);
+            yield return new WaitForSeconds(0.5f);
+
+            AppLogger.Log($"[Animation] Playing UNLOCK animation for {data.artefactId}");
+            
+            // TODO: Trigger lock-break/shake animation here
+            
+            yield return new WaitForSeconds(1.5f); 
+            
+            activeArtefactData.MarkUnlockAnimSeen(data.artefactId);
+        }
+        
+        AppLogger.Log("[Animation] All animation sequences complete!");
+    }
+
+    private void ScrollToArtefactGroup(string artefactId)
+    {
+        if (activeArtefactData == null || scrollSnap == null) return;
+
+        ArtefactDatabase database = activeArtefactData.GetArtefactDatabase();
+        if (database == null) return;
+
+        ArtefactGroupData[] allGroups = database.GetAllItems();
+        
+        for (int i = 0; i < allGroups.Length; i++)
+        {
+            ArtefactGroupData group = allGroups[i];
+            if (group == null || group.ArtefactDatas == null) continue;
+
+            foreach (ArtefactData artefact in group.ArtefactDatas)
+            {
+                if (artefact.BaseData.Id == artefactId)
+                {
+                    if (currentPanelIndex != i)
+                    {
+                        AppLogger.Log($"[LevelSelection] Automatically scrolling to page {i} for artefact {artefactId}");
+                        scrollSnap.GoToPanel(i);
+                    }
+                    return;
+                }
+            }
+        }
+    }
+
     private void OnPanelCentered(int newIndex, int oldIndex)
     {
         currentPanelIndex = newIndex;
@@ -167,7 +254,9 @@ public class LevelSelectionController : BaseMenuController
 
     private void OnRequestArtefactPlay(ArtefactData data)
     {
-        // TODO: show Loading Service later and pass the data to playerprogressiondata to initizlie the ebject and start playing on gameplay scene
+        playerProgressionData.SetCurrentActiveArtefact(data.BaseData.Id);
+
+        _ = sceneLoader.LoadSceneAsync(targetScene, LoadingType.Music); // TODO: REVISIT
     }
 
     private void OnRequestArtefactDetail(ArtefactItemUI itemUI, ArtefactGroupData groupData)

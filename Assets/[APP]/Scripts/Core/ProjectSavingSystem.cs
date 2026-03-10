@@ -4,6 +4,7 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 using System.Collections.Generic;
+using Modules;
 
 public class ProjectSavingSystem : SavingSystem, IStartable, ITickable
 {
@@ -89,7 +90,7 @@ public class ProjectSavingSystem : SavingSystem, IStartable, ITickable
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Error while saving data: {e}");
+            AppLogger.LogError($"Error while saving data: {e}");
             isSaving = false;
         }
     }
@@ -137,7 +138,7 @@ public class ProjectSavingSystem : SavingSystem, IStartable, ITickable
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Error while loading data: {e}");
+            AppLogger.LogError($"Error while loading data: {e}");
             isLoading = false;
         }
     }
