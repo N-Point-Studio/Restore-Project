@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ArtefactPieceStateMachine : StateMachine, IInteractObject, IClick, IDragObject, IHold, IAssembled, IInspectable, ICleanObject
+public class ArtefactPieceStateMachine : StateMachine, IInteractObject, IDragObject, IAssembled, IInspectable, ICleanObject
 {
     public ArtefactPieceState state = ArtefactPieceState.None;
     public string pieceId;
@@ -15,7 +15,7 @@ public class ArtefactPieceStateMachine : StateMachine, IInteractObject, IClick, 
     [SerializeField] CleaningObject cleaning;
 
     public bool isInspected;
-    public bool IsInspected => this.isInspected;
+    public bool IsInspected => isInspected;
 
     public static event Action<ArtefactPieceStateMachine> OnCreated;
     public IAssembled parent;
@@ -32,8 +32,6 @@ public class ArtefactPieceStateMachine : StateMachine, IInteractObject, IClick, 
         SwitchState(new ArtefactPieceIdleState(this));
     }
 
-    public ArtefactPieceState GetCurrentStateEnum() { return state; }
-
     public void ResetTransform()
     {
         transform.SetPositionAndRotation(InitialPosition, InitialRotation);
@@ -44,11 +42,6 @@ public class ArtefactPieceStateMachine : StateMachine, IInteractObject, IClick, 
         return sockets.Find(s => s.targetPieceId == otherId && !s.isOccupied);
     }
 
-    public void OnInteractStart() => (currentState as IInteract)?.OnInteractStart();
-    public void OnInteractEnd() => (currentState as IInteract)?.OnInteractEnd();
-    public void OnClick() => (currentState as IClick)?.OnClick();
-    // public void OnDragPerformed(Vector3 worldPos) => (currentState as IDrag)?.OnDragPerformed(worldPos);
-    public void OnHoldPerformed() => (currentState as IHold)?.OnHoldPerformed();
     public void OnAssembled(IAssembled parent, Transform transform) => (currentState as IAssembled)?.OnAssembled(parent, transform);
     public void OnDetached() => (currentState as IAssembled)?.OnDetached();
 
@@ -67,26 +60,16 @@ public class ArtefactPieceStateMachine : StateMachine, IInteractObject, IClick, 
         }
     }
 
-    public void OnInteractDetected()
-    {
-        // Debug.Log($"{name} interact detected");
-    }
-
-    public void OnInteractEnded()
-    {
-        // Debug.Log($"{name} interact notdetected");
-    }
-
-
     //==new
 
+    public void OnInteractDetected() { }
+    public void OnInteractEnded() { }
     public void OnDragStarted(Vector3 worldPos) => (currentState as IDragObject)?.OnDragStarted(worldPos);
     public void OnDragPerformed(Vector3 worldPos) => (currentState as IDragObject)?.OnDragPerformed(worldPos);
     public void OnDragEnded(Vector3 worldPos) => (currentState as IDragObject)?.OnDragEnded(worldPos);
 
     public void TryClean(Vector2 uv, Texture2D brush)
     {
-        Debug.Log("Cleaning");
         cleaning.TryClean(uv, brush);
     }
 }

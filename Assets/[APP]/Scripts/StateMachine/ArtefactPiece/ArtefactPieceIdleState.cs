@@ -1,14 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDragObject, IInspectable, IAssembled
+public class ArtefactPieceIdleState : ArtefactPieceBaseState, IDragObject, IInspectable, IAssembled
 {
     public string PieceId => stateMachine.pieceId;
     public bool IsInspected => stateMachine.isInspected;
     public List<ConnectionSocket> GetSockets() => stateMachine.sockets;
 
     public ArtefactPieceIdleState(ArtefactPieceStateMachine stateMachine) : base(stateMachine) { }
-
     public override void Enter()
     {
         stateMachine.ResetTransform();
@@ -17,18 +16,11 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDragObjec
     public override void Tick(float deltaTime) { }
     public override void Exit() { }
 
-    public void OnInteractStart() { stateMachine.ResetTransform(); }
-    public void OnInteractEnd() { stateMachine.ResetTransform(); }
-
-    public void OnClick() { }
-    // public void OnDragPerformed(Vector3 worldPos) { stateMachine.transform.position = worldPos; }
-
     public void EnterInspect(Transform targetTransform)
     {
         Debug.Log("Enter inspect from " + stateMachine.transform.position);
         stateMachine.isInspected = true;
         stateMachine.SwitchState(new ArtefactPieceMoveState(stateMachine, targetTransform, ArtefactPieceState.Inspect));
-        // stateMachine.SwitchState(new ArtefactPieceInspectState(stateMachine));
     }
     public void ExitInspect() { }
 
@@ -46,25 +38,16 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IClick, IDragObjec
 
     public void OnDragStarted(Vector3 worldPos)
     {
-        Debug.Log("Drag started");
-        // stateMachine.transform.position = worldPos;
+        stateMachine.transform.position = worldPos;
     }
 
     public void OnDragPerformed(Vector3 worldPos)
     {
-        Debug.Log("Drag performed");
-
         stateMachine.transform.position = worldPos;
-        Debug.Log("Enter Drag perform on " + worldPos);
-
     }
 
     public void OnDragEnded(Vector3 worldPos)
     {
-        Debug.Log("Enter Drag ended on " + worldPos);
         stateMachine.SwitchState(new ArtefactPieceReturningState(stateMachine));
-
-        // stateMachine.transform.position = worldPos;
-        // stateMachine.ResetTransform();
     }
 }

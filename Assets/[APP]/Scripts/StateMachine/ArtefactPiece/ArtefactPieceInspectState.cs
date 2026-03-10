@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ArtefactPieceInspectState : ArtefactPieceBaseState, IHold, IInspectable, IAssembled
+public class ArtefactPieceInspectState : ArtefactPieceBaseState, IInspectable, IAssembled
 {
     public string PieceId => stateMachine.pieceId;
     public Transform GetTransform() => stateMachine.transform;
@@ -16,10 +16,6 @@ public class ArtefactPieceInspectState : ArtefactPieceBaseState, IHold, IInspect
     }
     public override void Tick(float deltaTime) { }
     public override void Exit() { }
-
-    public void OnInteractStart() { }
-    public void OnHoldPerformed() { }
-    public void OnInteractEnd() { }
 
     public void EnterInspect(Transform targetPosition) { }
     public void ExitInspect()
