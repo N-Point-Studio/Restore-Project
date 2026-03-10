@@ -79,13 +79,12 @@ public class ToolService : IInitializable, IDisposable
             var worldPos = objectDetectionService.ScreenToWorld(vector, interact);
             currentTool.FollowMouse(worldPos);
 
-            surfaceDetectionService.PerformRaycast(vector, ESurfaceDetectionType.Texture);
-            if (surfaceDetectionService.HasHit)
+            if (surfaceDetectionService.PerformRaycast(vector, ESurfaceDetectionType.Texture))
             {
+                // Debug.Log($"Surface hit? {surfaceDetectionService.HasHit}");
                 StickToSurface(interact);
             }
 
-            // Debug.Log($"Surface hit? {surfaceDetectionService.HasHit}");
         }
     }
 
@@ -104,6 +103,7 @@ public class ToolService : IInitializable, IDisposable
 
         if (isCleaning && surfaceDetectionService.CleanObject != null)
         {
+            // Debug.Log("Surface hit " + surfaceDetectionService.CleanObject);
             cleaningService.TryCleaning(
                 surfaceDetectionService.CleanObject,
                 surfaceDetectionService.TextureSurface,

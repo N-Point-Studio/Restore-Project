@@ -25,7 +25,7 @@ public class SurfaceDetectionService
         this.cam = cam;
     }
 
-    public void PerformRaycast(Vector2 screenPos, ESurfaceDetectionType type)
+    public bool PerformRaycast(Vector2 screenPos, ESurfaceDetectionType type)
     {
         Ray ray = cam.ScreenPointToRay(screenPos);
         if (Physics.Raycast(ray, out RaycastHit hit))
@@ -35,6 +35,7 @@ public class SurfaceDetectionService
                 hasHit = artefact.state != ArtefactPieceState.Idle;
                 if (artefact is ICleanObject clean) currentSurfaceDetected = clean;
                 if (hasHit) EssentialDetecting(hit);
+                return hasHit;
             }
             // switch (type)
             // {
@@ -49,7 +50,10 @@ public class SurfaceDetectionService
             hasHit = false;
             currentSurfaceDetected = null;
             raycastPos = Vector3.positiveInfinity;
+            return hasHit;
         }
+
+        return false;
     }
 
     public void EssentialDetecting(RaycastHit hit)
