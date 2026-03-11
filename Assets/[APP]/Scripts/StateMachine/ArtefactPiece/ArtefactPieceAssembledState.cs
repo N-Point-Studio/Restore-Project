@@ -2,13 +2,13 @@ using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
-public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IAssembled, IInspectable
+public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IInspectable
 {
     public Transform GetTransform() => stateMachine.transform;
-    public IAssembled GetAssembleParrent() => stateMachine.parent;
+    // public IAssembled GetAssembleParrent() => stateMachine.parent;
     public string PieceId => stateMachine.pieceId;
-    public bool IsInspected => stateMachine.isInspected;
-    public List<ConnectionSocket> GetSockets() => stateMachine.sockets;
+    // public bool IsInspected => stateMachine.isInspected;
+    // public List<ConnectionSocket> GetSockets() => stateMachine.sockets;
 
     public ArtefactPieceAssembledState(ArtefactPieceStateMachine stateMachine) : base(stateMachine) { }
 
@@ -26,16 +26,16 @@ public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IAssembled, I
     }
     public void ExitInspect() { }
 
-    public void OnAssembled(IAssembled parent, Transform transform)
-    {
-        stateMachine.parent = parent;
-        stateMachine.SwitchState(new ArtefactPieceMoveState(stateMachine, transform, ArtefactPieceState.Assembled));
-    }
-    public void OnDetached()
-    {
-        stateMachine.parent = null;
-        stateMachine.SwitchState(new ArtefactPieceReturningState(stateMachine));
-    }
-    public ConnectionSocket GetAvailableSocketFor(string id) => stateMachine.GetAvailableSocketFor(id);
-    public void ReleaseSocketWith(string otherId) { }
+    // public void OnAssembled(IAssembled parent, Transform transform)
+    // {
+    //     stateMachine.parent = parent;
+    //     stateMachine.SwitchState(new ArtefactPieceMoveState(stateMachine, transform, ArtefactPieceState.Assembled));
+    // }
+    // public void OnDetached()
+    // {
+    //     stateMachine.parent = null;
+    //     stateMachine.SwitchState(new ArtefactPieceReturningState(stateMachine));
+    // }
+    // public ConnectionSocket GetAvailableSocketFor(string id) => stateMachine.GetAvailableSocketFor(id);
+    // public void ReleaseSocketWith(string otherId) { }
 }

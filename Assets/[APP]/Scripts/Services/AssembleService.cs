@@ -23,6 +23,26 @@ public class AssemblyService
         return temporary;
     }
 
+    public bool TryAssemble(IAssemble root, IAssemble incoming)
+    {
+        if (root is IArtefactPart parentPart)
+        {
+            if (incoming is IArtefactPart incomingPart)
+            {
+                GameObject newClusterGO = new GameObject("Cluster_" + parentPart.GetTransform().name + "_" + incomingPart.GetTransform().name);
+                var newCLuster = newClusterGO.AddComponent<ArtefactClusterStateMachine>();
+
+            }
+        }
+
+        if (root is ICluster cluster)
+        {
+
+        }
+
+        return false;
+    }
+
     public bool TryAssemble(IAssembled root, IAssembled incoming)
     {
         var rootParts = root.GetTransform().GetComponentsInChildren<IAssembled>();
@@ -47,6 +67,11 @@ public class AssemblyService
                 }
             }
         }
+        return false;
+    }
+
+    public bool AssembleAnjay(IAssembled root, IAssembled income)
+    {
         return false;
     }
 

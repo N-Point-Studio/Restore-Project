@@ -43,9 +43,9 @@ public class ArtefactManager : IInitializable, IDisposable
     {
         // if (tool.IsOnToolMode) return;
 
-        if (interact is IAssembled assembled)
+        if (interact is IAssemble assembled)
         {
-            var parent = assemblyService.GetAssembledRoot(assembled);
+            var parent = assembled.GetRoot();
             if (parent is IDragObject drag) { drag.OnDragStarted(worldPos); }
         }
     }
@@ -56,9 +56,9 @@ public class ArtefactManager : IInitializable, IDisposable
 
         if (interact is not ArtefactPieceStateMachine) return;
 
-        if (interact is IAssembled assembled)
+        if (interact is IAssemble assembled)
         {
-            var parent = assemblyService.GetAssembledRoot(assembled);
+            var parent = assembled.GetRoot();
             if (parent is IDragObject drag)
             {
                 drag.OnDragPerformed(worldPos);
@@ -91,9 +91,9 @@ public class ArtefactManager : IInitializable, IDisposable
         }
         else
         {
-            if (interact is IAssembled assembled)
+            if (interact is IAssemble assembled)
             {
-                var parent = assemblyService.GetAssembledRoot(assembled);
+                var parent = assembled.GetRoot();
                 if (parent is IDragObject drag) { drag.OnDragEnded(worldPos); }
             }
         }
@@ -118,7 +118,7 @@ public class ArtefactManager : IInitializable, IDisposable
         }
         else if (sm.parent != null)
         {
-            assemblyService.Detach(sm);
+            assemblyService.Detach(sm as IAssembled);
         }
     }
 
