@@ -6,14 +6,12 @@ using VContainer.Unity;
 public class ArtefactManager : IInitializable, IDisposable
 {
     private readonly InspectService inspectService;
-    private readonly AssemblyService assemblyService;
     private readonly ToolService toolService;
 
     [Inject]
-    public ArtefactManager(InspectService inspectService, AssemblyService assemblyService, ToolService toolService)
+    public ArtefactManager(InspectService inspectService, ToolService toolService)
     {
         this.inspectService = inspectService;
-        this.assemblyService = assemblyService;
         this.toolService = toolService;
     }
 
@@ -41,29 +39,12 @@ public class ArtefactManager : IInitializable, IDisposable
 
     private void HandleDragStarted(IInteractObject interact, Vector3 worldPos)
     {
-        // if (tool.IsOnToolMode) return;
-
-        if (interact is IAssemble assembled)
-        {
-            var parent = assembled.GetRoot();
-            if (parent is IDragObject drag) { drag.OnDragStarted(worldPos); }
-        }
+        if (interact is IDragObject drag) { drag.OnDragStarted(worldPos); }
     }
 
     private void HandleDragPerformed(IInteractObject interact, Vector3 worldPos)
     {
-        // if (tool.IsOnToolMode) return;
-
-        if (interact is not ArtefactPieceStateMachine) return;
-
-        if (interact is IAssemble assembled)
-        {
-            var parent = assembled.GetRoot();
-            if (parent is IDragObject drag)
-            {
-                drag.OnDragPerformed(worldPos);
-            }
-        }
+        if (interact is IDragObject drag) { drag.OnDragPerformed(worldPos); }
     }
 
     private void HandleDragEnded(IInteractObject interact, Vector3 worldPos)
@@ -77,53 +58,32 @@ public class ArtefactManager : IInitializable, IDisposable
         {
             if (inspectService.GetCurrentInspected() == null)
             {
-                Debug.Log("A masuk inspect");
                 inspectService.Inspect(inspectable);
             }
             else
             {
-                if (!assemblyService.TryAssemble(inspectService.GetCurrentInspected() as IAssembled, inspectable as IAssembled))
-                {
-                    Debug.Log("B masuk inspect");
-                    inspectService.Inspect(inspectable);
-                }
+                inspectService.Inspect(inspectable);
             }
         }
         else
         {
-            if (interact is IAssemble assembled)
-            {
-                var parent = assembled.GetRoot();
-                if (parent is IDragObject drag) { drag.OnDragEnded(worldPos); }
-            }
+            if (interact is IDragObject drag) { drag.OnDragEnded(worldPos); }
         }
     }
 
-    private void HandleHoldPerformed(IInteractObject interact, float obj)
-    {
-    }
+    private void HandleHoldPerformed(IInteractObject interact, float obj) { }
 
     private void HandleHoldCompleted(IInteractObject interact)
     {
         if (toolService.IsOnToolMode) return;
-
-        if (interact is not ArtefactPieceStateMachine sm) return;
-
         var currentInspect = inspectService.GetCurrentInspected();
 
-        if (sm as IInspectable == currentInspect)
+        if (interact as IInspectable == currentInspect)
         {
             inspectService.ExitInspect();
             return;
         }
-        else if (sm.parent != null)
-        {
-            assemblyService.Detach(sm as IAssembled);
-        }
     }
 
-    private void HandleHoldCanceled(IInteractObject interact)
-    {
-    }
-
+    private void HandleHoldCanceled(IInteractObject interact) { }
 }

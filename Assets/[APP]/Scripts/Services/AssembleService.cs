@@ -31,7 +31,8 @@ public class AssemblyService
             {
                 GameObject newClusterGO = new GameObject("Cluster_" + parentPart.GetTransform().name + "_" + incomingPart.GetTransform().name);
                 var newCLuster = newClusterGO.AddComponent<ArtefactClusterStateMachine>();
-
+                (newCLuster as ICluster).AddChild(root);
+                (newCLuster as ICluster).AddChild(incoming);
             }
         }
 
