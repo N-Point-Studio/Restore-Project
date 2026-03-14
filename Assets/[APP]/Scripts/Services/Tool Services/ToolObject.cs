@@ -56,4 +56,9 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
     {
         return brush;
     }
+
+    public void SetColliderEnable(bool isActive)
+    {
+        col.enabled = isActive;
+    }
 }

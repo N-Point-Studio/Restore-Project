@@ -131,7 +131,7 @@ public class ObjectInteractionManager : IInitializable, IDisposable
         if (currentInteract == null) return;
         currentState = GestureState.InteractingWithObject;
         InteractionEvents.OnHoldPerformed?.Invoke(currentInteract, obj);
-        Debug.Log("object interaction hold performed");
+        // Debug.Log("object interaction hold performed");
     }
 
     private void HandleHoldCompleted()
@@ -140,7 +140,7 @@ public class ObjectInteractionManager : IInitializable, IDisposable
         if (currentInteract == null) return;
         currentState = GestureState.InteractingWithObject;
         InteractionEvents.OnHoldCompleted?.Invoke(currentInteract);
-        Debug.Log("object interaction hold completed");
+        // Debug.Log("object interaction hold completed");
 
     }
 
@@ -150,7 +150,7 @@ public class ObjectInteractionManager : IInitializable, IDisposable
         if (currentInteract == null) return;
         currentState = GestureState.Idle;
         InteractionEvents.OnHoldCanceled?.Invoke(currentInteract);
-        Debug.Log("object interaction hold canceled");
+        // Debug.Log("object interaction hold canceled");
 
     }
 }

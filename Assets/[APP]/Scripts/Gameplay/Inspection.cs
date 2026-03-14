@@ -1,4 +1,5 @@
 using UnityEngine;
+using DG.Tweening;
 
 public class Inspection : MonoBehaviour
 {
@@ -17,6 +18,21 @@ public class Inspection : MonoBehaviour
 
     private Vector3 InitialInspectPosition;
     private Quaternion InitialInspectRotation;
+
+    public Transform assemblyRoot;
+    public Transform correctCenter;
+    private Sequence returnSequence;
+
+
+    public Transform GetAssemblyRoot()
+    {
+        return assemblyRoot;
+    }
+
+    public void SetCenter(Vector3 center)
+    {
+        assemblyRoot.position = center;
+    }
 
     void Start()
     {
@@ -92,5 +108,4 @@ public class Inspection : MonoBehaviour
         _targetPosition = InitialInspectPosition;
         _zoomVelocity = Vector3.zero;
     }
-
 }

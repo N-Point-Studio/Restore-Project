@@ -1,133 +1,132 @@
+using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using VContainer;
+using VContainer.Unity;
 
-public class AssemblyService
+public class AssemblyService : IInitializable, IDisposable
 {
     private readonly FragmentService registry;
+    private readonly Inspection inspectPoint;
+    private readonly List<IArtefactPart> currentAssembleList = new();
 
     [Inject]
-    public AssemblyService(FragmentService registry)
+    public AssemblyService(FragmentService registry, Inspection inspectPoint)
     {
         this.registry = registry;
+        this.inspectPoint = inspectPoint;
     }
 
-    public IAssembled GetAssembledRoot(IAssembled piece)
+    public Transform GetInspectPoint() => inspectPoint.transform;
+
+    public bool TryAssemble(IArtefactPart assembleObject)
     {
-        var temporary = piece;
-        while (temporary.GetAssembleParrent() != null)
+        if (IsInspectEmpty())
         {
-            temporary = temporary.GetAssembleParrent();
+            currentAssembleList.Add(assembleObject);
+            assembleObject.GetTransform().SetParent(inspectPoint.GetAssemblyRoot());
+            assembleObject.OnAssembled(inspectPoint.transform);
+            // RecenterAssembly();
+            return true;
         }
-
-        return temporary;
-    }
-
-    public bool TryAssemble(IAssemble root, IAssemble incoming)
-    {
-        if (root is IArtefactPart parentPart)
+        else
         {
-            if (incoming is IArtefactPart incomingPart)
+            Transform tempTf = null;
+            foreach (var part in currentAssembleList)
             {
-                GameObject newClusterGO = new GameObject("Cluster_" + parentPart.GetTransform().name + "_" + incomingPart.GetTransform().name);
-                var newCLuster = newClusterGO.AddComponent<ArtefactClusterStateMachine>();
-                (newCLuster as ICluster).AddChild(root);
-                (newCLuster as ICluster).AddChild(incoming);
-            }
-        }
-
-        if (root is ICluster cluster)
-        {
-
-        }
-
-        return false;
-    }
-
-    public bool TryAssemble(IAssembled root, IAssembled incoming)
-    {
-        var rootParts = root.GetTransform().GetComponentsInChildren<IAssembled>();
-        var incomingParts = incoming.GetTransform().GetComponentsInChildren<IAssembled>();
-
-        foreach (var rootPart in rootParts)
-        {
-            foreach (var incomingPart in incomingParts)
-            {
-                var rootSocket = rootPart.GetAvailableSocketFor(incomingPart.PieceId);
-                var incomingSocket = incomingPart.GetAvailableSocketFor(rootPart.PieceId);
-                if (rootSocket != null && incomingSocket != null)
+                var currentSocket = assembleObject.GetAvailableSocketFor(part.PieceId);
+                var partSocket = part.GetAvailableSocketFor(assembleObject.PieceId);
+                if (currentSocket != null && partSocket != null)
                 {
-                    if (incomingPart.GetAssembleParrent() != null && incomingPart.GetAssembleParrent() != rootPart)
-                    {
-                        ForceDetachFromCurrentParent(incomingPart);
-                    }
-                    PerformAssembly(rootPart, incomingPart, rootSocket, incomingSocket);
-                    RecursiveCheckReassembly(incomingPart, incomingParts);
-                    LogProgress("Assembled", incomingPart.PieceId);
-                    return true;
+                    currentSocket.isOccupied = true;
+                    partSocket.isOccupied = true;
+                    tempTf = partSocket.transform;
                 }
             }
-        }
-        return false;
-    }
 
-    public bool AssembleAnjay(IAssembled root, IAssembled income)
-    {
-        return false;
-    }
-
-    public void Detach(IAssembled piece)
-    {
-        IAssembled parent = piece.GetAssembleParrent();
-        if (parent == null) return;
-        parent.ReleaseSocketWith(piece.PieceId);
-        piece.ReleaseSocketWith(parent.PieceId);
-        piece.GetTransform().SetParent(null);
-        piece.OnDetached();
-        LogProgress("Detached", piece.PieceId);
-    }
-
-    private void ForceDetachFromCurrentParent(IAssembled piece)
-    {
-        IAssembled oldParent = piece.GetAssembleParrent();
-        if (oldParent == null) return;
-
-        oldParent.ReleaseSocketWith(piece.PieceId);
-        piece.ReleaseSocketWith(oldParent.PieceId);
-
-        Debug.Log($"[Detach] {piece.PieceId} dilepaskan dari {oldParent.PieceId}");
-    }
-
-    private void PerformAssembly(IAssembled parent, IAssembled incoming, ConnectionSocket parentSocket, ConnectionSocket incomingSocket)
-    {
-        incoming.GetTransform().SetParent(parent.GetTransform());
-        parentSocket.isOccupied = true;
-        incomingSocket.isOccupied = true;
-        Debug.Log($"slot untuk {incoming} di {parent} adalah {parentSocket.transform.position}");
-        incoming.OnAssembled(parent, parentSocket.transform);
-    }
-
-    private void RecursiveCheckReassembly(IAssembled newParent, IAssembled[] potentialChildren)
-    {
-        foreach (var child in potentialChildren)
-        {
-            if (child == newParent) continue;
-
-            var parentSocket = newParent.GetAvailableSocketFor(child.PieceId);
-            var incomingSocket = child.GetAvailableSocketFor(newParent.PieceId);
-
-            if (parentSocket != null && incomingSocket != null)
+            if (tempTf != null)
             {
-                Debug.Log($"{child} ditempel ke {newParent}");
-                PerformAssembly(newParent, child, parentSocket, incomingSocket);
-                RecursiveCheckReassembly(child, potentialChildren);
+                currentAssembleList.Add(assembleObject);
+                assembleObject.GetTransform().SetParent(inspectPoint.GetAssemblyRoot());
+                assembleObject.OnAssembled(tempTf);
+                LogProgress("Assembled", assembleObject.PieceId);
+                // RecenterAssembly();
+                return true;
             }
         }
+        return false;
+    }
+
+    public void Detach(IArtefactPart part)
+    {
+        if (currentAssembleList.Contains(part))
+        {
+            foreach (var assemble in currentAssembleList)
+            {
+                assemble.ReleaseSocketWith(part.PieceId);
+                part.ReleaseSocketWith(assemble.PieceId);
+            }
+
+            part.GetTransform().SetParent(null);
+            part.OnDetached();
+            currentAssembleList.Remove(part);
+        }
+
+        LogProgress("Detached", part.PieceId);
+        if (currentAssembleList.Count == 0) { inspectPoint.ResetPosition(); }
+    }
+
+    private Vector3 CalculateCenter()
+    {
+        if (currentAssembleList.Count == 0) return inspectPoint.GetAssemblyRoot().position;
+
+        Vector3 totalCenter = Vector3.zero;
+
+        foreach (var part in currentAssembleList)
+        {
+            Debug.Log($"{part} is {part.GetTransform().position}");
+            totalCenter += part.GetTransform().localPosition;
+        }
+
+        return totalCenter / currentAssembleList.Count;
+    }
+
+    private void RecenterAssembly()
+    {
+        Vector3 currentCenter = CalculateCenter();
+
+        Vector3 offset = currentCenter;
+
+        foreach (var part in currentAssembleList)
+        {
+            Transform partTf = part.GetTransform();
+            Vector3 targetPos = partTf.localPosition - offset;
+
+            partTf.DOLocalMove(targetPos, 0.5f)
+                  .SetEase(Ease.OutCubic)
+                  .SetLink(partTf.gameObject);
+        }
+    }
+
+    public bool IsInspectEmpty()
+    {
+        return currentAssembleList.Count == 0;
     }
 
     private void LogProgress(string action, string id)
     {
         float progress = registry.GetAssemblyProgress();
         Debug.Log($"<color=cyan>[{action}]</color> {id}. Progress: {progress * 100:F0}%");
+    }
+
+    public void Initialize()
+    {
+        InteractionEvents.OnAssembleInteractionFinished += RecenterAssembly;
+    }
+
+    public void Dispose()
+    {
+        InteractionEvents.OnAssembleInteractionFinished -= RecenterAssembly;
     }
 }

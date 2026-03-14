@@ -9,7 +9,6 @@ public enum ESurfaceDetectionType
 
 public class SurfaceDetectionService
 {
-    private float raycastLength = 10f;
     private Vector3 raycastNormal;
     private Vector3 raycastPos;
     private float tipRotation;

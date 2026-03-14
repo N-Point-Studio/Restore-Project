@@ -6,6 +6,7 @@ public class GameplayLifetimeScope : LifetimeScope
 {
     [SerializeField] private Inspection inspect;
     [SerializeField] private RectTransform inspectZone;
+    [SerializeField] private Transform pivotPoint;
     [SerializeField] private Transform planeReference;
     protected override void Configure(IContainerBuilder builder)
     {
@@ -15,10 +16,11 @@ public class GameplayLifetimeScope : LifetimeScope
         builder.RegisterInstance(Camera.main);
         builder.RegisterInstance(inspect);
         builder.RegisterInstance(inspectZone);
+        builder.RegisterInstance(pivotPoint);
 
         builder.RegisterEntryPoint<FragmentService>(Lifetime.Scoped).AsSelf();
 
-        builder.Register<AssemblyService>(Lifetime.Scoped).AsSelf();
+        builder.RegisterEntryPoint<AssemblyService>(Lifetime.Scoped).AsSelf();
         builder.Register<InspectService>(Lifetime.Scoped);
 
         builder.Register<SurfaceDetectionService>(Lifetime.Scoped);

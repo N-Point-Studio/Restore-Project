@@ -22,6 +22,5 @@ public class CleaningService
     public void EndClean()
     {
         isCleaning = false;
-        Debug.Log("Cleaning cuy! false");
     }
 }

@@ -103,7 +103,7 @@ public class ToolService : IInitializable, IDisposable
 
         if (isCleaning && surfaceDetectionService.CleanObject != null)
         {
-            // Debug.Log("Surface hit " + surfaceDetectionService.CleanObject);
+            Debug.Log("Surface hit " + surfaceDetectionService.CleanObject);
             cleaningService.TryCleaning(
                 surfaceDetectionService.CleanObject,
                 surfaceDetectionService.TextureSurface,

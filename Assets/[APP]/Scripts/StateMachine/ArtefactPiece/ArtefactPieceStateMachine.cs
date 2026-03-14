@@ -2,23 +2,33 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDragObject, IInspectable, ICleanObject
+public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDragObject, IInspectable, ICleanObject, IArtefactPart
 {
+    private Collider col;
+    private Renderer rd;
     public ArtefactPieceState state = ArtefactPieceState.None;
-    public string pieceId;
-    public List<ConnectionSocket> sockets;
     public static event Action<ArtefactPieceStateMachine> OnCreated;
 
-    // === CleaningObject ===
-    [SerializeField] CleaningObject cleaning;
-
-    private void Awake() { OnCreated?.Invoke(this); }
+    private void Awake()
+    {
+        col = GetComponent<Collider>();
+        rd = GetComponent<Renderer>();
+        OnCreated?.Invoke(this);
+    }
     private void Start()
     {
         InitialPosition = transform.position;
         InitialRotation = transform.rotation;
         SwitchState(new ArtefactPieceIdleState(this));
     }
+
+    // === Assemble ===
+    public string pieceId;
+    public List<ConnectionSocket> sockets;
+
+    // === CleaningObject ===
+    [SerializeField] CleaningObject cleaning;
+
 
     //=== IInspectable ===
     public Transform GetTransform() => transform;
@@ -34,4 +44,31 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
 
     //=== ICleanObject ===
     public void TryClean(Vector2 uv, Texture2D brush) => cleaning.TryClean(uv, brush);
+
+    //=== IAssemble ===
+    public string PieceId => pieceId;
+    public ConnectionSocket GetAvailableSocketFor(string id)
+    {
+        return sockets.Find(s => s.targetPieceId == id && !s.isOccupied);
+    }
+    public void OnAssembled(Transform targetTransform) => (currentState as IAssemble)?.OnAssembled(targetTransform);
+    public void OnDetached() => (currentState as IAssemble)?.OnDetached();
+    public void ReleaseSocketWith(string otherId)
+    {
+        var socket = sockets.Find(s => s.targetPieceId == otherId && s.isOccupied);
+        if (socket != null) socket.isOccupied = false;
+    }
+
+    public void SetColliderEnable(bool isActive)
+    {
+        col.enabled = isActive;
+        Debug.Log("Artefact collider enable?: " + isActive);
+    }
+
+    public List<ConnectionSocket> GetSockets() => sockets;
+
+    public Renderer GetRenderer()
+    {
+        return rd;
+    }
 }

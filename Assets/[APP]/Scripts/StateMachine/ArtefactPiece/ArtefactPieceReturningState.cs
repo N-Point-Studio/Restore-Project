@@ -25,6 +25,7 @@ public class ArtefactPieceReturningState : ArtefactPieceBaseState
         returnSequence.OnComplete(() =>
         {
             stateMachine.SwitchState(new ArtefactPieceIdleState(stateMachine));
+            InteractionEvents.OnAssembleInteractionFinished?.Invoke();
         });
     }
 
