@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDragObject, IInspectable, ICleanObject, IArtefactPart
+public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDragObject, IInspectable, ICleanSurfaceObject, IArtefactPart
 {
     private Collider col;
     private Renderer rd;
@@ -27,7 +27,7 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
     public List<ConnectionSocket> sockets;
 
     // === CleaningObject ===
-    [SerializeField] CleaningObject cleaning;
+    [SerializeField] CleaningSurfaceObject cleaning;
 
 
     //=== IInspectable ===
@@ -43,7 +43,10 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
     public void OnDragEnded(Vector3 worldPos) => (currentState as IDragObject)?.OnDragEnded(worldPos);
 
     //=== ICleanObject ===
-    public void TryClean(Vector2 uv, Texture2D brush) => cleaning.TryClean(uv, brush);
+    public void TryClean(Vector2 uv, Texture2D brush)
+    {
+        if (state != ArtefactPieceState.Idle) cleaning.TryClean(uv, brush);
+    }
 
     //=== IAssemble ===
     public string PieceId => pieceId;

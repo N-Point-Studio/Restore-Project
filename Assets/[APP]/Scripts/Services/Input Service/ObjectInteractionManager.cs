@@ -67,9 +67,11 @@ public class ObjectInteractionManager : IInitializable, IDisposable
 
     private void HandleInteractDetected(IInteractObject interact)
     {
-        if (currentState == GestureState.InteractingWithObject) return;
-        if (currentInteract == interact) return;
+        // if (currentState == GestureState.InteractingWithObject) return;
+        // if (currentInteract == interact) return;
         currentInteract = interact;
+        currentState = GestureState.InteractingWithObject;
+        InteractionEvents.OnPressStarted?.Invoke(currentInteract);
     }
 
     public IInteractObject GetCurrentInteract()
@@ -80,8 +82,9 @@ public class ObjectInteractionManager : IInitializable, IDisposable
     private void HandlePressStarted()
     {
         if (currentInteract == null) return;
-        currentState = GestureState.InteractingWithObject;
-        InteractionEvents.OnPressStarted?.Invoke(currentInteract);
+        // currentState = GestureState.InteractingWithObject;
+        // Debug.Log("Hit pertama");
+        // InteractionEvents.OnPressStarted?.Invoke(currentInteract);
     }
 
     private void HandlePressEnded()

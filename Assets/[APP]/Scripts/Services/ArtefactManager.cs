@@ -72,7 +72,7 @@ public class ArtefactManager : IInitializable, IDisposable
     private void HandleDragEnded(IInteractObject interact, Vector3 worldPos)
     {
         if (toolService.IsOnToolMode) return;
-
+        Debug.Log($"hit di {toolService.IsOnToolMode}");
         if (interact is not IInspectable inspectable) return;
 
         float distance = Vector3.Distance(worldPos, assemblyService.GetInspectPoint().position);

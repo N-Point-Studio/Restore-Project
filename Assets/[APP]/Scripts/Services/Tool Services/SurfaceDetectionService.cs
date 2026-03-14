@@ -1,7 +1,7 @@
 using UnityEngine;
 using VContainer;
 
-public enum ESurfaceDetectionType
+public enum SurfaceDetectionType
 {
     Texture,
     Mesh
@@ -14,48 +14,56 @@ public class SurfaceDetectionService
     private float tipRotation;
     private Vector2 textureSurface;
     private bool hasHit;
-    private readonly Camera cam;
 
-    private ICleanObject currentSurfaceDetected;
+    private readonly Camera cam;
+    private readonly int pieceLayerMask;
+
+    private ICleanSurfaceObject currentSurfaceDetected;
+    private ICleanHardObject currentHardDetected;
 
     [Inject]
     public SurfaceDetectionService(Camera cam)
     {
         this.cam = cam;
+        pieceLayerMask = LayerMask.GetMask("Dirts");
     }
 
-    public bool PerformRaycast(Vector2 screenPos, ESurfaceDetectionType type)
+    public bool PerformRaycast(Vector2 screenPos, SurfaceDetectionType type)
     {
+        ResetDetection();
+
         Ray ray = cam.ScreenPointToRay(screenPos);
-        if (Physics.Raycast(ray, out RaycastHit hit))
+
+        if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, pieceLayerMask))
+            return false;
+
+        if (hit.collider.TryGetComponent(out ArtefactPieceStateMachine artefact))
         {
-            if (hit.collider.TryGetComponent(out ArtefactPieceStateMachine artefact))
-            {
-                hasHit = artefact.state != ArtefactPieceState.Idle;
-                if (artefact is ICleanObject clean) currentSurfaceDetected = clean;
-                if (hasHit) EssentialDetecting(hit);
-                return hasHit;
-            }
-            // switch (type)
-            // {
-            //     case ESurfaceDetectionType.Texture:
-            //         break;
-            //     case ESurfaceDetectionType.Mesh:
-            //         break;
-            // }
+            hasHit = artefact.state != ArtefactPieceState.Idle;
         }
         else
         {
-            hasHit = false;
-            currentSurfaceDetected = null;
-            raycastPos = Vector3.positiveInfinity;
-            return hasHit;
+            hasHit = true;
         }
 
-        return false;
+        EssentialDetecting(hit);
+
+        // cek interface
+        currentSurfaceDetected = hit.collider.GetComponentInParent<ICleanSurfaceObject>();
+        currentHardDetected = hit.collider.GetComponent<ICleanHardObject>();
+
+        return true;
     }
 
-    public void EssentialDetecting(RaycastHit hit)
+    private void ResetDetection()
+    {
+        hasHit = false;
+        currentSurfaceDetected = null;
+        currentHardDetected = null;
+        raycastPos = Vector3.positiveInfinity;
+    }
+
+    private void EssentialDetecting(RaycastHit hit)
     {
         raycastNormal = hit.normal;
         raycastPos = hit.point;
@@ -70,6 +78,9 @@ public class SurfaceDetectionService
     public Vector3 RaycastPos => raycastPos;
     public float TipRotation => tipRotation;
     public Vector2 TextureSurface => textureSurface;
+
     public bool HasHit => hasHit;
-    public ICleanObject CleanObject => currentSurfaceDetected;
+
+    public ICleanSurfaceObject CleanObject => currentSurfaceDetected;
+    public ICleanHardObject HardObject => currentHardDetected;
 }

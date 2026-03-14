@@ -1,17 +1,11 @@
 using UnityEngine;
 
-public interface ICleanObject
-{
-    void TryClean(Vector2 uv, Texture2D brush);
-}
-
-public class CleaningObject : MonoBehaviour, ICleanObject
+public class CleaningSurfaceObject : MonoBehaviour, ICleanSurfaceObject
 {
     [SerializeField] private Texture2D dirtMaskBase;
     [SerializeField] private Material material;
 
     private Texture2D templateDirtMask;
-
     private float dirtAmountTotal;
     private float dirtAmount;
 

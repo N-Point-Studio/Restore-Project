@@ -3,14 +3,13 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class ToolService : IInitializable, IDisposable
+public class ToolService : IInitializable, IDisposable, ITickable
 {
     private readonly InputSystemService inputSystemService;
     private readonly ObjectDetectionService objectDetectionService;
     private readonly SurfaceDetectionService surfaceDetectionService;
     private readonly CleaningService cleaningService;
     private ITool currentTool;
-
     public bool isCleaning;
 
     [Inject]
@@ -26,24 +25,29 @@ public class ToolService : IInitializable, IDisposable
     public void Initialize()
     {
         InteractionEvents.OnPressStarted += HandlePressStarted;
-        inputSystemService.OnMouseMoved += HandleMouseMoved;
         InteractionEvents.OnPressEnded += HandlePressEnded;
     }
 
     public void Dispose()
     {
         InteractionEvents.OnPressStarted -= HandlePressStarted;
-        inputSystemService.OnMouseMoved -= HandleMouseMoved;
         InteractionEvents.OnPressEnded -= HandlePressEnded;
     }
 
     private void HandlePressStarted(IInteractObject interact)
     {
+        Debug.Log("Hit Here " + surfaceDetectionService.HasHit);
         if (interact is not ITool)
         {
             if (surfaceDetectionService.HasHit)
             {
                 isCleaning = true;
+                var hardObject = surfaceDetectionService.HardObject;
+                if (hardObject != null)
+                {
+                    if (currentTool.ToolType == SurfaceDetectionType.Mesh)
+                        cleaningService.TryCleaningHardSurface(hardObject);
+                }
             }
             else
             {
@@ -70,24 +74,6 @@ public class ToolService : IInitializable, IDisposable
         isCleaning = false;
     }
 
-    private void HandleMouseMoved(Vector2 vector)
-    {
-        if (currentTool == null) return;
-        if (currentTool is IInteractObject interact)
-        {
-            // Debug.Log($"interact adalah {interact} apakah dia cleanable? {interact is ICleanObject}");
-            var worldPos = objectDetectionService.ScreenToWorld(vector, interact);
-            currentTool.FollowMouse(worldPos);
-
-            if (surfaceDetectionService.PerformRaycast(vector, ESurfaceDetectionType.Texture))
-            {
-                // Debug.Log($"Surface hit? {surfaceDetectionService.HasHit}");
-                StickToSurface(interact);
-            }
-
-        }
-    }
-
     public ITool GetCurrentTool()
     {
         return currentTool;
@@ -103,12 +89,34 @@ public class ToolService : IInitializable, IDisposable
 
         if (isCleaning && surfaceDetectionService.CleanObject != null)
         {
-            Debug.Log("Surface hit " + surfaceDetectionService.CleanObject);
-            cleaningService.TryCleaning(
-                surfaceDetectionService.CleanObject,
-                surfaceDetectionService.TextureSurface,
-                currentTool.GetBrush()
-            );
+            var cleanObject = surfaceDetectionService.CleanObject;
+            if (cleanObject != null)
+            {
+                var texture = surfaceDetectionService.TextureSurface;
+                var brush = currentTool.GetBrush();
+                if (currentTool.ToolType == SurfaceDetectionType.Texture)
+                    cleaningService.TryCleaning(cleanObject, texture, brush);
+            }
+        }
+    }
+
+    public void Tick()
+    {
+        var mousePos = inputSystemService.GetMousePosition();
+        if (currentTool == null) return;
+        if (currentTool is IInteractObject interact)
+        {
+            // Debug.Log($"interact adalah {interact} apakah dia cleanable? {interact is ICleanObject}");
+            var worldPos = objectDetectionService.ScreenToWorld(mousePos, interact);
+            currentTool.FollowMouse(worldPos);
+
+            if (surfaceDetectionService.PerformRaycast(mousePos, currentTool.ToolType))
+            {
+                // Debug.Log($"Surface hit? {surfaceDetectionService.HasHit}");
+                StickToSurface(interact);
+                Debug.Log("hit will always run la " + surfaceDetectionService.HasHit);
+            }
+
         }
     }
 

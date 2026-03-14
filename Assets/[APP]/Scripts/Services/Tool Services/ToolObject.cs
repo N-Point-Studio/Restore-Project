@@ -9,7 +9,7 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
     private Sequence returnSequence;
     private bool isReturning;
     [SerializeField] private Texture2D brush;
-
+    [SerializeField] private SurfaceDetectionType toolType;
     private void Awake()
     {
         initialPosition = transform.position;
@@ -61,4 +61,6 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
     {
         col.enabled = isActive;
     }
+
+    public SurfaceDetectionType ToolType => toolType;
 }

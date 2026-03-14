@@ -8,7 +8,7 @@ public class CleaningService
 
     public bool isCleaning;
 
-    public void TryCleaning(ICleanObject clean, Vector2 textureSurface, Texture2D brush)
+    public void TryCleaning(ICleanSurfaceObject clean, Vector2 textureSurface, Texture2D brush)
     {
         if (clean == null || brush == null)
             return;
@@ -17,6 +17,11 @@ public class CleaningService
 
         clean.TryClean(textureSurface, brush);
         OnCleaningPerformed?.Invoke();
+    }
+
+    public void TryCleaningHardSurface(ICleanHardObject clean)
+    {
+        clean.Hit();
     }
 
     public void EndClean()
