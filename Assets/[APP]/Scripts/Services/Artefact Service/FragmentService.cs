@@ -8,6 +8,8 @@ public class FragmentService : IInitializable, IDisposable
 {
     private readonly HashSet<ArtefactPieceStateMachine> registry = new();
 
+    public event Action<float> OnProgressUpdate;
+
     public void Initialize() => ArtefactPieceStateMachine.OnCreated += Register;
     public void Dispose() => ArtefactPieceStateMachine.OnCreated -= Register;
 
@@ -19,6 +21,7 @@ public class FragmentService : IInitializable, IDisposable
     public float GetAssemblyProgress()
     {
         if (registry.Count == 0) return 0f;
+        if (registry.Count == 1) return 1f;
 
         int connectedPieces = 0;
 
@@ -44,5 +47,10 @@ public class FragmentService : IInitializable, IDisposable
         Debug.Log($"Progress: {connectedPieces}/{registry.Count} = {progress}");
 
         return progress;
+    }
+
+    public void ProgressUpdate()
+    {
+        OnProgressUpdate?.Invoke(GetAssemblyProgress());
     }
 }

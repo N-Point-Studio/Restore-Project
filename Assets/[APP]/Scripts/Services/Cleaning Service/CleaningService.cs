@@ -6,15 +6,15 @@ using System.Collections.Generic;
 
 public class CleaningService : IInitializable, IDisposable
 {
-    public event Action OnCleaningPerformed;
-    public event Action OnCleaningEnded;
-
     private readonly HashSet<CleaningHardObject> cleaningChunks = new();
     private readonly HashSet<CleaningSurfaceObject> cleaningSurfaces = new();
     public bool isCleaning;
 
     private int totalHardObjects;
     private int destroyedHardObjects;
+
+    public event Action<float> OnSurfaceCleaningUpdate;
+    public event Action<float> OnHardCleaningUpdate;
 
     public void Initialize()
     {
@@ -59,12 +59,13 @@ public class CleaningService : IInitializable, IDisposable
         isCleaning = true;
 
         clean.TryClean(textureSurface, brush);
-        OnCleaningPerformed?.Invoke();
+        OnSurfaceCleaningUpdate?.Invoke(CalculateSurfaceProgress());
     }
 
     public void TryCleaningHardSurface(ICleanHardObject clean)
     {
         clean.Hit();
+        OnHardCleaningUpdate?.Invoke(GetHardProgress());
     }
 
     public void EndClean()
