@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class CleaningHardObject : MonoBehaviour, IInteractObject, ICleanHardObject
@@ -8,12 +9,16 @@ public class CleaningHardObject : MonoBehaviour, IInteractObject, ICleanHardObje
 
     private int currentHit;
 
+    public static event Action<CleaningHardObject> OnCreated;
+    public static event Action<CleaningHardObject> OnDestroy;
+
     public int CurrentHit => currentHit;
     public int MaxHit => maxHitTimes;
 
     private void Awake()
     {
         targetRenderer = GetComponent<Renderer>();
+        OnCreated?.Invoke(this);
     }
 
     public void Hit()
@@ -43,6 +48,7 @@ public class CleaningHardObject : MonoBehaviour, IInteractObject, ICleanHardObje
 
     private void DestroyObject()
     {
+        OnDestroy?.Invoke(this);
         Destroy(gameObject);
     }
 

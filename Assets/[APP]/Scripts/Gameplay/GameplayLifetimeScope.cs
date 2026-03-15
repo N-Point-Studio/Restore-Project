@@ -19,13 +19,13 @@ public class GameplayLifetimeScope : LifetimeScope
         builder.RegisterInstance(pivotPoint);
 
         builder.RegisterEntryPoint<FragmentService>(Lifetime.Scoped).AsSelf();
-
         builder.RegisterEntryPoint<AssemblyService>(Lifetime.Scoped).AsSelf();
+
         builder.Register<InspectService>(Lifetime.Scoped);
 
         builder.Register<SurfaceDetectionService>(Lifetime.Scoped);
-        builder.Register<CleaningService>(Lifetime.Scoped);
 
+        builder.RegisterEntryPoint<CleaningService>(Lifetime.Scoped).AsSelf();
         builder.RegisterEntryPoint<ArtefactManager>(Lifetime.Scoped).AsSelf();
 
         builder.RegisterEntryPoint<ObjectDetectionService>(Lifetime.Scoped).AsSelf();
@@ -38,5 +38,7 @@ public class GameplayLifetimeScope : LifetimeScope
         builder.RegisterEntryPoint<ObjectInteractionManager>(Lifetime.Scoped).AsSelf();
 
         builder.RegisterEntryPoint<ToolService>(Lifetime.Scoped).AsSelf();
+
+        builder.RegisterEntryPoint<ProgressService>(Lifetime.Scoped).AsSelf();
     }
 }

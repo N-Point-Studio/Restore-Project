@@ -118,6 +118,7 @@ public class AssemblyService : IInitializable, IDisposable
     {
         float progress = registry.GetAssemblyProgress();
         Debug.Log($"<color=cyan>[{action}]</color> {id}. Progress: {progress * 100:F0}%");
+        registry.ProgressUpdate();
     }
 
     public void Initialize()

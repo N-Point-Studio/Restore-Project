@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class CleaningSurfaceObject : MonoBehaviour, ICleanSurfaceObject
@@ -8,8 +9,14 @@ public class CleaningSurfaceObject : MonoBehaviour, ICleanSurfaceObject
     private Texture2D templateDirtMask;
     private float dirtAmountTotal;
     private float dirtAmount;
-
     private Vector2Int lastPaintPixelPosition;
+
+    public static event Action<CleaningSurfaceObject> OnCreated;
+
+    private void Awake()
+    {
+        OnCreated?.Invoke(this);
+    }
 
     private void Start()
     {
