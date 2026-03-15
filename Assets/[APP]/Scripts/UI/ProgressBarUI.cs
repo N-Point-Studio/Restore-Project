@@ -28,6 +28,8 @@ public class ProgressBarUI : MonoBehaviour
     public static event Action<ProgressBarUI> OnCreated;
     public ProgressType progressType = ProgressType.None;
 
+    public static event Action OnProgressBarCompleted;
+
     private void Awake()
     {
         OnCreated?.Invoke(this);
@@ -54,7 +56,7 @@ public class ProgressBarUI : MonoBehaviour
             if (AudioSourceProgress != null && ProfressSound != null)
             {
                 AudioSourceProgress.PlayOneShot(ProfressSound);
-                HapticManager.Instance.Light();
+                OnProgressBarCompleted?.Invoke();
             }
         }
 
