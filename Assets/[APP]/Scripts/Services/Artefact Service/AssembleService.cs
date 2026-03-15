@@ -10,6 +10,7 @@ public class AssemblyService : IInitializable, IDisposable
     private readonly FragmentService registry;
     private readonly Inspection inspectPoint;
     private readonly List<IArtefactPart> currentAssembleList = new();
+    private float socketSnapDistance = 1f;
 
     [Inject]
     public AssemblyService(FragmentService registry, Inspection inspectPoint)
@@ -20,14 +21,51 @@ public class AssemblyService : IInitializable, IDisposable
 
     public Transform GetInspectPoint() => inspectPoint.transform;
 
+    // public void TryCheckSlot(IArtefactPart checkPart, Vector3 worldPos)
+    // {
+    //     foreach (var part in currentAssembleList)
+    //     {
+    //         var partSocket = part.GetAvailableSocketFor(checkPart.PieceId);
+
+    //         if (partSocket == null)
+    //             continue;
+
+    //         var renderer = partSocket.transform.GetComponent<Renderer>();
+    //         if (renderer == null) continue;
+
+    //         float distance = Vector3.Distance(worldPos, partSocket.transform.position);
+
+    //         renderer.enabled = distance <= socketSnapDistance;
+    //     }
+    // }
+
+    public void TryCheckSlot(IArtefactPart checkPart, Vector3 worldPos)
+    {
+        foreach (var part in currentAssembleList)
+        {
+            var partSocket = part.GetAvailableSocketFor(checkPart.PieceId);
+            if (partSocket != null)
+            {
+                var renderer = partSocket.transform.GetComponent<Renderer>();
+                float distance = Vector3.Distance(worldPos, partSocket.transform.position);
+
+                renderer.enabled = distance <= socketSnapDistance;
+                return;
+            }
+        }
+    }
+
     public bool TryAssemble(IArtefactPart assembleObject)
     {
         if (IsInspectEmpty())
         {
             currentAssembleList.Add(assembleObject);
+
             assembleObject.GetTransform().SetParent(inspectPoint.GetAssemblyRoot());
             assembleObject.OnAssembled(inspectPoint.transform);
-            // RecenterAssembly();
+
+            HideAllSockets();
+
             return true;
         }
         else
@@ -48,10 +86,14 @@ public class AssemblyService : IInitializable, IDisposable
             if (tempTf != null)
             {
                 currentAssembleList.Add(assembleObject);
+
                 assembleObject.GetTransform().SetParent(inspectPoint.GetAssemblyRoot());
                 assembleObject.OnAssembled(tempTf);
+
+                HideAllSockets(); // 🔥 matikan indikator
+
                 LogProgress("Assembled", assembleObject.PieceId);
-                // RecenterAssembly();
+
                 return true;
             }
         }
@@ -106,6 +148,21 @@ public class AssemblyService : IInitializable, IDisposable
             partTf.DOLocalMove(targetPos, 0.5f)
                   .SetEase(Ease.OutCubic)
                   .SetLink(partTf.gameObject);
+        }
+    }
+
+    private void HideAllSockets()
+    {
+        foreach (var part in currentAssembleList)
+        {
+            var sockets = part.GetSockets();
+
+            foreach (var socket in sockets)
+            {
+                var renderer = socket.transform.GetComponent<Renderer>();
+                if (renderer != null)
+                    renderer.enabled = false;
+            }
         }
     }
 
