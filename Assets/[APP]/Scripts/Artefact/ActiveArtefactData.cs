@@ -33,13 +33,19 @@ public class ActiveArtefactData : ISaveable
         var allArtefacts = artefactDatabase.GetAllArtefactDatas();
         for (int i = 0; i < allArtefacts.Count; i++)
         {
-            if (allArtefacts[i].UnlockedByDefault)
+            if (allArtefacts[i] != null && allArtefacts[i].UnlockedByDefault)
             {
                 UnlockArtefact(allArtefacts[i].BaseData.Id);
             }
         }
 
         EvaluateUnlockRequirements();
+
+        for (int i = 0; i < artefactProgress.Count; i++)
+        {
+            artefactProgress[i].hasSeenUnlockAnim = true;
+            artefactProgress[i].hasSeenCompletionAnim = true;
+        }
     }
 
     public void ResetData()
@@ -236,6 +242,22 @@ public class ActiveArtefactData : ISaveable
         }
     }
 
+    public bool IsStoryRead(string artefactId)
+    {
+        var data = artefactProgress.Find(x => x.artefactId == artefactId);
+        return data != null && data.hasReadStory;
+    }
+
+    public void MarkStoryRead(string artefactId)
+    {
+        var data = artefactProgress.Find(x => x.artefactId == artefactId);
+        if (data != null && !data.hasReadStory)
+        {
+            data.hasReadStory = true;
+            OnUpdated?.Invoke();
+        }
+    }
+
     public JSONNode AsJSON()
     {
         JSONObject json = new JSONObject();
@@ -247,6 +269,9 @@ public class ActiveArtefactData : ISaveable
             artefactJson[nameof(ArtefactProgressData.artefactId)] = artefactProgress[i].artefactId;
             artefactJson[nameof(ArtefactProgressData.isUnlocked)].AsBool = artefactProgress[i].isUnlocked;
             artefactJson[nameof(ArtefactProgressData.isCompleted)].AsBool = artefactProgress[i].isCompleted;
+            artefactJson[nameof(ArtefactProgressData.hasSeenUnlockAnim)].AsBool = artefactProgress[i].hasSeenUnlockAnim;
+            artefactJson[nameof(ArtefactProgressData.hasSeenCompletionAnim)].AsBool = artefactProgress[i].hasSeenCompletionAnim;
+            artefactJson[nameof(ArtefactProgressData.hasReadStory)].AsBool = artefactProgress[i].hasReadStory;
             artefactsArray.Add(artefactJson);
         }
         json["artefacts"] = artefactsArray;
@@ -267,7 +292,10 @@ public class ActiveArtefactData : ISaveable
                 {
                     artefactId = artefactJson[nameof(ArtefactProgressData.artefactId)],
                     isUnlocked = artefactJson[nameof(ArtefactProgressData.isUnlocked)].AsBool,
-                    isCompleted = artefactJson[nameof(ArtefactProgressData.isCompleted)].AsBool
+                    isCompleted = artefactJson[nameof(ArtefactProgressData.isCompleted)].AsBool,
+                    hasSeenUnlockAnim = artefactJson[nameof(ArtefactProgressData.hasSeenUnlockAnim)].AsBool,
+                    hasSeenCompletionAnim = artefactJson[nameof(ArtefactProgressData.hasSeenCompletionAnim)].AsBool,
+                    hasReadStory = artefactJson[nameof(ArtefactProgressData.hasReadStory)].AsBool
                 });
             }
         }
@@ -286,6 +314,7 @@ public class ArtefactProgressData
     public bool isCompleted;
     public bool hasSeenUnlockAnim;
     public bool hasSeenCompletionAnim;
+    public bool hasReadStory;
 }
 
 public class ArtefactRuntimeData

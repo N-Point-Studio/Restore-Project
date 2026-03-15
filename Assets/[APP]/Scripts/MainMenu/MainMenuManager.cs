@@ -10,17 +10,28 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private MenuController menuController;
     [SerializeField] private LevelSelectionController levelSelectionController;
 
+    [Header("Scene Configuration")]
+    [SerializeField] private string splashSceneName = "Splash";
+
     private PlayerProgressionData playerProgressionData;
     private ActiveArtefactData activeArtefactData;
+    private SceneLoader sceneLoader;
+    private ProjectSavingSystem projectSavingSystem;
+
+    private static bool isFirstSessionLoad = true;
 
     [Inject]
     public void Construct(
         PlayerProgressionData playerProgressionData, 
         ActiveArtefactData activeArtefactData, 
+        SceneLoader sceneLoader,
+        ProjectSavingSystem projectSavingSystem,
         IObjectResolver container)
     {
         this.playerProgressionData = playerProgressionData;
         this.activeArtefactData = activeArtefactData;
+        this.sceneLoader = sceneLoader;
+        this.projectSavingSystem = projectSavingSystem;
 
         container.Inject(menuController);
         container.Inject(levelSelectionController);
@@ -30,6 +41,7 @@ public class MainMenuManager : MonoBehaviour
     {
         MainMenuEvents.OnNewGame += OnRequestNewGameGame;
         MainMenuEvents.OnContinueGame += OnRequestContinueGame;
+        MainMenuEvents.OnCloseLevelSelection += OnRequestCloseLevelSelection;
     }
 
     private void Start()
@@ -38,9 +50,17 @@ public class MainMenuManager : MonoBehaviour
             activeArtefactData.GetPendingCompletionAnimations().Count > 0 || 
             activeArtefactData.GetPendingUnlockAnimations().Count > 0;
 
-        if (hasPendingAnimations)
+        if (isFirstSessionLoad)
         {
-            AppLogger.Log("[MainMenuManager] New player just finished gameplay! Opening Level Selection immediately.");
+            isFirstSessionLoad = false;
+            AppLogger.Log("[MainMenuManager] App just started. Entering normal Main Menu.");
+            
+            menuController.SetActive(true);
+            levelSelectionController.SetActive(false);
+        }
+        else if (hasPendingAnimations)
+        {
+            AppLogger.Log("[MainMenuManager] Player returned from gameplay! Opening Level Selection immediately.");
             
             menuController.SetActive(false);
             levelSelectionController.OpenLevelSelectionAndPlayAnimations();
@@ -57,22 +77,60 @@ public class MainMenuManager : MonoBehaviour
     private void OnDestroy()
     {
         MainMenuEvents.OnNewGame -= OnRequestNewGameGame;
-        MainMenuEvents.OnContinueGame -= OnRequestContinueGame;        
+        MainMenuEvents.OnContinueGame -= OnRequestContinueGame;   
+        MainMenuEvents.OnCloseLevelSelection -= OnRequestCloseLevelSelection;     
     }
 
     private void OnRequestNewGameGame()
     {
-        playerProgressionData.ClearData();
-        activeArtefactData.ResetData(); 
-        playerProgressionData.MarkAsPlayed();
+        bool isReturningPlayer = playerProgressionData.HasPlayedBefore;
 
-        menuController.SetActive(false);
-        levelSelectionController.OpenLevelSelection();
+        if (isReturningPlayer)
+        {
+            AppLogger.Log("[MainMenuManager] Veteran player resetting game -> Reload Splash");
+
+            playerProgressionData.ClearData();
+            activeArtefactData.ResetData(); 
+            
+            projectSavingSystem.SaveAll();
+
+            _ = sceneLoader.LoadSceneAsync(splashSceneName, LoadingType.ProgressBar);
+        }
+        else
+        {
+            AppLogger.Log("[MainMenuManager] New player starting -> Level Selection");
+            playerProgressionData.MarkAsPlayed();
+            activeArtefactData.ResetData(); 
+            projectSavingSystem.SaveAll();
+
+            menuController.SetActive(false);
+            levelSelectionController.OpenLevelSelection();
+            MainMenuEvents.TriggerCameraToLevelSelection();
+        }
     }
 
     private void OnRequestContinueGame()
     {
         menuController.SetActive(false);
-        levelSelectionController.OpenLevelSelection();
+        
+        bool hasPendingAnimations = 
+            activeArtefactData.GetPendingCompletionAnimations().Count > 0 || 
+            activeArtefactData.GetPendingUnlockAnimations().Count > 0;
+
+        if (hasPendingAnimations)
+        {
+            levelSelectionController.OpenLevelSelectionAndPlayAnimations();
+        }
+        else
+        {
+            levelSelectionController.OpenLevelSelection();
+            MainMenuEvents.TriggerCameraToLevelSelection();
+        }
+    }
+
+    private void OnRequestCloseLevelSelection()
+    {
+        menuController.SetActive(true);
+        menuController.RefreshButtonVisibility();
     }
 }

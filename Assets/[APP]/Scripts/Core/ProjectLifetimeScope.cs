@@ -44,9 +44,6 @@ public class ProjectLifetimeScope : LifetimeScope
         // Audio Service
         builder.RegisterEntryPoint<ProjectAudioService>(Lifetime.Singleton).AsSelf();
 
-        // Progression Service
-        builder.RegisterEntryPoint<ProjectProgressionService>(Lifetime.Singleton).AsSelf();
-
         // Input System
         builder.RegisterEntryPoint<PlayerInputSystem>(Lifetime.Singleton).AsSelf();
         builder.RegisterEntryPoint<InputSystemService>(Lifetime.Singleton).AsSelf();
