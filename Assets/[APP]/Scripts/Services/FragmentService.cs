@@ -13,8 +13,7 @@ public class FragmentService : IInitializable, IDisposable
 
     public void Register(ArtefactPieceStateMachine sm)
     {
-        if (registry.Add(sm))
-            Debug.Log($"Registered: {sm.name}");
+        if (registry.Add(sm)) Debug.Log($"Registered: {sm.name}");
     }
 
     public float GetAssemblyProgress()
