@@ -25,14 +25,12 @@ public class ProgressBarUI : MonoBehaviour
     [SerializeField] private AudioSource AudioSourceProgress;
     [SerializeField] public AudioClip ProfressSound;
 
-    public static event Action<ProgressBarUI> OnCreated;
     public ProgressType progressType = ProgressType.None;
 
     public static event Action OnProgressBarCompleted;
 
     private void Awake()
     {
-        OnCreated?.Invoke(this);
         checkList.enabled = false;
         progressText.text = currentValue.ToString();
     }
