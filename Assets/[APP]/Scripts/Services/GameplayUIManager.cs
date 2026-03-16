@@ -14,6 +14,7 @@ public class ProgressPair
 public class GameplayUIManager : MonoBehaviour
 {
     [SerializeField] public List<ProgressPair> progressBars;
+    private Dictionary<ProgressType, ProgressBarUI> progressMap;
     private CleaningService cleaningService;
     private FragmentService fragmentService;
 
@@ -22,6 +23,20 @@ public class GameplayUIManager : MonoBehaviour
     {
         this.cleaningService = cleaningService;
         this.fragmentService = fragmentService;
+    }
+
+    private void Awake()
+    {
+        progressMap = new Dictionary<ProgressType, ProgressBarUI>();
+        foreach (var pair in progressBars)
+        {
+            progressMap[pair.progressType] = pair.progressBar;
+        }
+    }
+
+    private void Start()
+    {
+        HandleAssembleAvailability();
     }
 
     private void OnEnable()
@@ -44,13 +59,38 @@ public class GameplayUIManager : MonoBehaviour
 
     private void UpdateProgress(ProgressType type, float value)
     {
-        foreach (var pair in progressBars)
+        if (progressMap.TryGetValue(type, out var bar))
         {
-            if (pair.progressType == type)
-            {
-                pair.progressBar.SetValue(value);
-                return;
-            }
+            bar.SetValue(value);
+            CheckOverallProgress();
         }
+    }
+
+    private void HandleAssembleAvailability()
+    {
+        if (fragmentService.GetPieceCount() <= 1 && progressMap.TryGetValue(ProgressType.Assemble, out var bar))
+            bar.gameObject.SetActive(false);
+    }
+
+    private void CheckOverallProgress()
+    {
+        float total = 0f;
+        int count = 0;
+
+        foreach (var bar in progressMap.Values)
+        {
+            if (!bar.gameObject.activeSelf) continue;
+            total += bar.GetValue();
+            count++;
+        }
+        if (count == 0) return;
+        float overall = total / count;
+
+        if (overall >= 1f) OnAllProgressCompleted();
+    }
+
+    private void OnAllProgressCompleted()
+    {
+        Debug.Log("All progress completed!");
     }
 }

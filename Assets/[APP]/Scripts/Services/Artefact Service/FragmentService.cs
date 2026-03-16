@@ -53,4 +53,6 @@ public class FragmentService : IInitializable, IDisposable
     {
         OnProgressUpdate?.Invoke(GetAssemblyProgress());
     }
+    public bool IsAssemblyRequired => registry.Count > 1;
+    public int GetPieceCount() => registry.Count;
 }
