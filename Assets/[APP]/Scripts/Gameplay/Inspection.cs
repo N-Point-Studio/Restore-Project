@@ -20,9 +20,7 @@ public class Inspection : MonoBehaviour
     private Quaternion InitialInspectRotation;
 
     public Transform assemblyRoot;
-    public Transform correctCenter;
-    private Sequence returnSequence;
-
+    private bool isContain = false;
 
     public Transform GetAssemblyRoot()
     {
@@ -84,6 +82,7 @@ public class Inspection : MonoBehaviour
 
     public void OnZoomPerformed(float zoomDelta)
     {
+        if (!isContain) return;
         if (_mainCamera == null) _mainCamera = Camera.main;
 
         Vector3 direction = (_targetPosition - _mainCamera.transform.position).normalized;
@@ -107,5 +106,10 @@ public class Inspection : MonoBehaviour
 
         _targetPosition = InitialInspectPosition;
         _zoomVelocity = Vector3.zero;
+    }
+
+    public void SetInspectionUsage(bool status)
+    {
+        isContain = status;
     }
 }

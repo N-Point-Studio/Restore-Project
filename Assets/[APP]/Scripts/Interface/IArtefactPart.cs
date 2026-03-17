@@ -8,4 +8,5 @@ public interface IArtefactPart : IAssemble
     void ReleaseSocketWith(string otherId);
     List<ConnectionSocket> GetSockets();
     Renderer GetRenderer();
+    void CorrectRotation(Quaternion rotation);
 }

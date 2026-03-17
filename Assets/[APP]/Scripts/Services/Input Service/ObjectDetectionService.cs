@@ -38,7 +38,6 @@ public class ObjectDetectionService : IInitializable, IDisposable
 
     private void HandleLeftPressStarted(Vector2 vector)
     {
-        Debug.Log("Hit detection ");
         OnInteractDetected?.Invoke(interactable);
     }
 

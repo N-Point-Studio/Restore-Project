@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -13,7 +14,8 @@ public class ProgressPair
 
 public class GameplayUIManager : MonoBehaviour
 {
-    [SerializeField] public List<ProgressPair> progressBars;
+    [SerializeField] private List<ProgressPair> progressBars;
+    [SerializeField] private ButtonItemUI buttonWrapUp;
     private Dictionary<ProgressType, ProgressBarUI> progressMap;
     private CleaningService cleaningService;
     private FragmentService fragmentService;
@@ -37,6 +39,7 @@ public class GameplayUIManager : MonoBehaviour
     private void Start()
     {
         HandleAssembleAvailability();
+        buttonWrapUp.gameObject.SetActive(false);
     }
 
     private void OnEnable()
@@ -44,6 +47,7 @@ public class GameplayUIManager : MonoBehaviour
         fragmentService.OnProgressUpdate += HandleProgressUpdate;
         cleaningService.OnHardCleaningUpdate += HandleHardCleaningUpdate;
         cleaningService.OnSurfaceCleaningUpdate += HandleSurfaceCleaningUpdate;
+        buttonWrapUp.OnClick += OnButtonWrapUpClick;
     }
 
     private void OnDisable()
@@ -51,11 +55,17 @@ public class GameplayUIManager : MonoBehaviour
         fragmentService.OnProgressUpdate -= HandleProgressUpdate;
         cleaningService.OnHardCleaningUpdate -= HandleHardCleaningUpdate;
         cleaningService.OnSurfaceCleaningUpdate -= HandleSurfaceCleaningUpdate;
+        buttonWrapUp.OnClick -= OnButtonWrapUpClick;
     }
 
     private void HandleSurfaceCleaningUpdate(float progress) => UpdateProgress(ProgressType.Dust, progress);
     private void HandleHardCleaningUpdate(float progress) => UpdateProgress(ProgressType.Mud, progress);
     private void HandleProgressUpdate(float progress) => UpdateProgress(ProgressType.Assemble, progress);
+
+    private void OnButtonWrapUpClick()
+    {
+        Debug.Log("Wrap up!");
+    }
 
     private void UpdateProgress(ProgressType type, float value)
     {
@@ -85,12 +95,6 @@ public class GameplayUIManager : MonoBehaviour
         }
         if (count == 0) return;
         float overall = total / count;
-
-        if (overall >= 1f) OnAllProgressCompleted();
-    }
-
-    private void OnAllProgressCompleted()
-    {
-        Debug.Log("All progress completed!");
+        buttonWrapUp.gameObject.SetActive(overall >= 100f);
     }
 }
