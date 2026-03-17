@@ -36,7 +36,6 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
     private void HandlePressStarted(IInteractObject interact)
     {
-        Debug.Log("Hit Here " + surfaceDetectionService.HasHit);
         if (interact is not ITool)
         {
             if (surfaceDetectionService.HasHit)

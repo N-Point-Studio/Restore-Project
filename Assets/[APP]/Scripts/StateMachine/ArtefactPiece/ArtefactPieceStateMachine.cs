@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDragObject, IInspectable, ICleanSurfaceObject, IArtefactPart
@@ -73,5 +74,11 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
     public Renderer GetRenderer()
     {
         return rd;
+    }
+
+    public void CorrectRotation(Quaternion rotation)
+    {
+        transform.DORotateQuaternion(rotation, 0.5f)
+                 .SetEase(Ease.OutCubic);
     }
 }

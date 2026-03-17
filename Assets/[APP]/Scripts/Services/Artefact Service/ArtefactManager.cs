@@ -67,6 +67,7 @@ public class ArtefactManager : IInitializable, IDisposable
     private void HandleDragPerformed(IInteractObject interact, Vector3 worldPos)
     {
         if (interact is IDragObject drag) { drag.OnDragPerformed(worldPos); }
+        if (interact is IArtefactPart part) assemblyService.TryCheckSlot(part, worldPos);
     }
 
     private void HandleDragEnded(IInteractObject interact, Vector3 worldPos)
@@ -82,34 +83,11 @@ public class ArtefactManager : IInitializable, IDisposable
             {
                 if (interact is IDragObject drag) { drag.OnDragEnded(worldPos); }
             }
-            // if (inspectService.IsInspectEmpty())
-            // {
-            //     // Debug.Log("currentinspect null");
-            //     inspectService.Inspect(inspectable);
-            // }
-            // else
-            // {
-            //     // if (slotDetected != null)
-            //     // {
-            //     //     Debug.Log("Harusnya attach di sini dengan " + slotDetected.TargetPieceId);
-            //     // }
-            //     if (interact is IDragObject drag) { drag.OnDragEnded(worldPos); }
-
-            //     // Debug.Log("currentinspect gak null");
-
-            //     // if (!assemblyService.TryAssemblePart(inspectService.GetCurrentInspected() as IAssemble, inspectable as IAssemble))
-            //     // {
-            //     //     inspectService.Inspect(inspectable);
-            //     //     // if (interact is IDragObject drag) { drag.OnDragEnded(worldPos); }
-            //     // }
-            // }
         }
         else
         {
             if (interact is IDragObject drag) { drag.OnDragEnded(worldPos); }
         }
-
-        // if (interact is IInteractObject interactObject) interactObject.SetColliderEnable(true);
     }
 
     private void HandleHoldPerformed(IInteractObject interact, float obj) { }
@@ -117,23 +95,8 @@ public class ArtefactManager : IInitializable, IDisposable
     private void HandleHoldCompleted(IInteractObject interact)
     {
         if (toolService.IsOnToolMode) return;
-        // var currentInspect = inspectService.GetCurrentInspected();
-
-        // if (interact as IInspectable == currentInspect)
-        // {
-        //     inspectService.ExitInspect();
-        //     return;
-        // }
-
-        // if (interact is IInspectable inspect)
-        // {
-        //     inspectService.ExitInspect(inspect);
-        //     return;
-        // }
-
         if (interact is IArtefactPart part)
         {
-            // inspectService.ExitInspect(part);
             assemblyService.Detach(part);
             return;
         }

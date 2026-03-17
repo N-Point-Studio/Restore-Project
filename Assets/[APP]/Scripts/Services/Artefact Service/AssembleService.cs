@@ -7,27 +7,59 @@ using VContainer.Unity;
 
 public class AssemblyService : IInitializable, IDisposable
 {
-    private readonly FragmentService registry;
     private readonly Inspection inspectPoint;
     private readonly List<IArtefactPart> currentAssembleList = new();
+    private float socketSnapDistance = 1f;
 
     [Inject]
-    public AssemblyService(FragmentService registry, Inspection inspectPoint)
+    public AssemblyService(Inspection inspectPoint)
     {
-        this.registry = registry;
         this.inspectPoint = inspectPoint;
     }
 
+    public void Initialize()
+    {
+        InteractionEvents.OnAssembleInteractionFinished += RecenterAssembly;
+    }
+
+    public void Dispose()
+    {
+        InteractionEvents.OnAssembleInteractionFinished -= RecenterAssembly;
+    }
+
     public Transform GetInspectPoint() => inspectPoint.transform;
+
+    public void TryCheckSlot(IArtefactPart checkPart, Vector3 worldPos)
+    {
+        foreach (var part in currentAssembleList)
+        {
+            var partSocket = part.GetAvailableSocketFor(checkPart.PieceId);
+            if (partSocket != null)
+            {
+                var renderer = partSocket.transform.GetComponent<Renderer>();
+                float distance = Vector3.Distance(worldPos, partSocket.transform.position);
+
+                if (distance <= socketSnapDistance)
+                {
+                    checkPart.CorrectRotation(partSocket.transform.rotation);
+                }
+                renderer.enabled = distance <= socketSnapDistance;
+                return;
+            }
+        }
+    }
 
     public bool TryAssemble(IArtefactPart assembleObject)
     {
         if (IsInspectEmpty())
         {
             currentAssembleList.Add(assembleObject);
+
             assembleObject.GetTransform().SetParent(inspectPoint.GetAssemblyRoot());
             assembleObject.OnAssembled(inspectPoint.transform);
-            // RecenterAssembly();
+
+            HideAllSockets();
+            inspectPoint.SetInspectionUsage(true);
             return true;
         }
         else
@@ -48,13 +80,16 @@ public class AssemblyService : IInitializable, IDisposable
             if (tempTf != null)
             {
                 currentAssembleList.Add(assembleObject);
+
                 assembleObject.GetTransform().SetParent(inspectPoint.GetAssemblyRoot());
                 assembleObject.OnAssembled(tempTf);
-                LogProgress("Assembled", assembleObject.PieceId);
-                // RecenterAssembly();
+
+                HideAllSockets();
+                inspectPoint.SetInspectionUsage(true);
                 return true;
             }
         }
+
         return false;
     }
 
@@ -72,9 +107,11 @@ public class AssemblyService : IInitializable, IDisposable
             part.OnDetached();
             currentAssembleList.Remove(part);
         }
-
-        LogProgress("Detached", part.PieceId);
-        if (currentAssembleList.Count == 0) { inspectPoint.ResetPosition(); }
+        if (currentAssembleList.Count == 0)
+        {
+            inspectPoint.ResetPosition();
+            inspectPoint.SetInspectionUsage(false);
+        }
     }
 
     private Vector3 CalculateCenter()
@@ -85,7 +122,6 @@ public class AssemblyService : IInitializable, IDisposable
 
         foreach (var part in currentAssembleList)
         {
-            Debug.Log($"{part} is {part.GetTransform().position}");
             totalCenter += part.GetTransform().localPosition;
         }
 
@@ -109,25 +145,23 @@ public class AssemblyService : IInitializable, IDisposable
         }
     }
 
+    private void HideAllSockets()
+    {
+        foreach (var part in currentAssembleList)
+        {
+            var sockets = part.GetSockets();
+
+            foreach (var socket in sockets)
+            {
+                var renderer = socket.transform.GetComponent<Renderer>();
+                if (renderer != null)
+                    renderer.enabled = false;
+            }
+        }
+    }
+
     public bool IsInspectEmpty()
     {
         return currentAssembleList.Count == 0;
-    }
-
-    private void LogProgress(string action, string id)
-    {
-        float progress = registry.GetAssemblyProgress();
-        Debug.Log($"<color=cyan>[{action}]</color> {id}. Progress: {progress * 100:F0}%");
-        registry.ProgressUpdate();
-    }
-
-    public void Initialize()
-    {
-        InteractionEvents.OnAssembleInteractionFinished += RecenterAssembly;
-    }
-
-    public void Dispose()
-    {
-        InteractionEvents.OnAssembleInteractionFinished -= RecenterAssembly;
     }
 }

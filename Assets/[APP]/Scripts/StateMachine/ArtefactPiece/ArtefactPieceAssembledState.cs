@@ -35,4 +35,5 @@ public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IArtefactPart
     }
 
     public Renderer GetRenderer() => stateMachine.GetRenderer();
+    public void CorrectRotation(Quaternion rotation) => stateMachine.CorrectRotation(rotation);
 }
