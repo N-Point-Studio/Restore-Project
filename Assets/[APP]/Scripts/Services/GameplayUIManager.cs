@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using VContainer;
-using VContainer.Unity;
 
 [Serializable]
 public class ProgressPair
@@ -16,9 +14,15 @@ public class GameplayUIManager : MonoBehaviour
 {
     [SerializeField] private List<ProgressPair> progressBars;
     [SerializeField] private ButtonItemUI buttonWrapUp;
+    [SerializeField] private ButtonItemUI buttonFinish;
+    [SerializeField] private Camera toolCamera;
+    [SerializeField] private GameObject mainCanvas;
+    [SerializeField] private GameObject endgameCanvas;
     private Dictionary<ProgressType, ProgressBarUI> progressMap;
     private CleaningService cleaningService;
     private FragmentService fragmentService;
+
+    public event Action OnGameFinished;
 
     [Inject]
     public void Construct(CleaningService cleaningService, FragmentService fragmentService)
@@ -47,7 +51,9 @@ public class GameplayUIManager : MonoBehaviour
         fragmentService.OnProgressUpdate += HandleProgressUpdate;
         cleaningService.OnHardCleaningUpdate += HandleHardCleaningUpdate;
         cleaningService.OnSurfaceCleaningUpdate += HandleSurfaceCleaningUpdate;
+
         buttonWrapUp.OnClick += OnButtonWrapUpClick;
+        buttonFinish.OnClick += OnFinishedGame;
     }
 
     private void OnDisable()
@@ -55,7 +61,9 @@ public class GameplayUIManager : MonoBehaviour
         fragmentService.OnProgressUpdate -= HandleProgressUpdate;
         cleaningService.OnHardCleaningUpdate -= HandleHardCleaningUpdate;
         cleaningService.OnSurfaceCleaningUpdate -= HandleSurfaceCleaningUpdate;
+
         buttonWrapUp.OnClick -= OnButtonWrapUpClick;
+        buttonFinish.OnClick -= OnFinishedGame;
     }
 
     private void HandleSurfaceCleaningUpdate(float progress) => UpdateProgress(ProgressType.Dust, progress);
@@ -65,6 +73,14 @@ public class GameplayUIManager : MonoBehaviour
     private void OnButtonWrapUpClick()
     {
         Debug.Log("Wrap up!");
+        toolCamera.gameObject.SetActive(false);
+        mainCanvas.SetActive(false);
+        endgameCanvas.SetActive(true);
+    }
+
+    private void OnFinishedGame()
+    {
+        OnGameFinished?.Invoke();
     }
 
     private void UpdateProgress(ProgressType type, float value)
