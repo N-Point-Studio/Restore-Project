@@ -4375,10 +4375,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2025231942}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 959.99994, y: -85}
-  m_SizeDelta: {x: 1919.9999, y: 70}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1027541683
 MonoBehaviour:
@@ -4916,6 +4916,10 @@ MonoBehaviour:
   - progressBar: {fileID: 1860778852}
     progressType: 3
   buttonWrapUp: {fileID: 181408901}
+  buttonFinish: {fileID: 1983380150}
+  toolCamera: {fileID: 1809664374}
+  mainCanvas: {fileID: 309445233}
+  endgameCanvas: {fileID: 543342672}
 --- !u!4 &1118638521
 Transform:
   m_ObjectHideFlags: 0
@@ -7227,10 +7231,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2025231942}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 959.99994, y: -25}
-  m_SizeDelta: {x: 1919.9999, y: 50}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1737387819
 MonoBehaviour:
@@ -7522,7 +7526,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!20 &1809664374
 Camera:
   m_ObjectHideFlags: 0
@@ -8757,6 +8761,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7419079706413985183, guid: 6a49c5ef214e9fe4ab4ee7a6f012476a, type: 3}
   m_PrefabInstance: {fileID: 1983380144}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1983380150 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5445000821573752765, guid: 6a49c5ef214e9fe4ab4ee7a6f012476a, type: 3}
+  m_PrefabInstance: {fileID: 1983380144}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4cce49914e8b144ebc024508d3c8f93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonItemUI
 --- !u!1001 &1987059950
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9997,7 +10012,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3799182504022232384, guid: 9ee5403fae64047df85dda737e04376f, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7902253082267426691, guid: 9ee5403fae64047df85dda737e04376f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -10216,7 +10231,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5238021633170566346, guid: 4dcfb79549dd64c74ba5d0291258c6c4, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
