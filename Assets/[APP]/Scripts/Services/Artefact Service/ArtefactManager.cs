@@ -5,26 +5,22 @@ using VContainer.Unity;
 
 public class ArtefactManager : IInitializable, IDisposable
 {
-    private readonly InspectService inspectService;
     private readonly ToolService toolService;
     private readonly AssemblyService assemblyService;
-    // private readonly ObjectDetectionService objectDetectionService;
-
-    // private IArtefactSlot slotDetected;
+    private readonly HoldProgressUI holdProgressUI;
+    private const float HOLD_DURATION = 0.5f;
+    private bool isHoldingUI = false;
 
     [Inject]
-    public ArtefactManager(InspectService inspectService, ToolService toolServic, AssemblyService assemblyService, ObjectDetectionService objectDetectionService)
+    public ArtefactManager(ToolService toolService, AssemblyService assemblyService, HoldProgressUI holdProgressUI)
     {
-        this.inspectService = inspectService;
         this.assemblyService = assemblyService;
-        this.toolService = toolServic;
-        // this.objectDetectionService = objectDetectionService;
+        this.toolService = toolService;
+        this.holdProgressUI = holdProgressUI;
     }
 
     public void Initialize()
     {
-        // objectDetectionService.OnInteractDetected += HandleInteractDetected;
-
         InteractionEvents.OnHoldPerformed += HandleHoldPerformed;
         InteractionEvents.OnHoldCompleted += HandleHoldCompleted;
         InteractionEvents.OnHoldCanceled += HandleHoldCanceled;
@@ -36,8 +32,6 @@ public class ArtefactManager : IInitializable, IDisposable
 
     public void Dispose()
     {
-        // objectDetectionService.OnInteractDetected += HandleInteractDetected;
-
         InteractionEvents.OnHoldPerformed -= HandleHoldPerformed;
         InteractionEvents.OnHoldCompleted -= HandleHoldCompleted;
         InteractionEvents.OnHoldCanceled -= HandleHoldCanceled;
@@ -46,24 +40,11 @@ public class ArtefactManager : IInitializable, IDisposable
         InteractionEvents.OnDragPerformed -= HandleDragPerformed;
         InteractionEvents.OnDragEnded -= HandleDragEnded;
     }
-    // private void HandleInteractDetected(IInteractObject interact)
-    // {
-    //     if (interact is IArtefactSlot slot)
-    //     {
-    //         slotDetected = slot;
-    //     }
-    //     else
-    //     {
-    //         slotDetected = null;
-    //     }
-    // }
 
     private void HandleDragStarted(IInteractObject interact, Vector3 worldPos)
     {
         if (interact is IDragObject drag) { drag.OnDragStarted(worldPos); }
-        // if (interact is IInteractObject interactObject) interactObject.SetColliderEnable(false);
     }
-
     private void HandleDragPerformed(IInteractObject interact, Vector3 worldPos)
     {
         if (interact is IDragObject drag) { drag.OnDragPerformed(worldPos); }
@@ -90,17 +71,54 @@ public class ArtefactManager : IInitializable, IDisposable
         }
     }
 
-    private void HandleHoldPerformed(IInteractObject interact, float obj) { }
-
-    private void HandleHoldCompleted(IInteractObject interact)
+    private void HandleHoldPerformed(IInteractObject interact, float holdTime, Vector2 position)
     {
         if (toolService.IsOnToolMode) return;
+
+        if (!isHoldingUI)
+        {
+            ShowHoldProgress(interact as IArtefactPart, position);
+        }
+
+        float normalized = Mathf.Clamp01(holdTime / HOLD_DURATION);
+        UpdateHoldProgress(interact as IArtefactPart, normalized, position);
+    }
+
+    private void HandleHoldCompleted(IInteractObject interact, Vector2 position)
+    {
+        HideHoldProgress(interact as IArtefactPart);
+
+        isHoldingUI = false;
+
+        if (toolService.IsOnToolMode) return;
+
         if (interact is IArtefactPart part)
         {
             assemblyService.Detach(part);
-            return;
         }
     }
 
-    private void HandleHoldCanceled(IInteractObject interact) { }
+    private void HandleHoldCanceled(IInteractObject interact, Vector2 position)
+    {
+        HideHoldProgress(interact as IArtefactPart);
+        isHoldingUI = false;
+    }
+
+    private void ShowHoldProgress(IArtefactPart part, Vector2 position)
+    {
+        if (part.CurrentState != ArtefactPieceState.Assembled) return;
+        holdProgressUI.Show(position);
+    }
+
+    private void UpdateHoldProgress(IArtefactPart part, float normalized, Vector2 position)
+    {
+        if (part.CurrentState != ArtefactPieceState.Assembled) return;
+        holdProgressUI.UpdateProgress(normalized, position);
+    }
+
+    private void HideHoldProgress(IArtefactPart part)
+    {
+        if (part.CurrentState != ArtefactPieceState.Assembled) return;
+        holdProgressUI.Hide();
+    }
 }

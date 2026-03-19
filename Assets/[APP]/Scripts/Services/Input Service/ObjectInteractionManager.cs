@@ -128,31 +128,31 @@ public class ObjectInteractionManager : IInitializable, IDisposable
         InteractionEvents.OnDragEnded?.Invoke(currentInteract, worldPos);
     }
 
-    private void HandleHoldPerformed(float obj)
+    private void HandleHoldPerformed(float val, Vector2 position)
     {
         if (cleaningService.isCleaning) return;
         if (currentInteract == null) return;
         currentState = GestureState.InteractingWithObject;
-        InteractionEvents.OnHoldPerformed?.Invoke(currentInteract, obj);
+        InteractionEvents.OnHoldPerformed?.Invoke(currentInteract, val, position);
         // Debug.Log("object interaction hold performed");
     }
 
-    private void HandleHoldCompleted()
+    private void HandleHoldCompleted(Vector2 position)
     {
         if (cleaningService.isCleaning) return;
         if (currentInteract == null) return;
         currentState = GestureState.InteractingWithObject;
-        InteractionEvents.OnHoldCompleted?.Invoke(currentInteract);
+        InteractionEvents.OnHoldCompleted?.Invoke(currentInteract, position);
         // Debug.Log("object interaction hold completed");
 
     }
 
-    private void HandleHoldCanceled()
+    private void HandleHoldCanceled(Vector2 position)
     {
         if (cleaningService.isCleaning) return;
         if (currentInteract == null) return;
         currentState = GestureState.Idle;
-        InteractionEvents.OnHoldCanceled?.Invoke(currentInteract);
+        InteractionEvents.OnHoldCanceled?.Invoke(currentInteract, position);
         // Debug.Log("object interaction hold canceled");
 
     }

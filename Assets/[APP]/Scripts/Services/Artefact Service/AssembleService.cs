@@ -8,13 +8,15 @@ using VContainer.Unity;
 public class AssemblyService : IInitializable, IDisposable
 {
     private readonly Inspection inspectPoint;
+    private readonly FragmentService fragmentService;
     private readonly List<IArtefactPart> currentAssembleList = new();
     private float socketSnapDistance = 1f;
 
     [Inject]
-    public AssemblyService(Inspection inspectPoint)
+    public AssemblyService(Inspection inspectPoint, FragmentService fragmentService)
     {
         this.inspectPoint = inspectPoint;
+        this.fragmentService = fragmentService;
     }
 
     public void Initialize()
@@ -60,6 +62,7 @@ public class AssemblyService : IInitializable, IDisposable
 
             HideAllSockets();
             inspectPoint.SetInspectionUsage(true);
+            fragmentService.ProgressUpdate();
             return true;
         }
         else
@@ -86,10 +89,11 @@ public class AssemblyService : IInitializable, IDisposable
 
                 HideAllSockets();
                 inspectPoint.SetInspectionUsage(true);
+                fragmentService.ProgressUpdate();
                 return true;
             }
         }
-
+        fragmentService.ProgressUpdate();
         return false;
     }
 
@@ -105,11 +109,13 @@ public class AssemblyService : IInitializable, IDisposable
 
             part.GetTransform().SetParent(null);
             part.OnDetached();
+            fragmentService.ProgressUpdate();
             currentAssembleList.Remove(part);
         }
         if (currentAssembleList.Count == 0)
         {
             inspectPoint.ResetPosition();
+            fragmentService.ProgressUpdate();
             inspectPoint.SetInspectionUsage(false);
         }
     }

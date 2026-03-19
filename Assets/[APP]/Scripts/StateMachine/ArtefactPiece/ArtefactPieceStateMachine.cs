@@ -51,6 +51,7 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
 
     //=== IAssemble ===
     public string PieceId => pieceId;
+    public ArtefactPieceState CurrentState => state;
     public ConnectionSocket GetAvailableSocketFor(string id)
     {
         return sockets.Find(s => s.targetPieceId == id && !s.isOccupied);

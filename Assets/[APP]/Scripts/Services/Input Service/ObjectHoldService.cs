@@ -19,9 +19,9 @@ public class ObjectHoldService : IInitializable, IDisposable, ITickable
     private const float HOLD_DURATION = .5f;
     private const float MOVE_TOLERANCE = 5f;
 
-    public event Action<float> OnHoldPerformed;
-    public event Action OnHoldCompleted;
-    public event Action OnHoldCanceled;
+    public event Action<float, Vector2> OnHoldPerformed;
+    public event Action<Vector2> OnHoldCompleted;
+    public event Action<Vector2> OnHoldCanceled;
 
     [Inject]
     public ObjectHoldService(InputSystemService inputSystemService)
@@ -64,12 +64,12 @@ public class ObjectHoldService : IInitializable, IDisposable, ITickable
 
         float holdTime = heldTime - HOLD_DELAY;
 
-        OnHoldPerformed?.Invoke(holdTime);
+        OnHoldPerformed?.Invoke(holdTime, inputSystemService.GetMousePosition());
         // Debug.Log("holding " + holdTime);
 
         if (holdTime >= HOLD_DURATION)
         {
-            OnHoldCompleted?.Invoke();
+            OnHoldCompleted?.Invoke(inputSystemService.GetMousePosition());
             CancelHold();
         }
     }
@@ -102,6 +102,6 @@ public class ObjectHoldService : IInitializable, IDisposable, ITickable
         isPressing = false;
         isHolding = false;
 
-        OnHoldCanceled?.Invoke();
+        OnHoldCanceled?.Invoke(inputSystemService.GetMousePosition());
     }
 }

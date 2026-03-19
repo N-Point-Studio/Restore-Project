@@ -4,7 +4,7 @@ using System;
 
 public class Inspection : MonoBehaviour
 {
-    public float rotateSpeed = 0.5f;
+    public float rotateSpeed = 1f;
     public float zoomSpeed = 0.02f;
     public float smoothTime = 0.1f;
 
@@ -66,7 +66,6 @@ public class Inspection : MonoBehaviour
         GameplayUIManager.OnGameWrapped -= HandleGameWrapped;
     }
 
-
     void Update()
     {
         transform.position = Vector3.SmoothDamp(
@@ -85,11 +84,20 @@ public class Inspection : MonoBehaviour
 
     public void OnRotatePerformed(Vector2 delta)
     {
-        float rotateY = -delta.x * rotateSpeed;
-        float rotateX = delta.y * rotateSpeed;
+        if (_mainCamera == null) return;
 
-        transform.Rotate(Vector3.up, rotateY, Space.World);
-        transform.Rotate(Vector3.right, rotateX, Space.World);
+        float rotateY = -delta.x;
+        float rotateX = delta.y;
+
+        // axis dari camera
+        Vector3 cameraRight = _mainCamera.transform.right;
+        Vector3 cameraUp = _mainCamera.transform.up;
+
+        // rotate horizontal (kiri kanan)
+        transform.Rotate(cameraUp, rotateY, Space.World);
+
+        // rotate vertical (atas bawah)
+        transform.Rotate(cameraRight, rotateX, Space.World);
     }
 
     public void OnZoomPerformed(float zoomDelta)

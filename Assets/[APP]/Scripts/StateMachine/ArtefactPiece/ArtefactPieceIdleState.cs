@@ -44,7 +44,7 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IDragObject, IInsp
 
     public ConnectionSocket GetAvailableSocketFor(string id) => stateMachine.GetAvailableSocketFor(id);
     public void ReleaseSocketWith(string otherId) { }
-
+    public ArtefactPieceState CurrentState => stateMachine.state;
     public void OnAssembled(Transform targetTransform)
     {
         stateMachine.SwitchState(new ArtefactPieceMoveState(stateMachine, targetTransform, ArtefactPieceState.Assembled));
