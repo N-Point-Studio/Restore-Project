@@ -10,7 +10,7 @@ public class GameplayManager : IInitializable, IDisposable
     private readonly PlayerProgressionData playerProgressionData;
     private readonly SceneLoader sceneLoader;
     private ActiveArtefactData activeArtefactData;
-    private ArtefactData artefact;
+    private ArtefactData artefactData;
 
     [Inject]
     public GameplayManager(PlayerProgressionData playerProgressionData, ActiveArtefactData activeArtefactData, SceneLoader sceneLoader)
@@ -69,7 +69,7 @@ public class GameplayManager : IInitializable, IDisposable
             string targetId = playerProgressionData.CurrentActiveArtefactId;
             if (!string.IsNullOrEmpty(targetId))
             {
-                // artefactData = activeArtefactData.GetArtefactDatabase().GetArtefactData(targetId);
+                artefactData = activeArtefactData.GetArtefactDatabase().GetArtefactData(targetId);
             }
             else
             {
