@@ -21,8 +21,8 @@ public class GameplayUIManager : MonoBehaviour
     private Dictionary<ProgressType, ProgressBarUI> progressMap;
     private CleaningService cleaningService;
     private FragmentService fragmentService;
-
-    public event Action OnGameFinished;
+    public static event Action OnGameWrapped;
+    public static event Action OnGameFinished;
 
     [Inject]
     public void Construct(CleaningService cleaningService, FragmentService fragmentService)
@@ -76,6 +76,7 @@ public class GameplayUIManager : MonoBehaviour
         toolCamera.gameObject.SetActive(false);
         mainCanvas.SetActive(false);
         endgameCanvas.SetActive(true);
+        OnGameWrapped?.Invoke();
     }
 
     private void OnFinishedGame()

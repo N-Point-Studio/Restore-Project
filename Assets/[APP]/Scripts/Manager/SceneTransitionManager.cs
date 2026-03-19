@@ -318,7 +318,7 @@ public class SceneTransitionManager : MonoBehaviour
 
         if (useEasyTransition)
         {
-            
+
         }
         else
         {
@@ -1636,12 +1636,12 @@ public class SceneTransitionManager : MonoBehaviour
     /// </summary>
     private void CleanupSceneManagersGently()
     {
-        // Clean up GamePlayManager (but not its transition coroutines)
-        if (GamePlayManager.Instance != null)
+        // Clean up GamePlayManagerOld (but not its transition coroutines)
+        if (GamePlayManagerOld.Instance != null)
         {
-            // Don't stop ALL coroutines - GamePlayManager might still need transition coroutines
+            // Don't stop ALL coroutines - GamePlayManagerOld might still need transition coroutines
             // Instead, just mark it as scene unloading
-            var gamePlayManager = GamePlayManager.Instance;
+            var gamePlayManager = GamePlayManagerOld.Instance;
             var isSceneUnloadingField = gamePlayManager.GetType().GetField("isSceneUnloading",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             if (isSceneUnloadingField != null)
@@ -1726,10 +1726,10 @@ public class SceneTransitionManager : MonoBehaviour
     /// </summary>
     private void CleanupSceneManagers()
     {
-        // Clean up GamePlayManager if it exists
-        if (GamePlayManager.Instance != null)
+        // Clean up GamePlayManagerOld if it exists
+        if (GamePlayManagerOld.Instance != null)
         {
-            GamePlayManager.Instance.StopAllCoroutines();
+            GamePlayManagerOld.Instance.StopAllCoroutines();
         }
 
         // Clean up UIManager if it exists

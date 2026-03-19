@@ -63,7 +63,7 @@ public class GameLoader : MonoBehaviour
             UIManager.Instance != null &&
             CleanManager.Instance != null &&
             AssembleManager.Instance != null &&
-            GamePlayManager.Instance != null &&
+            GamePlayManagerOld.Instance != null &&
             TouchManager.Instance != null
         );
 
@@ -74,7 +74,7 @@ public class GameLoader : MonoBehaviour
         CleanupPreviousFragments();
 
         // Reset gameplay session state
-        GamePlayManager.Instance?.ResetSession();
+        GamePlayManagerOld.Instance?.ResetSession();
 
         // Spawn artefact fragments
         LoadArtefact();
@@ -126,7 +126,7 @@ public class GameLoader : MonoBehaviour
         Vector3 position = artefactData.FinishTransform.Position;
 
         Quaternion rotation = Quaternion.Euler(eulerAngles);
-        GamePlayManager.Instance.SetFinishedRotationAndRotation(rotation, position);
+        GamePlayManagerOld.Instance.SetFinishedRotationAndRotation(rotation, position);
 
         AssembleManager.Instance.ShowingAssembleProgress();
     }
