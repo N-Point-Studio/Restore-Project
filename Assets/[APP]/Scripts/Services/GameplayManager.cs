@@ -69,7 +69,7 @@ public class GameplayManager : IInitializable, IDisposable
             string targetId = playerProgressionData.CurrentActiveArtefactId;
             if (!string.IsNullOrEmpty(targetId))
             {
-                artefactData = activeArtefactData.GetArtefactDatabase().GetArtefactData(targetId);
+                // artefactData = activeArtefactData.GetArtefactDatabase().GetArtefactData(targetId);
             }
             else
             {
