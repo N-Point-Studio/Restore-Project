@@ -63,7 +63,7 @@ public class GameLoader : MonoBehaviour
             UIManager.Instance != null &&
             CleanManager.Instance != null &&
             AssembleManager.Instance != null &&
-            GamePlayManager.Instance != null &&
+            GamePlayManagerOld.Instance != null &&
             TouchManager.Instance != null
         );
 
@@ -74,7 +74,7 @@ public class GameLoader : MonoBehaviour
         CleanupPreviousFragments();
 
         // Reset gameplay session state
-        GamePlayManager.Instance?.ResetSession();
+        GamePlayManagerOld.Instance?.ResetSession();
 
         // Spawn artefact fragments
         LoadArtefact();
@@ -91,44 +91,44 @@ public class GameLoader : MonoBehaviour
 
     public void LoadArtefact()
     {
-        if (artefactData == null)
-        {
-            Debug.LogError("No Artefact assigned to GameLoader!");
-            return;
-        }
+        // if (artefactData == null)
+        // {
+        //     Debug.LogError("No Artefact assigned to GameLoader!");
+        //     return;
+        // }
 
-        AssembleManager.Instance.assemblyTargets.Clear();
-        foreach (var fragData in artefactData.ArtefactFragmentDatas)
-        {
-            if (fragData.SpawnTransform.Position == null)
-            {
-                Debug.LogWarning("Fragment " + fragData.Prefab.name + " has no correct position assigned.");
-                GameObject spawned = Instantiate(fragData.Prefab);
-                spawnedFragments.Add(spawned);
-            }
-            else
-            {
-                Debug.Log("Spawning Fragment: " + fragData.Prefab.name);
-                GameObject spawned = Instantiate(fragData.Prefab);
-                spawnedFragments.Add(spawned);
+        // AssembleManager.Instance.assemblyTargets.Clear();
+        // foreach (var fragData in artefactData.ArtefactFragmentDatas)
+        // {
+        //     if (fragData.CorrectTransform.Position == null)
+        //     {
+        //         Debug.LogWarning("Fragment " + fragData.Prefab.name + " has no correct position assigned.");
+        //         GameObject spawned = Instantiate(fragData.Prefab);
+        //         spawnedFragments.Add(spawned);
+        //     }
+        //     else
+        //     {
+        //         Debug.Log("Spawning Fragment: " + fragData.Prefab.name);
+        //         GameObject spawned = Instantiate(fragData.Prefab);
+        //         spawnedFragments.Add(spawned);
 
-                FragmentStateMachine fragmentSM = spawned.GetComponent<FragmentStateMachine>();
+        //         FragmentStateMachine fragmentSM = spawned.GetComponent<FragmentStateMachine>();
 
-                AssemblyTarget newTarget = new AssemblyTarget(fragmentSM, fragData.SpawnTransform);
+        //         AssemblyTarget newTarget = new AssemblyTarget(fragmentSM, fragData.CorrectTransform);
 
-                AssembleManager.Instance.assemblyTargets.Add(newTarget);
-            }
-        }
+        //         AssembleManager.Instance.assemblyTargets.Add(newTarget);
+        //     }
+        // }
 
-        UIManager.Instance.SetArtefactName(artefactData.BaseData.ItemName);
+        // UIManager.Instance.SetArtefactName(artefactData.BaseData.ItemName);
 
         // Vector3 eulerAngles = artefactData.FinishTransform.Rotation;
         // Vector3 position = artefactData.FinishTransform.Position;
 
         // Quaternion rotation = Quaternion.Euler(eulerAngles);
-        // GamePlayManager.Instance.SetFinishedRotationAndRotation(rotation, position);
+        // GamePlayManagerOld.Instance.SetFinishedRotationAndRotation(rotation, position);
 
-        AssembleManager.Instance.ShowingAssembleProgress();
+        // AssembleManager.Instance.ShowingAssembleProgress();
     }
 
     private ArtefactData GetArtefactForType(ObjectType type)
