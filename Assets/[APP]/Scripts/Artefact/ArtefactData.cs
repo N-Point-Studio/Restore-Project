@@ -7,8 +7,18 @@ public class ArtefactData : ScriptableObject
     [SerializeField] private BaseData baseData;
     public BaseData BaseData => baseData;
 
-    [SerializeField] private Sprite completedIcon;
-    public Sprite CompletedIcon => completedIcon;
+    [Header("Story / Journal Data")]
+    [SerializeField] private StickyNoteData[] stickyNotes;
+    public StickyNoteData[] StickyNotes => stickyNotes;
+
+    [Header("Journal Content (Prefabs)")]
+    [Tooltip("Desain UI halaman kiri pas belum direstorasi (Sticky notes, doodle, dll)")]
+    [SerializeField] private JournalPageAnimator preRestorationPagePrefab;
+    public JournalPageAnimator PreRestorationPagePrefab => preRestorationPagePrefab;
+
+    [Tooltip("Desain UI halaman kanan setelah beres direstorasi (Sketsa, info detail, dll)")]
+    [SerializeField] private JournalPageAnimator postRestorationPagePrefab;
+    public JournalPageAnimator PostRestorationPagePrefab => postRestorationPagePrefab;
 
     [SerializeField] private bool unlockedByDefault;
     public bool UnlockedByDefault => unlockedByDefault;
@@ -16,17 +26,11 @@ public class ArtefactData : ScriptableObject
     [SerializeField] private ArtefactData[] unlockRequirements;
     public ArtefactData[] UnlockRequirements => unlockRequirements;
 
-    [SerializeField] private ArtefactOrigin artefactOrigin;
-    public ArtefactOrigin ArtefactOrigin => artefactOrigin;
-
     [SerializeField] private ToolType allowedToolTypes;
     public ToolType AllowedToolTypes => allowedToolTypes;
 
     [SerializeField] private List<ArtefactFragmentData> artefactFragmentDatas;
     public List<ArtefactFragmentData> ArtefactFragmentDatas => artefactFragmentDatas;
-
-    [SerializeField] private CustomTransform finishTransform;
-    public CustomTransform FinishTransform => finishTransform;
 
     private string artefactGroupId;
     public string ArtefactGroupId => artefactGroupId;
@@ -45,8 +49,8 @@ public struct ArtefactFragmentData
     [SerializeField] private GameObject prefab;
     public GameObject Prefab => prefab;
 
-    [SerializeField] private CustomTransform correctTransform;
-    public CustomTransform CorrectTransform => correctTransform;
+    [SerializeField] private CustomTransform spawnTransform;
+    public CustomTransform SpawnTransform => spawnTransform;
 }
 
 [System.Serializable]
@@ -59,9 +63,10 @@ public struct CustomTransform
     public Vector3 Position => position;
 }
 
-public enum ArtefactOrigin
+[System.Serializable]
+public struct StickyNoteData
 {
-    China,
-    Indonesia,
-    Egypt
+    [TextArea(3, 5)]
+    public string NoteText;
+    public Sprite NoteImage;
 }

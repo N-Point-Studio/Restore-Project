@@ -8,129 +8,165 @@ public class ArtefactDetailController : MonoBehaviour
     [Header("Main References")]
     [SerializeField] private GameObject root;
     [SerializeField] private CanvasGroup canvasGroupRoot;
-    [SerializeField] private Sprite defaultBgSprite;
-    [SerializeField] private Image imageBg;
-    [SerializeField] private Button buttonClean;
-    [SerializeField] private ButtonItemUI buttonBack;
+    [SerializeField] private Button buttonBack;
+    
+    [Header("Sub-Controllers")]
+    [SerializeField] private JournalController journalController; 
+    
+    [Header("Text Wall (Post-Restoration)")]
+    [SerializeField] private CanvasGroup wallTextGroup; 
+    [SerializeField] private TMP_Text wallTitleText;
+    [SerializeField] private TMP_Text wallDescText;
+    [SerializeField] private Button buttonReplay;
+    [SerializeField] private Button buttonContinueStory;
 
-    [Header("Restore Panel")]
-    [SerializeField] private GameObject panelRestore;
-    [SerializeField] private Image imageIconRestore;
-    [SerializeField] private RectTransform imageIconRectRestore;
-    [SerializeField] private TMP_Text textTitle;
-    [SerializeField] private TMP_Text textDescription;
-    [SerializeField] private TMP_Text textFooter;
-
-    [Header("Unrestore Panel")]
-    [SerializeField] private GameObject panelUnrestore;
-    [SerializeField] private Image imageIconUnrestore;
-    [SerializeField] private RectTransform imageIconRectUnrestore;
-
-    [Header("Settings")]
-    [SerializeField] private float fadeDuration;
+    [Header("Text Instructions")]
+    [SerializeField] private TMP_Text instructionText; 
 
     private ArtefactData currentArtefactData;
-
-    public RectTransform TargetIconRectRestore => imageIconRectRestore;
-    public RectTransform TargetIconRectUnrestore => imageIconRectUnrestore;
+    private Artefact3DItem current3DItem; 
+    private ActiveArtefactData activeArtefactData;
+    private bool isCompleted;
+    
+    private bool isBookOpen = false; 
 
     private void Awake()
     {
-        buttonBack.OnClick += OnClickBack;
-        buttonClean.onClick.AddListener(OnClickClean);
+        buttonBack.onClick.AddListener(OnBackClicked);
+        buttonReplay.onClick.AddListener(OnReplayClicked);
+        buttonContinueStory.onClick.AddListener(OnContinueStoryClicked);
         root.SetActive(false);
+        
+        StickyNote3DItem.OnNotePeeled += HandleNotePeeled;
     }
 
     private void OnDestroy()
     {
-        if (buttonBack) buttonBack.OnClick -= OnClickBack;
-        if (buttonClean) buttonClean.onClick.RemoveListener(OnClickClean);
-        transform.DOKill();
+        buttonBack.onClick.RemoveListener(OnBackClicked);
+        buttonReplay.onClick.RemoveListener(OnReplayClicked);
+        buttonContinueStory.onClick.RemoveListener(OnContinueStoryClicked);
+        StickyNote3DItem.OnNotePeeled -= HandleNotePeeled;
     }
 
-    public void OpenDetail(ArtefactData artefactData, Sprite bgSprite, bool isCompleted)
+    public void OpenDetail(ArtefactData artefactData, ActiveArtefactData activeData, Artefact3DItem item3D)
     {
         currentArtefactData = artefactData;
-
-        imageBg.sprite = bgSprite != null ? bgSprite : defaultBgSprite;
-
-        if (currentArtefactData == null) return;
+        activeArtefactData = activeData;
+        current3DItem = item3D;
+        isCompleted = activeArtefactData.IsArtefactCompleted(currentArtefactData.BaseData.Id);
         
-        panelRestore.SetActive(isCompleted);
-        panelUnrestore.SetActive(!isCompleted);
+        wallTextGroup.alpha = 0;
+        wallTextGroup.gameObject.SetActive(false);
+
+        root.SetActive(true);
+        canvasGroupRoot.alpha = 1;
 
         if (isCompleted)
         {
-            imageIconRestore.sprite = currentArtefactData.CompletedIcon;
-            textTitle.text = currentArtefactData.BaseData.ItemName;
-            textDescription.text = currentArtefactData.BaseData.ItemDescription;
-            textFooter.text = $"Code: {currentArtefactData.BaseData.Id}\nConserved by Nova";
+            // POST-RESTORATION FLOW
+            instructionText.gameObject.SetActive(false);
+            isBookOpen = true; // Book opens directly in the center of the screen
+            journalController.ShowPostRestoration(currentArtefactData, OnJournalContinueClicked);
         }
         else
         {
-            imageIconUnrestore.sprite = currentArtefactData.BaseData.ItemIcon;
+            // FLOW PRE-RESTORATION
+            bool isStoryRead = activeArtefactData.IsStoryRead(currentArtefactData.BaseData.Id);
+            
+            if (isStoryRead)
+            {
+                // Story has been read before, book just peeks from below
+                instructionText.gameObject.SetActive(true);
+                instructionText.text = "Open the box and start restore...";
+                isBookOpen = false; 
+                journalController.HideBookToPeek();
+            }
+            else
+            {
+                // First time clicking, book is still hidden
+                instructionText.gameObject.SetActive(true);
+                instructionText.text = "Peel off the sticky note...";
+                isBookOpen = false;
+                journalController.HideBookCompletely();
+            }
         }
+    }
 
-        HideContentInstant();
+    private void HandleNotePeeled(StickyNote3DItem peeledNote)
+    {
+        if (current3DItem != null) current3DItem.SetDetailMode(true, notesRemaining: false);
+        activeArtefactData.MarkStoryRead(currentArtefactData.BaseData.Id);
+        instructionText.gameObject.SetActive(false);
+        
+        isBookOpen = true; // Because peeling note triggers book to open to center
+        journalController.ShowPreRestoration(currentArtefactData, OnJournalRestoreClicked);
+    }
 
-        root.SetActive(true);
+    private void OnJournalRestoreClicked()
+    {
+        MainMenuEvents.TriggerArtefactPlay(currentArtefactData);
+    }
+
+    private void OnJournalContinueClicked()
+    {
+        isBookOpen = false; // Because book goes down (peeking)
+        journalController.HideBookToPeek();
+        
+        wallTitleText.text = currentArtefactData.BaseData.ItemName;
+        wallDescText.text = currentArtefactData.BaseData.ItemDescription;
+        
+        wallTextGroup.gameObject.SetActive(true);
+        wallTextGroup.DOFade(1, 0.5f);
+    }
+
+    // --- NEW BACK BUTTON LOGIC ---
+    private void OnBackClicked()
+    {
+        if (isBookOpen)
+        {
+            // IF BOOK IS OPEN (FORWARD): Back button will collapse book downwards
+            isBookOpen = false;
+            journalController.HideBookToPeek();
+
+            if (isCompleted)
+            {
+                // If restoration is done, show text on the wall
+                wallTitleText.text = currentArtefactData.BaseData.ItemName;
+                wallDescText.text = currentArtefactData.BaseData.ItemDescription;
+                wallTextGroup.gameObject.SetActive(true);
+                wallTextGroup.DOFade(1, 0.5f);
+            }
+            else
+            {
+                // If not done, show instruction text to click box
+                instructionText.gameObject.SetActive(true);
+                instructionText.text = "Open the box and start restore...";
+            }
+        }
+        else
+        {
+            // IF BOOK IS PEEKING/HIDDEN: Back button really exits Detail Mode
+            if (current3DItem != null) current3DItem.SetDetailMode(false, false);
+            CloseDetail();
+            MainMenuEvents.TriggerCloseArtefactDetail();
+        }
+    }
+
+    private void OnReplayClicked()
+    {
+        MainMenuEvents.TriggerArtefactPlay(currentArtefactData);
+    }
+
+    private void OnContinueStoryClicked()
+    {
+        // Exit from detail mode
+        if (current3DItem != null) current3DItem.SetDetailMode(false, false);
+        CloseDetail();
+        MainMenuEvents.TriggerCloseArtefactDetail();
     }
 
     public void CloseDetail()
     {
-        if (canvasGroupRoot != null)
-        {
-            canvasGroupRoot.DOFade(0f, 0.3f).OnComplete(() =>
-            {
-                root.SetActive(false);
-                canvasGroupRoot.alpha = 1f;
-            });
-        }
-        else
-        {
-            root.SetActive(false);
-        }
-    }
-
-    public void HideContentInstant()
-    {
-        if (canvasGroupRoot)
-        {
-            canvasGroupRoot.alpha = 0f;
-            canvasGroupRoot.blocksRaycasts = false;
-        }
-
-        if (imageBg) SetAlpha(imageBg, 0f);
-        if (imageIconRestore) SetAlpha(imageIconRestore, 0f);
-    }
-
-    public void ShowContentFadeIn()
-    {
-        Sequence seq = DOTween.Sequence();
-
-        if (canvasGroupRoot) canvasGroupRoot.blocksRaycasts = true;
-
-        if (imageBg) seq.Join(imageBg.DOFade(1f, fadeDuration));
-        if (imageIconRestore) seq.Join(imageIconRestore.DOFade(1f, fadeDuration));
-        if (canvasGroupRoot) seq.Join(canvasGroupRoot.DOFade(1f, fadeDuration));
-    }
-
-    private void SetAlpha(Graphic graphic, float alpha)
-    {
-        if (graphic == null) return;
-        Color c = graphic.color;
-        c.a = alpha;
-        graphic.color = c;
-    }
-
-    private void OnClickBack()
-    {
-        MainMenuEvents.TriggerCloseArtefactDetail();
-    }
-
-    private void OnClickClean()
-    {
-        if (currentArtefactData == null) return;
-        MainMenuEvents.TriggerArtefactPlay(currentArtefactData);
+        canvasGroupRoot.DOFade(0f, 0.3f).OnComplete(() => root.SetActive(false));
     }
 }

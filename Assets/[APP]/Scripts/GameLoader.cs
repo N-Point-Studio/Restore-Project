@@ -63,7 +63,7 @@ public class GameLoader : MonoBehaviour
             UIManager.Instance != null &&
             CleanManager.Instance != null &&
             AssembleManager.Instance != null &&
-            GamePlayManagerOld.Instance != null &&
+            GamePlayManager.Instance != null &&
             TouchManager.Instance != null
         );
 
@@ -74,7 +74,7 @@ public class GameLoader : MonoBehaviour
         CleanupPreviousFragments();
 
         // Reset gameplay session state
-        GamePlayManagerOld.Instance?.ResetSession();
+        GamePlayManager.Instance?.ResetSession();
 
         // Spawn artefact fragments
         LoadArtefact();
@@ -100,7 +100,7 @@ public class GameLoader : MonoBehaviour
         AssembleManager.Instance.assemblyTargets.Clear();
         foreach (var fragData in artefactData.ArtefactFragmentDatas)
         {
-            if (fragData.CorrectTransform.Position == null)
+            if (fragData.SpawnTransform.Position == null)
             {
                 Debug.LogWarning("Fragment " + fragData.Prefab.name + " has no correct position assigned.");
                 GameObject spawned = Instantiate(fragData.Prefab);
@@ -114,7 +114,7 @@ public class GameLoader : MonoBehaviour
 
                 FragmentStateMachine fragmentSM = spawned.GetComponent<FragmentStateMachine>();
 
-                AssemblyTarget newTarget = new AssemblyTarget(fragmentSM, fragData.CorrectTransform);
+                AssemblyTarget newTarget = new AssemblyTarget(fragmentSM, fragData.SpawnTransform);
 
                 AssembleManager.Instance.assemblyTargets.Add(newTarget);
             }
@@ -122,11 +122,11 @@ public class GameLoader : MonoBehaviour
 
         UIManager.Instance.SetArtefactName(artefactData.BaseData.ItemName);
 
-        Vector3 eulerAngles = artefactData.FinishTransform.Rotation;
-        Vector3 position = artefactData.FinishTransform.Position;
+        // Vector3 eulerAngles = artefactData.FinishTransform.Rotation;
+        // Vector3 position = artefactData.FinishTransform.Position;
 
-        Quaternion rotation = Quaternion.Euler(eulerAngles);
-        GamePlayManagerOld.Instance.SetFinishedRotationAndRotation(rotation, position);
+        // Quaternion rotation = Quaternion.Euler(eulerAngles);
+        // GamePlayManager.Instance.SetFinishedRotationAndRotation(rotation, position);
 
         AssembleManager.Instance.ShowingAssembleProgress();
     }

@@ -1,0 +1,17 @@
+using VContainer;
+using VContainer.Unity;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class SplashLifetimeScope : LifetimeScope
+{
+    [SerializeField] private string targetScene;
+    [SerializeField] private CanvasGroup canvasGroup;
+    [SerializeField] private Image splashImage;
+    [SerializeField] private Sprite[] splashSprites;
+
+    protected override void Configure(IContainerBuilder builder)
+    {   
+        builder.RegisterEntryPoint<SplashService>(Lifetime.Scoped).AsSelf().WithParameter(targetScene).WithParameter(canvasGroup).WithParameter(splashSprites).WithParameter(splashImage);
+    }
+}

@@ -5,12 +5,15 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/[APP]/Scenes/MainMenu.unity
-    guid: 8edb89efc75514e0681d819b4d04d664
   - enabled: 1
-    path: Assets/[APP]/Scenes/AssembleRework.unity
-    guid: f940ff4bcedff427abbeb54fb0084f89
+    path: Assets/[APP]/Scenes/Splash.unity
+    guid: 485d3c13e9a42b7458565b0f6390b823
+  - enabled: 1
+    path: Assets/[APP]/Scenes/MainMenu_New.unity
+    guid: 4b10fafa62532f543b50bdcd7abf03f1
+  - enabled: 1
+    path: Assets/[APP]/Scenes/AssembleReworkNew.unity
+    guid: 32a4806ab8314451e953848fe277e80e
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

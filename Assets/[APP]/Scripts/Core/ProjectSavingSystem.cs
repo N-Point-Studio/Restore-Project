@@ -1,151 +1,103 @@
 using Modules.SavingSystems;
-using SimpleJSON;
-using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-using System.Collections.Generic;
 using Modules;
+using System;
 
-public class ProjectSavingSystem : SavingSystem, IStartable, ITickable
+public class ProjectSavingSystem : SavingSystem, IInitializable, IStartable, IDisposable, ITickable
 {
     [Inject] protected readonly ActiveArtefactData activeArtefactData;
     [Inject] protected readonly ActiveSettingsData activeSettingsData;
-
-    // Player progress tracking
-    private bool hasPlayedBefore;
-    private HashSet<int> shownTutorials = new HashSet<int>();
-    
-    /// <summary>
-    /// Whether the player has ever launched gameplay before (used for first-time flows / tutorials).
-    /// </summary>
-    public bool HasPlayedBefore => hasPlayedBefore;
+    [Inject] protected readonly PlayerProgressionData playerProgressionData;
 
     public int MaxSlot => 6;
 
     private int progress;
     private bool isSaving;
     private bool isLoading;
-    private System.Action onFinished;
+    private Action onFinished;
 
-    /// <summary>
-    /// Marks that the player has completed their first play session. Idempotent.
-    /// </summary>
-    public void MarkAsPlayed()
+    void IInitializable.Initialize()
     {
-        hasPlayedBefore = true;
+        playerProgressionData.OnUpdated += HandleDataChanged;
+        activeArtefactData.OnUpdated += HandleDataChanged;
     }
 
-    /// <summary>
-    /// Checks if a specific tutorial has been shown before.
-    /// </summary>
-    public bool HasTutorialShown(int tutorialId)
+    void IDisposable.Dispose()
     {
-        return shownTutorials.Contains(tutorialId);
+        playerProgressionData.OnUpdated -= HandleDataChanged;
+        activeArtefactData.OnUpdated -= HandleDataChanged;
     }
 
-    /// <summary>
-    /// Marks a specific tutorial as shown. Idempotent.
-    /// </summary>
-    public void MarkTutorialShown(int tutorialId)
+    private void HandleDataChanged()
     {
-        shownTutorials.Add(tutorialId);
+        SaveAll();
     }
 
-    /// <summary>
-    /// Clears all runtime data and initializes to default state.
-    /// Call this when starting a new game.
-    /// </summary>
-    public void ClearPreviousData()
+    void IStartable.Start()
     {
-        activeArtefactData.Initialize();
-        hasPlayedBefore = false;
-        shownTutorials.Clear();
+        LoadAll(0, () => 
+        {
+            AppLogger.Log("[ProjectSavingSystem] Semua data save berhasil dimuat pada saat startup!");
+        });
     }
 
-    /// <summary>
-    /// Saves all game state to the specified slot.
-    /// </summary>
-    public void SaveAll(int slot = 0, System.Action onFinished = null)
+    public void SaveAll(int slot = 0, Action onFinished = null)
     {
         isSaving = true;
         this.onFinished = onFinished;
-        progress = 2; // Number of things we're saving (activeArtefactData + player progress)
+        progress = 3; 
 
         try
         {
             SaveToFile($"{slot}/{nameof(activeArtefactData)}", activeArtefactData.AsJSON(), () => progress--);
             SaveToFile($"{slot}/{nameof(activeSettingsData)}", activeSettingsData.AsJSON(), () => progress--);
-                
-            // Save player progress (hasPlayedBefore, etc.)
-            JSONNode playerProgressNode = new JSONObject();
-            playerProgressNode["hasPlayedBefore"] = hasPlayedBefore;
-            JSONArray tutorialsArray = new JSONArray();
-            foreach (int id in shownTutorials)
-            {
-                tutorialsArray.Add(id);
-            }
-            playerProgressNode["shownTutorials"] = tutorialsArray;
-
-            SaveToFile($"{slot}/PlayerProgress", playerProgressNode, () => progress--);
+            SaveToFile($"{slot}/{nameof(playerProgressionData)}", playerProgressionData.AsJSON(), () => progress--);
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             AppLogger.LogError($"Error while saving data: {e}");
             isSaving = false;
         }
     }
 
-    /// <summary>
-    /// Loads all game state from the specified slot.
-    /// </summary>
-    public void LoadAll(int slot = 0, System.Action onFinished = null)
+    public void LoadAll(int slot = 0, Action onFinished = null)
     {
         isLoading = true;
         this.onFinished = onFinished;
-        progress = 2; // Number of things we're loading (activeArtefactData + player progress)
+        progress = 3; 
 
         try
         {
-            LoadFromFile($"{slot}/{nameof(activeArtefactData)}", result => { 
-                    if (result != null && !result.IsNull)
-                    {
-                        activeArtefactData.LoadFromJSON(result);
-                    }
-                    progress--; 
-                });
+            LoadFromFile($"{slot}/{nameof(activeArtefactData)}", result => 
+            { 
+                if (result != null && !result.IsNull) 
+                {
+                    activeArtefactData.LoadFromJSON(result); 
+                }
+                else 
+                {
+                    activeArtefactData.Initialize(); 
+                }
+                progress--; 
+            });
 
-                
-            LoadFromFile($"{slot}/{nameof(activeSettingsData)}", result => { activeSettingsData.LoadFromJSON(result); progress--; });
-                
-            // Load player progress
-            LoadFromFile($"{slot}/PlayerProgress", 
-                result => { 
-                    if (result != null && !result.IsNull)
-                    {
-                        hasPlayedBefore = result["hasPlayedBefore"].AsBool;
-                        shownTutorials.Clear();
-                        if (result["shownTutorials"] != null)
-                        {
-                            JSONArray tutorialsArray = result["shownTutorials"].AsArray;
-                            foreach (JSONNode node in tutorialsArray)
-                            {
-                                shownTutorials.Add(node.AsInt);
-                            }
-                        }
-                    }
-                    progress--; 
-                });
+            LoadFromFile($"{slot}/{nameof(activeSettingsData)}", result => 
+            { 
+                if (result != null && !result.IsNull) activeSettingsData.LoadFromJSON(result); 
+                progress--; 
+            });
+            LoadFromFile($"{slot}/{nameof(playerProgressionData)}", result => 
+            { 
+                if (result != null && !result.IsNull) playerProgressionData.LoadFromJSON(result); 
+                progress--; 
+            });
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             AppLogger.LogError($"Error while loading data: {e}");
             isLoading = false;
         }
-    }
-
-    void IStartable.Start()
-    {
-        // Initialize on startup if needed
     }
 
     void ITickable.Tick()
@@ -155,7 +107,7 @@ public class ProjectSavingSystem : SavingSystem, IStartable, ITickable
 
     private void CheckCompletion()
     {
-        if ((isSaving || isLoading) && progress == 0)
+        if ((isSaving || isLoading) && progress <= 0)
         {
             onFinished?.Invoke();
             isSaving = false;
