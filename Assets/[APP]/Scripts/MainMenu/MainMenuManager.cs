@@ -9,6 +9,7 @@ public class MainMenuManager : MonoBehaviour
     [Header("Sub-Controller")]
     [SerializeField] private MenuController menuController;
     [SerializeField] private LevelSelectionController levelSelectionController;
+    [SerializeField] private BackgroundController backgroundController;
 
     [Header("Scene Configuration")]
     [SerializeField] private string splashSceneName = "Splash";
@@ -42,6 +43,10 @@ public class MainMenuManager : MonoBehaviour
         MainMenuEvents.OnNewGame += OnRequestNewGameGame;
         MainMenuEvents.OnContinueGame += OnRequestContinueGame;
         MainMenuEvents.OnCloseLevelSelection += OnRequestCloseLevelSelection;
+        MainMenuEvents.OnCameraFocusToArtefact += OnRequestCameraFocusArtefact;
+        MainMenuEvents.OnCloseArtefactDetail += OnRequestCloseArtefactDetail;
+
+        backgroundController.SetActive(false);
     }
 
     private void Start()
@@ -78,7 +83,9 @@ public class MainMenuManager : MonoBehaviour
     {
         MainMenuEvents.OnNewGame -= OnRequestNewGameGame;
         MainMenuEvents.OnContinueGame -= OnRequestContinueGame;   
-        MainMenuEvents.OnCloseLevelSelection -= OnRequestCloseLevelSelection;     
+        MainMenuEvents.OnCloseLevelSelection -= OnRequestCloseLevelSelection;   
+        MainMenuEvents.OnCameraFocusToArtefact -= OnRequestCameraFocusArtefact;  
+        MainMenuEvents.OnCloseArtefactDetail -= OnRequestCloseArtefactDetail;
     }
 
     private void OnRequestNewGameGame()
@@ -132,5 +139,15 @@ public class MainMenuManager : MonoBehaviour
     {
         menuController.SetActive(true);
         menuController.RefreshButtonVisibility();
+    }
+
+    private void OnRequestCameraFocusArtefact(Transform transform)
+    {
+        backgroundController.SetActive(true);
+    }
+
+    private void OnRequestCloseArtefactDetail()
+    {
+        backgroundController.SetActive(false);
     }
 }

@@ -20,6 +20,7 @@ public class LevelSelectionController : BaseMenuController
     private ActiveArtefactData activeArtefactData;
     private PlayerProgressionData playerProgressionData;
     private SceneLoader sceneLoader;
+    private Artefact3DItem clickedItem;
 
     [Inject]
     public void Construct(
@@ -159,7 +160,7 @@ public class LevelSelectionController : BaseMenuController
     private void OnRequestArtefactDetail(ArtefactData data)
     {        
         backButtonItemUI.gameObject.SetActive(false);
-        Artefact3DItem clickedItem = Array.Find(artefact3DItems, x => x != null && x.ArtefactId == data.BaseData.Id);
+        clickedItem = Array.Find(artefact3DItems, x => x != null && x.ArtefactId == data.BaseData.Id);
 
         if (clickedItem == null)
         {
@@ -185,9 +186,9 @@ public class LevelSelectionController : BaseMenuController
 
         for (int i = 0; i < artefact3DItems.Length; i++)
         {
-            if (artefact3DItems[i] != null)
+            if (artefact3DItems[i] != null && artefact3DItems[i] != clickedItem)
             {
-                artefact3DItems[i].gameObject.SetActive(true);
+                artefact3DItems[i].SetVisibility(false);
             }
         }
     }

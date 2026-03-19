@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using DG.Tweening;
+using TMPro;
 
 public class JournalPageAnimator : MonoBehaviour
 {
@@ -8,6 +9,8 @@ public class JournalPageAnimator : MonoBehaviour
     [SerializeField] private float delayBetweenElements = 0.5f;
     [SerializeField] private float fadeDuration = 0.4f;
 
+    [Header("UI Text References")]
+    [SerializeField] private TMP_Text[] uiNoteTexts;
     public void PlayRevealAnimation(System.Action onComplete = null)
     {
         StartCoroutine(RevealSequence(onComplete));
@@ -44,6 +47,19 @@ public class JournalPageAnimator : MonoBehaviour
                     element.alpha = 1f;
                     element.transform.localScale = Vector3.one;
                 }
+            }
+        }
+    }
+
+    public void InjectTexts(string[] textsFromSSoT)
+    {
+        if (uiNoteTexts == null || textsFromSSoT == null) return;
+
+        for (int i = 0; i < uiNoteTexts.Length; i++)
+        {
+            if (i < textsFromSSoT.Length && uiNoteTexts[i] != null)
+            {
+                uiNoteTexts[i].text = textsFromSSoT[i];
             }
         }
     }

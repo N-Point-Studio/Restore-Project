@@ -8,15 +8,13 @@ public class ArtefactData : ScriptableObject
     public BaseData BaseData => baseData;
 
     [Header("Story / Journal Data")]
-    [SerializeField] private StickyNoteData[] stickyNotes;
-    public StickyNoteData[] StickyNotes => stickyNotes;
+    [TextArea(2, 4)]
+    [SerializeField] private string[] stickyNoteTexts;
+    public string[] StickyNoteTexts => stickyNoteTexts;
 
     [Header("Journal Content (Prefabs)")]
-    [Tooltip("Desain UI halaman kiri pas belum direstorasi (Sticky notes, doodle, dll)")]
     [SerializeField] private JournalPageAnimator preRestorationPagePrefab;
     public JournalPageAnimator PreRestorationPagePrefab => preRestorationPagePrefab;
-
-    [Tooltip("Desain UI halaman kanan setelah beres direstorasi (Sketsa, info detail, dll)")]
     [SerializeField] private JournalPageAnimator postRestorationPagePrefab;
     public JournalPageAnimator PostRestorationPagePrefab => postRestorationPagePrefab;
 
@@ -61,12 +59,4 @@ public struct CustomTransform
 
     [SerializeField] private Vector3 position;
     public Vector3 Position => position;
-}
-
-[System.Serializable]
-public struct StickyNoteData
-{
-    [TextArea(3, 5)]
-    public string NoteText;
-    public Sprite NoteImage;
 }

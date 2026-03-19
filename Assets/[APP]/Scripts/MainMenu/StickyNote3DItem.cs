@@ -1,46 +1,50 @@
 using System;
 using UnityEngine;
-using TMPro; 
+using TMPro;
 
 [RequireComponent(typeof(Collider))]
 public class StickyNote3DItem : MonoBehaviour
 {
-    [SerializeField] private Outline outline;
-    [SerializeField] private string label;
-    [SerializeField] private TMP_Text text3D; 
+    [Header("Visuals")]
+    [Range(0f, 1f)]
+    [SerializeField] private float hoverOpacity = 0.7f;
+    [SerializeField] private TMP_Text text3D;
+    
+    private SpriteRenderer spriteRenderer;
+    private Color originalColor;
     
     public static Action<StickyNote3DItem> OnNotePeeled;
 
     private void Awake()
     {
-        if (outline == null) outline = GetComponent<Outline>();
-        if (outline != null) outline.enabled = false;
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        originalColor = spriteRenderer.color;
+    }
+
+    public void Initialize(string noteText)
+    {
+        if (text3D != null) text3D.text = noteText;
+        
+        spriteRenderer.color = originalColor;
+        gameObject.SetActive(true);
     }
 
     private void OnMouseEnter()
     {
-        if (outline != null) outline.enabled = true;
+        Color hoverColor = originalColor;
+        hoverColor.a = hoverOpacity;
+        spriteRenderer.color = hoverColor;
     }
 
     private void OnMouseExit()
     {
-        if (outline != null) outline.enabled = false;
+        spriteRenderer.color = originalColor;
     }
 
     private void OnMouseDown()
     {
-        if (outline != null) outline.enabled = false;
+        spriteRenderer.color = originalColor;
         gameObject.SetActive(false);
         OnNotePeeled?.Invoke(this);
     }
-
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        if (text3D != null && !string.IsNullOrEmpty(label))
-        {
-            text3D.text = label;
-        }
-    }
-#endif
 }

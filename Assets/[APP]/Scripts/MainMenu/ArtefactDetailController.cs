@@ -65,8 +65,10 @@ public class ArtefactDetailController : MonoBehaviour
         {
             // POST-RESTORATION FLOW
             instructionText.gameObject.SetActive(false);
-            isBookOpen = true; // Book opens directly in the center of the screen
-            journalController.ShowPostRestoration(currentArtefactData, OnJournalContinueClicked);
+            isBookOpen = true; 
+            
+            // ---> MENGGUNAKAN SETUP BUKAN SHOW <---
+            journalController.SetupPostRestoration(currentArtefactData, OnJournalContinueClicked);
         }
         else
         {
@@ -79,6 +81,9 @@ public class ArtefactDetailController : MonoBehaviour
                 instructionText.gameObject.SetActive(true);
                 instructionText.text = "Open the box and start restore...";
                 isBookOpen = false; 
+                
+                // ---> MENGGUNAKAN SETUP BUKAN SHOW <---
+                journalController.SetupPreRestoration(currentArtefactData, OnJournalRestoreClicked);
                 journalController.HideBookToPeek();
             }
             else
@@ -87,6 +92,9 @@ public class ArtefactDetailController : MonoBehaviour
                 instructionText.gameObject.SetActive(true);
                 instructionText.text = "Peel off the sticky note...";
                 isBookOpen = false;
+                
+                // ---> MENGGUNAKAN SETUP BUKAN SHOW <---
+                journalController.SetupPreRestoration(currentArtefactData, OnJournalRestoreClicked);
                 journalController.HideBookCompletely();
             }
         }
@@ -98,8 +106,10 @@ public class ArtefactDetailController : MonoBehaviour
         activeArtefactData.MarkStoryRead(currentArtefactData.BaseData.Id);
         instructionText.gameObject.SetActive(false);
         
-        isBookOpen = true; // Because peeling note triggers book to open to center
-        journalController.ShowPreRestoration(currentArtefactData, OnJournalRestoreClicked);
+        isBookOpen = true; 
+        
+        // ---> MENGGUNAKAN SETUP BUKAN SHOW <---
+        journalController.SetupPreRestoration(currentArtefactData, OnJournalRestoreClicked);
     }
 
     private void OnJournalRestoreClicked()
