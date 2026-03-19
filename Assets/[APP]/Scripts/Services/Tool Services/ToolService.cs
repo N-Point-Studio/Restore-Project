@@ -11,6 +11,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
     private readonly CleaningService cleaningService;
     private ITool currentTool;
     public bool isCleaning;
+    public bool isFinished = false;
 
     [Inject]
     public ToolService(InputSystemService inputSystemService, ObjectDetectionService objectDetectionService,
@@ -26,16 +27,21 @@ public class ToolService : IInitializable, IDisposable, ITickable
     {
         InteractionEvents.OnPressStarted += HandlePressStarted;
         InteractionEvents.OnPressEnded += HandlePressEnded;
+
+        GameplayUIManager.OnGameWrapped += HandleGameWrapped;
     }
 
     public void Dispose()
     {
         InteractionEvents.OnPressStarted -= HandlePressStarted;
         InteractionEvents.OnPressEnded -= HandlePressEnded;
+
+        GameplayUIManager.OnGameWrapped += HandleGameWrapped;
     }
 
     private void HandlePressStarted(IInteractObject interact)
     {
+        if (isFinished) return;
         if (interact is not ITool)
         {
             if (surfaceDetectionService.HasHit)
@@ -59,6 +65,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
     private void HandlePressEnded(IInteractObject interact)
     {
+        if (isFinished) return;
         if (interact is ITool tool)
         {
             if (currentTool != tool)
@@ -117,6 +124,11 @@ public class ToolService : IInitializable, IDisposable, ITickable
             }
 
         }
+    }
+
+    private void HandleGameWrapped()
+    {
+        currentTool?.Return();
     }
 
     public bool IsOnToolMode => GetCurrentTool() != null;

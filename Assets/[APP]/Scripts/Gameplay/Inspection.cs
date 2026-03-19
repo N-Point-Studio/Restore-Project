@@ -1,5 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
+using System;
 
 public class Inspection : MonoBehaviour
 {
@@ -21,6 +22,7 @@ public class Inspection : MonoBehaviour
 
     public Transform assemblyRoot;
     private bool isContain = false;
+    private bool isGameFinished = false;
 
     public Transform GetAssemblyRoot()
     {
@@ -53,13 +55,17 @@ public class Inspection : MonoBehaviour
             _mainCamera.transform.position,
             transform.position
         );
+
+        GameplayUIManager.OnGameWrapped += HandleGameWrapped;
     }
 
     void OnDisable()
     {
         InteractionEvents.OnRotatePerformed -= OnRotatePerformed;
         InteractionEvents.OnZoomPerformed -= OnZoomPerformed;
+        GameplayUIManager.OnGameWrapped -= HandleGameWrapped;
     }
+
 
     void Update()
     {
@@ -69,6 +75,12 @@ public class Inspection : MonoBehaviour
             ref _zoomVelocity,
             smoothTime
         );
+    }
+
+    private void HandleGameWrapped()
+    {
+        isGameFinished = true;
+        FinishPosition();
     }
 
     public void OnRotatePerformed(Vector2 delta)
@@ -82,7 +94,7 @@ public class Inspection : MonoBehaviour
 
     public void OnZoomPerformed(float zoomDelta)
     {
-        if (!isContain) return;
+        if (!isContain || isGameFinished) return;
         if (_mainCamera == null) _mainCamera = Camera.main;
 
         Vector3 direction = (_targetPosition - _mainCamera.transform.position).normalized;
@@ -93,16 +105,24 @@ public class Inspection : MonoBehaviour
         );
 
         float targetDistance = currentDistance + (zoomDelta * zoomSpeed);
-
-        // clamp antara zoom in dan posisi awal
         targetDistance = Mathf.Clamp(targetDistance, minDistance, _initialDistance);
-
         _targetPosition = _mainCamera.transform.position + direction * targetDistance;
     }
 
     public void ResetPosition()
     {
         transform.SetPositionAndRotation(InitialInspectPosition, InitialInspectRotation);
+        _targetPosition = InitialInspectPosition;
+        _zoomVelocity = Vector3.zero;
+    }
+
+    public void FinishPosition()
+    {
+        isGameFinished = true;
+
+        transform.DOKill();
+        transform.DOMove(InitialInspectPosition, 1f).SetEase(Ease.OutBack);
+        transform.DORotateQuaternion(InitialInspectRotation, 1f).SetEase(Ease.OutBack);
 
         _targetPosition = InitialInspectPosition;
         _zoomVelocity = Vector3.zero;

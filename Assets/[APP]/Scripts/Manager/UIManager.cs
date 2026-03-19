@@ -412,15 +412,15 @@ public class UIManager : MonoBehaviour
     {
         Debug.Log("=== FINISH BUTTON CLICKED ===");
 
-        // Check if GamePlayManager exists
-        if (GamePlayManager.Instance != null)
+        // Check if GamePlayManagerOld exists
+        if (GamePlayManagerOld.Instance != null)
         {
-            // Trigger the finish button functionality in GamePlayManager
-            GamePlayManager.Instance.TriggerFinishButton();
+            // Trigger the finish button functionality in GamePlayManagerOld
+            GamePlayManagerOld.Instance.TriggerFinishButton();
         }
         else
         {
-            Debug.LogWarning("GamePlayManager.Instance not found! Trying alternative transition...");
+            Debug.LogWarning("GamePlayManagerOld.Instance not found! Trying alternative transition...");
 
             // FALLBACK: Try to trigger scene transition directly via SceneTransitionManager
             if (SceneTransitionManager.Instance != null)

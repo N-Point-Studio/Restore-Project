@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Mathematics;
 
-public class GamePlayManager : MonoBehaviour
+public class GamePlayManagerOld : MonoBehaviour
 {
-    public static GamePlayManager Instance;
+    public static GamePlayManagerOld Instance;
 
     [SerializeField] GameObject Environment;
     [SerializeField] Transform ClearInspect;
@@ -77,7 +77,7 @@ public class GamePlayManager : MonoBehaviour
 
         if (enableDebugLogs && Time.time >= nextDebugLogTime)
         {
-            Debug.Log($"[GamePlayManager] Progress value: {UIManager.Instance.GetAllProgressValue()}");
+            Debug.Log($"[GamePlayManagerOld] Progress value: {UIManager.Instance.GetAllProgressValue()}");
             nextDebugLogTime = Time.time + debugLogInterval;
         }
         FinishedGame();
@@ -222,7 +222,7 @@ public class GamePlayManager : MonoBehaviour
             TouchManager.Instance.DisableAllTouch(false);
         }
 
-        Debug.Log("[GamePlayManager] Session reset.");
+        Debug.Log("[GamePlayManagerOld] Session reset.");
     }
 
     /// <summary>
@@ -285,7 +285,7 @@ public class GamePlayManager : MonoBehaviour
         else
         {
             SceneTransitionManager.Instance.MarkReturningFromGameplay();
-            SceneTransitionManager.Instance.TransitionToMainSceneWithContentSwitcher(objectType, targetScene, "GamePlayManager");
+            SceneTransitionManager.Instance.TransitionToMainSceneWithContentSwitcher(objectType, targetScene, "GamePlayManagerOld");
         }
     }
 
