@@ -68,7 +68,11 @@ public class GameplayUIManager : MonoBehaviour
 
     private void HandleSurfaceCleaningUpdate(float progress) => UpdateProgress(ProgressType.Dust, progress);
     private void HandleHardCleaningUpdate(float progress) => UpdateProgress(ProgressType.Mud, progress);
-    private void HandleProgressUpdate(float progress) => UpdateProgress(ProgressType.Assemble, progress);
+    private void HandleProgressUpdate(float progress)
+    {
+        Debug.Log("Assemble harusnya");
+        UpdateProgress(ProgressType.Assemble, progress);
+    }
 
     private void OnButtonWrapUpClick()
     {

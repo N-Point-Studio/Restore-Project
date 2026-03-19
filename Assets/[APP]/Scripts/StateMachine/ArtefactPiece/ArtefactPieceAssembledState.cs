@@ -18,6 +18,8 @@ public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IArtefactPart
     public override void Tick(float deltaTime) { }
     public override void Exit() { }
 
+    public ArtefactPieceState CurrentState => stateMachine.state;
+
     public ConnectionSocket GetAvailableSocketFor(string id) => stateMachine.GetAvailableSocketFor(id);
 
     public void ReleaseSocketWith(string otherId) => stateMachine.ReleaseSocketWith(otherId);
