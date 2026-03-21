@@ -18,6 +18,7 @@ public class GameplayManager : IInitializable, IDisposable
         this.playerProgressionData = playerProgressionData;
         this.activeArtefactData = activeArtefactData;
         this.sceneLoader = sceneLoader;
+        InitializeSession();
     }
 
     public void Initialize()
@@ -55,13 +56,13 @@ public class GameplayManager : IInitializable, IDisposable
         if (!string.IsNullOrEmpty(currentArtefactId))
         {
             activeArtefactData.CompleteArtefact(currentArtefactId);
-            AppLogger.Log($"[Manager] Artefact{currentArtefactId} has been completed");
+            AppLogger.Log($"[Gameplay Manager] Artefact{currentArtefactId} has been completed");
         }
     }
 
     public void StartSceneTransition()
     {
-        Debug.Log($"[Manager] Back to menu using SceneLoader...");
+        AppLogger.Log($"[Gameplay Manager] Back to menu using SceneLoader...");
 
         _ = sceneLoader.LoadSceneAsync(TARGET_SCENE, LoadingType.Camera, 1.0f);
     }
@@ -76,10 +77,11 @@ public class GameplayManager : IInitializable, IDisposable
             if (!string.IsNullOrEmpty(targetId))
             {
                 artefactData = activeArtefactData.GetArtefactDatabase().GetItem(targetId);
+                AppLogger.Log($"[Gameplay Manager] Artefact:{artefactData.BaseData.Id} Loaded!");
             }
             else
             {
-                AppLogger.LogWarning("[GameLoader] Empty artefact ID!");
+                AppLogger.LogWarning("[Gameplay Manager] Empty artefact ID!");
             }
         }
         // LoadArtefact();

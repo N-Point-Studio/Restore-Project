@@ -40,7 +40,7 @@ public class SplashService : IStartable
         // Fallback: If any references are empty, directly load main menu to prevent the game from getting stuck
         if (canvasGroup == null || splashImage == null || splashSprites == null || splashSprites.Length == 0)
         {
-            Debug.LogWarning("[SplashService] UI references are incomplete. Skipping Splash animation.");
+            AppLogger.LogWarning("[SplashService] UI references are incomplete. Skipping Splash animation.");
             await LoadNextScene();
             return;
         }

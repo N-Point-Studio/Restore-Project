@@ -43,6 +43,13 @@ public class LevelSelectionController : BaseMenuController
         backButtonItemUI.OnClick += OnBackButtonClick;
     }
 
+    protected override void Start()
+    {
+        base.Start();
+        RefreshUI();        
+        SetArtefactsInteractable(false);
+    }
+
     protected override void OnDestroy()
     {
         base.OnDestroy();
@@ -57,21 +64,36 @@ public class LevelSelectionController : BaseMenuController
     {
         RefreshUI();
         SetActive(true);
+        SetArtefactsInteractable(true);
         MainMenuEvents.TriggerCameraToLevelSelection();
     }
 
     public void CloseLevelSelection()
     {
         SetActive(false);
+        SetArtefactsInteractable(false);
     }
     
     public void OpenLevelSelectionAndPlayAnimations()
     {
         RefreshUI();
         SetActive(true);
+        SetArtefactsInteractable(true);
         MainMenuEvents.TriggerCameraToLevelSelection();
         
         StartCoroutine(PlayPendingAnimationsSequence());
+    }
+
+    private void SetArtefactsInteractable(bool active)
+    {
+        if (artefact3DItems == null) return;
+        for (int i = 0; i < artefact3DItems.Length; i++)
+        {
+            if (artefact3DItems[i] != null)
+            {
+                artefact3DItems[i].SetSelectionModeActive(active);
+            }
+        }
     }
 
     public void RefreshUI()
@@ -171,7 +193,8 @@ public class LevelSelectionController : BaseMenuController
         {
             if (artefact3DItems[i] != null && artefact3DItems[i] != clickedItem)
             {
-                artefact3DItems[i].gameObject.SetActive(false);
+                artefact3DItems[i].SetVisibility(false);
+                artefact3DItems[i].ShowPedestal(false);
             }
         }
 
@@ -189,6 +212,7 @@ public class LevelSelectionController : BaseMenuController
             if (artefact3DItems[i] != null && artefact3DItems[i] != clickedItem)
             {
                 artefact3DItems[i].SetVisibility(false);
+                artefact3DItems[i].ShowPedestal(true);
             }
         }
     }

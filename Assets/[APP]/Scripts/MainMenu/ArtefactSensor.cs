@@ -1,7 +1,8 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Collider))]
-public class ArtefactSensor : MonoBehaviour
+public class ArtefactSensor : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     [SerializeField] private Outline outline; 
     public bool isBoxObject; 
@@ -19,7 +20,7 @@ public class ArtefactSensor : MonoBehaviour
         brain = boss;
     }
 
-    private void OnMouseEnter()
+    public void OnPointerEnter(PointerEventData eventData)
     {
         if (brain != null && brain.CanInteract(isBoxObject))
         {
@@ -27,12 +28,12 @@ public class ArtefactSensor : MonoBehaviour
         }
     }
 
-    private void OnMouseExit()
+    public void OnPointerExit(PointerEventData eventData)
     {
         if (outline != null) outline.enabled = false;
     }
 
-    private void OnMouseDown()
+    public void OnPointerClick(PointerEventData eventData)
     {
         if (brain != null && brain.CanInteract(isBoxObject))
         {
