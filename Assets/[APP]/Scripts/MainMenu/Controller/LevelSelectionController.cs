@@ -128,7 +128,7 @@ public class LevelSelectionController : BaseMenuController
 
                 AppLogger.Log($"[Animation] Playing REVEAL animation for {data.artefactId}");
                 
-                // targetItem.PlayCompletionAnimation();
+                targetItem.PlayCompletionAnimation();
                 
                 yield return new WaitForSeconds(2.0f); 
             }
@@ -155,7 +155,7 @@ public class LevelSelectionController : BaseMenuController
 
                 AppLogger.Log($"[Animation] Playing UNLOCK animation for {data.artefactId}");
                 
-                // targetItem.PlayUnlockAnimation();
+                targetItem.PlayUnlockAnimation();
                 
                 yield return new WaitForSeconds(1.5f); 
             }

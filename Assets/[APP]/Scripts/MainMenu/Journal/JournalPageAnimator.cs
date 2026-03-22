@@ -25,6 +25,7 @@ public class PageElement
 public class JournalPageAnimator : MonoBehaviour
 {
     [Header("Animation Sequence")]
+    [SerializeField] private float initialDelay = 0.5f;
     [SerializeField] private PageElement[] sequenceElements;
     [SerializeField] private float delayBetweenElements = 0.5f;
     [SerializeField] private float fadeDuration = 0.4f;
@@ -39,6 +40,28 @@ public class JournalPageAnimator : MonoBehaviour
     {
         if (sequenceElements != null)
         {
+            foreach (var element in sequenceElements)
+            {
+                if (element == null || element.canvasGroup == null) continue;
+
+                element.canvasGroup.alpha = 0f;
+
+                if (element.revealStyle == RevealStyle.FadeAndPop)
+                    element.canvasGroup.transform.localScale = Vector3.one * 0.9f;
+                else if (element.revealStyle == RevealStyle.Typewriter && element.textComponent != null)
+                    element.textComponent.maxVisibleCharacters = 0;
+                else if (element.revealStyle == RevealStyle.Scribble && element.imageComponent != null)
+                    element.imageComponent.fillAmount = 0f;
+            }
+        }
+
+        if (initialDelay > 0)
+        {
+            yield return new WaitForSeconds(initialDelay); 
+        }
+
+        if (sequenceElements != null)
+        {
             for (int i = 0; i < sequenceElements.Length; i++)
             {
                 PageElement element = sequenceElements[i];
@@ -49,16 +72,13 @@ public class JournalPageAnimator : MonoBehaviour
                 switch (element.revealStyle)
                 {
                     case RevealStyle.FadeAndPop:
-                        element.canvasGroup.transform.localScale = Vector3.one * 0.9f;
                         element.canvasGroup.transform.DOScale(1f, fadeDuration).SetEase(Ease.OutBack);
                         break;
 
                     case RevealStyle.Typewriter:
                         if (element.textComponent != null)
                         {
-                            element.textComponent.maxVisibleCharacters = 0;
                             int totalChars = element.textComponent.text.Length;
-                            
                             DOTween.To(() => element.textComponent.maxVisibleCharacters, 
                                        x => element.textComponent.maxVisibleCharacters = x, 
                                        totalChars, 
@@ -70,7 +90,6 @@ public class JournalPageAnimator : MonoBehaviour
                     case RevealStyle.Scribble:
                         if (element.imageComponent != null)
                         {
-                            element.imageComponent.fillAmount = 0f;
                             element.imageComponent.DOFillAmount(1f, fadeDuration * 1.5f).SetEase(Ease.InOutQuad);
                         }
                         break;

@@ -1,4 +1,5 @@
 using DG.Tweening;
+using MoreMountains.Feedbacks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,6 +23,9 @@ public class ArtefactDetailController : MonoBehaviour
 
     [Header("Text Instructions")]
     [SerializeField] private TMP_Text instructionText; 
+
+    [Header("Feedbacks")]
+    [SerializeField] private MMF_Player wallTextRevealFeedback;
 
     private ArtefactData currentArtefactData;
     private Artefact3DItem current3DItem; 
@@ -131,7 +135,15 @@ public class ArtefactDetailController : MonoBehaviour
         wallDescText.text = currentArtefactData.BaseData.ItemDescription;
         
         wallTextGroup.gameObject.SetActive(true);
-        wallTextGroup.DOFade(1, 0.5f);
+
+        if (wallTextRevealFeedback != null)
+        {
+            wallTextRevealFeedback.PlayFeedbacks();
+        }
+        else
+        {
+            wallTextGroup.DOFade(1, 0.5f);
+        }
     }
 
     private void OnBackClicked()

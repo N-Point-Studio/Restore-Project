@@ -1,3 +1,4 @@
+using MoreMountains.Feedbacks;
 using UnityEngine;
 
 public class Artefact3DItem : MonoBehaviour
@@ -18,6 +19,10 @@ public class Artefact3DItem : MonoBehaviour
 
     [Header("Environment")]
     [SerializeField] private GameObject assignedPedestal;
+
+    [Header("Feedbacks")]
+    [SerializeField] private MMF_Player unlockFeedback;
+    [SerializeField] private MMF_Player completionFeedback;
 
     private ArtefactData artefactData;
     private bool isInteractable = false;
@@ -156,5 +161,24 @@ public class Artefact3DItem : MonoBehaviour
         {
             boxTransform.gameObject.SetActive(isVisible);
         }
+    }
+
+    public void PlayUnlockAnimation()
+    {
+        if (boxTransform != null) boxTransform.localScale = Vector3.zero;
+
+        if (unlockFeedback != null) unlockFeedback.PlayFeedbacks();
+    }
+
+    public void PlayCompletionAnimation()
+    {
+        if (artefactTransform != null) 
+        {
+            artefactTransform.gameObject.SetActive(true);
+            artefactTransform.localScale = Vector3.zero; 
+        }
+        if (boxTransform != null) boxTransform.gameObject.SetActive(false);
+        
+        if (completionFeedback != null) completionFeedback.PlayFeedbacks();
     }
 }
