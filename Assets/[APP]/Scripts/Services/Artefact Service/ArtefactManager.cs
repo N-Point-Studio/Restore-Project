@@ -10,6 +10,7 @@ public class ArtefactManager : IInitializable, IDisposable
     private readonly HoldProgressUI holdProgressUI;
     private const float HOLD_DURATION = 0.5f;
     private bool isHoldingUI = false;
+    private bool isGameFinished = false;
 
     [Inject]
     public ArtefactManager(ToolService toolService, AssemblyService assemblyService, HoldProgressUI holdProgressUI)
@@ -28,6 +29,8 @@ public class ArtefactManager : IInitializable, IDisposable
         InteractionEvents.OnDragStarted += HandleDragStarted;
         InteractionEvents.OnDragPerformed += HandleDragPerformed;
         InteractionEvents.OnDragEnded += HandleDragEnded;
+
+        GameplayUIManager.OnGameWrapped += HandleGameWrapped;
     }
 
     public void Dispose()
@@ -39,12 +42,20 @@ public class ArtefactManager : IInitializable, IDisposable
         InteractionEvents.OnDragStarted -= HandleDragStarted;
         InteractionEvents.OnDragPerformed -= HandleDragPerformed;
         InteractionEvents.OnDragEnded -= HandleDragEnded;
+
+        GameplayUIManager.OnGameWrapped -= HandleGameWrapped;
+    }
+
+    private void HandleGameWrapped()
+    {
+        isGameFinished = true;
     }
 
     private void HandleDragStarted(IInteractObject interact, Vector3 worldPos)
     {
         if (interact is IDragObject drag) { drag.OnDragStarted(worldPos); }
     }
+
     private void HandleDragPerformed(IInteractObject interact, Vector3 worldPos)
     {
         if (interact is IDragObject drag) { drag.OnDragPerformed(worldPos); }
@@ -73,7 +84,7 @@ public class ArtefactManager : IInitializable, IDisposable
 
     private void HandleHoldPerformed(IInteractObject interact, float holdTime, Vector2 position)
     {
-        if (toolService.IsOnToolMode) return;
+        if (toolService.IsOnToolMode || isGameFinished) return;
 
         if (!isHoldingUI)
         {
@@ -86,11 +97,10 @@ public class ArtefactManager : IInitializable, IDisposable
 
     private void HandleHoldCompleted(IInteractObject interact, Vector2 position)
     {
+        if (toolService.IsOnToolMode || isGameFinished) return;
+
         HideHoldProgress(interact as IArtefactPart);
-
         isHoldingUI = false;
-
-        if (toolService.IsOnToolMode) return;
 
         if (interact is IArtefactPart part)
         {
@@ -100,6 +110,7 @@ public class ArtefactManager : IInitializable, IDisposable
 
     private void HandleHoldCanceled(IInteractObject interact, Vector2 position)
     {
+        if (toolService.IsOnToolMode || isGameFinished) return;
         HideHoldProgress(interact as IArtefactPart);
         isHoldingUI = false;
     }
