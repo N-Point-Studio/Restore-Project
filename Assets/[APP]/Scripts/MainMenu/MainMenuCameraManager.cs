@@ -6,10 +6,10 @@ public class MainMenuCameraManager : MonoBehaviour
 {
     [Header("Cinemachine Cameras")]
     [Tooltip("Camera when in the initial Main Menu")]
-    [SerializeField] private GameObject vcamMainMenu;
+    [SerializeField] private CinemachineCamera vcamMainMenu;
     
     [Tooltip("Overview camera when selecting level/artefact")]
-    [SerializeField] private GameObject vcamLevelSelection;
+    [SerializeField] private CinemachineCamera vcamLevelSelection;
     
     [Tooltip("Detail camera that will zoom to a specific artefact")]
     [SerializeField] private CinemachineCamera vcamArtefactDetail;
@@ -35,16 +35,16 @@ public class MainMenuCameraManager : MonoBehaviour
 
     private void SetCameraToMainMenu()
     {
-        vcamMainMenu.SetActive(true);
-        vcamLevelSelection.SetActive(false);
-        vcamArtefactDetail.gameObject.SetActive(false);
+        vcamMainMenu.Priority = 10;
+        vcamLevelSelection.Priority = 0;
+        vcamArtefactDetail.Priority = 0;
     }
 
     private void SetCameraToLevelSelection()
     {
-        vcamMainMenu.SetActive(false);
-        vcamLevelSelection.SetActive(true);
-        vcamArtefactDetail.gameObject.SetActive(false);
+        vcamMainMenu.Priority = 0;
+        vcamLevelSelection.Priority = 10;
+        vcamArtefactDetail.Priority = 0;
     }
 
     private void SetCameraToArtefact(Transform target)
@@ -55,8 +55,8 @@ public class MainMenuCameraManager : MonoBehaviour
             vcamArtefactDetail.LookAt = target;
         }
 
-        vcamMainMenu.SetActive(false);
-        vcamLevelSelection.SetActive(false);
-        vcamArtefactDetail.gameObject.SetActive(true);
+        vcamMainMenu.Priority = 0;
+        vcamLevelSelection.Priority = 0;
+        vcamArtefactDetail.Priority = 10;
     }
 }

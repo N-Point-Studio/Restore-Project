@@ -3,118 +3,244 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using MoreMountains.Feedbacks;
+
+public enum JournalState { Hidden, Peeking, Opened }
 
 public class JournalController : MonoBehaviour
 {
-    [Header("Book Animations")]
+    [Header("Overlay Animations")]
+    [SerializeField] protected CanvasGroup canvasGroup;
+    [SerializeField] protected float fadeDuration = 0.25f;
+
+    [Header("Feel Feedbacks (Gerakan Utama)")]
+    [SerializeField] private MMF_Player feedbackOpen; 
+    [SerializeField] private MMF_Player feedbackPeek;
+    [SerializeField] private MMF_Player feedbackHide;
+
+    [Header("Book Transform & Hover (DOTween)")]
     [SerializeField] private RectTransform bookRect;
     [SerializeField] private Vector2 posHidden;
     [SerializeField] private Vector2 posPeek;
-    [SerializeField] private Vector2 posOpened;
-    [SerializeField] private float animDuration = 0.5f;
+    [SerializeField] private Vector2 posPeekHovered;
 
     [Header("Page Containers")]
-    [SerializeField] private Transform leftPageContainer;  // Empty it, just a container for left prefab
-    [SerializeField] private Transform rightPageContainer; // Empty it, just a container for right prefab
+    [SerializeField] private Transform leftPageContainer;
+    [SerializeField] private Transform rightPageContainer;
 
-    [Header("Buttons")]
-    [SerializeField] private Button buttonAction; 
+    [Header("Buttons & Interactions")]
+    [SerializeField] private Button buttonAction;
     [SerializeField] private TMP_Text buttonActionText;
+    [SerializeField] private BookPanelInteractable bookInteractable;
 
-    private Action onActionCallback;
+    public JournalState CurrentState { get; private set; } = JournalState.Hidden;
+    private ArtefactData currentData;
+    private Action currentActionCallback;
+    private bool isPostRestoration;
+    private bool isContentRevealed = false; 
+
     private JournalPageAnimator activeLeftPage;
     private JournalPageAnimator activeRightPage;
 
     private void Awake()
     {
-        buttonAction.onClick.AddListener(() => onActionCallback?.Invoke());
+        buttonAction.onClick.AddListener(OnButtonActionClicked);
+
+        if (canvasGroup != null)
+        {
+            canvasGroup.alpha = 0f;
+            canvasGroup.blocksRaycasts = false;
+            canvasGroup.interactable = false;
+        }
+
+        if (bookInteractable != null)
+        {
+            bookInteractable.OnBookHoverEnter += HandleBookHoverEntered;
+            bookInteractable.OnBookHoverExit += HandleBookHoverExited;
+            bookInteractable.OnBookClicked += HandleBookClicked;
+        }
     }
 
-    // --- PRE-RESTORATION (Not Played Yet) ---
-    public void ShowPreRestoration(ArtefactData data, Action onRestoreClicked)
+    private void OnDestroy()
     {
-        ResetBook();
+        buttonAction.onClick.RemoveListener(OnButtonActionClicked);
+
+        if (bookInteractable != null)
+        {
+            bookInteractable.OnBookHoverEnter -= HandleBookHoverEntered;
+            bookInteractable.OnBookHoverExit -= HandleBookHoverExited;
+            bookInteractable.OnBookClicked -= HandleBookClicked;
+        }
+    }
+
+    public void SetupPreRestoration(ArtefactData data, Action onRestoreClicked)
+    {
+        currentData = data;
+        currentActionCallback = onRestoreClicked;
+        isPostRestoration = false;
         
         buttonActionText.text = "Let's Restore";
-        onActionCallback = onRestoreClicked;
-        buttonAction.gameObject.SetActive(false);
-
-        // Spawn Left Page (Sticky notes & initial scribbles)
-        if (data.PreRestorationPagePrefab != null)
-        {
-            activeLeftPage = Instantiate(data.PreRestorationPagePrefab, leftPageContainer);
-        }
-
-        bookRect.DOAnchorPos(posOpened, animDuration).SetEase(Ease.OutBack).OnComplete(() =>
-        {
-            if (activeLeftPage != null)
-            {
-                // Play left page animation, when finished then show the Let's Restore button
-                activeLeftPage.PlayRevealAnimation(() => buttonAction.gameObject.SetActive(true));
-            }
-            else
-            {
-                buttonAction.gameObject.SetActive(true);
-            }
-        });
     }
 
-    // --- POST-RESTORATION (Already Played) ---
-    public void ShowPostRestoration(ArtefactData data, Action onContinueClicked)
+    public void SetupPostRestoration(ArtefactData data, Action onContinueClicked)
     {
-        ResetBook();
-        
+        currentData = data;
+        currentActionCallback = onContinueClicked;
+        isPostRestoration = true;
+
         buttonActionText.text = "Continue";
-        onActionCallback = onContinueClicked;
-        buttonAction.gameObject.SetActive(false);
+    }
 
-        // Spawn Left Page (Instant) & Right Page (Empty/Alpha 0)
-        if (data.PreRestorationPagePrefab != null)
-        {
-            activeLeftPage = Instantiate(data.PreRestorationPagePrefab, leftPageContainer);
-            activeLeftPage.ShowInstant(); // Directly visible because it's been seen before
-        }
+    public void SetBookHiddenInstant()
+    {
+        CurrentState = JournalState.Hidden;
+        isContentRevealed = false;
 
-        if (data.PostRestorationPagePrefab != null)
-        {
-            activeRightPage = Instantiate(data.PostRestorationPagePrefab, rightPageContainer);
-        }
+        if (feedbackOpen != null) feedbackOpen.StopFeedbacks();
+        if (feedbackPeek != null) feedbackPeek.StopFeedbacks();
+        if (feedbackHide != null) feedbackHide.StopFeedbacks();
+        bookRect.DOKill(); 
 
-        bookRect.DOAnchorPos(posOpened, animDuration).SetEase(Ease.OutBack).OnComplete(() =>
+        if (bookRect != null) bookRect.anchoredPosition = posHidden;
+        HideOverlay();
+    }
+
+    private void SpawnAndInjectHalaman()
+    {
+        StopAllCoroutines();
+        foreach (Transform child in leftPageContainer) Destroy(child.gameObject);
+        foreach (Transform child in rightPageContainer) Destroy(child.gameObject);
+
+        activeLeftPage = null;
+        activeRightPage = null;
+
+        if (!isPostRestoration) // FLOW PRE-RESTORATION
         {
-            if (activeRightPage != null)
+            if (currentData.PreRestorationPagePrefab != null)
             {
-                // Play right page animation, when finished then show the Continue button
+                activeLeftPage = Instantiate(currentData.PreRestorationPagePrefab, leftPageContainer);
+                activeLeftPage.InjectTexts(currentData.StickyNoteTexts);
+            }
+        }
+        else // FLOW POST-RESTORATION
+        {
+            if (currentData.PreRestorationPagePrefab != null)
+            {
+                activeLeftPage = Instantiate(currentData.PreRestorationPagePrefab, leftPageContainer);
+                activeLeftPage.InjectTexts(currentData.StickyNoteTexts);
+            }
+
+            if (currentData.PostRestorationPagePrefab != null)
+            {
+                activeRightPage = Instantiate(currentData.PostRestorationPagePrefab, rightPageContainer);
+            }
+        }
+    }
+
+    public void OpenBookFull()
+    {
+        CurrentState = JournalState.Opened;
+        buttonAction.gameObject.SetActive(false);
+        ShowOverlay();
+
+        if (!isContentRevealed)
+        {
+            SpawnAndInjectHalaman();
+        }
+        else
+        {
+            if (activeLeftPage != null) activeLeftPage.ShowInstant();
+            if (activeRightPage != null) activeRightPage.ShowInstant();
+        }
+
+        if (feedbackOpen != null) feedbackOpen.PlayFeedbacks();
+
+        if (!isContentRevealed)
+        {
+            if (!isPostRestoration && activeLeftPage != null)
+            {
+                activeLeftPage.PlayRevealAnimation(() => buttonAction.gameObject.SetActive(true));
+            }
+            else if (isPostRestoration && activeRightPage != null)
+            {
                 activeRightPage.PlayRevealAnimation(() => buttonAction.gameObject.SetActive(true));
             }
             else
             {
                 buttonAction.gameObject.SetActive(true);
             }
-        });
+            
+            isContentRevealed = true;
+        }
+        else
+        {
+            buttonAction.gameObject.SetActive(true);
+        }
     }
 
     public void HideBookToPeek()
     {
-        bookRect.DOAnchorPos(posPeek, animDuration).SetEase(Ease.InOutQuad);
+        CurrentState = JournalState.Peeking;
+        HideOverlay();
+        buttonAction.gameObject.SetActive(false);
+        
+        if (feedbackPeek != null) feedbackPeek.PlayFeedbacks();
     }
 
     public void HideBookCompletely()
     {
-        bookRect.DOAnchorPos(posHidden, animDuration).SetEase(Ease.InBack);
+        CurrentState = JournalState.Hidden;
+        HideOverlay();
+        
+        if (feedbackHide != null) feedbackHide.PlayFeedbacks();
     }
 
-    private void ResetBook()
+    private void AnimateHoverPeek(bool isHovering)
     {
-        bookRect.DOKill();
-        StopAllCoroutines();
-        
-        // Delete old page contents
-        foreach (Transform child in leftPageContainer) Destroy(child.gameObject);
-        foreach (Transform child in rightPageContainer) Destroy(child.gameObject);
-        
-        activeLeftPage = null;
-        activeRightPage = null;
-        bookRect.anchoredPosition = posHidden;
+        Vector2 targetPos = isHovering ? posPeekHovered : posPeek;
+        if (bookRect != null) bookRect.DOAnchorPos(targetPos, 0.15f).SetEase(Ease.OutQuad);
+    }
+
+    private void OpenBookFromPeek()
+    {
+        OpenBookFull(); 
+    }
+
+    private void ShowOverlay()
+    {
+        if (canvasGroup != null)
+        {
+            canvasGroup.blocksRaycasts = true;
+            canvasGroup.DOFade(1f, fadeDuration);
+        }
+    }
+
+    private void HideOverlay()
+    {
+        if (canvasGroup != null)
+        {
+            canvasGroup.blocksRaycasts = false;
+            canvasGroup.DOFade(0f, fadeDuration);
+        }
+    }
+
+    private void OnButtonActionClicked()
+    {
+        currentActionCallback?.Invoke();
+    }
+
+    private void HandleBookHoverEntered()
+    {
+        if (CurrentState == JournalState.Peeking) AnimateHoverPeek(true);
+    }
+
+    private void HandleBookHoverExited()
+    {
+        if (CurrentState == JournalState.Peeking) AnimateHoverPeek(false);
+    }
+
+    private void HandleBookClicked()
+    {
+        if (CurrentState == JournalState.Peeking) OpenBookFromPeek();
     }
 }

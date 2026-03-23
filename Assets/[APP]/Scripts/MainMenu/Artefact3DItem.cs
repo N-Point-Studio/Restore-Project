@@ -1,38 +1,49 @@
+using MoreMountains.Feedbacks;
 using UnityEngine;
 
-[RequireComponent(typeof(Collider))]
 public class Artefact3DItem : MonoBehaviour
 {
     [Header("Artefact Configuration")]
-    [SerializeField] private string artefactId; 
-    
-    [Header("3D Visuals")]
-    [SerializeField] private Transform artefactTransform; 
-    [SerializeField] private Transform boxTransform;      
+    [SerializeField] private string artefactId;
 
-    [Header("Sticky Notes Visual")]
-    [SerializeField] private StickyNote3DItem[] stickyNoteObjects; 
-    
-    [Header("Highlight System")]
-    [SerializeField] private Outline boxOutline;      // Outline for box
-    [SerializeField] private Outline artefactOutline; // Outline for artefact
-    
-    private Outline activeOutline; // Which outline is currently used (box/artefact)
+    [Header("3D Visuals")]
+    [SerializeField] private Transform artefactTransform;
+    [SerializeField] private Transform boxTransform;
+
+    [Header("Sensors")]
+    [SerializeField] private ArtefactSensor boxSensor;
+    [SerializeField] private ArtefactSensor artefactSensor;
+
+    [Header("Sticky Notes")]
+    [SerializeField] private StickyNote3DItem[] stickyNoteObjects;
+
+    [Header("Environment")]
+    [SerializeField] private GameObject assignedPedestal;
+
+    [Header("Feedbacks")]
+    [SerializeField] private MMF_Player unlockFeedback;
+    [SerializeField] private MMF_Player completionFeedback;
 
     private ArtefactData artefactData;
     private bool isInteractable = false;
-    
-    // State to differentiate clicks in Level Selection vs Detail
     private bool isInDetailMode = false;
     private bool hasUnpeeledNotes = false;
+    private bool isSelectionModeActive = false;
 
     public string ArtefactId => artefactId;
-
-    private void Awake()
+    public bool IsInDetailMode => isInDetailMode;
+    public bool CheckUnpeeledNotes()
     {
-        // Make sure both outlines are off when the game starts
-        if (boxOutline != null) boxOutline.enabled = false;
-        if (artefactOutline != null) artefactOutline.enabled = false;
+        if (stickyNoteObjects == null) return false;
+
+        for (int i = 0; i < stickyNoteObjects.Length; i++)
+        {
+            if (stickyNoteObjects[i] != null && stickyNoteObjects[i].gameObject.activeSelf)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void Initialize(ActiveArtefactData activeData)
@@ -44,88 +55,130 @@ public class Artefact3DItem : MonoBehaviour
         bool isCompleted = activeData.IsArtefactCompleted(artefactId);
         bool isStoryRead = activeData.IsStoryRead(artefactId);
 
-        if (isCompleted)
-        {
-            artefactTransform.gameObject.SetActive(true);
-            boxTransform.gameObject.SetActive(false);
-            isInteractable = true;
-            
-            activeOutline = artefactOutline; // Use artefact outline
-        }
-        else if (isUnlocked)
-        {
-            artefactTransform.gameObject.SetActive(false);
-            boxTransform.gameObject.SetActive(true);
-            isInteractable = true;
-            
-            activeOutline = boxOutline; // Use box outline
-        }
-        else
-        {
-            artefactTransform.gameObject.SetActive(false);
-            boxTransform.gameObject.SetActive(false);
-            isInteractable = false;
-            
-            activeOutline = null; // Nothing can be hovered
-        }
+        if (boxSensor != null) boxSensor.Initialize(this);
+        if (artefactSensor != null) artefactSensor.Initialize(this);
 
-        hasUnpeeledNotes = !isCompleted && !isStoryRead;
+        artefactTransform.gameObject.SetActive(isCompleted);
+        boxTransform.gameObject.SetActive(!isCompleted && isUnlocked);
+
+        isInteractable = isUnlocked || isCompleted;
+        hasUnpeeledNotes = isUnlocked && !isCompleted && !isStoryRead;
 
         if (stickyNoteObjects != null)
         {
-            foreach (var note in stickyNoteObjects)
+            for (int i = 0; i < stickyNoteObjects.Length; i++)
             {
-                if (note != null) note.gameObject.SetActive(hasUnpeeledNotes);
+                StickyNote3DItem note = stickyNoteObjects[i];
+                if (note != null)
+                {
+                    if (hasUnpeeledNotes)
+                    {
+                        string labelText = "";
+                        if (artefactData.StickyNoteTexts != null && i < artefactData.StickyNoteTexts.Length)
+                        {
+                            labelText = artefactData.StickyNoteTexts[i];
+                        }
+
+                        note.Initialize(labelText, this);
+                        note.ToggleCollider(false);
+                    }
+                    else
+                    {
+                        note.gameObject.SetActive(false);
+                    }
+                }
             }
         }
     }
 
-    // Called by ArtefactDetailController when detail menu is opened/closed
     public void SetDetailMode(bool isDetail, bool notesRemaining)
     {
         isInDetailMode = isDetail;
         hasUnpeeledNotes = notesRemaining;
-        
-        if (activeOutline != null) activeOutline.enabled = false; // Turn off outline during transition
+
+        if (stickyNoteObjects != null)
+        {
+            for (int i = 0; i < stickyNoteObjects.Length; i++)
+            {
+                StickyNote3DItem note = stickyNoteObjects[i];
+                if (note != null) note.ToggleCollider(isDetail);
+            }
+        }
     }
 
-    private void OnMouseEnter()
+    public bool CanInteract(bool isSensorBox)
     {
-        if (!isInteractable || artefactData == null) return;
-        
-        // BLOCK HIGHLIGHT: If in Detail Mode, box MUST NOT be hovered while notes still exist
-        if (isInDetailMode && hasUnpeeledNotes) return;
+        if (!isSelectionModeActive) return false;
 
-        if (activeOutline != null) activeOutline.enabled = true;
+        if (!isInteractable || artefactData == null) return false;
+        if (isSensorBox && isInDetailMode && hasUnpeeledNotes) return false;
+        return true;
     }
 
-    private void OnMouseExit()
+    public void SetSelectionModeActive(bool isActive)
     {
-        if (activeOutline != null) activeOutline.enabled = false;
+        isSelectionModeActive = isActive;
     }
 
-    private void OnMouseDown()
+    public void OnSensorClicked(bool isSensorBox)
     {
-        if (!isInteractable || artefactData == null) return;
-        
-        // BLOCK CLICK: If in Detail Mode and notes still exist, ignore click on box
-        if (isInDetailMode && hasUnpeeledNotes) return;
-
-        if (activeOutline != null) activeOutline.enabled = false;
-
         if (isInDetailMode)
         {
-            // If clicked in Detail Mode (and notes are gone), play directly!
             MainMenuEvents.TriggerArtefactPlay(artefactData);
         }
         else
         {
-            // If clicked in Level Selection, open Detail
             MainMenuEvents.TriggerOpenArtefactDetail(artefactData);
-            
-            // Focus camera to the currently active transform (can be box or artefact)
-            Transform targetTransform = activeOutline == artefactOutline ? artefactTransform : boxTransform;
+            Transform targetTransform = isSensorBox ? boxTransform : artefactTransform;
             MainMenuEvents.TriggerCameraFocusToArtefact(targetTransform);
         }
+    }
+
+    /// <summary>
+    /// Visibility of Pedestal
+    /// </summary>
+    /// <param name="isVisible"></param>
+    public void ShowPedestal(bool isVisible)
+    {
+        if (assignedPedestal != null)
+        {
+            assignedPedestal.gameObject.SetActive(isVisible);
+        }
+    }
+
+    /// <summary>
+    /// Visibility of Artefact and Box
+    /// </summary>
+    /// <param name="isVisible"></param>
+    public void SetVisibility(bool isVisible)
+    {
+        if (artefactTransform != null)
+        {
+            artefactTransform.gameObject.SetActive(isVisible);
+        }
+
+        if (boxTransform != null)
+        {
+            boxTransform.gameObject.SetActive(isVisible);
+        }
+    }
+
+    public void PlayUnlockAnimation()
+    {
+        if (boxTransform != null) boxTransform.localScale = Vector3.zero;
+
+        if (unlockFeedback != null) unlockFeedback.PlayFeedbacks();
+    }
+
+    public void PlayCompletionAnimation()
+    {
+        if (artefactTransform != null) 
+        {
+            artefactTransform.gameObject.SetActive(true);
+            artefactTransform.localScale = Vector3.zero; 
+        }
+        if (boxTransform != null) boxTransform.gameObject.SetActive(false);
+        
+        if (completionFeedback != null) completionFeedback.PlayFeedbacks();
     }
 }

@@ -1,46 +1,106 @@
 using System;
 using UnityEngine;
-using TMPro; 
+using TMPro;
+using UnityEngine.EventSystems;
+using MoreMountains.Feedbacks;
+using DG.Tweening;
 
 [RequireComponent(typeof(Collider))]
-public class StickyNote3DItem : MonoBehaviour
+public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
-    [SerializeField] private Outline outline;
-    [SerializeField] private string label;
+    [Header("Visuals")]
+    [Range(0f, 1f)]
+    [SerializeField] private float hoverOpacity = 0.7f;
     [SerializeField] private TMP_Text text3D; 
+    [SerializeField] private SpriteRenderer spriteRenderer;
+
+    [Header("Feedbacks")]
+    [SerializeField] private MMF_Player peelFeedback;
+    
+    private Color originalColor;
+    private Vector3 originalScale;
+    private Vector3 originalRotation;
+    private Artefact3DItem brain;
+    
+    private Collider col;
     
     public static Action<StickyNote3DItem> OnNotePeeled;
 
     private void Awake()
     {
-        if (outline == null) outline = GetComponent<Outline>();
-        if (outline != null) outline.enabled = false;
+        originalColor = spriteRenderer.color;
+        originalScale = transform.localScale;
+        originalRotation = transform.localEulerAngles;
+        
+        col = GetComponent<Collider>();
+        if (col != null) col.enabled = false;
     }
 
-    private void OnMouseEnter()
+    public void Initialize(string noteText, Artefact3DItem boss)
     {
-        if (outline != null) outline.enabled = true;
+        brain = boss;
+        if (text3D != null) text3D.text = noteText;
+        
+        spriteRenderer.color = originalColor;
+        transform.DOKill(); 
+        transform.localScale = originalScale; 
+        transform.localEulerAngles = originalRotation;
+        gameObject.SetActive(true);
     }
 
-    private void OnMouseExit()
+    public void ToggleCollider(bool isOn)
     {
-        if (outline != null) outline.enabled = false;
+        if (col != null) col.enabled = isOn;
     }
 
-    private void OnMouseDown()
+    public void OnPointerEnter(PointerEventData eventData)
     {
-        if (outline != null) outline.enabled = false;
+        if (brain == null || !brain.IsInDetailMode) return;
+
+        Color hoverColor = originalColor;
+        hoverColor.a = hoverOpacity;
+        spriteRenderer.color = hoverColor;
+
+        transform.DOKill();
+        transform.DOScale(originalScale * 1.1f, 0.2f).SetEase(Ease.OutBack);
+        transform.DOLocalRotate(originalRotation + new Vector3(0, 0, 5f), 0.2f).SetEase(Ease.OutBack);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        spriteRenderer.color = originalColor;
+
+        transform.DOKill();
+        transform.DOScale(originalScale, 0.2f).SetEase(Ease.OutQuad);
+        transform.DOLocalRotate(originalRotation, 0.2f).SetEase(Ease.OutQuad);
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (brain == null || !brain.IsInDetailMode) return;
+
+        spriteRenderer.color = originalColor;
+
+        transform.DOKill();
+        
+        if (peelFeedback != null)
+        {
+            ToggleCollider(false); 
+            
+            peelFeedback.Events.OnComplete.AddListener(OnPeelAnimationFinished);
+            peelFeedback.PlayFeedbacks();
+        }
+        else
+        {
+            gameObject.SetActive(false);
+            OnNotePeeled?.Invoke(this);
+        }
+    }
+
+    private void OnPeelAnimationFinished()
+    {
+        peelFeedback.Events.OnComplete.RemoveListener(OnPeelAnimationFinished);
         gameObject.SetActive(false);
         OnNotePeeled?.Invoke(this);
     }
-
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        if (text3D != null && !string.IsNullOrEmpty(label))
-        {
-            text3D.text = label;
-        }
-    }
-#endif
 }

@@ -38,7 +38,7 @@ public class ProjectSavingSystem : SavingSystem, IInitializable, IStartable, IDi
     {
         LoadAll(0, () => 
         {
-            AppLogger.Log("[ProjectSavingSystem] Semua data save berhasil dimuat pada saat startup!");
+            AppLogger.Log("[ProjectSavingSystem] All save data loaded successfully at startup!");
         });
     }
 

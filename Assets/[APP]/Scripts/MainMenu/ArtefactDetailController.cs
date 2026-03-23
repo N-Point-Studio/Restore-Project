@@ -1,4 +1,5 @@
 using DG.Tweening;
+using MoreMountains.Feedbacks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,13 +24,14 @@ public class ArtefactDetailController : MonoBehaviour
     [Header("Text Instructions")]
     [SerializeField] private TMP_Text instructionText; 
 
+    [Header("Feedbacks")]
+    [SerializeField] private MMF_Player wallTextRevealFeedback;
+
     private ArtefactData currentArtefactData;
     private Artefact3DItem current3DItem; 
     private ActiveArtefactData activeArtefactData;
     private bool isCompleted;
     
-    private bool isBookOpen = false; 
-
     private void Awake()
     {
         buttonBack.onClick.AddListener(OnBackClicked);
@@ -54,6 +56,13 @@ public class ArtefactDetailController : MonoBehaviour
         activeArtefactData = activeData;
         current3DItem = item3D;
         isCompleted = activeArtefactData.IsArtefactCompleted(currentArtefactData.BaseData.Id);
+        bool isStoryRead = activeArtefactData.IsStoryRead(currentArtefactData.BaseData.Id);
+
+        bool hasNotesRemaining = !isCompleted && !isStoryRead;
+        if (current3DItem != null) 
+        {
+            current3DItem.SetDetailMode(true, hasNotesRemaining); 
+        }
         
         wallTextGroup.alpha = 0;
         wallTextGroup.gameObject.SetActive(false);
@@ -61,45 +70,56 @@ public class ArtefactDetailController : MonoBehaviour
         root.SetActive(true);
         canvasGroupRoot.alpha = 1;
 
+        journalController.SetBookHiddenInstant();
+
         if (isCompleted)
         {
             // POST-RESTORATION FLOW
             instructionText.gameObject.SetActive(false);
-            isBookOpen = true; // Book opens directly in the center of the screen
-            journalController.ShowPostRestoration(currentArtefactData, OnJournalContinueClicked);
+            
+            journalController.SetupPostRestoration(currentArtefactData, OnJournalContinueClicked);
+            journalController.OpenBookFull();
         }
         else
         {
             // FLOW PRE-RESTORATION
-            bool isStoryRead = activeArtefactData.IsStoryRead(currentArtefactData.BaseData.Id);
-            
             if (isStoryRead)
             {
-                // Story has been read before, book just peeks from below
                 instructionText.gameObject.SetActive(true);
                 instructionText.text = "Open the box and start restore...";
-                isBookOpen = false; 
+                
+                journalController.SetupPreRestoration(currentArtefactData, OnJournalRestoreClicked);
                 journalController.HideBookToPeek();
             }
             else
             {
-                // First time clicking, book is still hidden
                 instructionText.gameObject.SetActive(true);
                 instructionText.text = "Peel off the sticky note...";
-                isBookOpen = false;
-                journalController.HideBookCompletely();
+                
+                journalController.SetupPreRestoration(currentArtefactData, OnJournalRestoreClicked);
             }
         }
     }
 
     private void HandleNotePeeled(StickyNote3DItem peeledNote)
     {
-        if (current3DItem != null) current3DItem.SetDetailMode(true, notesRemaining: false);
-        activeArtefactData.MarkStoryRead(currentArtefactData.BaseData.Id);
-        instructionText.gameObject.SetActive(false);
-        
-        isBookOpen = true; // Because peeling note triggers book to open to center
-        journalController.ShowPreRestoration(currentArtefactData, OnJournalRestoreClicked);
+        if (current3DItem == null) return;
+
+        bool hasNotesLeft = current3DItem.CheckUnpeeledNotes();
+
+        if (hasNotesLeft)
+        {
+            current3DItem.SetDetailMode(true, true);
+        }
+        else
+        {
+            current3DItem.SetDetailMode(true, false);
+            activeArtefactData.MarkStoryRead(currentArtefactData.BaseData.Id);
+            instructionText.gameObject.SetActive(false);
+                        
+            journalController.SetupPreRestoration(currentArtefactData, OnJournalRestoreClicked);
+            journalController.OpenBookFull();
+        }
     }
 
     private void OnJournalRestoreClicked()
@@ -109,28 +129,31 @@ public class ArtefactDetailController : MonoBehaviour
 
     private void OnJournalContinueClicked()
     {
-        isBookOpen = false; // Because book goes down (peeking)
         journalController.HideBookToPeek();
         
         wallTitleText.text = currentArtefactData.BaseData.ItemName;
         wallDescText.text = currentArtefactData.BaseData.ItemDescription;
         
         wallTextGroup.gameObject.SetActive(true);
-        wallTextGroup.DOFade(1, 0.5f);
+
+        if (wallTextRevealFeedback != null)
+        {
+            wallTextRevealFeedback.PlayFeedbacks();
+        }
+        else
+        {
+            wallTextGroup.DOFade(1, 0.5f);
+        }
     }
 
-    // --- NEW BACK BUTTON LOGIC ---
     private void OnBackClicked()
     {
-        if (isBookOpen)
+        if (journalController.CurrentState == JournalState.Opened)
         {
-            // IF BOOK IS OPEN (FORWARD): Back button will collapse book downwards
-            isBookOpen = false;
             journalController.HideBookToPeek();
 
             if (isCompleted)
             {
-                // If restoration is done, show text on the wall
                 wallTitleText.text = currentArtefactData.BaseData.ItemName;
                 wallDescText.text = currentArtefactData.BaseData.ItemDescription;
                 wallTextGroup.gameObject.SetActive(true);
@@ -138,17 +161,16 @@ public class ArtefactDetailController : MonoBehaviour
             }
             else
             {
-                // If not done, show instruction text to click box
                 instructionText.gameObject.SetActive(true);
                 instructionText.text = "Open the box and start restore...";
             }
         }
         else
         {
-            // IF BOOK IS PEEKING/HIDDEN: Back button really exits Detail Mode
             if (current3DItem != null) current3DItem.SetDetailMode(false, false);
             CloseDetail();
             MainMenuEvents.TriggerCloseArtefactDetail();
+            journalController.HideBookCompletely();
         }
     }
 
@@ -159,10 +181,10 @@ public class ArtefactDetailController : MonoBehaviour
 
     private void OnContinueStoryClicked()
     {
-        // Exit from detail mode
         if (current3DItem != null) current3DItem.SetDetailMode(false, false);
         CloseDetail();
         MainMenuEvents.TriggerCloseArtefactDetail();
+        journalController.HideBookCompletely();
     }
 
     public void CloseDetail()

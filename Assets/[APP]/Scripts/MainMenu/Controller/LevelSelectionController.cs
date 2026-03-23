@@ -20,6 +20,7 @@ public class LevelSelectionController : BaseMenuController
     private ActiveArtefactData activeArtefactData;
     private PlayerProgressionData playerProgressionData;
     private SceneLoader sceneLoader;
+    private Artefact3DItem clickedItem;
 
     [Inject]
     public void Construct(
@@ -42,6 +43,13 @@ public class LevelSelectionController : BaseMenuController
         backButtonItemUI.OnClick += OnBackButtonClick;
     }
 
+    protected override void Start()
+    {
+        base.Start();
+        RefreshUI();        
+        SetArtefactsInteractable(false);
+    }
+
     protected override void OnDestroy()
     {
         base.OnDestroy();
@@ -56,21 +64,36 @@ public class LevelSelectionController : BaseMenuController
     {
         RefreshUI();
         SetActive(true);
+        SetArtefactsInteractable(true);
         MainMenuEvents.TriggerCameraToLevelSelection();
     }
 
     public void CloseLevelSelection()
     {
         SetActive(false);
+        SetArtefactsInteractable(false);
     }
     
     public void OpenLevelSelectionAndPlayAnimations()
     {
         RefreshUI();
         SetActive(true);
+        SetArtefactsInteractable(true);
         MainMenuEvents.TriggerCameraToLevelSelection();
         
         StartCoroutine(PlayPendingAnimationsSequence());
+    }
+
+    private void SetArtefactsInteractable(bool active)
+    {
+        if (artefact3DItems == null) return;
+        for (int i = 0; i < artefact3DItems.Length; i++)
+        {
+            if (artefact3DItems[i] != null)
+            {
+                artefact3DItems[i].SetSelectionModeActive(active);
+            }
+        }
     }
 
     public void RefreshUI()
@@ -105,7 +128,7 @@ public class LevelSelectionController : BaseMenuController
 
                 AppLogger.Log($"[Animation] Playing REVEAL animation for {data.artefactId}");
                 
-                // targetItem.PlayCompletionAnimation();
+                targetItem.PlayCompletionAnimation();
                 
                 yield return new WaitForSeconds(2.0f); 
             }
@@ -132,7 +155,7 @@ public class LevelSelectionController : BaseMenuController
 
                 AppLogger.Log($"[Animation] Playing UNLOCK animation for {data.artefactId}");
                 
-                // targetItem.PlayUnlockAnimation();
+                targetItem.PlayUnlockAnimation();
                 
                 yield return new WaitForSeconds(1.5f); 
             }
@@ -159,7 +182,7 @@ public class LevelSelectionController : BaseMenuController
     private void OnRequestArtefactDetail(ArtefactData data)
     {        
         backButtonItemUI.gameObject.SetActive(false);
-        Artefact3DItem clickedItem = Array.Find(artefact3DItems, x => x != null && x.ArtefactId == data.BaseData.Id);
+        clickedItem = Array.Find(artefact3DItems, x => x != null && x.ArtefactId == data.BaseData.Id);
 
         if (clickedItem == null)
         {
@@ -170,7 +193,8 @@ public class LevelSelectionController : BaseMenuController
         {
             if (artefact3DItems[i] != null && artefact3DItems[i] != clickedItem)
             {
-                artefact3DItems[i].gameObject.SetActive(false);
+                artefact3DItems[i].SetVisibility(false);
+                artefact3DItems[i].ShowPedestal(false);
             }
         }
 
@@ -185,9 +209,10 @@ public class LevelSelectionController : BaseMenuController
 
         for (int i = 0; i < artefact3DItems.Length; i++)
         {
-            if (artefact3DItems[i] != null)
+            if (artefact3DItems[i] != null && artefact3DItems[i] != clickedItem)
             {
-                artefact3DItems[i].gameObject.SetActive(true);
+                artefact3DItems[i].SetVisibility(false);
+                artefact3DItems[i].ShowPedestal(true);
             }
         }
     }

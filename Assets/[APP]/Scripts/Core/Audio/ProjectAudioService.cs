@@ -1,4 +1,5 @@
 using System;
+using Modules;
 using Modules.SoundSystems;
 using UnityEngine;
 using VContainer;
@@ -67,7 +68,7 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         }
         catch (Exception e)
         {
-            Debug.LogWarning($"[ProjectAudioService] Failed to play SFX {audioType}: {e.Message}");
+            AppLogger.LogWarning($"[ProjectAudioService] Failed to play SFX {audioType}: {e.Message}");
         }
     }
 
@@ -102,7 +103,7 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         }
         catch (Exception e)
         {
-            Debug.LogWarning($"[ProjectAudioService] Failed to play BGM Game: {e.Message}");
+            AppLogger.LogWarning($"[ProjectAudioService] Failed to play BGM Game: {e.Message}");
         }
     }
 
@@ -115,7 +116,7 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         }
         catch (Exception e)
         {
-            Debug.LogWarning($"[ProjectAudioService] Failed to play BGM Main Menu: {e.Message}");
+            AppLogger.LogWarning($"[ProjectAudioService] Failed to play BGM Main Menu: {e.Message}");
         }
     }
 }
