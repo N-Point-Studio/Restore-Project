@@ -1,10 +1,5 @@
 using UnityEngine;
 using VContainer;
-using DG.Tweening;
-
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 public class MenuController : BaseMenuController
 {
@@ -13,15 +8,8 @@ public class MenuController : BaseMenuController
     [SerializeField] private ButtonItemUI buttonContinue;
     [SerializeField] private ButtonItemUI buttonSettings;
     [SerializeField] private ButtonItemUI buttonQuit;
-    [Header("Others")]
-    [SerializeField] private ButtonItemUI buttonWishlist;
-    [SerializeField] private ButtonItemUI buttonTwitter;
-    [SerializeField] private ButtonItemUI buttonInstagram;
-    [SerializeField] private ButtonItemUI buttonWebsite;
 
     private PlayerProgressionData playerProgressionData;
-
-    private Tween quitTween;
 
     [Inject]
     public void Construct(PlayerProgressionData playerProgressionData)
@@ -36,10 +24,6 @@ public class MenuController : BaseMenuController
         buttonContinue.OnClick += OnButtonContinueClick;
         buttonSettings.OnClick += OnButtonSettingsClick;
         buttonQuit.OnClick += OnButtonQuitClick;
-        buttonWishlist.OnClick += OnButtonWishlistClick;
-        buttonTwitter.OnClick += OnButtonTwitterClick;
-        buttonInstagram.OnClick += OnButtonInstagramClick;
-        buttonWebsite.OnClick += OnButtonWebsiteClick;
     }
 
     protected override void Start()
@@ -55,15 +39,6 @@ public class MenuController : BaseMenuController
         buttonContinue.OnClick -= OnButtonContinueClick;
         buttonSettings.OnClick -= OnButtonSettingsClick;
         buttonQuit.OnClick -= OnButtonQuitClick;
-        buttonWishlist.OnClick -= OnButtonWishlistClick;
-        buttonTwitter.OnClick -= OnButtonTwitterClick;
-        buttonInstagram.OnClick -= OnButtonInstagramClick;
-        buttonWebsite.OnClick -= OnButtonWebsiteClick;
-
-        if (quitTween != null && quitTween.IsActive())
-        {
-            quitTween.Kill();
-        }
     }
 
     public void RefreshButtonVisibility()
@@ -88,40 +63,11 @@ public class MenuController : BaseMenuController
 
     private void OnButtonSettingsClick()
     {
-        // TODO: Ignore for now
+        MainMenuEvents.TriggerOpenSettingsGame();
     }
 
     private void OnButtonQuitClick()
     {
-        if (quitTween != null && quitTween.IsActive()) return;
-
-        quitTween = DOVirtual.DelayedCall(0.05f, () =>
-        {
-#if UNITY_EDITOR
-            EditorApplication.isPlaying = false;
-#else
-            Application.Quit();
-#endif
-        }).SetUpdate(true);
-    }
-
-    private void OnButtonWishlistClick()
-    {
-        // TODO: Ignore for now
-    }
-
-    private void OnButtonTwitterClick()
-    {
-        // TODO: Ignore for now
-    }
-
-    private void OnButtonInstagramClick()
-    {
-        // TODO: Ignore for now
-    }
-
-    private void OnButtonWebsiteClick()
-    {
-        // TODO: Ignore for now
+        MainMenuEvents.TriggerQuitGame();
     }
 }

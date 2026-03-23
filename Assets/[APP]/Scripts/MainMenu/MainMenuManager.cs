@@ -9,6 +9,8 @@ public class MainMenuManager : MonoBehaviour
     [Header("Sub-Controller")]
     [SerializeField] private MenuController menuController;
     [SerializeField] private LevelSelectionController levelSelectionController;
+    [SerializeField] private SettingsController settingsController;
+    [SerializeField] private QuitController quitController;
     [SerializeField] private BackgroundController backgroundController;
 
     [Header("Scene Configuration")]
@@ -36,6 +38,8 @@ public class MainMenuManager : MonoBehaviour
 
         container.Inject(menuController);
         container.Inject(levelSelectionController);
+        container.Inject(settingsController);
+        container.Inject(quitController);
     }
 
     private void Awake()
@@ -45,6 +49,8 @@ public class MainMenuManager : MonoBehaviour
         MainMenuEvents.OnCloseLevelSelection += OnRequestCloseLevelSelection;
         MainMenuEvents.OnCameraFocusToArtefact += OnRequestCameraFocusArtefact;
         MainMenuEvents.OnCloseArtefactDetail += OnRequestCloseArtefactDetail;
+        MainMenuEvents.OnOpenSettings += OnRequestOpenSettings;
+        MainMenuEvents.OnRequestQuit += OnRequestQuit;
 
         backgroundController.SetActive(false);
     }
@@ -55,19 +61,22 @@ public class MainMenuManager : MonoBehaviour
             activeArtefactData.GetPendingCompletionAnimations().Count > 0 || 
             activeArtefactData.GetPendingUnlockAnimations().Count > 0;
 
+        menuController.SetActive(false);
+        levelSelectionController.SetActive(false);
+        settingsController.SetActive(false);
+        quitController.SetActive(false);
+
         if (isFirstSessionLoad)
         {
             isFirstSessionLoad = false;
             AppLogger.Log("[MainMenuManager] App just started. Entering normal Main Menu.");
             
             menuController.SetActive(true);
-            levelSelectionController.SetActive(false);
         }
         else if (hasPendingAnimations)
         {
             AppLogger.Log("[MainMenuManager] Player returned from gameplay! Opening Level Selection immediately.");
             
-            menuController.SetActive(false);
             levelSelectionController.OpenLevelSelectionAndPlayAnimations();
         }
         else
@@ -75,7 +84,6 @@ public class MainMenuManager : MonoBehaviour
             AppLogger.Log("[MainMenuManager] Entering normal Main Menu.");
             
             menuController.SetActive(true);
-            levelSelectionController.SetActive(false);
         }
     }
 
@@ -86,6 +94,8 @@ public class MainMenuManager : MonoBehaviour
         MainMenuEvents.OnCloseLevelSelection -= OnRequestCloseLevelSelection;   
         MainMenuEvents.OnCameraFocusToArtefact -= OnRequestCameraFocusArtefact;  
         MainMenuEvents.OnCloseArtefactDetail -= OnRequestCloseArtefactDetail;
+        MainMenuEvents.OnOpenSettings -= OnRequestOpenSettings;
+        MainMenuEvents.OnRequestQuit -= OnRequestQuit;
     }
 
     private void OnRequestNewGameGame()
@@ -101,7 +111,7 @@ public class MainMenuManager : MonoBehaviour
             
             projectSavingSystem.SaveAll();
 
-            _ = sceneLoader.LoadSceneAsync(splashSceneName, LoadingType.ProgressBar);
+            _ = sceneLoader.LoadSceneAsync(splashSceneName);
         }
         else
         {
@@ -149,5 +159,15 @@ public class MainMenuManager : MonoBehaviour
     private void OnRequestCloseArtefactDetail()
     {
         backgroundController.SetActive(false);
+    }
+
+    private void OnRequestOpenSettings()
+    {
+        settingsController.SetActive(true);
+    }
+
+    private void OnRequestQuit()
+    {
+        quitController.SetActive(true);
     }
 }

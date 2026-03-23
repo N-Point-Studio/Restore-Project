@@ -64,7 +64,7 @@ public class GameplayManager : IInitializable, IDisposable
     {
         AppLogger.Log($"[Gameplay Manager] Back to menu using SceneLoader...");
 
-        _ = sceneLoader.LoadSceneAsync(TARGET_SCENE, LoadingType.Camera, 1.0f);
+        _ = sceneLoader.LoadSceneAsync(TARGET_SCENE, 2f);
     }
 
     // TODO: Call this at the first time playing of the timing not right (e.g: UI or sumthin not loaded properly)
