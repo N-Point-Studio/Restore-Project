@@ -6,8 +6,8 @@ using VContainer.Unity;
 
 public class ProjectSettingsService : IInitializable, IStartable, IDisposable
 {
-    protected readonly ActiveSettingsData activeSettingsData;
-    protected readonly SoundSystem soundSystem;
+    private readonly ActiveSettingsData activeSettingsData;
+    private readonly SoundSystem soundSystem;
 
     [Inject]
     public ProjectSettingsService(ActiveSettingsData activeSettingsData, SoundSystem soundSystem)
@@ -16,74 +16,49 @@ public class ProjectSettingsService : IInitializable, IStartable, IDisposable
         this.soundSystem = soundSystem;
     }
 
-    private ProjectSettingsData defaultSettingsData;
-    public ProjectSettingsData DefaultSettingsData => defaultSettingsData;
-
-    private ProjectSettingsData currentSettingsData;
-    public ProjectSettingsData CurrentSettingsData => currentSettingsData;
-
-    public float masterVolume
-    {
-        get { return soundSystem != null ? soundSystem.GlobalVolume : 1f; }
-        set { if (soundSystem != null) soundSystem.GlobalVolume = value; }
-    }
-    public float bgmVolume
-    {
-        get { return soundSystem != null ? soundSystem.GlobalMusicVolume : 1f; }
-        set { if (soundSystem != null) soundSystem.GlobalMusicVolume = value; }
-    }
-    public float sfxVolume
-    {
-        get { return soundSystem != null ? soundSystem.GlobalSoundsVolume : 1f; }
-        set { if (soundSystem != null) soundSystem.GlobalSoundsVolume = soundSystem.GlobalUISoundsVolume = soundSystem.GlobalVoiceVolume = value; } 
-    }
-
     void IInitializable.Initialize()
     {
-        CoreEvents.OnSettingsChanged += HandleOnSettingsChanged;
-        activeSettingsData.OnSettingsDataLoaded += HandleOnActiveSettingsChanged;
-    }
-
-    void IStartable.Start()
-    {
-        defaultSettingsData = UnityEngine.Object.Instantiate(activeSettingsData.DefaultSettingsData);
-        currentSettingsData = UnityEngine.Object.Instantiate(activeSettingsData.CurrentSettingsData);
-
-        HandleOnSettingsChanged(currentSettingsData);
+        CoreEvents.OnSettingsChanged += ApplySettingsToEngine;
+        activeSettingsData.OnSettingsDataLoaded += HandleOnSaveDataLoaded;
     }
 
     void IDisposable.Dispose()
     {
-        CoreEvents.OnSettingsChanged -= HandleOnSettingsChanged;
-        activeSettingsData.OnSettingsDataLoaded -= HandleOnActiveSettingsChanged;
+        CoreEvents.OnSettingsChanged -= ApplySettingsToEngine;
+        activeSettingsData.OnSettingsDataLoaded -= HandleOnSaveDataLoaded;
     }
 
-    private void HandleOnSettingsChanged(ProjectSettingsData settingsData)
+    void IStartable.Start()
     {
-        currentSettingsData = settingsData;
+        ApplySettingsToEngine(activeSettingsData.CurrentSettingsData);
+    }
+
+    private void HandleOnSaveDataLoaded()
+    {
+        ApplySettingsToEngine(activeSettingsData.CurrentSettingsData);
+    }
+
+    private void ApplySettingsToEngine(ProjectSettingsData settingsData)
+    {
+        if (settingsData == null) return;
+
         for (int i = 0; i < QualitySettings.names.Length; i++)
         {
             if ((int)settingsData.GraphicMode == i)
             {
                 QualitySettings.SetQualityLevel(i, true);
+                break;
             }
         }
 
-        masterVolume = settingsData.MasterVolume;
-        bgmVolume = settingsData.BGMVolume;
-        sfxVolume = settingsData.SFXVolume;
-
-        activeSettingsData.UpdateSettingsData(currentSettingsData);
-    }
-
-    private void HandleOnActiveSettingsChanged()
-    {
-        if (defaultSettingsData != null) UnityEngine.Object.Destroy(defaultSettingsData);
-        if (currentSettingsData != null) UnityEngine.Object.Destroy(currentSettingsData);
-
-        defaultSettingsData = UnityEngine.Object.Instantiate(activeSettingsData.DefaultSettingsData);
-        currentSettingsData = UnityEngine.Object.Instantiate(activeSettingsData.CurrentSettingsData);
-
-        HandleOnSettingsChanged(currentSettingsData);
+        if (soundSystem != null)
+        {
+            soundSystem.GlobalVolume = settingsData.MasterVolume;
+            soundSystem.GlobalMusicVolume = settingsData.BGMVolume;
+            
+            soundSystem.GlobalSoundsVolume = settingsData.SFXVolume;
+            soundSystem.GlobalUISoundsVolume = settingsData.SFXVolume;
+            soundSystem.GlobalVoiceVolume = settingsData.SFXVolume;
+        }
     }
 }

@@ -51,8 +51,6 @@ public class MainMenuManager : MonoBehaviour
         MainMenuEvents.OnCloseArtefactDetail += OnRequestCloseArtefactDetail;
         MainMenuEvents.OnOpenSettings += OnRequestOpenSettings;
         MainMenuEvents.OnRequestQuit += OnRequestQuit;
-
-        backgroundController.SetActive(false);
     }
 
     private void Start()
@@ -60,11 +58,6 @@ public class MainMenuManager : MonoBehaviour
         bool hasPendingAnimations = 
             activeArtefactData.GetPendingCompletionAnimations().Count > 0 || 
             activeArtefactData.GetPendingUnlockAnimations().Count > 0;
-
-        menuController.SetActive(false);
-        levelSelectionController.SetActive(false);
-        settingsController.SetActive(false);
-        quitController.SetActive(false);
 
         if (isFirstSessionLoad)
         {

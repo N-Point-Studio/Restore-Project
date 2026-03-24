@@ -9,7 +9,7 @@ public class ArtefactDetailController : MonoBehaviour
     [Header("Main References")]
     [SerializeField] private GameObject root;
     [SerializeField] private CanvasGroup canvasGroupRoot;
-    [SerializeField] private Button buttonBack;
+    [SerializeField] private ButtonInputInstructionUI buttonBack;
     
     [Header("Sub-Controllers")]
     [SerializeField] private JournalController journalController; 
@@ -18,8 +18,8 @@ public class ArtefactDetailController : MonoBehaviour
     [SerializeField] private CanvasGroup wallTextGroup; 
     [SerializeField] private TMP_Text wallTitleText;
     [SerializeField] private TMP_Text wallDescText;
-    [SerializeField] private Button buttonReplay;
-    [SerializeField] private Button buttonContinueStory;
+    [SerializeField] private ButtonInputInstructionUI buttonReplay;
+    [SerializeField] private ButtonInputInstructionUI buttonContinueStory;
 
     [Header("Text Instructions")]
     [SerializeField] private TMP_Text instructionText; 
@@ -34,9 +34,9 @@ public class ArtefactDetailController : MonoBehaviour
     
     private void Awake()
     {
-        buttonBack.onClick.AddListener(OnBackClicked);
-        buttonReplay.onClick.AddListener(OnReplayClicked);
-        buttonContinueStory.onClick.AddListener(OnContinueStoryClicked);
+        buttonBack.OnClick += OnBackClicked;
+        buttonReplay.OnClick += OnReplayClicked;
+        buttonContinueStory.OnClick += OnContinueStoryClicked;
         root.SetActive(false);
         
         StickyNote3DItem.OnNotePeeled += HandleNotePeeled;
@@ -44,9 +44,9 @@ public class ArtefactDetailController : MonoBehaviour
 
     private void OnDestroy()
     {
-        buttonBack.onClick.RemoveListener(OnBackClicked);
-        buttonReplay.onClick.RemoveListener(OnReplayClicked);
-        buttonContinueStory.onClick.RemoveListener(OnContinueStoryClicked);
+        buttonBack.OnClick -= OnBackClicked;
+        buttonReplay.OnClick -= OnReplayClicked;
+        buttonContinueStory.OnClick -= OnContinueStoryClicked;
         StickyNote3DItem.OnNotePeeled -= HandleNotePeeled;
     }
 
@@ -167,7 +167,11 @@ public class ArtefactDetailController : MonoBehaviour
         }
         else
         {
-            if (current3DItem != null) current3DItem.SetDetailMode(false, false);
+            if (current3DItem != null) 
+            {
+                current3DItem.SetDetailMode(false, false);
+                current3DItem.Initialize(activeArtefactData); 
+            }
             CloseDetail();
             MainMenuEvents.TriggerCloseArtefactDetail();
             journalController.HideBookCompletely();
@@ -181,7 +185,11 @@ public class ArtefactDetailController : MonoBehaviour
 
     private void OnContinueStoryClicked()
     {
-        if (current3DItem != null) current3DItem.SetDetailMode(false, false);
+        if (current3DItem != null) 
+        {
+            current3DItem.SetDetailMode(false, false);            
+            current3DItem.Initialize(activeArtefactData); 
+        }
         CloseDetail();
         MainMenuEvents.TriggerCloseArtefactDetail();
         journalController.HideBookCompletely();
