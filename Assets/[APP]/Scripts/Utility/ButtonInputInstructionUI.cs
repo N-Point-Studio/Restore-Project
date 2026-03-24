@@ -9,6 +9,8 @@ public class ButtonInputInstructionUI : InputInstructionUI, IPointerEnterHandler
     [SerializeField] protected Button button;
     public Button Button => button;
 
+    public Action OnClick;
+
     [Header("Text Animation Settings")]
     [SerializeField] private RectTransform animatedTextRect;
     [SerializeField] private TextColorChanger textColorChanger;
@@ -20,9 +22,10 @@ public class ButtonInputInstructionUI : InputInstructionUI, IPointerEnterHandler
     [SerializeField] private float tweenDuration = 0.2f;
     [SerializeField] private Ease tweenEase = Ease.OutQuad;
 
-    private Vector3 originalScale;
+    [Header("Style Settings")]
+    [SerializeField] private bool useAlternateStyle = false;
 
-    public Action OnClick;
+    private Vector3 originalScale;
 
     protected override void Awake()
     {
@@ -49,9 +52,17 @@ public class ButtonInputInstructionUI : InputInstructionUI, IPointerEnterHandler
 
     private void HandleOnButtonClicked()
     {
+        if (button != null && !button.interactable) return;
         OnClick?.Invoke();
     }
 
+    public void SetAlternateStyle(bool isAlternate)
+    {
+        useAlternateStyle = isAlternate;
+        ApplyVisualState(false, false); 
+    }
+
+    #region Pointer Events (Hover & Press)
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (button == null || !button.interactable) return;
@@ -73,27 +84,25 @@ public class ButtonInputInstructionUI : InputInstructionUI, IPointerEnterHandler
     public void OnPointerUp(PointerEventData eventData)
     {
         if (button == null || !button.interactable) return;
-        
         bool isStillHovering = eventData.pointerCurrentRaycast.gameObject != null && 
                                (eventData.pointerCurrentRaycast.gameObject == gameObject || 
                                 eventData.pointerCurrentRaycast.gameObject.transform.IsChildOf(transform));
-                                
         ApplyVisualState(isStillHovering, false);
     }
+    #endregion
 
     private void ApplyVisualState(bool isHovered, bool isPressed)
     {
         if (animatedTextRect == null) return;
 
         animatedTextRect.DOKill();
-
         Vector3 targetScale = originalScale;
         if (isHovered) targetScale = originalScale * hoverScale;
         if (isPressed) targetScale *= pressScaleModifier;
 
         animatedTextRect.DOScale(targetScale, tweenDuration).SetEase(isPressed ? Ease.OutBack : tweenEase);
 
-        int stateIndex = isHovered ? 1 : 0;
+        int stateIndex = useAlternateStyle ? 1 : 0; 
         
         if (textColorChanger != null) textColorChanger.ChangeColorSmooth(stateIndex, tweenDuration);
         if (textFontChanger != null) textFontChanger.ChangeFont(stateIndex);

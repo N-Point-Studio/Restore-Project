@@ -253,6 +253,7 @@ GameObject:
   - component: {fileID: 6208020625732715587}
   - component: {fileID: 8910341680950255479}
   - component: {fileID: 7700293422838988684}
+  - component: {fileID: 387958538769206433}
   m_Layer: 5
   m_Name: ButtonInputInstructionUI
   m_TagString: Untagged
@@ -357,6 +358,7 @@ MonoBehaviour:
   pressScaleModifier: 0.95
   tweenDuration: 0.2
   tweenEase: 6
+  useAlternateStyle: 0
 --- !u!114 &7336051414703635489
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -474,6 +476,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isConfirm: 1
+--- !u!114 &387958538769206433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4009351290740636880}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60ae9437bdb1d0e4f86291fa20102a79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISoundEffectTriggerHover
 --- !u!1 &4679535128803416057
 GameObject:
   m_ObjectHideFlags: 0

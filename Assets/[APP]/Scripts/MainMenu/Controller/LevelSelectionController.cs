@@ -9,7 +9,7 @@ public class LevelSelectionController : BaseMenuController
 {
     [Header("UI References")]
     [SerializeField] private ArtefactDetailController artefactDetailController;
-    [SerializeField] private ButtonItemUI backButtonItemUI;
+    [SerializeField] private ButtonInputInstructionUI backButtonItemUI;
 
     [Header("3D Scene References")]
     [SerializeField] private Artefact3DItem[] artefact3DItems;

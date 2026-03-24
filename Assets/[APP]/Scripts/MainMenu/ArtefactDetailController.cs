@@ -1,3 +1,4 @@
+using System;
 using DG.Tweening;
 using MoreMountains.Feedbacks;
 using TMPro;
@@ -9,7 +10,7 @@ public class ArtefactDetailController : MonoBehaviour
     [Header("Main References")]
     [SerializeField] private GameObject root;
     [SerializeField] private CanvasGroup canvasGroupRoot;
-    [SerializeField] private ButtonInputInstructionUI buttonBack;
+    [SerializeField] private ButtonInputInstructionUI buttonBack; 
     
     [Header("Sub-Controllers")]
     [SerializeField] private JournalController journalController; 
@@ -18,8 +19,8 @@ public class ArtefactDetailController : MonoBehaviour
     [SerializeField] private CanvasGroup wallTextGroup; 
     [SerializeField] private TMP_Text wallTitleText;
     [SerializeField] private TMP_Text wallDescText;
-    [SerializeField] private ButtonInputInstructionUI buttonReplay;
-    [SerializeField] private ButtonInputInstructionUI buttonContinueStory;
+    [SerializeField] private Button buttonReplay;
+    [SerializeField] private Button buttonContinueStory;
 
     [Header("Text Instructions")]
     [SerializeField] private TMP_Text instructionText; 
@@ -35,19 +36,29 @@ public class ArtefactDetailController : MonoBehaviour
     private void Awake()
     {
         buttonBack.OnClick += OnBackClicked;
-        buttonReplay.OnClick += OnReplayClicked;
-        buttonContinueStory.OnClick += OnContinueStoryClicked;
+        buttonReplay.onClick.AddListener(OnReplayClicked);
+        buttonContinueStory.onClick.AddListener(OnContinueStoryClicked);
         root.SetActive(false);
         
         StickyNote3DItem.OnNotePeeled += HandleNotePeeled;
+
+        if (journalController != null)
+        {
+            journalController.OnBookOpened += HandleJournalOpenedFromClick;
+        }
     }
 
     private void OnDestroy()
     {
         buttonBack.OnClick -= OnBackClicked;
-        buttonReplay.OnClick -= OnReplayClicked;
-        buttonContinueStory.OnClick -= OnContinueStoryClicked;
+        buttonReplay.onClick.RemoveListener(OnReplayClicked);
+        buttonContinueStory.onClick.RemoveListener(OnContinueStoryClicked);
         StickyNote3DItem.OnNotePeeled -= HandleNotePeeled;
+
+        if (journalController != null)
+        {
+            journalController.OnBookOpened -= HandleJournalOpenedFromClick;
+        }
     }
 
     public void OpenDetail(ArtefactData artefactData, ActiveArtefactData activeData, Artefact3DItem item3D)
@@ -74,20 +85,25 @@ public class ArtefactDetailController : MonoBehaviour
 
         if (isCompleted)
         {
-            // POST-RESTORATION FLOW
             instructionText.gameObject.SetActive(false);
             
+            buttonBack.Button.interactable = false; 
+            DOVirtual.DelayedCall(1.5f, () => { if (buttonBack != null) buttonBack.Button.interactable = true; });
+
+            buttonBack.SetAlternateStyle(true);
+
             journalController.SetupPostRestoration(currentArtefactData, OnJournalContinueClicked);
             journalController.OpenBookFull();
         }
         else
         {
-            // FLOW PRE-RESTORATION
             if (isStoryRead)
             {
                 instructionText.gameObject.SetActive(true);
                 instructionText.text = "Open the box and start restore...";
                 
+                buttonBack.SetAlternateStyle(false);
+
                 journalController.SetupPreRestoration(currentArtefactData, OnJournalRestoreClicked);
                 journalController.HideBookToPeek();
             }
@@ -96,6 +112,8 @@ public class ArtefactDetailController : MonoBehaviour
                 instructionText.gameObject.SetActive(true);
                 instructionText.text = "Peel off the sticky note...";
                 
+                buttonBack.SetAlternateStyle(false);
+
                 journalController.SetupPreRestoration(currentArtefactData, OnJournalRestoreClicked);
             }
         }
@@ -117,8 +135,21 @@ public class ArtefactDetailController : MonoBehaviour
             activeArtefactData.MarkStoryRead(currentArtefactData.BaseData.Id);
             instructionText.gameObject.SetActive(false);
                         
+            buttonBack.Button.interactable = false; 
+            DOVirtual.DelayedCall(1.5f, () => { if (buttonBack != null) buttonBack.Button.interactable = true; });
+
+            buttonBack.SetAlternateStyle(true);
+
             journalController.SetupPreRestoration(currentArtefactData, OnJournalRestoreClicked);
             journalController.OpenBookFull();
+        }
+    } 
+
+    private void HandleJournalOpenedFromClick()
+    {
+        if (buttonBack != null)
+        {
+            buttonBack.SetAlternateStyle(true);
         }
     }
 
@@ -151,6 +182,8 @@ public class ArtefactDetailController : MonoBehaviour
         if (journalController.CurrentState == JournalState.Opened)
         {
             journalController.HideBookToPeek();
+            
+            buttonBack.SetAlternateStyle(false);
 
             if (isCompleted)
             {
@@ -187,7 +220,7 @@ public class ArtefactDetailController : MonoBehaviour
     {
         if (current3DItem != null) 
         {
-            current3DItem.SetDetailMode(false, false);            
+            current3DItem.SetDetailMode(false, false);
             current3DItem.Initialize(activeArtefactData); 
         }
         CloseDetail();

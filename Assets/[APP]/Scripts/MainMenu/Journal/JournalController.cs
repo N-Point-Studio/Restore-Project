@@ -42,6 +42,8 @@ public class JournalController : MonoBehaviour
     private JournalPageAnimator activeLeftPage;
     private JournalPageAnimator activeRightPage;
 
+    public Action OnBookOpened;
+
     private void Awake()
     {
         buttonAction.onClick.AddListener(OnButtonActionClicked);
@@ -142,6 +144,8 @@ public class JournalController : MonoBehaviour
         CurrentState = JournalState.Opened;
         buttonAction.gameObject.SetActive(false);
         ShowOverlay();
+
+        OnBookOpened?.Invoke();
 
         if (!isContentRevealed)
         {
