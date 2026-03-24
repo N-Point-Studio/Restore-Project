@@ -121,9 +121,9 @@ public class SurfaceDetection : MonoBehaviour
 
         // --- TAMBAHAN TUTORIAL ---
         // Jika terdeteksi menyentuh permukaan, anggap user sudah bisa cleaning
-        if (TutorialManager.Instance != null)
+        if (TutorialManagera.Instance != null)
         {
-            TutorialManager.Instance.CompleteStep(1); // Index 1 = Cleaning
+            TutorialManagera.Instance.CompleteStep(1); // Index 1 = Cleaning
         }
         // -------------------------
 

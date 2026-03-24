@@ -4,6 +4,7 @@ using DG.Tweening;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using NINESOFT.TUTORIAL_SYSTEM;
 
 public class AssemblyService : IInitializable, IDisposable
 {
@@ -63,6 +64,13 @@ public class AssemblyService : IInitializable, IDisposable
             HideAllSockets();
             inspectPoint.SetInspectionUsage(true);
             fragmentService.ProgressUpdate();
+
+            //complete tutorial drag ke inspect
+            if (!TutorialManager.Instance.AllTutorialsCompleted)
+            {
+                TutorialManager.Instance.StageCompleted(0, 0);
+            }
+
             return true;
         }
         else

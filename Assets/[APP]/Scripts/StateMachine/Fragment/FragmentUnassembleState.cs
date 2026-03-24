@@ -21,9 +21,9 @@ public class FragmentUnassembleState : FragmentBaseState
         }
 
         // --- TAMBAHAN TUTORIAL ---
-        if (TutorialManager.Instance != null)
+        if (TutorialManagera.Instance != null)
         {
-            TutorialManager.Instance.CompleteStep(5); // Index 5 = Disassemble
+            TutorialManagera.Instance.CompleteStep(5); // Index 5 = Disassemble
         }
         // -------------------------
 

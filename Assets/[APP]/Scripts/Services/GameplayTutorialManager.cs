@@ -1,17 +1,13 @@
-using System.Collections.Generic;
+using NINESOFT.TUTORIAL_SYSTEM;
 using UnityEngine;
-
-public class TutorialData
-{
-    public string tutorialName;
-    public Sprite tutorialSprite;
-    public string tutorialDescription;
-}
 
 public class GameplayTutorialManager : MonoBehaviour
 {
-
-    public List<TutorialData> tutorialDatas;
+    public TutorialStage tutorialStage1;
+    public TutorialStage tutorialStage2;
+    public TutorialStage tutorialStage3;
+    public TutorialStage tutorialStage4;
+    public TutorialStage tutorialStage5;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

@@ -24,9 +24,9 @@ public class FragmentAttachedState : FragmentBaseState
         moveRoutine = stateMachine.StartCoroutine(MoveToCorrectPosition());
 
         // --- TAMBAHAN TUTORIAL ---
-        if (TutorialManager.Instance != null)
+        if (TutorialManagera.Instance != null)
         {
-            TutorialManager.Instance.CompleteStep(4); // Index 4 = Assemble
+            TutorialManagera.Instance.CompleteStep(4); // Index 4 = Assemble
         }
         // -------------------------
 

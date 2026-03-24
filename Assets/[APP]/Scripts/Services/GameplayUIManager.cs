@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
+using NINESOFT.TUTORIAL_SYSTEM;
 
 [Serializable]
 public class ProgressPair
@@ -66,8 +67,26 @@ public class GameplayUIManager : MonoBehaviour
         buttonFinish.OnClick -= OnFinishedGame;
     }
 
-    private void HandleSurfaceCleaningUpdate(float progress) => UpdateProgress(ProgressType.Dust, progress);
-    private void HandleHardCleaningUpdate(float progress) => UpdateProgress(ProgressType.Mud, progress);
+    private void HandleSurfaceCleaningUpdate(float progress)
+    {
+        UpdateProgress(ProgressType.Dust, progress);
+        //complete tutorial brush
+        if (!TutorialManager.Instance.AllTutorialsCompleted)
+        {
+            Debug.Log("Harusnya stage brush selesai");
+            TutorialManager.Instance.StageCompleted(0, 3);
+        }
+    }
+    private void HandleHardCleaningUpdate(float progress)
+    {
+        UpdateProgress(ProgressType.Mud, progress);
+        //complete tutorial chisel
+        if (!TutorialManager.Instance.AllTutorialsCompleted)
+        {
+            Debug.Log("Harusnya stage chisel selesai");
+            TutorialManager.Instance.StageCompleted(0, 4);
+        }
+    }
     private void HandleProgressUpdate(float progress)
     {
         Debug.Log("Assemble harusnya");

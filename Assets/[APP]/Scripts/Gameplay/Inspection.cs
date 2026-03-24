@@ -1,6 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
-using System;
+using NINESOFT.TUTORIAL_SYSTEM;
 
 public class Inspection : MonoBehaviour
 {
@@ -84,6 +84,7 @@ public class Inspection : MonoBehaviour
 
     public void OnRotatePerformed(Vector2 delta)
     {
+        if (!isContain) return;
         if (_mainCamera == null) return;
 
         float rotateY = -delta.x;
@@ -98,6 +99,11 @@ public class Inspection : MonoBehaviour
 
         // rotate vertical (atas bawah)
         transform.Rotate(cameraRight, rotateX, Space.World);
+
+        if (!TutorialManager.Instance.AllTutorialsCompleted)
+        {
+            TutorialManager.Instance.StageCompleted(0, 2);
+        }
     }
 
     public void OnZoomPerformed(float zoomDelta)
@@ -115,6 +121,12 @@ public class Inspection : MonoBehaviour
         float targetDistance = currentDistance + (zoomDelta * zoomSpeed);
         targetDistance = Mathf.Clamp(targetDistance, minDistance, _initialDistance);
         _targetPosition = _mainCamera.transform.position + direction * targetDistance;
+
+        //complete tutorial zoom
+        if (!TutorialManager.Instance.AllTutorialsCompleted)
+        {
+            TutorialManager.Instance.StageCompleted(0, 1);
+        }
     }
 
     public void ResetPosition()

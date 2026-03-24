@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TutorialManager : MonoBehaviour
+public class TutorialManagera : MonoBehaviour
 {
-    public static TutorialManager Instance;
+    public static TutorialManagera Instance;
 
     [System.Serializable]
     public class TutorialStep
