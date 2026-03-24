@@ -100,6 +100,10 @@ public class GameplayUIManager : MonoBehaviour
         mainCanvas.SetActive(false);
         endgameCanvas.SetActive(true);
         OnGameWrapped?.Invoke();
+        if (!TutorialManager.Instance.AllTutorialsCompleted)
+        {
+            TutorialManager.Instance.StageCompleted(1, 0);
+        }
     }
 
     private void OnFinishedGame()
@@ -135,6 +139,11 @@ public class GameplayUIManager : MonoBehaviour
         }
         if (count == 0) return;
         float overall = total / count;
-        buttonWrapUp.gameObject.SetActive(overall >= 100f);
+        buttonWrapUp.gameObject.SetActive(overall >= 95f);
+
+        if (!TutorialManager.Instance.AllTutorialsCompleted && overall >= 95f)
+        {
+            TutorialManager.Instance.StageStarted(1, 0);
+        }
     }
 }
