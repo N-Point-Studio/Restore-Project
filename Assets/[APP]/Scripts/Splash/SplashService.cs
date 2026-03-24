@@ -93,6 +93,6 @@ public class SplashService : IStartable
     private async Task LoadNextScene()
     {
         string sceneToLoad = string.IsNullOrEmpty(targetScene) ? "MainMenu" : targetScene;        
-        await sceneLoader.LoadSceneAsync(sceneToLoad, LoadingType.Music);
+        await sceneLoader.LoadSceneAsync(sceneToLoad);
     }
 }

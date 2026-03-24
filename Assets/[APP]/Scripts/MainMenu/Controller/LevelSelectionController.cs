@@ -176,7 +176,7 @@ public class LevelSelectionController : BaseMenuController
     private void OnRequestArtefactPlay(ArtefactData data)
     {
         playerProgressionData.SetCurrentActiveArtefact(data.BaseData.Id);
-        _ = sceneLoader.LoadSceneAsync(targetScene, LoadingType.ProgressBar);
+        _ = sceneLoader.LoadSceneAsync(targetScene, 2f);
     }
 
     private void OnRequestArtefactDetail(ArtefactData data)

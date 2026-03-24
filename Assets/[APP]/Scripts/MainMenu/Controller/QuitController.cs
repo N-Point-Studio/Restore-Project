@@ -1,16 +1,54 @@
 using UnityEngine;
+using VContainer;
+using DG.Tweening;
 
-public class QuitController : MonoBehaviour
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+public class QuitController : BaseMenuController
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] private ButtonInputInstructionUI buttonCancel;
+    [SerializeField] private ButtonInputInstructionUI buttonConfirm;
+
+    private Tween quitTween;
+
+    protected override void Awake()
     {
-        
+        base.Awake();
+        buttonCancel.OnClick += OnButtonCancelClick;
+        buttonConfirm.OnClick += OnButtonConfirmClick;
     }
 
-    // Update is called once per frame
-    void Update()
+    protected override void OnDestroy()
     {
-        
+        base.OnDestroy();
+        buttonCancel.OnClick += OnButtonCancelClick;
+        buttonConfirm.OnClick += OnButtonConfirmClick;
+
+        if (quitTween != null && quitTween.IsActive())
+        {
+            quitTween.Kill();
+        }
+    }
+
+    private void OnButtonCancelClick()
+    {
+        SetActive(false);
+    }
+
+    private void OnButtonConfirmClick()
+    {
+        // TODO: Save All Before Quitting?
+        if (quitTween != null && quitTween.IsActive()) return;
+
+        quitTween = DOVirtual.DelayedCall(0.05f, () =>
+        {
+#if UNITY_EDITOR
+            EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        }).SetUpdate(true);
     }
 }
