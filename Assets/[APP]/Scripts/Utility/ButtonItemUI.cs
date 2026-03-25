@@ -88,7 +88,7 @@ public class ButtonItemUI : UIBehaviour, IPointerEnterHandler, IPointerExitHandl
 
         rectTransform.DOKill();
         Vector3 pressScale = (changeSizeWhenSelected ? selectedScale : originalScale) * pressScaleModifier;
-        rectTransform.DOScale(pressScale, tweenDuration / 2f).SetEase(Ease.OutBack);
+        rectTransform.DOScale(pressScale, tweenDuration / 2f).SetEase(Ease.OutBack).SetUpdate(true);
     }
 
     public void OnPointerUp(PointerEventData eventData)
@@ -125,12 +125,12 @@ public class ButtonItemUI : UIBehaviour, IPointerEnterHandler, IPointerExitHandl
 
         if (changeSizeWhenSelected)
         {
-            rectTransform.DOSizeDelta(showAsSelected ? selectedSizeDelta : originalSizeDelta, tweenDuration).SetEase(tweenEase);
-            rectTransform.DOScale(showAsSelected ? selectedScale : originalScale, tweenDuration).SetEase(tweenEase);
+            rectTransform.DOSizeDelta(showAsSelected ? selectedSizeDelta : originalSizeDelta, tweenDuration).SetEase(tweenEase).SetUpdate(true);
+            rectTransform.DOScale(showAsSelected ? selectedScale : originalScale, tweenDuration).SetEase(tweenEase).SetUpdate(true);
         }
         else
         {
-            rectTransform.DOScale(originalScale, tweenDuration).SetEase(tweenEase); 
+            rectTransform.DOScale(originalScale, tweenDuration).SetEase(tweenEase).SetUpdate(true); 
         }
 
         int stateIndex = showAsSelected ? 1 : 0;

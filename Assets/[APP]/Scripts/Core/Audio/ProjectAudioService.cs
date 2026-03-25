@@ -27,6 +27,7 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         AudioEvents.OnPlaySliderSFX += HandleOnOnPlaySliderSFX;
         AudioEvents.OnPlayBGMGameplay += HandleOnPlayBGMGameplay;
         AudioEvents.OnPlayBGMMainMenu += HandleOnPlayBGMMainMenu;
+        AudioEvents.OnPlayCustomSFX += HandleOnPlayCustomSFX;
     }
 
     void IDisposable.Dispose()
@@ -37,6 +38,7 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         AudioEvents.OnPlaySliderSFX -= HandleOnOnPlaySliderSFX;
         AudioEvents.OnPlayBGMGameplay -= HandleOnPlayBGMGameplay;
         AudioEvents.OnPlayBGMMainMenu -= HandleOnPlayBGMMainMenu;
+        AudioEvents.OnPlayCustomSFX -= HandleOnPlayCustomSFX;
     }
 
     void IStartable.Start()
@@ -118,5 +120,11 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         {
             AppLogger.LogWarning($"[ProjectAudioService] Failed to play BGM Main Menu: {e.Message}");
         }
+    }
+    
+
+    private void HandleOnPlayCustomSFX(AudioKey audioKey)
+    {
+        PlaySFX(audioKey);
     }
 }

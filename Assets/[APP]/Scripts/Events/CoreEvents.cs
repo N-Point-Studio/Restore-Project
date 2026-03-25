@@ -3,7 +3,7 @@ using UnityEngine;
 
 public static class CoreEvents
 {
-    public static Action<ProjectSettingsData> OnSettingsChanged;
+    public static event Action<ProjectSettingsData> OnSettingsChanged;
 
     public static void TriggerSettingsChange(ProjectSettingsData projectSettingsData)
     {

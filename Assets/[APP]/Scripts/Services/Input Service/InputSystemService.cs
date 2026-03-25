@@ -17,6 +17,7 @@ public class InputSystemService : IInitializable, IDisposable
     public event Action OnRightPressEnded;
     public event Action<float> OnScrollPerformed;
     public event Action OnPlayerKeycodeEscapePerformed;
+    public event Action OnPlayerKeycodeEnterPerformed;
 
     // UI
     public event Action OnUIKeycodeEnterPerformed;
@@ -38,6 +39,7 @@ public class InputSystemService : IInitializable, IDisposable
         Input.Player.ScreenPos.performed += HandleMouseMoved;
         Input.Player.Scroll.performed += HandleScrollPerformed;
         Input.Player.KeycodeEscape.performed += HandlePlayerKeycodeEscapePerformed;
+        Input.Player.KeycodeEnter.performed += HandlePlayerKeycodeEnterPerformed;
 
         Input.UI.KeycodeEnter.performed += HandleUIKeycodeEnterPerformed;
         Input.UI.KeycodeEscape.performed += HandleUIKeycodeEscapePerformed;
@@ -53,6 +55,7 @@ public class InputSystemService : IInitializable, IDisposable
         Input.Player.ScreenPos.performed -= HandleMouseMoved;
         Input.Player.Scroll.performed -= HandleScrollPerformed;
         Input.Player.KeycodeEscape.performed -= HandlePlayerKeycodeEscapePerformed;
+        Input.Player.KeycodeEnter.performed -= HandlePlayerKeycodeEnterPerformed;
         
         Input.UI.KeycodeEnter.performed -= HandleUIKeycodeEnterPerformed;
         Input.UI.KeycodeEscape.performed -= HandleUIKeycodeEscapePerformed;
@@ -72,6 +75,7 @@ public class InputSystemService : IInitializable, IDisposable
     private void HandleMouseMoved(InputAction.CallbackContext context) => OnMouseMoved?.Invoke(context.ReadValue<Vector2>());
     private void HandleScrollPerformed(InputAction.CallbackContext context) => OnScrollPerformed?.Invoke(context.ReadValue<float>());
     private void HandlePlayerKeycodeEscapePerformed(InputAction.CallbackContext context) => OnPlayerKeycodeEscapePerformed?.Invoke();
+    private void HandlePlayerKeycodeEnterPerformed(InputAction.CallbackContext context) => OnPlayerKeycodeEnterPerformed?.Invoke();
     public Vector2 GetMousePosition() { return Input.Player.ScreenPos.ReadValue<Vector2>(); }
 
     // UI

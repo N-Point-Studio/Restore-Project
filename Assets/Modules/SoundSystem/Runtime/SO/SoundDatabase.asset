@@ -40,12 +40,12 @@ MonoBehaviour:
       type: 1
   - id: ui
     items:
-    - key: UI_Change_Page
-      value: {fileID: 8300000, guid: 53c0e558172e2b340af5835d9c12a7ad, type: 3}
-      type: 1
     - key: UI_Button_Click
       value: {fileID: 8300000, guid: adcf3b2b5883d0e40a342c48e94f8b6b, type: 3}
-      type: 1
+      type: 2
+    - key: UI_Change_Page
+      value: {fileID: 8300000, guid: 53c0e558172e2b340af5835d9c12a7ad, type: 3}
+      type: 2
   randomizePitchForDuplicates: 1
   minPitch: 0.75
   maxPitch: 1.25
