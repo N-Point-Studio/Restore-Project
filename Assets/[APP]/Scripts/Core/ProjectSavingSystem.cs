@@ -3,6 +3,7 @@ using VContainer;
 using VContainer.Unity;
 using Modules;
 using System;
+using UnityEngine;
 
 public class ProjectSavingSystem : SavingSystem, IInitializable, IStartable, IDisposable, ITickable
 {
@@ -16,36 +17,55 @@ public class ProjectSavingSystem : SavingSystem, IInitializable, IStartable, IDi
     private bool isSaving;
     private bool isLoading;
     private Action onFinished;
+    
+    private bool isDataDirty = false;
+    private float autoSaveTimer = 0f;
+    private const float AUTO_SAVE_COOLDOWN = 1.0f;
 
     void IInitializable.Initialize()
-    {
-        playerProgressionData.OnUpdated += HandleDataChanged;
-        activeArtefactData.OnUpdated += HandleDataChanged;
-    }
-
-    void IDisposable.Dispose()
-    {
-        playerProgressionData.OnUpdated -= HandleDataChanged;
-        activeArtefactData.OnUpdated -= HandleDataChanged;
-    }
-
-    private void HandleDataChanged()
-    {
-        SaveAll();
-    }
-
-    void IStartable.Start()
     {
         LoadAll(0, () => 
         {
             AppLogger.Log("[ProjectSavingSystem] All save data loaded successfully at startup!");
         });
+        
+        playerProgressionData.OnUpdated += RequestAutoSave;
+        activeArtefactData.OnUpdated += RequestAutoSave;
     }
 
-    public void SaveAll(int slot = 0, Action onFinished = null)
+    void IDisposable.Dispose()
     {
+        playerProgressionData.OnUpdated -= RequestAutoSave;
+        activeArtefactData.OnUpdated -= RequestAutoSave;
+    }
+
+    private void RequestAutoSave()
+    {
+        isDataDirty = true;
+        autoSaveTimer = AUTO_SAVE_COOLDOWN;
+    }
+
+    void IStartable.Start()
+    {
+    }
+
+    public void SaveAll(int slot = 0, Action onFinishedCallback = null)
+    {
+        if (isSaving) 
+        {
+            AppLogger.LogWarning("[ProjectSavingSystem] Sedang proses save, request ditunda/diabaikan.");
+            if (onFinishedCallback != null) this.onFinished += onFinishedCallback;
+            return;
+        }
+
         isSaving = true;
-        this.onFinished = onFinished;
+        isDataDirty = false;
+        
+        if (onFinishedCallback != null)
+        {
+            this.onFinished += onFinishedCallback;
+        }
+        
         progress = 3; 
 
         try
@@ -58,13 +78,17 @@ public class ProjectSavingSystem : SavingSystem, IInitializable, IStartable, IDi
         {
             AppLogger.LogError($"Error while saving data: {e}");
             isSaving = false;
+            this.onFinished?.Invoke();
+            this.onFinished = null;
         }
     }
 
-    public void LoadAll(int slot = 0, Action onFinished = null)
+    public void LoadAll(int slot = 0, Action onFinishedCallback = null)
     {
+        if (isLoading) return;
+
         isLoading = true;
-        this.onFinished = onFinished;
+        this.onFinished = onFinishedCallback;
         progress = 3; 
 
         try
@@ -97,11 +121,22 @@ public class ProjectSavingSystem : SavingSystem, IInitializable, IStartable, IDi
         {
             AppLogger.LogError($"Error while loading data: {e}");
             isLoading = false;
+            this.onFinished?.Invoke();
+            this.onFinished = null;
         }
     }
 
     void ITickable.Tick()
     {
+        if (isDataDirty && !isSaving && !isLoading)
+        {
+            autoSaveTimer -= Time.deltaTime;
+            if (autoSaveTimer <= 0)
+            {
+                SaveAll();
+            }
+        }
+
         CheckCompletion();
     }
 
@@ -109,9 +144,10 @@ public class ProjectSavingSystem : SavingSystem, IInitializable, IStartable, IDi
     {
         if ((isSaving || isLoading) && progress <= 0)
         {
-            onFinished?.Invoke();
             isSaving = false;
             isLoading = false;
+            
+            onFinished?.Invoke();
             onFinished = null;
         }
     }

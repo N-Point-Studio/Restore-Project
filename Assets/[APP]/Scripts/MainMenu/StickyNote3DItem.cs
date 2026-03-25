@@ -26,6 +26,21 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
     
     public static Action<StickyNote3DItem> OnNotePeeled;
 
+    private bool isInitialized = false;
+
+    private void SetupOriginalValues()
+    {
+        if (isInitialized) return;
+        
+        originalColor = spriteRenderer.color;
+        originalScale = transform.localScale;
+        originalRotation = transform.localEulerAngles;
+        
+        col = GetComponent<Collider>();
+        
+        isInitialized = true;
+    }
+
     private void Awake()
     {
         originalColor = spriteRenderer.color;
@@ -38,6 +53,8 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     public void Initialize(string noteText, Artefact3DItem boss)
     {
+        SetupOriginalValues();
+        
         brain = boss;
         if (text3D != null) text3D.text = noteText;
         

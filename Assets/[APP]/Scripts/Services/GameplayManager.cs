@@ -8,16 +8,19 @@ public class GameplayManager : IInitializable, IDisposable
     private readonly PlayerProgressionData playerProgressionData;
     private readonly SceneLoader sceneLoader;
     private ActiveArtefactData activeArtefactData;
+    private InputSystemService inputSystemService;
     private ArtefactData artefactData;
 
     private const string TARGET_SCENE = "MainMenu";
 
     [Inject]
-    public GameplayManager(PlayerProgressionData playerProgressionData, ActiveArtefactData activeArtefactData, SceneLoader sceneLoader)
+    public GameplayManager(PlayerProgressionData playerProgressionData, ActiveArtefactData activeArtefactData, SceneLoader sceneLoader, InputSystemService inputSystemService)
     {
         this.playerProgressionData = playerProgressionData;
         this.activeArtefactData = activeArtefactData;
         this.sceneLoader = sceneLoader;
+        this.inputSystemService = inputSystemService;
+
         InitializeSession();
     }
 
@@ -64,13 +67,16 @@ public class GameplayManager : IInitializable, IDisposable
     {
         AppLogger.Log($"[Gameplay Manager] Back to menu using SceneLoader...");
 
-        _ = sceneLoader.LoadSceneAsync(TARGET_SCENE, 2f);
+        _ = sceneLoader.LoadSceneAsync(TARGET_SCENE, 2f, "Displaying Artefact...");
     }
 
-    // TODO: Call this at the first time playing of the timing not right (e.g: UI or sumthin not loaded properly)
-    // do edit GameLoader and initialize from there and make Maybe GameplayEvents.OnArtefactInitialize maybe? then make UI and other service listen from it
     private void InitializeSession()
     {
+        if (inputSystemService != null)
+        {
+            inputSystemService.ChangeInputState(InputStateType.Player);
+        }
+
         if (playerProgressionData != null && activeArtefactData != null)
         {
             string targetId = playerProgressionData.CurrentActiveArtefactId;
@@ -84,6 +90,5 @@ public class GameplayManager : IInitializable, IDisposable
                 AppLogger.LogWarning("[Gameplay Manager] Empty artefact ID!");
             }
         }
-        // LoadArtefact();
     }
 }

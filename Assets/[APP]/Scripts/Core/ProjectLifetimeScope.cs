@@ -7,7 +7,6 @@ public class ProjectLifetimeScope : LifetimeScope
 {
     // Core systems
     [SerializeField] private SoundSystem soundSystem;
-    [SerializeField] protected HapticManager hapticManager;
     [SerializeField] protected GameObject loadingPrefab;
 
     [Header("Settings")]
@@ -21,13 +20,6 @@ public class ProjectLifetimeScope : LifetimeScope
         // Core systems
         SoundSystem soundSystemInstance = Instantiate(soundSystem, transform);
         builder.RegisterComponent(soundSystemInstance).AsSelf();
-
-        // Haptic manager
-#if UNITY_IOS
-        HapticManager hapticInstance = Instantiate(hapticManager, transform);
-        builder.RegisterComponentInHierarchy<HapticManager>().AsSelf();
-        hapticInstance.SetActiveHaptic(true);
-#endif
 
         // Active Container (runtime state - all Singleton)
         builder.Register<PlayerProgressionData>(Lifetime.Singleton).AsSelf();

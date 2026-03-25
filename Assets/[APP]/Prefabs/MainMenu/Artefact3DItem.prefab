@@ -2389,8 +2389,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 14.871}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.064, y: -0.0299}
-  m_SizeDelta: {x: 17.5706, y: 17.5807}
+  m_AnchoredPosition: {x: 0.0538, y: -0.0329}
+  m_SizeDelta: {x: 17.0044, y: 17.5807}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &7251970882888491311
 MeshRenderer:
@@ -2417,7 +2417,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 169593585352349610, guid: 02d5461614bd89147a713f9e2cacfbb4, type: 2}
+  - {fileID: -1999879239979766154, guid: 30630ed0a05528b49b38107864c2e9a6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2464,15 +2464,15 @@ MonoBehaviour:
   m_text: "Here\u2019s your first artifact, Nova.\nI hope this is a beautiful start
     to your journey here!\n\n-Mrs. Maya :)"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 02d5461614bd89147a713f9e2cacfbb4, type: 2}
-  m_sharedMaterial: {fileID: 169593585352349610, guid: 02d5461614bd89147a713f9e2cacfbb4, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 30630ed0a05528b49b38107864c2e9a6, type: 2}
+  m_sharedMaterial: {fileID: -1999879239979766154, guid: 30630ed0a05528b49b38107864c2e9a6, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4278523939
+  m_fontColor: {r: 0.13725491, g: 0.09411765, b: 0.019607844, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -2489,8 +2489,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 21
+  m_fontSizeBase: 21
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2502,7 +2502,7 @@ MonoBehaviour:
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
   m_wordSpacing: 0
-  m_lineSpacing: -12.02
+  m_lineSpacing: -20
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
@@ -2662,8 +2662,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 6.244}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.003, y: -0.041}
-  m_SizeDelta: {x: 20, y: 16.9163}
+  m_AnchoredPosition: {x: -0.0215, y: -0.044}
+  m_SizeDelta: {x: 18.6543, y: 16.9163}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &2443515622903078436
 MeshRenderer:
@@ -2690,7 +2690,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 169593585352349610, guid: 02d5461614bd89147a713f9e2cacfbb4, type: 2}
+  - {fileID: -1999879239979766154, guid: 30630ed0a05528b49b38107864c2e9a6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2737,15 +2737,15 @@ MonoBehaviour:
   m_text: P.S Amazing to see this project in the hands of someone so competent! I
     know I can trust you.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 02d5461614bd89147a713f9e2cacfbb4, type: 2}
-  m_sharedMaterial: {fileID: 169593585352349610, guid: 02d5461614bd89147a713f9e2cacfbb4, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 30630ed0a05528b49b38107864c2e9a6, type: 2}
+  m_sharedMaterial: {fileID: -1999879239979766154, guid: 30630ed0a05528b49b38107864c2e9a6, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4278523939
+  m_fontColor: {r: 0.13725491, g: 0.09411765, b: 0.019607844, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -2775,7 +2775,7 @@ MonoBehaviour:
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
   m_wordSpacing: 0
-  m_lineSpacing: -12.02
+  m_lineSpacing: -20
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0

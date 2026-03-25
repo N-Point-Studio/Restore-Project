@@ -12,6 +12,7 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private SettingsController settingsController;
     [SerializeField] private QuitController quitController;
     [SerializeField] private BackgroundController backgroundController;
+    [SerializeField] private PopUpConfirmationController popUpConfirmationController;
 
     [Header("Scene Configuration")]
     [SerializeField] private string splashSceneName = "Splash";
@@ -20,6 +21,7 @@ public class MainMenuManager : MonoBehaviour
     private ActiveArtefactData activeArtefactData;
     private SceneLoader sceneLoader;
     private ProjectSavingSystem projectSavingSystem;
+    private InputSystemService input;
 
     private static bool isFirstSessionLoad = true;
 
@@ -29,17 +31,21 @@ public class MainMenuManager : MonoBehaviour
         ActiveArtefactData activeArtefactData, 
         SceneLoader sceneLoader,
         ProjectSavingSystem projectSavingSystem,
-        IObjectResolver container)
+        IObjectResolver container,
+        InputSystemService input)
     {
         this.playerProgressionData = playerProgressionData;
         this.activeArtefactData = activeArtefactData;
         this.sceneLoader = sceneLoader;
         this.projectSavingSystem = projectSavingSystem;
+        this.input = input;
 
         container.Inject(menuController);
         container.Inject(levelSelectionController);
         container.Inject(settingsController);
         container.Inject(quitController);
+
+        input.ChangeInputState(InputStateType.UI);
     }
 
     private void Awake()
@@ -51,8 +57,8 @@ public class MainMenuManager : MonoBehaviour
         MainMenuEvents.OnCloseArtefactDetail += OnRequestCloseArtefactDetail;
         MainMenuEvents.OnOpenSettings += OnRequestOpenSettings;
         MainMenuEvents.OnRequestQuit += OnRequestQuit;
-
-        backgroundController.SetActive(false);
+        popUpConfirmationController.OnConfirm += OnConfirmNewGame;
+        popUpConfirmationController.OnCancel += OnCancelNewGame;
     }
 
     private void Start()
@@ -60,11 +66,6 @@ public class MainMenuManager : MonoBehaviour
         bool hasPendingAnimations = 
             activeArtefactData.GetPendingCompletionAnimations().Count > 0 || 
             activeArtefactData.GetPendingUnlockAnimations().Count > 0;
-
-        menuController.SetActive(false);
-        levelSelectionController.SetActive(false);
-        settingsController.SetActive(false);
-        quitController.SetActive(false);
 
         if (isFirstSessionLoad)
         {
@@ -96,6 +97,8 @@ public class MainMenuManager : MonoBehaviour
         MainMenuEvents.OnCloseArtefactDetail -= OnRequestCloseArtefactDetail;
         MainMenuEvents.OnOpenSettings -= OnRequestOpenSettings;
         MainMenuEvents.OnRequestQuit -= OnRequestQuit;
+        popUpConfirmationController.OnConfirm -= OnConfirmNewGame;
+        popUpConfirmationController.OnCancel -= OnCancelNewGame;
     }
 
     private void OnRequestNewGameGame()
@@ -104,14 +107,7 @@ public class MainMenuManager : MonoBehaviour
 
         if (isReturningPlayer)
         {
-            AppLogger.Log("[MainMenuManager] Veteran player resetting game -> Reload Splash");
-
-            playerProgressionData.ClearData();
-            activeArtefactData.ResetData(); 
-            
-            projectSavingSystem.SaveAll();
-
-            _ = sceneLoader.LoadSceneAsync(splashSceneName);
+            popUpConfirmationController.SetActive(true);
         }
         else
         {
@@ -169,5 +165,22 @@ public class MainMenuManager : MonoBehaviour
     private void OnRequestQuit()
     {
         quitController.SetActive(true);
+    }
+
+    private void OnConfirmNewGame()
+    {
+        AppLogger.Log("[MainMenuManager] Veteran player resetting game -> Reload Splash");
+
+        playerProgressionData.ClearData();
+        activeArtefactData.ResetData(); 
+        
+        projectSavingSystem.SaveAll();
+
+        _ = sceneLoader.LoadSceneAsync(splashSceneName);
+    }
+
+    private void OnCancelNewGame()
+    {
+        popUpConfirmationController.SetActive(false);
     }
 }

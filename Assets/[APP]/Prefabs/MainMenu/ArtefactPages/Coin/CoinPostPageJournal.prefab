@@ -68,15 +68,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: Feb 26, 2017
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 2ed3cb5592c73cc478df7268f8002121, type: 2}
-  m_sharedMaterial: {fileID: -828601511121429308, guid: 2ed3cb5592c73cc478df7268f8002121, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 30630ed0a05528b49b38107864c2e9a6, type: 2}
+  m_sharedMaterial: {fileID: -1999879239979766154, guid: 30630ed0a05528b49b38107864c2e9a6, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4278523939
+  m_fontColor: {r: 0.13725491, g: 0.09411765, b: 0.019607844, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -177,7 +177,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2140565966222655866}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.0000078745}
+  m_LocalPosition: {x: 0, y: 0, z: -0.000021103}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -185,8 +185,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 13.026459, y: -130.6065}
-  m_SizeDelta: {x: 397.947, y: 265.413}
+  m_AnchoredPosition: {x: 13.026, y: -157.79}
+  m_SizeDelta: {x: 397.947, y: 319.78}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1477905407710442776
 CanvasRenderer:
@@ -220,15 +220,15 @@ MonoBehaviour:
     but Ms. Maya was so so sweet and supportive.\n\nCan\u2019t wait to tell Mama
     about this! I think she went to China for an excavation project once...?"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 2ed3cb5592c73cc478df7268f8002121, type: 2}
-  m_sharedMaterial: {fileID: -828601511121429308, guid: 2ed3cb5592c73cc478df7268f8002121, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 30630ed0a05528b49b38107864c2e9a6, type: 2}
+  m_sharedMaterial: {fileID: -1999879239979766154, guid: 30630ed0a05528b49b38107864c2e9a6, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4278523939
+  m_fontColor: {r: 0.13725491, g: 0.09411765, b: 0.019607844, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -245,8 +245,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -329,7 +329,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2140621435347144561}
   m_LocalRotation: {x: 0.00000042018377, y: 0.00000078603614, z: -0.09478554, w: -0.9954977}
-  m_LocalPosition: {x: 0, y: 0, z: -0.000010052181}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -337,8 +337,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 10.878}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -12.599915, y: 146.2}
-  m_SizeDelta: {x: 220, y: 220}
+  m_AnchoredPosition: {x: -4.234, y: 140.531}
+  m_SizeDelta: {x: 234.291, y: 234.291}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1753006237653431838
 CanvasRenderer:
@@ -414,7 +414,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2443599034862929671}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -441,6 +441,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4229f3e50f8b3ab44b35be3cb132d7b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::JournalPageAnimator
+  initialDelay: 0.5
   sequenceElements:
   - canvasGroup: {fileID: 2005077659878570155}
     revealStyle: 1

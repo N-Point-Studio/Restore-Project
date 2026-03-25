@@ -102,6 +102,15 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
+                    ""name"": ""KeycodeEscape"",
+                    ""type"": ""Button"",
+                    ""id"": ""24ab1896-da09-44f5-8831-93fad29e18f5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""ScreenPos"",
                     ""type"": ""Value"",
                     ""id"": ""e78f3ab0-f8c3-4982-a0df-284b90b60d5f"",
@@ -147,15 +156,6 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Tap"",
-                    ""type"": ""Button"",
-                    ""id"": ""99404de8-2ad0-475c-8b6c-2b12eb485264"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": ""Tap"",
-                    ""initialStateCheck"": false
-                },
-                {
                     ""name"": ""SecondaryFingerPress"",
                     ""type"": ""Button"",
                     ""id"": ""cfe54ebe-93c9-4b36-98e9-ef80a03b0e24"",
@@ -172,7 +172,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Desktop"",
                     ""action"": ""Press"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -183,8 +183,19 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Touchscreen>/touch0/press"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Mobile"",
                     ""action"": ""Press"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5395deb9-7afc-4ccb-aabf-4311d0c13ea1"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Desktop"",
+                    ""action"": ""KeycodeEscape"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -194,7 +205,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Mouse>/position"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Desktop"",
                     ""action"": ""ScreenPos"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -205,7 +216,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Touchscreen>/touch0/position"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Mobile"",
                     ""action"": ""ScreenPos"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -216,7 +227,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Touchscreen>/Press"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Mobile"",
                     ""action"": ""Hold"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -227,7 +238,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Desktop"",
                     ""action"": ""Hold"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -238,7 +249,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Pointer>/press"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Desktop"",
                     ""action"": ""Hold"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -249,19 +260,8 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Touchscreen>/touch1/position"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Mobile"",
                     ""action"": ""SecondaryFingerPos"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""bdf1720f-e5ad-4e8a-b99f-9774e8b557ca"",
-                    ""path"": """",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Tap"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -271,7 +271,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Touchscreen>/touch1/press"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Mobile"",
                     ""action"": ""SecondaryFingerPress"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -282,7 +282,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Mouse>/rightButton"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Desktop"",
                     ""action"": ""SecondaryPress"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -293,7 +293,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Mouse>/scroll/y"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Desktop"",
                     ""action"": ""Scroll"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -304,7 +304,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""path"": ""<VirtualMouse>/scroll/y"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Mobile"",
                     ""action"": ""Scroll"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -316,9 +316,27 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             ""id"": ""496491a5-091b-453e-955c-b6c4adde0d80"",
             ""actions"": [
                 {
-                    ""name"": ""New action"",
+                    ""name"": ""KeycodeEscape"",
                     ""type"": ""Button"",
                     ""id"": ""ec6feda2-678d-4269-a74f-b4ac1dd133a2"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""KeycodeR"",
+                    ""type"": ""Button"",
+                    ""id"": ""b1cfcf24-2ef4-4c03-8be8-a0945eba7542"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""KeycodeEnter"",
+                    ""type"": ""Button"",
+                    ""id"": ""ec44f62b-bf7f-4731-9b45-c14f64baa8e8"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -329,32 +347,79 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""85434685-32e6-4e9f-86a1-82832275515e"",
-                    ""path"": """",
+                    ""path"": ""<Keyboard>/escape"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""New action"",
+                    ""groups"": ""Desktop"",
+                    ""action"": ""KeycodeEscape"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cb593c82-4e8d-4f40-8344-2cce559fe77c"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Desktop"",
+                    ""action"": ""KeycodeR"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f5b353b4-ab0e-4f48-9cd3-9552ea0bbcdc"",
+                    ""path"": ""<Keyboard>/enter"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Desktop"",
+                    ""action"": ""KeycodeEnter"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
             ]
         }
     ],
-    ""controlSchemes"": []
+    ""controlSchemes"": [
+        {
+            ""name"": ""Desktop"",
+            ""bindingGroup"": ""Desktop"",
+            ""devices"": [
+                {
+                    ""devicePath"": ""<Keyboard>"",
+                    ""isOptional"": false,
+                    ""isOR"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Mobile"",
+            ""bindingGroup"": ""Mobile"",
+            ""devices"": [
+                {
+                    ""devicePath"": ""<Touchscreen>"",
+                    ""isOptional"": false,
+                    ""isOR"": false
+                }
+            ]
+        }
+    ]
 }");
         // Player
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Press = m_Player.FindAction("Press", throwIfNotFound: true);
+        m_Player_KeycodeEscape = m_Player.FindAction("KeycodeEscape", throwIfNotFound: true);
         m_Player_ScreenPos = m_Player.FindAction("ScreenPos", throwIfNotFound: true);
         m_Player_SecondaryPress = m_Player.FindAction("SecondaryPress", throwIfNotFound: true);
         m_Player_Scroll = m_Player.FindAction("Scroll", throwIfNotFound: true);
         m_Player_SecondaryFingerPos = m_Player.FindAction("SecondaryFingerPos", throwIfNotFound: true);
         m_Player_Hold = m_Player.FindAction("Hold", throwIfNotFound: true);
-        m_Player_Tap = m_Player.FindAction("Tap", throwIfNotFound: true);
         m_Player_SecondaryFingerPress = m_Player.FindAction("SecondaryFingerPress", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
-        m_UI_Newaction = m_UI.FindAction("New action", throwIfNotFound: true);
+        m_UI_KeycodeEscape = m_UI.FindAction("KeycodeEscape", throwIfNotFound: true);
+        m_UI_KeycodeR = m_UI.FindAction("KeycodeR", throwIfNotFound: true);
+        m_UI_KeycodeEnter = m_UI.FindAction("KeycodeEnter", throwIfNotFound: true);
     }
 
     ~@GameInput()
@@ -437,12 +502,12 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Player;
     private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
     private readonly InputAction m_Player_Press;
+    private readonly InputAction m_Player_KeycodeEscape;
     private readonly InputAction m_Player_ScreenPos;
     private readonly InputAction m_Player_SecondaryPress;
     private readonly InputAction m_Player_Scroll;
     private readonly InputAction m_Player_SecondaryFingerPos;
     private readonly InputAction m_Player_Hold;
-    private readonly InputAction m_Player_Tap;
     private readonly InputAction m_Player_SecondaryFingerPress;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
@@ -459,6 +524,10 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Press".
         /// </summary>
         public InputAction @Press => m_Wrapper.m_Player_Press;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/KeycodeEscape".
+        /// </summary>
+        public InputAction @KeycodeEscape => m_Wrapper.m_Player_KeycodeEscape;
         /// <summary>
         /// Provides access to the underlying input action "Player/ScreenPos".
         /// </summary>
@@ -479,10 +548,6 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Hold".
         /// </summary>
         public InputAction @Hold => m_Wrapper.m_Player_Hold;
-        /// <summary>
-        /// Provides access to the underlying input action "Player/Tap".
-        /// </summary>
-        public InputAction @Tap => m_Wrapper.m_Player_Tap;
         /// <summary>
         /// Provides access to the underlying input action "Player/SecondaryFingerPress".
         /// </summary>
@@ -516,6 +581,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Press.started += instance.OnPress;
             @Press.performed += instance.OnPress;
             @Press.canceled += instance.OnPress;
+            @KeycodeEscape.started += instance.OnKeycodeEscape;
+            @KeycodeEscape.performed += instance.OnKeycodeEscape;
+            @KeycodeEscape.canceled += instance.OnKeycodeEscape;
             @ScreenPos.started += instance.OnScreenPos;
             @ScreenPos.performed += instance.OnScreenPos;
             @ScreenPos.canceled += instance.OnScreenPos;
@@ -531,9 +599,6 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Hold.started += instance.OnHold;
             @Hold.performed += instance.OnHold;
             @Hold.canceled += instance.OnHold;
-            @Tap.started += instance.OnTap;
-            @Tap.performed += instance.OnTap;
-            @Tap.canceled += instance.OnTap;
             @SecondaryFingerPress.started += instance.OnSecondaryFingerPress;
             @SecondaryFingerPress.performed += instance.OnSecondaryFingerPress;
             @SecondaryFingerPress.canceled += instance.OnSecondaryFingerPress;
@@ -551,6 +616,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Press.started -= instance.OnPress;
             @Press.performed -= instance.OnPress;
             @Press.canceled -= instance.OnPress;
+            @KeycodeEscape.started -= instance.OnKeycodeEscape;
+            @KeycodeEscape.performed -= instance.OnKeycodeEscape;
+            @KeycodeEscape.canceled -= instance.OnKeycodeEscape;
             @ScreenPos.started -= instance.OnScreenPos;
             @ScreenPos.performed -= instance.OnScreenPos;
             @ScreenPos.canceled -= instance.OnScreenPos;
@@ -566,9 +634,6 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Hold.started -= instance.OnHold;
             @Hold.performed -= instance.OnHold;
             @Hold.canceled -= instance.OnHold;
-            @Tap.started -= instance.OnTap;
-            @Tap.performed -= instance.OnTap;
-            @Tap.canceled -= instance.OnTap;
             @SecondaryFingerPress.started -= instance.OnSecondaryFingerPress;
             @SecondaryFingerPress.performed -= instance.OnSecondaryFingerPress;
             @SecondaryFingerPress.canceled -= instance.OnSecondaryFingerPress;
@@ -609,7 +674,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     // UI
     private readonly InputActionMap m_UI;
     private List<IUIActions> m_UIActionsCallbackInterfaces = new List<IUIActions>();
-    private readonly InputAction m_UI_Newaction;
+    private readonly InputAction m_UI_KeycodeEscape;
+    private readonly InputAction m_UI_KeycodeR;
+    private readonly InputAction m_UI_KeycodeEnter;
     /// <summary>
     /// Provides access to input actions defined in input action map "UI".
     /// </summary>
@@ -622,9 +689,17 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// </summary>
         public UIActions(@GameInput wrapper) { m_Wrapper = wrapper; }
         /// <summary>
-        /// Provides access to the underlying input action "UI/Newaction".
+        /// Provides access to the underlying input action "UI/KeycodeEscape".
         /// </summary>
-        public InputAction @Newaction => m_Wrapper.m_UI_Newaction;
+        public InputAction @KeycodeEscape => m_Wrapper.m_UI_KeycodeEscape;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/KeycodeR".
+        /// </summary>
+        public InputAction @KeycodeR => m_Wrapper.m_UI_KeycodeR;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/KeycodeEnter".
+        /// </summary>
+        public InputAction @KeycodeEnter => m_Wrapper.m_UI_KeycodeEnter;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -651,9 +726,15 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_UIActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_UIActionsCallbackInterfaces.Add(instance);
-            @Newaction.started += instance.OnNewaction;
-            @Newaction.performed += instance.OnNewaction;
-            @Newaction.canceled += instance.OnNewaction;
+            @KeycodeEscape.started += instance.OnKeycodeEscape;
+            @KeycodeEscape.performed += instance.OnKeycodeEscape;
+            @KeycodeEscape.canceled += instance.OnKeycodeEscape;
+            @KeycodeR.started += instance.OnKeycodeR;
+            @KeycodeR.performed += instance.OnKeycodeR;
+            @KeycodeR.canceled += instance.OnKeycodeR;
+            @KeycodeEnter.started += instance.OnKeycodeEnter;
+            @KeycodeEnter.performed += instance.OnKeycodeEnter;
+            @KeycodeEnter.canceled += instance.OnKeycodeEnter;
         }
 
         /// <summary>
@@ -665,9 +746,15 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UIActions" />
         private void UnregisterCallbacks(IUIActions instance)
         {
-            @Newaction.started -= instance.OnNewaction;
-            @Newaction.performed -= instance.OnNewaction;
-            @Newaction.canceled -= instance.OnNewaction;
+            @KeycodeEscape.started -= instance.OnKeycodeEscape;
+            @KeycodeEscape.performed -= instance.OnKeycodeEscape;
+            @KeycodeEscape.canceled -= instance.OnKeycodeEscape;
+            @KeycodeR.started -= instance.OnKeycodeR;
+            @KeycodeR.performed -= instance.OnKeycodeR;
+            @KeycodeR.canceled -= instance.OnKeycodeR;
+            @KeycodeEnter.started -= instance.OnKeycodeEnter;
+            @KeycodeEnter.performed -= instance.OnKeycodeEnter;
+            @KeycodeEnter.canceled -= instance.OnKeycodeEnter;
         }
 
         /// <summary>
@@ -701,6 +788,32 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     /// Provides a new <see cref="UIActions" /> instance referencing this action map.
     /// </summary>
     public UIActions @UI => new UIActions(this);
+    private int m_DesktopSchemeIndex = -1;
+    /// <summary>
+    /// Provides access to the input control scheme.
+    /// </summary>
+    /// <seealso cref="UnityEngine.InputSystem.InputControlScheme" />
+    public InputControlScheme DesktopScheme
+    {
+        get
+        {
+            if (m_DesktopSchemeIndex == -1) m_DesktopSchemeIndex = asset.FindControlSchemeIndex("Desktop");
+            return asset.controlSchemes[m_DesktopSchemeIndex];
+        }
+    }
+    private int m_MobileSchemeIndex = -1;
+    /// <summary>
+    /// Provides access to the input control scheme.
+    /// </summary>
+    /// <seealso cref="UnityEngine.InputSystem.InputControlScheme" />
+    public InputControlScheme MobileScheme
+    {
+        get
+        {
+            if (m_MobileSchemeIndex == -1) m_MobileSchemeIndex = asset.FindControlSchemeIndex("Mobile");
+            return asset.controlSchemes[m_MobileSchemeIndex];
+        }
+    }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Player" which allows adding and removing callbacks.
     /// </summary>
@@ -715,6 +828,13 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPress(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "KeycodeEscape" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnKeycodeEscape(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "ScreenPos" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
@@ -751,13 +871,6 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnHold(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Tap" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnTap(InputAction.CallbackContext context);
-        /// <summary>
         /// Method invoked when associated input action "SecondaryFingerPress" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
@@ -773,11 +886,25 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     public interface IUIActions
     {
         /// <summary>
-        /// Method invoked when associated input action "New action" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "KeycodeEscape" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnNewaction(InputAction.CallbackContext context);
+        void OnKeycodeEscape(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "KeycodeR" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnKeycodeR(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "KeycodeEnter" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnKeycodeEnter(InputAction.CallbackContext context);
     }
 }

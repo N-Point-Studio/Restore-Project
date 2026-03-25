@@ -4,42 +4,38 @@ using System;
 
 public class ActiveSettingsData : ISaveable
 {
-    private ProjectSettingsData defaultSettingsData;
-    public ProjectSettingsData DefaultSettingsData => defaultSettingsData;
-
-    private ProjectSettingsData currentSettingsData;
-    public ProjectSettingsData CurrentSettingsData => currentSettingsData;
+    public ProjectSettingsData DefaultSettingsData { get; private set; }
+    public ProjectSettingsData CurrentSettingsData { get; private set; }
 
     public Action OnSettingsDataLoaded;
 
     public ActiveSettingsData(ProjectSettingsData defaultSettingsDataAsset)
     {
-        this.defaultSettingsData = UnityEngine.Object.Instantiate(defaultSettingsDataAsset);
-        this.currentSettingsData = UnityEngine.Object.Instantiate(defaultSettingsDataAsset);
+        this.DefaultSettingsData = defaultSettingsDataAsset;
+        this.CurrentSettingsData = UnityEngine.Object.Instantiate(defaultSettingsDataAsset);
     }
 
-    public void UpdateSettingsData(ProjectSettingsData updatedSettingsData)
+    public void CopyFrom(ProjectSettingsData source)
     {
-        if (currentSettingsData != null) UnityEngine.Object.Destroy(currentSettingsData);
-        currentSettingsData = UnityEngine.Object.Instantiate(updatedSettingsData);
+        CurrentSettingsData.Apply(source.GraphicMode);
+        CurrentSettingsData.Apply(ProjectSettingsAudioType.Master, source.MasterVolume);
+        CurrentSettingsData.Apply(ProjectSettingsAudioType.BGM, source.BGMVolume);
+        CurrentSettingsData.Apply(ProjectSettingsAudioType.SFX, source.SFXVolume);
+        CurrentSettingsData.Apply(source.Crosshair);
     }
 
     public JSONNode AsJSON()
     {
         JSONObject json = new JSONObject();
-        json[nameof(currentSettingsData)] = currentSettingsData.AsJSON();
-
+        json[nameof(CurrentSettingsData)] = CurrentSettingsData.AsJSON();
         return json;
     }
 
     public void LoadFromJSON(JSONNode json)
     {
-        if (json == null || json.ToString() == "{}" || json.ToString() == "null")
-        {
-            return;
-        }
+        if (json == null || json.ToString() == "{}" || json.ToString() == "null") return;
 
-        currentSettingsData.LoadFromJSON(json[nameof(currentSettingsData)]);
+        CurrentSettingsData.LoadFromJSON(json[nameof(CurrentSettingsData)]);
         OnSettingsDataLoaded?.Invoke();
     }
 }

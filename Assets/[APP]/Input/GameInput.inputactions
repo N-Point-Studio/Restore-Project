@@ -16,6 +16,15 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "KeycodeEscape",
+                    "type": "Button",
+                    "id": "24ab1896-da09-44f5-8831-93fad29e18f5",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "ScreenPos",
                     "type": "Value",
                     "id": "e78f3ab0-f8c3-4982-a0df-284b90b60d5f",
@@ -61,15 +70,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Tap",
-                    "type": "Button",
-                    "id": "99404de8-2ad0-475c-8b6c-2b12eb485264",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "Tap",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "SecondaryFingerPress",
                     "type": "Button",
                     "id": "cfe54ebe-93c9-4b36-98e9-ef80a03b0e24",
@@ -86,7 +86,7 @@
                     "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "Desktop",
                     "action": "Press",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -97,8 +97,19 @@
                     "path": "<Touchscreen>/touch0/press",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Mobile",
                     "action": "Press",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5395deb9-7afc-4ccb-aabf-4311d0c13ea1",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Desktop",
+                    "action": "KeycodeEscape",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -108,7 +119,7 @@
                     "path": "<Mouse>/position",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "Desktop",
                     "action": "ScreenPos",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -119,7 +130,7 @@
                     "path": "<Touchscreen>/touch0/position",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Mobile",
                     "action": "ScreenPos",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -130,7 +141,7 @@
                     "path": "<Touchscreen>/Press",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Mobile",
                     "action": "Hold",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -141,7 +152,7 @@
                     "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "Desktop",
                     "action": "Hold",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -152,7 +163,7 @@
                     "path": "<Pointer>/press",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "Desktop",
                     "action": "Hold",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -163,19 +174,8 @@
                     "path": "<Touchscreen>/touch1/position",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Mobile",
                     "action": "SecondaryFingerPos",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "bdf1720f-e5ad-4e8a-b99f-9774e8b557ca",
-                    "path": "",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Tap",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -185,7 +185,7 @@
                     "path": "<Touchscreen>/touch1/press",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Mobile",
                     "action": "SecondaryFingerPress",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -196,7 +196,7 @@
                     "path": "<Mouse>/rightButton",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "Desktop",
                     "action": "SecondaryPress",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -207,7 +207,7 @@
                     "path": "<Mouse>/scroll/y",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "Desktop",
                     "action": "Scroll",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -218,7 +218,7 @@
                     "path": "<VirtualMouse>/scroll/y",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Mobile",
                     "action": "Scroll",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -230,9 +230,27 @@
             "id": "496491a5-091b-453e-955c-b6c4adde0d80",
             "actions": [
                 {
-                    "name": "New action",
+                    "name": "KeycodeEscape",
                     "type": "Button",
                     "id": "ec6feda2-678d-4269-a74f-b4ac1dd133a2",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "KeycodeR",
+                    "type": "Button",
+                    "id": "b1cfcf24-2ef4-4c03-8be8-a0945eba7542",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "KeycodeEnter",
+                    "type": "Button",
+                    "id": "ec44f62b-bf7f-4731-9b45-c14f64baa8e8",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -243,16 +261,61 @@
                 {
                     "name": "",
                     "id": "85434685-32e6-4e9f-86a1-82832275515e",
-                    "path": "",
+                    "path": "<Keyboard>/escape",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
-                    "action": "New action",
+                    "groups": "Desktop",
+                    "action": "KeycodeEscape",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cb593c82-4e8d-4f40-8344-2cce559fe77c",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Desktop",
+                    "action": "KeycodeR",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f5b353b4-ab0e-4f48-9cd3-9552ea0bbcdc",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Desktop",
+                    "action": "KeycodeEnter",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
             ]
         }
     ],
-    "controlSchemes": []
+    "controlSchemes": [
+        {
+            "name": "Desktop",
+            "bindingGroup": "Desktop",
+            "devices": [
+                {
+                    "devicePath": "<Keyboard>",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        },
+        {
+            "name": "Mobile",
+            "bindingGroup": "Mobile",
+            "devices": [
+                {
+                    "devicePath": "<Touchscreen>",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        }
+    ]
 }
