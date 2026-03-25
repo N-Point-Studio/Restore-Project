@@ -20,16 +20,20 @@ public class GameplayUIManager : MonoBehaviour
     [SerializeField] private GameObject mainCanvas;
     [SerializeField] private GameObject endgameCanvas;
     private Dictionary<ProgressType, ProgressBarUI> progressMap;
+    
     private CleaningService cleaningService;
     private FragmentService fragmentService;
+    private InputSystemService inputSystemService;
+
     public static event Action OnGameWrapped;
     public static event Action OnGameFinished;
 
     [Inject]
-    public void Construct(CleaningService cleaningService, FragmentService fragmentService)
+    public void Construct(CleaningService cleaningService, FragmentService fragmentService, InputSystemService inputSystemService)
     {
         this.cleaningService = cleaningService;
         this.fragmentService = fragmentService;
+        this.inputSystemService = inputSystemService;
     }
 
     private void Awake()
@@ -99,6 +103,12 @@ public class GameplayUIManager : MonoBehaviour
         toolCamera.gameObject.SetActive(false);
         mainCanvas.SetActive(false);
         endgameCanvas.SetActive(true);
+        
+        if (inputSystemService != null)
+        {
+            inputSystemService.ChangeInputState(InputStateType.UI);
+        }
+
         OnGameWrapped?.Invoke();
         if (!TutorialManager.Instance.AllTutorialsCompleted)
         {

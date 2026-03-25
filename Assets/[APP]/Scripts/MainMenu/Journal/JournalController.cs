@@ -29,8 +29,7 @@ public class JournalController : MonoBehaviour
     [SerializeField] private Transform rightPageContainer;
 
     [Header("Buttons & Interactions")]
-    [SerializeField] private Button buttonAction;
-    [SerializeField] private TMP_Text buttonActionText;
+    [SerializeField] private ButtonInputInstructionUI buttonAction;
     [SerializeField] private BookPanelInteractable bookInteractable;
 
     public JournalState CurrentState { get; private set; } = JournalState.Hidden;
@@ -44,9 +43,11 @@ public class JournalController : MonoBehaviour
 
     public Action OnBookOpened;
 
+    private InputSystemService input;
+
     private void Awake()
     {
-        buttonAction.onClick.AddListener(OnButtonActionClicked);
+        buttonAction.OnClick += OnButtonActionClicked;
 
         if (canvasGroup != null)
         {
@@ -65,13 +66,33 @@ public class JournalController : MonoBehaviour
 
     private void OnDestroy()
     {
-        buttonAction.onClick.RemoveListener(OnButtonActionClicked);
+        buttonAction.OnClick -= OnButtonActionClicked;
 
         if (bookInteractable != null)
         {
             bookInteractable.OnBookHoverEnter -= HandleBookHoverEntered;
             bookInteractable.OnBookHoverExit -= HandleBookHoverExited;
             bookInteractable.OnBookClicked -= HandleBookClicked;
+        }
+
+        if (this.input != null)
+        {
+            this.input.OnUIKeycodeEnterPerformed -= OnUIKeycodeEnterPerformed;
+        }
+    }
+
+    public void SetInputSystemService(InputSystemService input)
+    {
+        if (this.input != null)
+        {
+            this.input.OnUIKeycodeEnterPerformed -= OnUIKeycodeEnterPerformed;
+        }
+
+        this.input = input;
+
+        if (this.input != null)
+        {
+            this.input.OnUIKeycodeEnterPerformed += OnUIKeycodeEnterPerformed;
         }
     }
 
@@ -81,7 +102,7 @@ public class JournalController : MonoBehaviour
         currentActionCallback = onRestoreClicked;
         isPostRestoration = false;
         
-        buttonActionText.text = "Let's Restore";
+        buttonAction.ForceSetText(false, "Let's Restore");
     }
 
     public void SetupPostRestoration(ArtefactData data, Action onContinueClicked)
@@ -90,7 +111,7 @@ public class JournalController : MonoBehaviour
         currentActionCallback = onContinueClicked;
         isPostRestoration = true;
 
-        buttonActionText.text = "Continue";
+        buttonAction.ForceSetText(false, "Continue");
     }
 
     public void SetBookHiddenInstant()
@@ -246,5 +267,14 @@ public class JournalController : MonoBehaviour
     private void HandleBookClicked()
     {
         if (CurrentState == JournalState.Peeking) OpenBookFromPeek();
+    }
+
+    private void OnUIKeycodeEnterPerformed()
+    {
+        if (CurrentState == JournalState.Opened && buttonAction != null && 
+            buttonAction.gameObject.activeInHierarchy && buttonAction.Button.interactable)
+        {
+            OnButtonActionClicked();
+        }
     }
 }

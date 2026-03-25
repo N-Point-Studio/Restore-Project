@@ -32,6 +32,10 @@ public class ArtefactDetailController : MonoBehaviour
     private Artefact3DItem current3DItem; 
     private ActiveArtefactData activeArtefactData;
     private bool isCompleted;
+
+    private InputSystemService input;
+
+    public bool IsOpen => root != null && root.activeSelf;
     
     private void Awake()
     {
@@ -58,6 +62,33 @@ public class ArtefactDetailController : MonoBehaviour
         if (journalController != null)
         {
             journalController.OnBookOpened -= HandleJournalOpenedFromClick;
+        }
+
+        if (this.input != null)
+        {
+            this.input.OnUIKeycodeEscapePerformed -= OnUIKeycodeEscapePerformed;
+            this.input.OnUIKeycodeRPerformed -= OnUIKeycodeRPerformed;
+            this.input.OnUIKeycodeEnterPerformed -= OnUIKeycodeEnterPerformed;
+        }
+    }
+
+    public void SetInputSystemService(InputSystemService input)
+    {
+        if (this.input != null)
+        {
+            this.input.OnUIKeycodeEscapePerformed -= OnUIKeycodeEscapePerformed;
+            this.input.OnUIKeycodeRPerformed -= OnUIKeycodeRPerformed;
+            this.input.OnUIKeycodeEnterPerformed -= OnUIKeycodeEnterPerformed;
+        }
+
+        this.input = input;
+        journalController.SetInputSystemService(this.input);
+
+        if (this.input != null)
+        {
+            this.input.OnUIKeycodeEscapePerformed += OnUIKeycodeEscapePerformed;
+            this.input.OnUIKeycodeRPerformed += OnUIKeycodeRPerformed;
+            this.input.OnUIKeycodeEnterPerformed += OnUIKeycodeEnterPerformed;
         }
     }
 
@@ -231,5 +262,34 @@ public class ArtefactDetailController : MonoBehaviour
     public void CloseDetail()
     {
         canvasGroupRoot.DOFade(0f, 0.3f).OnComplete(() => root.SetActive(false));
+    }
+
+    private void OnUIKeycodeEscapePerformed()
+    {
+        if (!IsOpen) return;
+        if (buttonBack != null && buttonBack.Button.interactable && buttonBack.gameObject.activeInHierarchy)
+        {
+            OnBackClicked();
+        }
+    }
+
+    private void OnUIKeycodeRPerformed()
+    {
+        if (!IsOpen) return;
+        if (wallTextGroup != null && wallTextGroup.gameObject.activeInHierarchy && 
+            buttonReplay != null && buttonReplay.interactable)
+        {
+            OnReplayClicked();
+        }
+    }
+
+    private void OnUIKeycodeEnterPerformed()
+    {
+        if (!IsOpen) return;
+        if (wallTextGroup != null && wallTextGroup.gameObject.activeInHierarchy && 
+            buttonContinueStory != null && buttonContinueStory.interactable)
+        {
+            OnContinueStoryClicked();
+        }
     }
 }

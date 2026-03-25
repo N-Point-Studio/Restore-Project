@@ -20,17 +20,24 @@ public class LevelSelectionController : BaseMenuController
     private ActiveArtefactData activeArtefactData;
     private PlayerProgressionData playerProgressionData;
     private SceneLoader sceneLoader;
+    private InputSystemService input;
+
+
     private Artefact3DItem clickedItem;
 
     [Inject]
     public void Construct(
         ActiveArtefactData activeArtefactData, 
         PlayerProgressionData playerProgressionData,
-        SceneLoader sceneLoader)
+        SceneLoader sceneLoader,
+        InputSystemService input        
+        )
     {
         this.activeArtefactData = activeArtefactData;
         this.playerProgressionData = playerProgressionData;
         this.sceneLoader = sceneLoader;
+        this.input = input;
+        artefactDetailController.SetInputSystemService(this.input);
     }
 
     protected override void Awake()
@@ -58,6 +65,19 @@ public class LevelSelectionController : BaseMenuController
         MainMenuEvents.OnOpenArtefactDetail -= OnRequestArtefactDetail;
         MainMenuEvents.OnCloseArtefactDetail -= OnCloseArtefactDetail;
         backButtonItemUI.OnClick -= OnBackButtonClick;
+    }
+
+    public override void SetActive(bool isActive)
+    {
+        base.SetActive(isActive);
+        if (isActive) 
+        {
+            input.OnUIKeycodeEscapePerformed += OnUIKeycodeEscapePerformed; 
+        }
+        else 
+        {
+            input.OnUIKeycodeEscapePerformed -= OnUIKeycodeEscapePerformed; 
+        }
     }
 
     public void OpenLevelSelection()
@@ -176,7 +196,7 @@ public class LevelSelectionController : BaseMenuController
     private void OnRequestArtefactPlay(ArtefactData data)
     {
         playerProgressionData.SetCurrentActiveArtefact(data.BaseData.Id);
-        _ = sceneLoader.LoadSceneAsync(targetScene, 2f);
+        _ = sceneLoader.LoadSceneAsync(targetScene, 2f, "Unboxing Artefact...");
     }
 
     private void OnRequestArtefactDetail(ArtefactData data)
@@ -222,5 +242,15 @@ public class LevelSelectionController : BaseMenuController
         CloseLevelSelection();
         MainMenuEvents.TriggerCloseLevelSelection();
         MainMenuEvents.TriggerCameraToMainMenu();
+    }
+
+    private void OnUIKeycodeEscapePerformed()
+    {
+        if (artefactDetailController != null && artefactDetailController.IsOpen) 
+        {
+            return; 
+        }
+
+        OnBackButtonClick();
     }
 }

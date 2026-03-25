@@ -157,15 +157,15 @@ MonoBehaviour:
   m_text: "Here\u2019s your first artifact, Nova.\LI hope this is a beautiful start
     to your journey here!\n\n-Mrs. Maya :)"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 2ed3cb5592c73cc478df7268f8002121, type: 2}
-  m_sharedMaterial: {fileID: -828601511121429308, guid: 2ed3cb5592c73cc478df7268f8002121, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e0e966e0001c5b14f95829d062742975, type: 2}
+  m_sharedMaterial: {fileID: 4181502694298773041, guid: e0e966e0001c5b14f95829d062742975, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4278523939
+  m_fontColor: {r: 0.13725491, g: 0.09411765, b: 0.019607844, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -262,7 +262,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000030517578, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &8636906436748886089
@@ -277,6 +277,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4229f3e50f8b3ab44b35be3cb132d7b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::JournalPageAnimator
+  initialDelay: 0.5
   sequenceElements:
   - canvasGroup: {fileID: 1731867647185635237}
     revealStyle: 0
@@ -359,15 +360,15 @@ MonoBehaviour:
   m_text: P.S Amazing to see this project in the hands of someone so competent! I
     know I can trust you.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 2ed3cb5592c73cc478df7268f8002121, type: 2}
-  m_sharedMaterial: {fileID: -828601511121429308, guid: 2ed3cb5592c73cc478df7268f8002121, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 30630ed0a05528b49b38107864c2e9a6, type: 2}
+  m_sharedMaterial: {fileID: -1999879239979766154, guid: 30630ed0a05528b49b38107864c2e9a6, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4278523939
+  m_fontColor: {r: 0.13725491, g: 0.09411765, b: 0.019607844, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -384,8 +385,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 27
+  m_fontSizeBase: 27
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
