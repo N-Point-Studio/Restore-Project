@@ -26,6 +26,6 @@ public class UISoundEffectTriggerButton : UISoundEffectTrigger
     protected override void PlaySound()
     {
         base.PlaySound();
-        AudioEvents.OnPlayButtonSFX?.Invoke(isConfirm);
+        AudioEvents.TriggerPlayButtonSFX(isConfirm);
     }
 }

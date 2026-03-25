@@ -21,7 +21,7 @@ public class UISoundEffectTriggerSlider : UISoundEffectTrigger
     protected override void PlaySound()
     {
         base.PlaySound();
-        AudioEvents.OnPlaySliderSFX?.Invoke();
+        AudioEvents.TriggerPlaySliderSFX();
     }
 
     private void OnSliderValueChanged(float value)
