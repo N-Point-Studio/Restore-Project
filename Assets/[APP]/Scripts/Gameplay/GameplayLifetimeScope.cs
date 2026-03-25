@@ -14,8 +14,10 @@ public class GameplayLifetimeScope : LifetimeScope
         Plane dragPlane = new(planeReference.up, planeReference.position);
         builder.RegisterInstance(dragPlane);
 
+        builder.Register<TutorialService>(Lifetime.Scoped);
+        
         builder.RegisterInstance(Camera.main);
-        builder.RegisterInstance(inspect);
+        builder.RegisterComponent(inspect);
         builder.RegisterInstance(inspectZone);
         builder.RegisterInstance(pivotPoint);
         builder.RegisterInstance(holdProgressUI);

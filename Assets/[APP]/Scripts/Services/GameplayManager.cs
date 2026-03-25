@@ -41,9 +41,11 @@ public class GameplayManager : IInitializable, IDisposable
         SaveObjectCompletion();
     }
 
-    private void HandleGameFinished()
+    private void HandleGameFinished(bool isCompleted)
     {
-        StartSceneTransition();
+        string loadingText = isCompleted ? "Saving Artefact..." : "Returning to Menu...";
+
+        StartSceneTransition(loadingText);
     }
 
     private void SaveObjectCompletion()
@@ -63,11 +65,11 @@ public class GameplayManager : IInitializable, IDisposable
         }
     }
 
-    public void StartSceneTransition()
+    public void StartSceneTransition(string loadingMessage)
     {
-        AppLogger.Log($"[Gameplay Manager] Back to menu using SceneLoader...");
+        AppLogger.Log($"[Gameplay Manager] Back to menu using SceneLoader. Message: {loadingMessage}");
 
-        _ = sceneLoader.LoadSceneAsync(TARGET_SCENE, 2f, "Displaying Artefact...");
+        _ = sceneLoader.LoadSceneAsync(TARGET_SCENE, 2f, loadingMessage);
     }
 
     private void InitializeSession()

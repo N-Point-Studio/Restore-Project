@@ -1,6 +1,7 @@
 using UnityEngine;
 using DG.Tweening;
 using NINESOFT.TUTORIAL_SYSTEM;
+using VContainer;
 
 public class Inspection : MonoBehaviour
 {
@@ -23,6 +24,14 @@ public class Inspection : MonoBehaviour
     public Transform assemblyRoot;
     private bool isContain = false;
     private bool isGameFinished = false;
+
+    private TutorialService tutorialService;
+
+    [Inject]
+    public void Construct(TutorialService tutorialService)
+    {
+        this.tutorialService = tutorialService;
+    }
 
     public Transform GetAssemblyRoot()
     {
@@ -90,20 +99,18 @@ public class Inspection : MonoBehaviour
         float rotateY = -delta.x;
         float rotateX = delta.y;
 
-        // axis dari camera
+        // Axis from camera
         Vector3 cameraRight = _mainCamera.transform.right;
         Vector3 cameraUp = _mainCamera.transform.up;
 
-        // rotate horizontal (kiri kanan)
+        // Rotate horizontal (left right)
         transform.Rotate(cameraUp, rotateY, Space.World);
 
-        // rotate vertical (atas bawah)
+        // Rotate vertical (up down)
         transform.Rotate(cameraRight, rotateX, Space.World);
 
-        if (!TutorialManager.Instance.AllTutorialsCompleted)
-        {
-            TutorialManager.Instance.StageCompleted(0, 2);
-        }
+        tutorialService.CompleteTutorial(TutorialIDs.ROTATE_INSPECT, 0, 2);
+        tutorialService.StartTutorial(TutorialIDs.BRUSH_DUST, 0, 3);
     }
 
     public void OnZoomPerformed(float zoomDelta)
@@ -122,11 +129,9 @@ public class Inspection : MonoBehaviour
         targetDistance = Mathf.Clamp(targetDistance, minDistance, _initialDistance);
         _targetPosition = _mainCamera.transform.position + direction * targetDistance;
 
-        //complete tutorial zoom
-        if (!TutorialManager.Instance.AllTutorialsCompleted)
-        {
-            TutorialManager.Instance.StageCompleted(0, 1);
-        }
+        // Complete zoom tutorial
+        tutorialService.CompleteTutorial(TutorialIDs.ZOOM_INSPECT, 0, 1);
+        tutorialService.StartTutorial(TutorialIDs.ROTATE_INSPECT, 0, 2);
     }
 
     public void ResetPosition()

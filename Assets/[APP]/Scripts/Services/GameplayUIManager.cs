@@ -4,12 +4,13 @@ using UnityEngine;
 using VContainer;
 using NINESOFT.TUTORIAL_SYSTEM;
 using Modules;
+using System.Collections;
 
 public class GameplayUIManager : MonoBehaviour
 {
     [SerializeField] private List<ProgressBarUI> progressBars;
     [SerializeField] private Camera toolCamera;
-    
+
     [Header("Controllers")]
     [SerializeField] private MainUIController mainUIController;
     [SerializeField] private EndgameUIController endgameController;
@@ -19,29 +20,36 @@ public class GameplayUIManager : MonoBehaviour
 
     [Header("Settings")]
     [SerializeField] private float wrapUpThreshold;
-    
+
     private CleaningService cleaningService;
     private FragmentService fragmentService;
     private InputSystemService input;
+    private TutorialService tutorialService;
 
     private bool canWrapUp;
 
     public static event Action OnGameWrapped;
-    public static event Action OnGameFinished;
+    public static event Action<bool> OnGameFinished;
 
     [Inject]
-    public void Construct(CleaningService cleaningService, FragmentService fragmentService, InputSystemService input, IObjectResolver container)
+    public void Construct(
+        CleaningService cleaningService,
+        FragmentService fragmentService,
+        InputSystemService input,
+        TutorialService tutorialService,
+        IObjectResolver container)
     {
         this.cleaningService = cleaningService;
         this.fragmentService = fragmentService;
         this.input = input;
-        
+        this.tutorialService = tutorialService;
+
         fragmentService.OnProgressUpdate += HandleProgressUpdate;
         cleaningService.OnHardCleaningUpdate += HandleHardCleaningUpdate;
         cleaningService.OnSurfaceCleaningUpdate += HandleSurfaceCleaningUpdate;
 
         this.input.OnPlayerKeycodeEscapePerformed += OnPlayerKeycodeEscapePerformed;
-        
+
         container.Inject(settingsController);
         container.Inject(endgameController);
         container.Inject(mainUIController);
@@ -62,10 +70,14 @@ public class GameplayUIManager : MonoBehaviour
         mainUIController.SetActive(true);
     }
 
-    private void Start()
+    private IEnumerator Start()
     {
         HandleAssembleAvailability();
         mainUIController.ShowButtonWrap(false);
+
+        yield return null; 
+
+        tutorialService.StartTutorial(TutorialIDs.DRAG_TO_INSPECT, 0, 0);
     }
 
     private void OnDestroy()
@@ -78,11 +90,11 @@ public class GameplayUIManager : MonoBehaviour
 
         mainUIController.OnWrapUp -= OnWrapUp;
         endgameController.OnFinishedGame -= OnFinishedGame;
-        
+
         pauseController.OnResume -= OnResume;
         pauseController.OnOpenSettings -= OnOpenSettings;
         pauseController.OnBackToMenu -= OnBackToMenu;
-        
+
         quitConfirmationController.OnConfirm -= OnConfirmQuit;
         quitConfirmationController.OnCancel -= OnCancelQuit;
     }
@@ -128,42 +140,35 @@ public class GameplayUIManager : MonoBehaviour
         }
         if (count == 0) return;
         float overall = total / count;
+        
         canWrapUp = overall >= wrapUpThreshold;
+        
         mainUIController.EnableWrapUp(canWrapUp);
         mainUIController.ShowButtonWrap(canWrapUp);
 
-        if (!TutorialManager.Instance.AllTutorialsCompleted && canWrapUp)
+        if (canWrapUp)
         {
-            TutorialManager.Instance.StageStarted(1, 0);
+            tutorialService.StartTutorial(TutorialIDs.WRAP_UP_SHOW, 1, 0);
         }
     }
 
     private void HandleProgressUpdate(float progress)
     {
-        AppLogger.Log("Assemble harusnya");
+        AppLogger.Log("Assemble should be");
         UpdateProgress(ProgressType.Assemble, progress);
     }
 
     private void HandleHardCleaningUpdate(float progress)
     {
         UpdateProgress(ProgressType.Mud, progress);
-        //complete tutorial chisel
-        if (!TutorialManager.Instance.AllTutorialsCompleted)
-        {
-            AppLogger.Log("Harusnya stage chisel selesai");
-            TutorialManager.Instance.StageCompleted(0, 4);
-        }
+        tutorialService.CompleteTutorial(TutorialIDs.CHISEL_MUD, 0, 4);
     }
 
     private void HandleSurfaceCleaningUpdate(float progress)
     {
         UpdateProgress(ProgressType.Dust, progress);
-        //complete tutorial brush
-        if (!TutorialManager.Instance.AllTutorialsCompleted)
-        {
-            AppLogger.Log("Harusnya stage brush selesai");
-            TutorialManager.Instance.StageCompleted(0, 3);
-        }
+        tutorialService.CompleteTutorial(TutorialIDs.BRUSH_DUST, 0, 3);
+        tutorialService.StartTutorial(TutorialIDs.CHISEL_MUD, 0, 4);
     }
 
     private void OnPlayerKeycodeEscapePerformed()
@@ -186,22 +191,20 @@ public class GameplayUIManager : MonoBehaviour
         toolCamera.gameObject.SetActive(false);
         mainUIController.SetActive(false);
         endgameController.SetActive(true);
-        
+
         if (input != null)
         {
             input.ChangeInputState(InputStateType.UI);
         }
 
         OnGameWrapped?.Invoke();
-        if (!TutorialManager.Instance.AllTutorialsCompleted)
-        {
-            TutorialManager.Instance.StageCompleted(1, 0);
-        }
+
+        tutorialService.CompleteTutorial(TutorialIDs.WRAP_UP_CLICK, 1, 0);
     }
 
     private void OnFinishedGame()
     {
-        OnGameFinished?.Invoke();
+        OnGameFinished?.Invoke(true);
     }
 
     private void OnResume()
@@ -221,7 +224,7 @@ public class GameplayUIManager : MonoBehaviour
             if (input != null)
             {
                 input.ChangeInputState(InputStateType.Player);
-            }            
+            }
         }
     }
 
@@ -237,17 +240,22 @@ public class GameplayUIManager : MonoBehaviour
     {
         if (quitConfirmationController.IsActive)
             return;
-        
+
         quitConfirmationController.SetActive(true);
     }
 
     private void OnConfirmQuit()
     {
-        Time.timeScale = 1f;
-        // TODO:
-        // This is quit from settings.
-        // if canvas is end udah ada panggil buttonFinish.OnClick?.Invoke(); biar dia dari satu pintu aja
-        // kalo belum end dan dia quit lgsg ke main menu (ini kan pasti belum ngesave apa2 asumsi ku sih)
+        quitConfirmationController.SetActive(false);
+
+        if (endgameController.IsActive)
+        {
+            OnFinishedGame();
+        }
+        else
+        {
+            OnGameFinished?.Invoke(false);
+        }
     }
 
     private void OnCancelQuit()
