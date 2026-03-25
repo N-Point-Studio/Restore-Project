@@ -21,7 +21,7 @@ public class UISoundEffectTriggerToggle : UISoundEffectTrigger
     protected override void PlaySound()
     {
         base.PlaySound();
-        AudioEvents.OnPlayToggleSFX?.Invoke();
+        AudioEvents.TriggerPlayToggleSFX();
     }
 
     protected void OnToggleValueChanged(bool isOn)

@@ -6,7 +6,7 @@ public class UISoundEffectTriggerHover : UISoundEffectTrigger, ISelectHandler, I
     protected override void PlaySound()
     {
         base.PlaySound();
-        AudioEvents.OnPlayUIComponentSelectedSFX?.Invoke();
+        AudioEvents.TriggerPlayUIComponentSelectedSFX();
     }
 
     void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
