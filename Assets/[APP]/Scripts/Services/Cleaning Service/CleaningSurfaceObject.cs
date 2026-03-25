@@ -103,4 +103,14 @@ public class CleaningSurfaceObject : MonoBehaviour, ICleanSurfaceObject
 
         return Mathf.Clamp01(1f - (dirtAmount / dirtAmountTotal));
     }
+
+    public bool IsCleanable()
+    {
+        var parentPart = GetComponentInParent<ICleanSurfaceObject>();
+        if (parentPart != null)
+        {
+            return parentPart.IsCleanable();
+        }
+        return false;
+    }
 }

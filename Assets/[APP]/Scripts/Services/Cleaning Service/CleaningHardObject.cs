@@ -64,4 +64,14 @@ public class CleaningHardObject : MonoBehaviour, IInteractObject, ICleanHardObje
     public void SetColliderEnable(bool isActive)
     {
     }
+
+    public bool IsCleanable()
+    {
+        var parentPart = GetComponentInParent<ICleanSurfaceObject>();
+        if (parentPart != null)
+        {
+            return parentPart.IsCleanable();
+        }
+        return false;
+    }
 }
