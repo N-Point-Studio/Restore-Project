@@ -82,4 +82,9 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
         transform.DORotateQuaternion(rotation, 0.5f)
                  .SetEase(Ease.OutCubic);
     }
+
+    public bool IsCleanable()
+    {
+        return state == ArtefactPieceState.Assembled;
+    }
 }

@@ -51,7 +51,10 @@ public class ToolService : IInitializable, IDisposable, ITickable
                 if (hardObject != null)
                 {
                     if (currentTool.ToolType == SurfaceDetectionType.Mesh)
+                    {
                         cleaningService.TryCleaningHardSurface(hardObject);
+                        currentTool?.PlaySfx(true);
+                    }
                 }
             }
             else
@@ -77,6 +80,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
         }
 
         cleaningService.EndClean();
+        currentTool?.PlaySfx(false);
         isCleaning = false;
     }
 
@@ -101,7 +105,10 @@ public class ToolService : IInitializable, IDisposable, ITickable
                 var texture = surfaceDetectionService.TextureSurface;
                 var brush = currentTool.GetBrush();
                 if (currentTool.ToolType == SurfaceDetectionType.Texture)
+                {
                     cleaningService.TryCleaning(cleanObject, texture, brush);
+                    currentTool.PlaySfx(true);
+                }
             }
         }
     }
@@ -120,7 +127,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
             {
                 // Debug.Log($"Surface hit? {surfaceDetectionService.HasHit}");
                 StickToSurface(interact);
-                Debug.Log("hit will always run la " + surfaceDetectionService.HasHit);
+                // Debug.Log("hit will always run la " + surfaceDetectionService.HasHit);
             }
 
         }

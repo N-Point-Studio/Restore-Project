@@ -37,14 +37,15 @@ public class SurfaceDetectionService
         if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, pieceLayerMask))
             return false;
 
-        if (hit.collider.TryGetComponent(out ArtefactPieceStateMachine artefact))
+        if (hit.collider.TryGetComponent(out ICleanable cleanable))
         {
-            hasHit = artefact.state != ArtefactPieceState.Idle;
+            hasHit = cleanable.IsCleanable();
+            Debug.Log("is hit: " + hasHit);
         }
-        else
-        {
-            hasHit = true;
-        }
+        // else
+        // {
+        //     hasHit = true;
+        // }
 
         EssentialDetecting(hit);
 

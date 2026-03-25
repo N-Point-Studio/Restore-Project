@@ -64,6 +64,8 @@ public class CleaningService : IInitializable, IDisposable
 
     public void TryCleaningHardSurface(ICleanHardObject clean)
     {
+        isCleaning = true;
+
         clean.Hit();
         OnHardCleaningUpdate?.Invoke(GetHardProgress());
     }
