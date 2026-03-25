@@ -36,7 +36,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
         InteractionEvents.OnPressStarted -= HandlePressStarted;
         InteractionEvents.OnPressEnded -= HandlePressEnded;
 
-        GameplayUIManager.OnGameWrapped += HandleGameWrapped;
+        GameplayUIManager.OnGameWrapped -= HandleGameWrapped;
     }
 
     private void HandlePressStarted(IInteractObject interact)
