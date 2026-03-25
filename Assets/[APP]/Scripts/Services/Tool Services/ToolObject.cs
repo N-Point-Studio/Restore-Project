@@ -10,6 +10,8 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
     private bool isReturning;
     [SerializeField] private Texture2D brush;
     [SerializeField] private SurfaceDetectionType toolType;
+    [SerializeField] private AudioSource audioSource;
+
     private void Awake()
     {
         initialPosition = transform.position;
@@ -60,6 +62,24 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
     public void SetColliderEnable(bool isActive)
     {
         col.enabled = isActive;
+    }
+
+    public void PlaySfx(bool isPlaying)
+    {
+        if (isPlaying && audioSource.isPlaying) return;
+
+        if (isPlaying)
+        {
+            audioSource.Play();
+        }
+        else
+        {
+            audioSource.Stop();
+        }
+    }
+
+    public void PlayVfx(bool isPlaying)
+    {
     }
 
     public SurfaceDetectionType ToolType => toolType;
