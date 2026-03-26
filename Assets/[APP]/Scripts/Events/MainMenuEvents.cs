@@ -3,17 +3,18 @@ using UnityEngine;
 
 public static class MainMenuEvents
 {
-    public static Action<ArtefactData> OnOpenArtefactDetail;
-    public static Action<ArtefactData> OnArtefactPlay;
-    public static Action OnCloseArtefactDetail;
-    public static Action OnCloseLevelSelection;
-    public static Action OnNewGame;
-    public static Action OnContinueGame;
-    public static Action OnOpenSettings;
-    public static Action OnRequestQuit;
-    public static Action OnCameraToMainMenu;
-    public static Action OnCameraToLevelSelection;
-    public static Action<Transform> OnCameraFocusToArtefact;
+    public static event Action<ArtefactData> OnOpenArtefactDetail;
+    public static event Action<ArtefactData> OnArtefactPlay;
+    public static event Action OnCloseArtefactDetail;
+    public static event Action OnCloseLevelSelection;
+    public static event Action OnNewGame;
+    public static event Action OnContinueGame;
+    public static event Action OnOpenSettings;
+    public static event Action OnRequestQuit;
+    public static event Action OnCameraToMainMenu;
+    public static event Action OnCameraToLevelSelection;
+    public static event Action<Transform> OnCameraFocusToArtefact;
+    public static event Action OnPauseGameplay;
 
     public static void TriggerOpenArtefactDetail(ArtefactData data) => OnOpenArtefactDetail?.Invoke(data);
     public static void TriggerArtefactPlay(ArtefactData artefactData) => OnArtefactPlay?.Invoke(artefactData);

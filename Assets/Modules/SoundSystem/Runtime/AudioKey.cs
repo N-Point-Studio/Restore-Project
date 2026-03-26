@@ -11,7 +11,7 @@ namespace Modules.SoundSystems
         SFX_Brush,
         SFX_Chisel,
         SFX_Finish,
-        UI_Change_Page,
         UI_Button_Click,
+        UI_Change_Page,
     }
 }

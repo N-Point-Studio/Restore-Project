@@ -1,6 +1,8 @@
 using System;
+using Modules.SoundSystems;
 using TMPro;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 using UnityEngine.UI;
 
 public enum ProgressType
@@ -19,13 +21,12 @@ public class ProgressBarUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI progressTitle;
     [SerializeField] private int minimum = 0;
     [SerializeField] private int maximum = 100;
+    [SerializeField] private AudioKey audioKey;
     private int currentValue = 0;
     private int lastValue = -1;
 
-    [SerializeField] private AudioSource AudioSourceProgress;
-    [SerializeField] public AudioClip ProfressSound;
-
-    public ProgressType progressType = ProgressType.None;
+    [SerializeField] private ProgressType progressType = ProgressType.None;
+    public ProgressType ProgressType => progressType;
 
     public static event Action OnProgressBarCompleted;
 
@@ -51,11 +52,8 @@ public class ProgressBarUI : MonoBehaviour
 
         if (currentValue == 100 && lastValue != 100)
         {
-            if (AudioSourceProgress != null && ProfressSound != null)
-            {
-                AudioSourceProgress.PlayOneShot(ProfressSound);
-                OnProgressBarCompleted?.Invoke();
-            }
+            AudioEvents.TriggerPlayCustomSFX(audioKey);
+            OnProgressBarCompleted?.Invoke();
         }
 
         lastValue = currentValue;

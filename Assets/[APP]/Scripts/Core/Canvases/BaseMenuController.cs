@@ -70,6 +70,7 @@ public abstract class BaseMenuController : MonoBehaviour
             {
                 canvasGroup.DOFade(1, fadeDuration)
                     .SetEase(Ease.OutQuad)
+                    .SetUpdate(true)
                     .OnComplete(OnShowComplete);
             }
         }
@@ -88,6 +89,7 @@ public abstract class BaseMenuController : MonoBehaviour
             {
                 canvasGroup.DOFade(0, fadeDuration)
                     .SetEase(Ease.InQuad)
+                    .SetUpdate(true)
                     .OnComplete(OnHideComplete);
             }
         }

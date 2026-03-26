@@ -32,7 +32,7 @@ public class SpriteColorChanger : MonoBehaviour
         if (image != null && index >= 0 && index < color.Length)
         {
             image.DOKill();
-            image.DOColor(color[index], duration);
+            image.DOColor(color[index], duration).SetUpdate(true);
         }
     }
 }

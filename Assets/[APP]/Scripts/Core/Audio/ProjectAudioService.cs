@@ -30,6 +30,7 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         AudioEvents.OnPlayBrushSFX += HandleOnPlayBrushSFX;
         AudioEvents.OnPlayChiselSFX += HandleOnPlayChiselSFX;
         AudioEvents.OnPlayAssembleSFX += HandleOnPlayAssembleSFX;
+        AudioEvents.OnPlayCustomSFX += HandleOnPlayCustomSFX;
     }
 
     void IDisposable.Dispose()
@@ -40,6 +41,7 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         AudioEvents.OnPlaySliderSFX -= HandleOnOnPlaySliderSFX;
         AudioEvents.OnPlayBGMGameplay -= HandleOnPlayBGMGameplay;
         AudioEvents.OnPlayBGMMainMenu -= HandleOnPlayBGMMainMenu;
+        AudioEvents.OnPlayCustomSFX -= HandleOnPlayCustomSFX;
         AudioEvents.OnPlayBrushSFX -= HandleOnPlayBrushSFX;
         AudioEvents.OnPlayChiselSFX -= HandleOnPlayChiselSFX;
         AudioEvents.OnPlayAssembleSFX -= HandleOnPlayAssembleSFX;
@@ -139,5 +141,11 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
     private void HandleOnPlayAssembleSFX()
     {
         PlaySFX(AudioKey.SFX_Assemble);
+    }
+
+
+    private void HandleOnPlayCustomSFX(AudioKey audioKey)
+    {
+        PlaySFX(audioKey);
     }
 }

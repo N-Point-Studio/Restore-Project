@@ -4,20 +4,22 @@ using DG.Tweening;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-using NINESOFT.TUTORIAL_SYSTEM;
 
 public class AssemblyService : IInitializable, IDisposable
 {
     private readonly Inspection inspectPoint;
     private readonly FragmentService fragmentService;
+    private readonly TutorialService tutorialService;
+    
     private readonly List<IArtefactPart> currentAssembleList = new();
     private float socketSnapDistance = 1f;
 
     [Inject]
-    public AssemblyService(Inspection inspectPoint, FragmentService fragmentService)
+    public AssemblyService(Inspection inspectPoint, FragmentService fragmentService, TutorialService tutorialService)
     {
         this.inspectPoint = inspectPoint;
         this.fragmentService = fragmentService;
+        this.tutorialService = tutorialService;
     }
 
     public void Initialize()
@@ -66,11 +68,8 @@ public class AssemblyService : IInitializable, IDisposable
             fragmentService.ProgressUpdate();
             // RecenterAssembly();
 
-            //complete tutorial drag ke inspect
-            if (!TutorialManager.Instance.AllTutorialsCompleted)
-            {
-                TutorialManager.Instance.StageCompleted(0, 0);
-            }
+            tutorialService.CompleteTutorial(TutorialIDs.DRAG_TO_INSPECT, 0, 0);
+            tutorialService.StartTutorial(TutorialIDs.ZOOM_INSPECT, 0, 1);
 
             return true;
         }

@@ -110,18 +110,21 @@ public class ArtefactManager : IInitializable, IDisposable
 
     private void ShowHoldProgress(IArtefactPart part, Vector2 position)
     {
+        if (part == null) return;
         if (part.CurrentState != ArtefactPieceState.Assembled) return;
         holdProgressUI.Show(position);
     }
 
     private void UpdateHoldProgress(IArtefactPart part, float normalized, Vector2 position)
     {
+        if (part == null) return;
         if (part.CurrentState != ArtefactPieceState.Assembled) return;
         holdProgressUI.UpdateProgress(normalized, position);
     }
 
     private void HideHoldProgress(IArtefactPart part)
     {
+        if (part == null) return;
         if (part.CurrentState != ArtefactPieceState.Assembled) return;
         holdProgressUI.Hide();
     }

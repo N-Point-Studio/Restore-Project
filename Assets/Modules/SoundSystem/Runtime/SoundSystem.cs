@@ -270,7 +270,18 @@ namespace Modules.SoundSystems
 
         public AudioMixerGroup GetAudioMixerGroup(Audio.AudioType audioType)
         {
-            return audioMixer.FindMatchingGroups(audioType.ToString())[0];
+            string groupName = audioType.ToString();
+
+            AudioMixerGroup[] matchingGroups = audioMixer.FindMatchingGroups(groupName);
+            
+            if (matchingGroups.Length > 0)
+            {
+                return matchingGroups[0];
+            }
+            else
+            {
+                return audioMixer.FindMatchingGroups("Master")[0];
+            }
         }
 
         #region GetAudio Functions

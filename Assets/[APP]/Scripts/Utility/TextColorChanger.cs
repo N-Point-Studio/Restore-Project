@@ -32,7 +32,7 @@ public class TextColorChanger : MonoBehaviour
         if (tmpText != null && index >= 0 && index < color.Length)
         {
             tmpText.DOKill();
-            tmpText.DOColor(color[index], duration);
+            tmpText.DOColor(color[index], duration).SetUpdate(true);
         }
     }
 }
