@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
-public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDragObject, IInspectable, ICleanSurfaceObject, IArtefactPart
+public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDragObject, ICleanSurfaceObject, IArtefactPart
 {
     private Collider col;
     private Renderer rd;
@@ -31,11 +31,6 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
     [SerializeField] CleaningSurfaceObject cleaning;
 
 
-    //=== IInspectable ===
-    public Transform GetTransform() => transform;
-    public void EnterInspect(Transform targetPosition) => (currentState as IInspectable)?.EnterInspect(targetPosition);
-    public void ExitInspect() => (currentState as IInspectable)?.ExitInspect();
-
     //=== IInteractObject, IDragObject ===
     public void OnInteractDetected() => (currentState as IInteractObject)?.OnInteractDetected();
     public void OnInteractEnded() => (currentState as IInteractObject)?.OnInteractEnded();
@@ -50,6 +45,7 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
     }
 
     //=== IAssemble ===
+    public Transform GetTransform() => transform;
     public string PieceId => pieceId;
     public ArtefactPieceState CurrentState => state;
     public ConnectionSocket GetAvailableSocketFor(string id)
@@ -72,15 +68,9 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
 
     public List<ConnectionSocket> GetSockets() => sockets;
 
-    public Renderer GetRenderer()
-    {
-        return rd;
-    }
-
     public void CorrectRotation(Quaternion rotation)
     {
-        transform.DORotateQuaternion(rotation, 0.5f)
-                 .SetEase(Ease.OutCubic);
+        transform.DORotateQuaternion(rotation, 0.5f).SetEase(Ease.OutCubic);
     }
 
     public bool IsCleanable()

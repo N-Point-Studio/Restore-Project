@@ -10,7 +10,7 @@ public class AssemblyService : IInitializable, IDisposable
     private readonly Inspection inspectPoint;
     private readonly FragmentService fragmentService;
     private readonly TutorialService tutorialService;
-    
+
     private readonly List<IArtefactPart> currentAssembleList = new();
     private float socketSnapDistance = 1f;
 
@@ -24,12 +24,12 @@ public class AssemblyService : IInitializable, IDisposable
 
     public void Initialize()
     {
-        InteractionEvents.OnAssembleInteractionFinished += RecenterAssembly;
+        AssembleEvents.OnAssembleFinished += RecenterAssembly;
     }
 
     public void Dispose()
     {
-        InteractionEvents.OnAssembleInteractionFinished -= RecenterAssembly;
+        AssembleEvents.OnAssembleFinished -= RecenterAssembly;
     }
 
     public Transform GetInspectPoint() => inspectPoint.transform;

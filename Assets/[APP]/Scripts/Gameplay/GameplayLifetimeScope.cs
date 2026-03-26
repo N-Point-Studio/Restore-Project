@@ -15,7 +15,7 @@ public class GameplayLifetimeScope : LifetimeScope
         builder.RegisterInstance(dragPlane);
 
         builder.Register<TutorialService>(Lifetime.Scoped);
-        
+
         builder.RegisterInstance(Camera.main);
         builder.RegisterComponent(inspect);
         builder.RegisterInstance(inspectZone);
@@ -24,8 +24,6 @@ public class GameplayLifetimeScope : LifetimeScope
 
         builder.RegisterEntryPoint<FragmentService>(Lifetime.Scoped).AsSelf();
         builder.RegisterEntryPoint<AssemblyService>(Lifetime.Scoped).AsSelf();
-
-        builder.Register<InspectService>(Lifetime.Scoped);
 
         builder.Register<SurfaceDetectionService>(Lifetime.Scoped);
 

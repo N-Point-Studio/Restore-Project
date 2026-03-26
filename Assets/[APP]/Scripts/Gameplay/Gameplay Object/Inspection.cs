@@ -2,6 +2,7 @@ using UnityEngine;
 using DG.Tweening;
 using NINESOFT.TUTORIAL_SYSTEM;
 using VContainer;
+using System;
 
 public class Inspection : MonoBehaviour
 {
@@ -27,20 +28,12 @@ public class Inspection : MonoBehaviour
 
     private TutorialService tutorialService;
 
+    private bool isAssembling = false;
+
     [Inject]
     public void Construct(TutorialService tutorialService)
     {
         this.tutorialService = tutorialService;
-    }
-
-    public Transform GetAssemblyRoot()
-    {
-        return assemblyRoot;
-    }
-
-    public void SetCenter(Vector3 center)
-    {
-        assemblyRoot.position = center;
     }
 
     void Start()
@@ -55,6 +48,9 @@ public class Inspection : MonoBehaviour
     {
         InteractionEvents.OnRotatePerformed += OnRotatePerformed;
         InteractionEvents.OnZoomPerformed += OnZoomPerformed;
+
+        AssembleEvents.OnAssemblePerformed += HandleAssemblePerformed;
+        AssembleEvents.OnAssembleFinished += HandleAssembleFinished;
 
         _mainCamera = Camera.main;
 
@@ -72,6 +68,10 @@ public class Inspection : MonoBehaviour
     {
         InteractionEvents.OnRotatePerformed -= OnRotatePerformed;
         InteractionEvents.OnZoomPerformed -= OnZoomPerformed;
+
+        AssembleEvents.OnAssemblePerformed -= HandleAssemblePerformed;
+        AssembleEvents.OnAssembleFinished -= HandleAssembleFinished;
+
         GameplayUIManager.OnGameWrapped -= HandleGameWrapped;
     }
 
@@ -85,6 +85,8 @@ public class Inspection : MonoBehaviour
         );
     }
 
+    public Transform GetAssemblyRoot() => assemblyRoot;
+
     private void HandleGameWrapped()
     {
         isGameFinished = true;
@@ -93,7 +95,7 @@ public class Inspection : MonoBehaviour
 
     public void OnRotatePerformed(Vector2 delta)
     {
-        if (!isContain) return;
+        if (!isContain || isAssembling) return;
         if (_mainCamera == null) return;
 
         float rotateY = -delta.x;
@@ -115,7 +117,7 @@ public class Inspection : MonoBehaviour
 
     public void OnZoomPerformed(float zoomDelta)
     {
-        if (!isContain || isGameFinished) return;
+        if (!isContain || isGameFinished || isAssembling) return;
         if (_mainCamera == null) _mainCamera = Camera.main;
 
         Vector3 direction = (_targetPosition - _mainCamera.transform.position).normalized;
@@ -153,8 +155,8 @@ public class Inspection : MonoBehaviour
         _zoomVelocity = Vector3.zero;
     }
 
-    public void SetInspectionUsage(bool status)
-    {
-        isContain = status;
-    }
+    public void SetInspectionUsage(bool status) => isContain = status;
+    private void HandleAssemblePerformed() => isAssembling = true;
+    private void HandleAssembleFinished() => isAssembling = false;
+
 }

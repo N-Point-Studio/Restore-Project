@@ -7,7 +7,6 @@ public interface IArtefactPart : IAssemble
     ConnectionSocket GetAvailableSocketFor(string id);
     void ReleaseSocketWith(string otherId);
     List<ConnectionSocket> GetSockets();
-    Renderer GetRenderer();
     void CorrectRotation(Quaternion rotation);
     ArtefactPieceState CurrentState { get; }
 }

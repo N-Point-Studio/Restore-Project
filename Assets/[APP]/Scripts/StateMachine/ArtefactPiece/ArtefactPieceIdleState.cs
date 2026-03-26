@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ArtefactPieceIdleState : ArtefactPieceBaseState, IDragObject, IInspectable, IArtefactPart
+public class ArtefactPieceIdleState : ArtefactPieceBaseState, IDragObject, IArtefactPart
 {
     public string PieceId => stateMachine.pieceId;
 
@@ -13,16 +13,6 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IDragObject, IInsp
     }
     public override void Tick(float deltaTime) { }
     public override void Exit() { }
-
-    public Transform GetTransform() => stateMachine.transform;
-
-    //=== IInspectable ===
-    public void EnterInspect(Transform targetTransform)
-    {
-        stateMachine.SwitchState(new ArtefactPieceMoveState(stateMachine, targetTransform, ArtefactPieceState.Inspect));
-    }
-    public void ExitInspect() { }
-
 
     //=== IDragObject ===
     public void OnDragStarted(Vector3 worldPos)
@@ -47,13 +37,14 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IDragObject, IInsp
     public ArtefactPieceState CurrentState => stateMachine.state;
     public void OnAssembled(Transform targetTransform)
     {
-        stateMachine.SwitchState(new ArtefactPieceMoveState(stateMachine, targetTransform, ArtefactPieceState.Assembled));
+        stateMachine.SwitchState(new ArtefactPieceMoveState(stateMachine, targetTransform));
+        AssembleEvents.OnAssemblePerformed?.Invoke();
     }
     public void OnDetached() { }
 
     public List<ConnectionSocket> GetSockets() => stateMachine.sockets;
 
-    public Renderer GetRenderer() => stateMachine.GetRenderer();
+    public Transform GetTransform() => stateMachine.transform;
 
     public void CorrectRotation(Quaternion rotation) => stateMachine.CorrectRotation(rotation);
 }

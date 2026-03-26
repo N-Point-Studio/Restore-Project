@@ -14,7 +14,7 @@ public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IArtefactPart
         stateMachine.state = ArtefactPieceState.Assembled;
         stateMachine.transform.DOPunchRotation(new Vector3(5, 5, 0), 0.4f);
         AudioEvents.TriggerPlayAssembleSFX();
-        InteractionEvents.OnAssembleInteractionFinished?.Invoke();
+        AssembleEvents.OnAssembleFinished?.Invoke();
     }
     public override void Tick(float deltaTime) { }
     public override void Exit() { }
@@ -36,6 +36,5 @@ public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IArtefactPart
         stateMachine.SwitchState(new ArtefactPieceReturningState(stateMachine));
     }
 
-    public Renderer GetRenderer() => stateMachine.GetRenderer();
     public void CorrectRotation(Quaternion rotation) => stateMachine.CorrectRotation(rotation);
 }

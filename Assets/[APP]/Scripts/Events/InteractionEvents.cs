@@ -18,6 +18,4 @@ public static class InteractionEvents
     public static Action<IInteractObject, float, Vector2> OnHoldPerformed;
     public static Action<IInteractObject, Vector2> OnHoldCanceled;
     public static Action<IInteractObject, Vector2> OnHoldCompleted;
-
-    public static Action OnAssembleInteractionFinished;
 }

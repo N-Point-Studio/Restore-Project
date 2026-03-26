@@ -65,13 +65,15 @@ public class ArtefactManager : IInitializable, IDisposable
     private void HandleDragEnded(IInteractObject interact, Vector3 worldPos)
     {
         if (toolService.IsOnToolMode) return;
+        // Debug.Log("Trial 1");
 
-        if (interact is not IInspectable inspectable) return;
+        if (interact is not IArtefactPart artefactPart) return;
+        // Debug.Log("Trial 2");
 
         float distance = Vector3.Distance(worldPos, assemblyService.GetInspectPoint().position);
         bool isCloseEnough = distance < 1.5f;
 
-        if (isCloseEnough && assemblyService.TryAssemble(inspectable as IArtefactPart)) return;
+        if (isCloseEnough && assemblyService.TryAssemble(artefactPart)) return;
         if (interact is IDragObject drag) drag.OnDragEnded(worldPos);
     }
 
