@@ -10,18 +10,13 @@ public class CleaningSurfaceObject : MonoBehaviour, ICleanSurfaceObject
     private float dirtAmountTotal;
     private float dirtAmount;
     private Vector2Int lastPaintPixelPosition;
-
     public static event Action<CleaningSurfaceObject> OnCreated;
-
-    private void Awake()
-    {
-        OnCreated?.Invoke(this);
-    }
 
     private void Start()
     {
         CreateTexture();
         CalculateDirtTotal();
+        OnCreated?.Invoke(this);
     }
 
     private void CreateTexture()

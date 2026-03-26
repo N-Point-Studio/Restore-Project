@@ -3,6 +3,7 @@ using VContainer;
 using VContainer.Unity;
 using UnityEngine;
 using System.Collections.Generic;
+using Modules;
 
 public class CleaningService : IInitializable, IDisposable
 {
@@ -26,13 +27,13 @@ public class CleaningService : IInitializable, IDisposable
     public void Dispose()
     {
         CleaningHardObject.OnCreated -= RegisterChunk;
-        CleaningHardObject.OnDestroy += CalculateChunks;
+        CleaningHardObject.OnDestroy -= CalculateChunks;
         CleaningSurfaceObject.OnCreated -= RegisterSurface;
     }
 
     public void RegisterSurface(CleaningSurfaceObject cleanObj)
     {
-        if (cleaningSurfaces.Add(cleanObj)) Debug.Log($"Registered: {cleanObj.name}");
+        cleaningSurfaces.Add(cleanObj);
     }
 
     public void RegisterChunk(CleaningHardObject cleanObj)

@@ -18,12 +18,15 @@ public class CleaningHardObject : MonoBehaviour, IInteractObject, ICleanHardObje
     private void Awake()
     {
         targetRenderer = GetComponent<Renderer>();
+    }
+
+    private void Start()
+    {
         OnCreated?.Invoke(this);
     }
 
     public void Hit()
     {
-        Debug.Log($"Hit {name} loh ya!");
         currentHit++;
 
         UpdateTexture();
@@ -54,7 +57,6 @@ public class CleaningHardObject : MonoBehaviour, IInteractObject, ICleanHardObje
 
     public void OnInteractDetected()
     {
-        // Debug.Log($"Hard object {name} detected");
     }
 
     public void OnInteractEnded()

@@ -15,7 +15,7 @@ public class FragmentService : IInitializable, IDisposable
 
     public void Register(ArtefactPieceStateMachine sm)
     {
-        if (registry.Add(sm)) Debug.Log($"Registered: {sm.name}");
+        registry.Add(sm);
     }
 
     public float GetAssemblyProgress()
@@ -44,7 +44,6 @@ public class FragmentService : IInitializable, IDisposable
         }
 
         float progress = (float)connectedPieces / registry.Count;
-        Debug.Log($"Progress: {connectedPieces}/{registry.Count} = {progress}");
 
         return progress;
     }

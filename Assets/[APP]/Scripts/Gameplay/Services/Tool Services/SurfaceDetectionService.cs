@@ -40,13 +40,7 @@ public class SurfaceDetectionService
         if (hit.collider.TryGetComponent(out ICleanable cleanable))
         {
             hasHit = cleanable.IsCleanable();
-            Debug.Log("is hit: " + hasHit);
         }
-        // else
-        // {
-        //     hasHit = true;
-        // }
-
         EssentialDetecting(hit);
 
         // cek interface

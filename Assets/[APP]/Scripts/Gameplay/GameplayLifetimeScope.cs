@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -5,10 +6,10 @@ using VContainer.Unity;
 public class GameplayLifetimeScope : LifetimeScope
 {
     [SerializeField] private Inspection inspect;
-    [SerializeField] private RectTransform inspectZone;
     [SerializeField] private Transform pivotPoint;
     [SerializeField] private Transform planeReference;
     [SerializeField] private HoldProgressUI holdProgressUI;
+    [SerializeField] private string targetScene;
     protected override void Configure(IContainerBuilder builder)
     {
         Plane dragPlane = new(planeReference.up, planeReference.position);
@@ -18,7 +19,6 @@ public class GameplayLifetimeScope : LifetimeScope
 
         builder.RegisterInstance(Camera.main);
         builder.RegisterComponent(inspect);
-        builder.RegisterInstance(inspectZone);
         builder.RegisterInstance(pivotPoint);
         builder.RegisterInstance(holdProgressUI);
 
@@ -43,6 +43,6 @@ public class GameplayLifetimeScope : LifetimeScope
 
         builder.RegisterComponentInHierarchy<GameplayUIManager>().AsSelf();
 
-        builder.RegisterEntryPoint<GameplayManager>().AsSelf();
+        builder.RegisterEntryPoint<GameplayManager>().AsSelf().WithParameter(targetScene);
     }
 }

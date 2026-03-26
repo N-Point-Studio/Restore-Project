@@ -72,12 +72,12 @@ public class GameplayUIManager : MonoBehaviour
 
     private IEnumerator Start()
     {
-        HandleAssembleAvailability();
         mainUIController.ShowButtonWrap(false);
 
-        yield return null; 
+        yield return null;
 
         tutorialService.StartTutorial(TutorialIDs.DRAG_TO_INSPECT, 0, 0);
+        HandleAssembleAvailability();
     }
 
     private void OnDestroy()
@@ -97,6 +97,7 @@ public class GameplayUIManager : MonoBehaviour
 
         quitConfirmationController.OnConfirm -= OnConfirmQuit;
         quitConfirmationController.OnCancel -= OnCancelQuit;
+
     }
 
     private void UpdateProgress(ProgressType type, float value)
@@ -140,9 +141,9 @@ public class GameplayUIManager : MonoBehaviour
         }
         if (count == 0) return;
         float overall = total / count;
-        
+
         canWrapUp = overall >= wrapUpThreshold;
-        
+
         mainUIController.EnableWrapUp(canWrapUp);
         mainUIController.ShowButtonWrap(canWrapUp);
 

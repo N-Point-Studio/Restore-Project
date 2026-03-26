@@ -65,7 +65,6 @@ public class ObjectHoldService : IInitializable, IDisposable, ITickable
         float holdTime = heldTime - HOLD_DELAY;
 
         OnHoldPerformed?.Invoke(holdTime, inputSystemService.GetMousePosition());
-        // Debug.Log("holding " + holdTime);
 
         if (holdTime >= HOLD_DURATION)
         {

@@ -150,7 +150,6 @@ public class AssemblyService : IInitializable, IDisposable
 
         foreach (var part in currentAssembleList)
         {
-            Debug.Log("Recenter " + part);
             Transform partTf = part.GetTransform();
             Vector3 targetPos = partTf.localPosition - offset;
 

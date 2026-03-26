@@ -82,9 +82,6 @@ public class ObjectInteractionManager : IInitializable, IDisposable
     private void HandlePressStarted()
     {
         if (currentInteract == null) return;
-        // currentState = GestureState.InteractingWithObject;
-        // Debug.Log("Hit pertama");
-        // InteractionEvents.OnPressStarted?.Invoke(currentInteract);
     }
 
     private void HandlePressEnded()
@@ -101,15 +98,6 @@ public class ObjectInteractionManager : IInitializable, IDisposable
         Vector3 worldPos = detectionService.ScreenToWorld(vector, currentInteract);
         InteractionEvents.OnDragStarted?.Invoke(currentInteract, worldPos);
     }
-
-    // private void HandleDragPerformed(Vector2 vector)
-    // {
-    //     if (currentInteract == null) return;
-    //     // currentState = GestureState.InteractingWithObject;
-    //     // Debug.Log("Current position " + vector);
-    //     Vector3 worldPos = detectionService.ScreenToWorld(vector, currentInteract);
-    //     InteractionEvents.OnDragPerformed?.Invoke(currentInteract, worldPos);
-    // }
 
     private void HandleDragPerformed(Vector2 vector)
     {
@@ -134,7 +122,6 @@ public class ObjectInteractionManager : IInitializable, IDisposable
         if (currentInteract == null) return;
         currentState = GestureState.InteractingWithObject;
         InteractionEvents.OnHoldPerformed?.Invoke(currentInteract, val, position);
-        // Debug.Log("object interaction hold performed");
     }
 
     private void HandleHoldCompleted(Vector2 position)
@@ -143,7 +130,6 @@ public class ObjectInteractionManager : IInitializable, IDisposable
         if (currentInteract == null) return;
         currentState = GestureState.InteractingWithObject;
         InteractionEvents.OnHoldCompleted?.Invoke(currentInteract, position);
-        // Debug.Log("object interaction hold completed");
 
     }
 
@@ -153,7 +139,6 @@ public class ObjectInteractionManager : IInitializable, IDisposable
         if (currentInteract == null) return;
         currentState = GestureState.Idle;
         InteractionEvents.OnHoldCanceled?.Invoke(currentInteract, position);
-        // Debug.Log("object interaction hold canceled");
 
     }
 }

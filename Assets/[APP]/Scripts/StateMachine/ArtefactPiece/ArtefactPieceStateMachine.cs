@@ -14,13 +14,13 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
     {
         col = GetComponent<Collider>();
         rd = GetComponent<Renderer>();
-        OnCreated?.Invoke(this);
     }
     private void Start()
     {
         InitialPosition = transform.position;
         InitialRotation = transform.rotation;
         SwitchState(new ArtefactPieceIdleState(this));
+        OnCreated?.Invoke(this);
     }
 
     // === Assemble ===
@@ -63,7 +63,6 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
     public void SetColliderEnable(bool isActive)
     {
         col.enabled = isActive;
-        Debug.Log("Artefact collider enable?: " + isActive);
     }
 
     public List<ConnectionSocket> GetSockets() => sockets;

@@ -23,7 +23,6 @@ public class ObjectDetectionService : IInitializable, IDisposable
 
     public void Initialize()
     {
-        // Debug.Log("initialize");
         inputSystemService.OnLeftPressStarted += HandleLeftPressStarted;
         inputSystemService.OnMouseMoved += HandleMouseMove;
         inputSystemService.OnLeftPressEnded += HandleLeftPressEnded;

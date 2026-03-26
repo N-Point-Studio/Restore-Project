@@ -73,8 +73,6 @@ public class ProgressBarUI : MonoBehaviour
             fill.fillAmount = 1f;
         else
             fill.fillAmount = progress;
-
-        Debug.Log("Progress " + progress);
     }
 
     public int GetValue()

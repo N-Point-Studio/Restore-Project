@@ -10,16 +10,22 @@ public class GameplayManager : IInitializable, IDisposable
     private ActiveArtefactData activeArtefactData;
     private InputSystemService inputSystemService;
     private ArtefactData artefactData;
+    public Action OnGameStarted;
 
-    private const string TARGET_SCENE = "MainMenu";
+    private string targetScene = "MainMenu";
 
     [Inject]
-    public GameplayManager(PlayerProgressionData playerProgressionData, ActiveArtefactData activeArtefactData, SceneLoader sceneLoader, InputSystemService inputSystemService)
+    public GameplayManager(PlayerProgressionData playerProgressionData,
+    ActiveArtefactData activeArtefactData,
+    SceneLoader sceneLoader,
+    InputSystemService inputSystemService,
+    string targetScene)
     {
         this.playerProgressionData = playerProgressionData;
         this.activeArtefactData = activeArtefactData;
         this.sceneLoader = sceneLoader;
         this.inputSystemService = inputSystemService;
+        this.targetScene = targetScene;
 
         InitializeSession();
     }
@@ -69,7 +75,7 @@ public class GameplayManager : IInitializable, IDisposable
     {
         AppLogger.Log($"[Gameplay Manager] Back to menu using SceneLoader. Message: {loadingMessage}");
 
-        _ = sceneLoader.LoadSceneAsync(TARGET_SCENE, 2f, loadingMessage);
+        _ = sceneLoader.LoadSceneAsync(targetScene, 2f, loadingMessage);
     }
 
     private void InitializeSession()
