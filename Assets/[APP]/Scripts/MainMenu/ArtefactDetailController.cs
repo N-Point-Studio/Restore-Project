@@ -92,7 +92,8 @@ public class ArtefactDetailController : MonoBehaviour
         }
     }
 
-    public void OpenDetail(ArtefactData artefactData, ActiveArtefactData activeData, Artefact3DItem item3D)
+    // ---> TAMBAH PARAMETER bool forceShowBook = false <---
+    public void OpenDetail(ArtefactData artefactData, ActiveArtefactData activeData, Artefact3DItem item3D, bool forceShowBook = false)
     {
         currentArtefactData = artefactData;
         activeArtefactData = activeData;
@@ -118,13 +119,37 @@ public class ArtefactDetailController : MonoBehaviour
         {
             instructionText.gameObject.SetActive(false);
             
-            buttonBack.Button.interactable = false; 
-            DOVirtual.DelayedCall(1.5f, () => { if (buttonBack != null) buttonBack.Button.interactable = true; });
+            if (forceShowBook)
+            {
+                if (buttonBack != null) buttonBack.Button.interactable = false; 
+                DOVirtual.DelayedCall(1.5f, () => { if (buttonBack != null) buttonBack.Button.interactable = true; });
 
-            buttonBack.SetAlternateStyle(true);
+                buttonBack.SetAlternateStyle(true);
 
-            journalController.SetupPostRestoration(currentArtefactData, OnJournalContinueClicked);
-            journalController.OpenBookFull();
+                journalController.SetupPostRestoration(currentArtefactData, OnJournalContinueClicked);
+                journalController.OpenBookFull();
+            }
+            else
+            {
+                if (buttonBack != null) buttonBack.Button.interactable = true;
+                buttonBack.SetAlternateStyle(false); 
+
+                journalController.SetupPostRestoration(currentArtefactData, OnJournalContinueClicked);
+                journalController.HideBookToPeek();
+
+                wallTitleText.text = currentArtefactData.BaseData.ItemName;
+                wallDescText.text = currentArtefactData.BaseData.ItemDescription;
+                wallTextGroup.gameObject.SetActive(true);
+
+                if (wallTextRevealFeedback != null)
+                {
+                    wallTextRevealFeedback.PlayFeedbacks();
+                }
+                else
+                {
+                    wallTextGroup.DOFade(1, 0.5f);
+                }
+            }
         }
         else
         {
@@ -276,6 +301,9 @@ public class ArtefactDetailController : MonoBehaviour
     private void OnUIKeycodeRPerformed()
     {
         if (!IsOpen) return;
+        if (journalController != null && journalController.CurrentState == JournalState.Opened)
+            return;
+
         if (wallTextGroup != null && wallTextGroup.gameObject.activeInHierarchy && 
             buttonReplay != null && buttonReplay.interactable)
         {
@@ -286,6 +314,10 @@ public class ArtefactDetailController : MonoBehaviour
     private void OnUIKeycodeEnterPerformed()
     {
         if (!IsOpen) return;
+        
+        if (journalController != null && journalController.CurrentState == JournalState.Opened)
+            return;
+
         if (wallTextGroup != null && wallTextGroup.gameObject.activeInHierarchy && 
             buttonContinueStory != null && buttonContinueStory.interactable)
         {

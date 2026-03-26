@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Modules.SoundSystems;
 
 [RequireComponent(typeof(Slider))]
 public class UISoundEffectTriggerSlider : UISoundEffectTrigger
@@ -21,7 +22,14 @@ public class UISoundEffectTriggerSlider : UISoundEffectTrigger
     protected override void PlaySound()
     {
         base.PlaySound();
-        AudioEvents.TriggerPlaySliderSFX();
+        if (customKey != AudioKey.None)
+        {
+            AudioEvents.TriggerPlayCustomSFX(customKey);
+        }
+        else
+        {
+            AudioEvents.TriggerPlaySliderSFX();
+        }
     }
 
     private void OnSliderValueChanged(float value)

@@ -1,9 +1,12 @@
-using System;
 using UnityEngine;
 using Unity.Cinemachine;
+using System.Collections;
 
 public class MainMenuCameraManager : MonoBehaviour
 {
+    [Header("Brain")]
+    [SerializeField] private CinemachineBrain brain;
+
     [Header("Cinemachine Cameras")]
     [Tooltip("Camera when in the initial Main Menu")]
     [SerializeField] private CinemachineCamera vcamMainMenu;
@@ -38,6 +41,8 @@ public class MainMenuCameraManager : MonoBehaviour
         vcamMainMenu.Priority = 10;
         vcamLevelSelection.Priority = 0;
         vcamArtefactDetail.Priority = 0;
+
+        MoveToTargetCamera();
     }
 
     private void SetCameraToLevelSelection()
@@ -45,6 +50,8 @@ public class MainMenuCameraManager : MonoBehaviour
         vcamMainMenu.Priority = 0;
         vcamLevelSelection.Priority = 10;
         vcamArtefactDetail.Priority = 0;
+
+        MoveToTargetCamera();
     }
 
     private void SetCameraToArtefact(Transform target)
@@ -58,5 +65,24 @@ public class MainMenuCameraManager : MonoBehaviour
         vcamMainMenu.Priority = 0;
         vcamLevelSelection.Priority = 0;
         vcamArtefactDetail.Priority = 10;
+
+        MoveToTargetCamera();
+    }
+
+    private void MoveToTargetCamera()
+    {
+        StartCoroutine(WaitUntilBlendFinished());
+    }
+
+    private IEnumerator WaitUntilBlendFinished()
+    {
+        yield return null;
+
+        while (brain.IsBlending)
+        {
+            yield return null;
+        }
+
+        MainMenuEvents.TriggerCameraMoveFinished();
     }
 }

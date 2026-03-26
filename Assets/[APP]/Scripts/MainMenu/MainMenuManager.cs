@@ -53,7 +53,7 @@ public class MainMenuManager : MonoBehaviour
         MainMenuEvents.OnNewGame += OnRequestNewGameGame;
         MainMenuEvents.OnContinueGame += OnRequestContinueGame;
         MainMenuEvents.OnCloseLevelSelection += OnRequestCloseLevelSelection;
-        MainMenuEvents.OnCameraFocusToArtefact += OnRequestCameraFocusArtefact;
+        MainMenuEvents.OnOpenArtefactDetail += OnRequestOpenArtefactDetail;
         MainMenuEvents.OnCloseArtefactDetail += OnRequestCloseArtefactDetail;
         MainMenuEvents.OnOpenSettings += OnRequestOpenSettings;
         MainMenuEvents.OnRequestQuit += OnRequestQuit;
@@ -63,6 +63,8 @@ public class MainMenuManager : MonoBehaviour
 
     private void Start()
     {
+        AudioEvents.TriggerPlayBGMMainMenu();
+
         bool hasPendingAnimations = 
             activeArtefactData.GetPendingCompletionAnimations().Count > 0 || 
             activeArtefactData.GetPendingUnlockAnimations().Count > 0;
@@ -93,7 +95,7 @@ public class MainMenuManager : MonoBehaviour
         MainMenuEvents.OnNewGame -= OnRequestNewGameGame;
         MainMenuEvents.OnContinueGame -= OnRequestContinueGame;   
         MainMenuEvents.OnCloseLevelSelection -= OnRequestCloseLevelSelection;   
-        MainMenuEvents.OnCameraFocusToArtefact -= OnRequestCameraFocusArtefact;  
+        MainMenuEvents.OnOpenArtefactDetail -= OnRequestOpenArtefactDetail;
         MainMenuEvents.OnCloseArtefactDetail -= OnRequestCloseArtefactDetail;
         MainMenuEvents.OnOpenSettings -= OnRequestOpenSettings;
         MainMenuEvents.OnRequestQuit -= OnRequestQuit;
@@ -117,8 +119,8 @@ public class MainMenuManager : MonoBehaviour
             projectSavingSystem.SaveAll();
 
             menuController.SetActive(false);
-            levelSelectionController.OpenLevelSelection();
-            MainMenuEvents.TriggerCameraToLevelSelection();
+
+            levelSelectionController.OpenLevelSelectionAndPlayAnimations();
         }
     }
 
@@ -147,7 +149,7 @@ public class MainMenuManager : MonoBehaviour
         menuController.RefreshButtonVisibility();
     }
 
-    private void OnRequestCameraFocusArtefact(Transform transform)
+    private void OnRequestOpenArtefactDetail(ArtefactData data)
     {
         backgroundController.SetActive(true);
     }
@@ -175,6 +177,8 @@ public class MainMenuManager : MonoBehaviour
         activeArtefactData.ResetData(); 
         
         projectSavingSystem.SaveAll();
+
+        isFirstSessionLoad = true;
 
         _ = sceneLoader.LoadSceneAsync(splashSceneName);
     }

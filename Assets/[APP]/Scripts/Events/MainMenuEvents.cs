@@ -11,10 +11,12 @@ public static class MainMenuEvents
     public static event Action OnContinueGame;
     public static event Action OnOpenSettings;
     public static event Action OnRequestQuit;
+
+    // Camera
     public static event Action OnCameraToMainMenu;
     public static event Action OnCameraToLevelSelection;
     public static event Action<Transform> OnCameraFocusToArtefact;
-    public static event Action OnPauseGameplay;
+    public static event Action OnCameraMoveFinished;
 
     public static void TriggerOpenArtefactDetail(ArtefactData data) => OnOpenArtefactDetail?.Invoke(data);
     public static void TriggerArtefactPlay(ArtefactData artefactData) => OnArtefactPlay?.Invoke(artefactData);
@@ -27,6 +29,7 @@ public static class MainMenuEvents
     public static void TriggerCameraToMainMenu() => OnCameraToMainMenu?.Invoke();
     public static void TriggerCameraToLevelSelection() => OnCameraToLevelSelection?.Invoke();
     public static void TriggerCameraFocusToArtefact(Transform targetTransform) => OnCameraFocusToArtefact?.Invoke(targetTransform);
+    public static void TriggerCameraMoveFinished() => OnCameraMoveFinished?.Invoke();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()

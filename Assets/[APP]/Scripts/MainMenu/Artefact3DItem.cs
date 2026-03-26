@@ -1,3 +1,4 @@
+using DG.Tweening;
 using MoreMountains.Feedbacks;
 using UnityEngine;
 
@@ -29,6 +30,7 @@ public class Artefact3DItem : MonoBehaviour
     private bool isInDetailMode = false;
     private bool hasUnpeeledNotes = false;
     private bool isSelectionModeActive = false;
+    private bool isCompleted = false;
 
     public string ArtefactId => artefactId;
     public bool IsInDetailMode => isInDetailMode;
@@ -52,14 +54,30 @@ public class Artefact3DItem : MonoBehaviour
         if (artefactData == null) return;
 
         bool isUnlocked = activeData.IsArtefactUnlocked(artefactId);
-        bool isCompleted = activeData.IsArtefactCompleted(artefactId);
+        isCompleted = activeData.IsArtefactCompleted(artefactId);
         bool isStoryRead = activeData.IsStoryRead(artefactId);
+
+        bool hasPendingUnlock = activeData.GetPendingUnlockAnimations().Exists(x => x.artefactId == artefactId);
+        bool hasPendingCompletion = activeData.GetPendingCompletionAnimations().Exists(x => x.artefactId == artefactId);
+
+        if (hasPendingCompletion) isCompleted = false;
 
         if (boxSensor != null) boxSensor.Initialize(this);
         if (artefactSensor != null) artefactSensor.Initialize(this);
 
-        artefactTransform.gameObject.SetActive(isCompleted);
-        boxTransform.gameObject.SetActive(!isCompleted && isUnlocked);
+        if (hasPendingUnlock)
+        {
+            if (artefactTransform != null) artefactTransform.gameObject.SetActive(false);
+            if (boxTransform != null) boxTransform.gameObject.SetActive(false);
+        }
+        else
+        {
+            if (artefactTransform != null) artefactTransform.gameObject.SetActive(isCompleted);
+            if (boxTransform != null) boxTransform.gameObject.SetActive(!isCompleted && isUnlocked);
+        }
+
+        // artefactTransform.gameObject.SetActive(isCompleted);
+        // boxTransform.gameObject.SetActive(!isCompleted && isUnlocked);
 
         isInteractable = isUnlocked || isCompleted;
         hasUnpeeledNotes = isUnlocked && !isCompleted && !isStoryRead;
@@ -106,12 +124,16 @@ public class Artefact3DItem : MonoBehaviour
         }
     }
 
-    public bool CanInteract(bool isSensorBox)
+     public bool CanInteract(bool isSensorBox)
     {
         if (!isSelectionModeActive) return false;
 
         if (!isInteractable || artefactData == null) return false;
+
+        if (isInDetailMode && isCompleted) return false;
+
         if (isSensorBox && isInDetailMode && hasUnpeeledNotes) return false;
+        
         return true;
     }
 
@@ -165,7 +187,11 @@ public class Artefact3DItem : MonoBehaviour
 
     public void PlayUnlockAnimation()
     {
-        if (boxTransform != null) boxTransform.localScale = Vector3.zero;
+        if (boxTransform != null) 
+        {
+            boxTransform.localScale = Vector3.zero;
+            boxTransform.gameObject.SetActive(true); 
+        }
 
         if (unlockFeedback != null) unlockFeedback.PlayFeedbacks();
     }
@@ -174,11 +200,33 @@ public class Artefact3DItem : MonoBehaviour
     {
         if (artefactTransform != null) 
         {
-            artefactTransform.gameObject.SetActive(true);
             artefactTransform.localScale = Vector3.zero; 
+            artefactTransform.gameObject.SetActive(true);
         }
         if (boxTransform != null) boxTransform.gameObject.SetActive(false);
         
         if (completionFeedback != null) completionFeedback.PlayFeedbacks();
+    }
+
+    public void AnimateItem(bool show, float duration = 0.5f)
+    {
+        if (assignedPedestal != null)
+        {
+            PedestalAnimator animator = assignedPedestal.GetComponent<PedestalAnimator>();
+            if (animator != null) 
+            {
+                animator.AnimatePedestal(show, duration);
+                return;
+            }
+        }
+
+        float targetAlpha = show ? 1f : 0f;
+        Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
+        foreach (Renderer r in renderers)
+        {
+            if (r.material == null) continue;
+            if (r.material.HasProperty("_BaseColor")) r.material.DOFade(targetAlpha, "_BaseColor", duration);
+            else if (r.material.HasProperty("_Color")) r.material.DOFade(targetAlpha, "_Color", duration);
+        }
     }
 }

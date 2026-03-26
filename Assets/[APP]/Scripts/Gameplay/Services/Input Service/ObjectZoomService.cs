@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -7,7 +6,6 @@ public class ObjectZoomService : IInitializable, IDisposable
 {
     private readonly InputSystemService inputSystemService;
     private const float ScrollSensitivity = 10f;
-    public event Action<float> OnZoomPerformed;
 
     [Inject]
     public ObjectZoomService(InputSystemService inputSystemService)
