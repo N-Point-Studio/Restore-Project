@@ -157,8 +157,8 @@ MonoBehaviour:
   m_text: "Here\u2019s your first artifact, Nova.\LI hope this is a beautiful start
     to your journey here!\n\n-Mrs. Maya :)"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: e0e966e0001c5b14f95829d062742975, type: 2}
-  m_sharedMaterial: {fileID: 4181502694298773041, guid: e0e966e0001c5b14f95829d062742975, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1829725b9ea9c8944adc0a664a7da4a9, type: 2}
+  m_sharedMaterial: {fileID: -8280454748715224624, guid: 1829725b9ea9c8944adc0a664a7da4a9, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -195,7 +195,7 @@ MonoBehaviour:
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
   m_wordSpacing: 0
-  m_lineSpacing: 0
+  m_lineSpacing: -35
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
@@ -251,7 +251,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5938450527352720124}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -357,11 +357,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: P.S Amazing to see this project in the hands of someone so competent! I
-    know I can trust you.
+  m_text: "Here\u2019s your first artifact, Nova.\LI hope this is a beautiful start
+    to your journey here!\n\n-Mrs. Maya :)"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 30630ed0a05528b49b38107864c2e9a6, type: 2}
-  m_sharedMaterial: {fileID: -1999879239979766154, guid: 30630ed0a05528b49b38107864c2e9a6, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1829725b9ea9c8944adc0a664a7da4a9, type: 2}
+  m_sharedMaterial: {fileID: -8280454748715224624, guid: 1829725b9ea9c8944adc0a664a7da4a9, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -385,8 +385,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 27
-  m_fontSizeBase: 27
+  m_fontSize: 24
+  m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -398,7 +398,7 @@ MonoBehaviour:
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
   m_wordSpacing: 0
-  m_lineSpacing: 0
+  m_lineSpacing: -35
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
