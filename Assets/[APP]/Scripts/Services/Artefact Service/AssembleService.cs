@@ -64,6 +64,7 @@ public class AssemblyService : IInitializable, IDisposable
             HideAllSockets();
             inspectPoint.SetInspectionUsage(true);
             fragmentService.ProgressUpdate();
+            // RecenterAssembly();
 
             //complete tutorial drag ke inspect
             if (!TutorialManager.Instance.AllTutorialsCompleted)
@@ -150,6 +151,7 @@ public class AssemblyService : IInitializable, IDisposable
 
         foreach (var part in currentAssembleList)
         {
+            Debug.Log("Recenter " + part);
             Transform partTf = part.GetTransform();
             Vector3 targetPos = partTf.localPosition - offset;
 

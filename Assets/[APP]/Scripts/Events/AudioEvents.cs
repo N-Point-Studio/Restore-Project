@@ -3,12 +3,15 @@ using UnityEngine;
 
 public static class AudioEvents
 {
-    public static Action<bool> OnPlayButtonSFX;   
-    public static Action OnPlayToggleSFX; 
+    public static Action<bool> OnPlayButtonSFX;
+    public static Action OnPlayToggleSFX;
     public static Action OnPlaySliderSFX;
     public static Action OnPlayUIComponentSelectedSFX;
     public static Action OnPlayBGMMainMenu;
     public static Action OnPlayBGMGameplay;
+    public static Action OnPlayBrushSFX;
+    public static Action OnPlayChiselSFX;
+    public static Action OnPlayAssembleSFX;
 
     public static void TriggerPlayButtonSFX(bool isConfirm)
     {
@@ -40,6 +43,21 @@ public static class AudioEvents
         OnPlayBGMGameplay?.Invoke();
     }
 
+    public static void TriggerPlayBrushSFX()
+    {
+        OnPlayBrushSFX?.Invoke();
+    }
+
+    public static void TriggerPlayChiselSFX()
+    {
+        OnPlayChiselSFX?.Invoke();
+    }
+
+    public static void TriggerPlayAssembleSFX()
+    {
+        OnPlayAssembleSFX?.Invoke();
+    }
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
@@ -49,5 +67,8 @@ public static class AudioEvents
         OnPlayUIComponentSelectedSFX = null;
         OnPlayBGMMainMenu = null;
         OnPlayBGMGameplay = null;
+        OnPlayBrushSFX = null;
+        OnPlayChiselSFX = null;
+        OnPlayAssembleSFX = null;
     }
 }

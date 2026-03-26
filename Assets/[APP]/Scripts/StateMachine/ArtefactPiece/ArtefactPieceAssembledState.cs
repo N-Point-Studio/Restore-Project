@@ -13,6 +13,7 @@ public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IArtefactPart
     {
         stateMachine.state = ArtefactPieceState.Assembled;
         stateMachine.transform.DOPunchRotation(new Vector3(5, 5, 0), 0.4f);
+        AudioEvents.TriggerPlayAssembleSFX();
         InteractionEvents.OnAssembleInteractionFinished?.Invoke();
     }
     public override void Tick(float deltaTime) { }
@@ -28,7 +29,6 @@ public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IArtefactPart
 
     public void OnAssembled(Transform targetTransform)
     {
-
     }
 
     public void OnDetached()

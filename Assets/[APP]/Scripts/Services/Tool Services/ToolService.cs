@@ -53,7 +53,8 @@ public class ToolService : IInitializable, IDisposable, ITickable
                     if (currentTool.ToolType == SurfaceDetectionType.Mesh)
                     {
                         cleaningService.TryCleaningHardSurface(hardObject);
-                        currentTool?.PlaySfx(true);
+                        // currentTool?.PlaySfx(true);
+                        AudioEvents.TriggerPlayChiselSFX();
                     }
                 }
             }
@@ -80,7 +81,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
         }
 
         cleaningService.EndClean();
-        currentTool?.PlaySfx(false);
+        // currentTool?.PlaySfx(false);
         isCleaning = false;
     }
 
@@ -107,7 +108,8 @@ public class ToolService : IInitializable, IDisposable, ITickable
                 if (currentTool.ToolType == SurfaceDetectionType.Texture)
                 {
                     cleaningService.TryCleaning(cleanObject, texture, brush);
-                    currentTool.PlaySfx(true);
+                    // currentTool.PlaySfx(true);
+                    // AudioEvents.TriggerPlayBrushSFX();
                 }
             }
         }

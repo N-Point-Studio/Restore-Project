@@ -26,6 +26,7 @@ public class ArtefactPieceReturningState : ArtefactPieceBaseState
         {
             stateMachine.SwitchState(new ArtefactPieceIdleState(stateMachine));
             InteractionEvents.OnAssembleInteractionFinished?.Invoke();
+            AudioEvents.TriggerPlayAssembleSFX();
         });
     }
 
