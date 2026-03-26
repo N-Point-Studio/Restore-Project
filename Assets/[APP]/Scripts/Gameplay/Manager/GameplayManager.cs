@@ -86,11 +86,31 @@ public class GameplayManager : IInitializable, IDisposable
             {
                 artefactData = activeArtefactData.GetArtefactDatabase().GetItem(targetId);
                 AppLogger.Log($"[Gameplay Manager] Artefact:{artefactData.BaseData.Id} Loaded!");
+                var artefactFragments = artefactData.ArtefactFragmentDatas;
+                foreach (var artefact in artefactFragments)
+                {
+                    Spawn(artefact.Prefab, artefact.SpawnTransform.Position, artefact.SpawnTransform.Rotation);
+                }
             }
             else
             {
                 AppLogger.LogWarning("[Gameplay Manager] Empty artefact ID!");
             }
         }
+    }
+
+    void Spawn(GameObject prefab, Vector3 position, Vector3 rotation)
+    {
+        if (prefab == null)
+        {
+            AppLogger.LogError("[Gameplay Manager] Prefab is NULL!");
+            return;
+        }
+
+        Quaternion rot = Quaternion.Euler(rotation);
+
+        GameObject obj = UnityEngine.Object.Instantiate(prefab, position, rot);
+
+        AppLogger.Log($"[Gameplay Manager] Spawned: {obj.name}");
     }
 }
