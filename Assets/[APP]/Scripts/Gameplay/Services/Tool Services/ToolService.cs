@@ -12,6 +12,9 @@ public class ToolService : IInitializable, IDisposable, ITickable
     private ITool currentTool;
     public bool isCleaning;
     public bool isFinished = false;
+    private Vector2 lastMousePos;
+    private float audioKeepAliveTimer = 0f;
+    private const float AUDIO_GRACE_PERIOD = 0.15f;
 
     [Inject]
     public ToolService(InputSystemService inputSystemService, ObjectDetectionService objectDetectionService,
@@ -53,7 +56,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
                     if (currentTool.ToolType == SurfaceDetectionType.Mesh)
                     {
                         cleaningService.TryCleaningHardSurface(hardObject);
-                        AudioEvents.TriggerPlayChiselSFX();
+                        currentTool.PlaySfx(true);
                     }
                 }
             }
@@ -79,6 +82,11 @@ public class ToolService : IInitializable, IDisposable, ITickable
             }
         }
 
+        if (currentTool != null)
+        {
+            currentTool.PlaySfx(false);
+        }
+
         cleaningService.EndClean();
         isCleaning = false;
     }
@@ -88,7 +96,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
         return currentTool;
     }
 
-    private void StickToSurface(IInteractObject interact)
+    private void StickToSurface(IInteractObject interact, float mouseDelta)
     {
         Vector3 targetPos = surfaceDetectionService.RaycastPos;
         Vector3 targetNormal = surfaceDetectionService.RaycastNormal;
@@ -98,14 +106,24 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
         if (isCleaning && surfaceDetectionService.CleanObject != null)
         {
-            var cleanObject = surfaceDetectionService.CleanObject;
+            ICleanSurfaceObject cleanObject = surfaceDetectionService.CleanObject;
             if (cleanObject != null)
             {
-                var texture = surfaceDetectionService.TextureSurface;
-                var brush = currentTool.GetBrush();
+                Vector2 texture = surfaceDetectionService.TextureSurface;
+                Texture2D brush = currentTool.GetBrush();
+
                 if (currentTool.ToolType == SurfaceDetectionType.Texture)
                 {
                     cleaningService.TryCleaning(cleanObject, texture, brush);
+
+                    if (mouseDelta > 0.1f)
+                    {
+                        currentTool.PlaySfx(true);
+                    }
+                    else
+                    {
+                        currentTool.PlaySfx(false);
+                    }
                 }
             }
         }
@@ -115,21 +133,36 @@ public class ToolService : IInitializable, IDisposable, ITickable
     {
         var mousePos = inputSystemService.GetMousePosition();
         if (currentTool == null) return;
+
+        if (audioKeepAliveTimer > 0f)
+        {
+            audioKeepAliveTimer -= Time.deltaTime;
+        }
+
         if (currentTool is IInteractObject interact)
         {
             var worldPos = objectDetectionService.ScreenToWorld(mousePos, interact);
             currentTool.FollowMouse(worldPos);
 
+            float mouseDelta = Vector2.Distance(mousePos, lastMousePos);
+            lastMousePos = mousePos;
+
             if (surfaceDetectionService.PerformRaycast(mousePos, currentTool.ToolType))
             {
-                StickToSurface(interact);
+                StickToSurface(interact, mouseDelta);
             }
-
+            else
+            {
+                audioKeepAliveTimer = 0f;
+                currentTool.PlaySfx(false);
+            }
         }
     }
 
     private void HandleGameWrapped()
     {
+        if (currentTool != null) currentTool.PlaySfx(false);
+
         currentTool?.Return();
     }
 

@@ -6,6 +6,7 @@ using VContainer.Unity;
 public class ObjectHoldService : IInitializable, IDisposable, ITickable
 {
     private readonly InputSystemService inputSystemService;
+    private readonly GameConfigData config;
 
     private bool isPressing;
     private bool isHolding;
@@ -15,18 +16,15 @@ public class ObjectHoldService : IInitializable, IDisposable, ITickable
     private Vector2 pressPosition;
     private Vector2 currentMousePosition;
 
-    private const float HOLD_DELAY = 0.2f;
-    private const float HOLD_DURATION = .5f;
-    private const float MOVE_TOLERANCE = 5f;
-
     public event Action<float, Vector2> OnHoldPerformed;
     public event Action<Vector2> OnHoldCompleted;
     public event Action<Vector2> OnHoldCanceled;
 
     [Inject]
-    public ObjectHoldService(InputSystemService inputSystemService)
+    public ObjectHoldService(InputSystemService inputSystemService, GameConfigData config)
     {
         this.inputSystemService = inputSystemService;
+        this.config = config;
     }
 
     public void Initialize()
@@ -47,7 +45,7 @@ public class ObjectHoldService : IInitializable, IDisposable, ITickable
     {
         if (!isPressing) return;
 
-        if (Vector2.Distance(currentMousePosition, pressPosition) > MOVE_TOLERANCE)
+        if (Vector2.Distance(currentMousePosition, pressPosition) > config.holdMoveTolerance)
         {
             CancelHold();
             return;
@@ -55,18 +53,18 @@ public class ObjectHoldService : IInitializable, IDisposable, ITickable
 
         float heldTime = Time.time - pressTime;
 
-        if (!isHolding && heldTime >= HOLD_DELAY)
+        if (!isHolding && heldTime >= config.holdDelay)
         {
             isHolding = true;
         }
 
         if (!isHolding) return;
 
-        float holdTime = heldTime - HOLD_DELAY;
+        float holdTime = heldTime - config.holdDelay;
 
         OnHoldPerformed?.Invoke(holdTime, inputSystemService.GetMousePosition());
 
-        if (holdTime >= HOLD_DURATION)
+        if (holdTime >= config.holdDuration)
         {
             OnHoldCompleted?.Invoke(inputSystemService.GetMousePosition());
             CancelHold();

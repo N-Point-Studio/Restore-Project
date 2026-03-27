@@ -1,8 +1,6 @@
 using DG.Tweening;
 using System;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using MoreMountains.Feedbacks;
 
 public enum JournalState { Hidden, Peeking, Opened }
@@ -23,6 +21,7 @@ public class JournalController : MonoBehaviour
     [SerializeField] private Vector2 posHidden;
     [SerializeField] private Vector2 posPeek;
     [SerializeField] private Vector2 posPeekHovered;
+    [SerializeField] private float hoverAnimDuration = 0.15f;
 
     [Header("Page Containers")]
     [SerializeField] private Transform leftPageContainer;
@@ -223,7 +222,7 @@ public class JournalController : MonoBehaviour
     private void AnimateHoverPeek(bool isHovering)
     {
         Vector2 targetPos = isHovering ? posPeekHovered : posPeek;
-        if (bookRect != null) bookRect.DOAnchorPos(targetPos, 0.15f).SetEase(Ease.OutQuad);
+        if (bookRect != null) bookRect.DOAnchorPos(targetPos, hoverAnimDuration).SetEase(Ease.OutQuad);
     }
 
     private void OpenBookFromPeek()

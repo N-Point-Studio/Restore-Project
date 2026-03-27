@@ -6,12 +6,16 @@ namespace Modules.SoundSystems
         None, // Default fallback
         BGM_Home,
         BGM_Game,
+        BGM_Game_China,
+        BGM_Game_Indonesia,
         SFX_Assemble,
         SFX_Camera,
         SFX_Brush,
         SFX_Chisel,
         SFX_Finish,
-        UI_Button_Click,
-        UI_Change_Page,
+        UI_Click,
+        UI_Hover,
+        UI_Cancel,
+        UI_Hover_Paper,
     }
 }

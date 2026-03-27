@@ -55,6 +55,12 @@ public class CleaningHardObject : MonoBehaviour, IInteractObject, ICleanHardObje
         Destroy(gameObject);
     }
 
+    public void ForceClean()
+    {
+        currentHit = maxHitTimes;
+        DestroyObject();
+    }
+
     public void OnInteractDetected()
     {
     }

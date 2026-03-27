@@ -14,7 +14,7 @@ public class ArtefactData : ScriptableObject
     public string[] StickyNoteTexts => stickyNoteTexts;
 
     [Header("Audio Settings")]
-    [SerializeField] private AudioKey customGameplayBGM = AudioKey.BGM_Game;
+    [SerializeField] private AudioKey customGameplayBGM;
     public AudioKey CustomGameplayBGM => customGameplayBGM;
 
     [Header("Journal Content (Prefabs)")]

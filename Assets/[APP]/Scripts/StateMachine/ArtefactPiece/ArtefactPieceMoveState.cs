@@ -16,13 +16,8 @@ public class ArtefactPieceMoveState : ArtefactPieceBaseState
         stateMachine.state = ArtefactPieceState.Move;
         moveSequence = DOTween.Sequence();
 
-        moveSequence.Join(
-            stateMachine.transform.DOMove(targetTransform.position, 0.5f).SetEase(Ease.OutBack)
-        );
-
-        moveSequence.Join(
-            stateMachine.transform.DORotateQuaternion(targetTransform.rotation, 0.5f).SetEase(Ease.OutBack)
-        );
+        moveSequence.Join(stateMachine.transform.DOMove(targetTransform.position, stateMachine.moveDuration).SetEase(Ease.OutBack));
+        moveSequence.Join(stateMachine.transform.DORotateQuaternion(targetTransform.rotation, stateMachine.moveDuration).SetEase(Ease.OutBack));
 
         moveSequence.OnComplete(() =>
         {

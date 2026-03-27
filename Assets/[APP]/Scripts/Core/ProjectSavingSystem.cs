@@ -10,6 +10,7 @@ public class ProjectSavingSystem : SavingSystem, IInitializable, IStartable, IDi
     [Inject] protected readonly ActiveArtefactData activeArtefactData;
     [Inject] protected readonly ActiveSettingsData activeSettingsData;
     [Inject] protected readonly PlayerProgressionData playerProgressionData;
+    [Inject] protected readonly GameConfigData config;
 
     public int MaxSlot => 6;
 
@@ -20,7 +21,6 @@ public class ProjectSavingSystem : SavingSystem, IInitializable, IStartable, IDi
     
     private bool isDataDirty = false;
     private float autoSaveTimer = 0f;
-    private const float AUTO_SAVE_COOLDOWN = 1.0f;
 
     void IInitializable.Initialize()
     {
@@ -42,7 +42,7 @@ public class ProjectSavingSystem : SavingSystem, IInitializable, IStartable, IDi
     private void RequestAutoSave()
     {
         isDataDirty = true;
-        autoSaveTimer = AUTO_SAVE_COOLDOWN;
+        autoSaveTimer = config.autoSaveCooldown;
     }
 
     void IStartable.Start()

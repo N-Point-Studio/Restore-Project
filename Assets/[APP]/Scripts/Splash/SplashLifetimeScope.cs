@@ -10,8 +10,14 @@ public class SplashLifetimeScope : LifetimeScope
     [SerializeField] private Image splashImage;
     [SerializeField] private Sprite[] splashSprites;
 
+    [Header("Animation Settings")]
+    [SerializeField] private SplashSettings splashSettings;
+
     protected override void Configure(IContainerBuilder builder)
     {   
-        builder.RegisterEntryPoint<SplashService>(Lifetime.Scoped).AsSelf().WithParameter(targetScene).WithParameter(canvasGroup).WithParameter(splashSprites).WithParameter(splashImage);
+        builder.RegisterEntryPoint<SplashService>(Lifetime.Scoped).AsSelf()
+            .WithParameter(targetScene).WithParameter(canvasGroup)
+            .WithParameter(splashSprites).WithParameter(splashImage)
+            .WithParameter(splashSettings);
     }
 }

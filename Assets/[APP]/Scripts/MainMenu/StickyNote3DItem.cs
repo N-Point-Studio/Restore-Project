@@ -14,6 +14,11 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
     [SerializeField] private TMP_Text text3D; 
     [SerializeField] private SpriteRenderer spriteRenderer;
 
+    [Header("Hover Animation")]
+    [SerializeField] private float hoverScaleMultiplier = 1.1f;
+    [SerializeField] private float hoverRotationZ = 5f;
+    [SerializeField] private float hoverAnimDuration = 0.2f;
+
     [Header("Feedbacks")]
     [SerializeField] private MMF_Player peelFeedback;
     
@@ -79,8 +84,8 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
         spriteRenderer.color = hoverColor;
 
         transform.DOKill();
-        transform.DOScale(originalScale * 1.1f, 0.2f).SetEase(Ease.OutBack);
-        transform.DOLocalRotate(originalRotation + new Vector3(0, 0, 5f), 0.2f).SetEase(Ease.OutBack);
+        transform.DOScale(originalScale * hoverScaleMultiplier, hoverAnimDuration).SetEase(Ease.OutBack);
+        transform.DOLocalRotate(originalRotation + new Vector3(0, 0, hoverRotationZ), hoverAnimDuration).SetEase(Ease.OutBack);
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -88,8 +93,8 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
         spriteRenderer.color = originalColor;
 
         transform.DOKill();
-        transform.DOScale(originalScale, 0.2f).SetEase(Ease.OutQuad);
-        transform.DOLocalRotate(originalRotation, 0.2f).SetEase(Ease.OutQuad);
+        transform.DOScale(originalScale, hoverAnimDuration).SetEase(Ease.OutQuad);
+        transform.DOLocalRotate(originalRotation, hoverAnimDuration).SetEase(Ease.OutQuad);
     }
 
     public void OnPointerClick(PointerEventData eventData)

@@ -6,14 +6,15 @@ using VContainer.Unity;
 public class ObjectRotateService : IInitializable, IDisposable
 {
     private readonly InputSystemService inputSystemService;
+    private readonly GameConfigData config;
     private bool isRotating;
     private Vector2 lastMousePos;
-    private const float RotateSensitivity = 0.2f;
 
     [Inject]
-    public ObjectRotateService(InputSystemService inputSystemService)
+    public ObjectRotateService(InputSystemService inputSystemService, GameConfigData config)
     {
         this.inputSystemService = inputSystemService;
+        this.config = config;
     }
 
     public void Initialize()
@@ -47,7 +48,7 @@ public class ObjectRotateService : IInitializable, IDisposable
 
         Vector2 delta = currentPos - lastMousePos;
         lastMousePos = currentPos;
-        Vector2 rotateDelta = delta * RotateSensitivity;
+        Vector2 rotateDelta = delta * config.rotateSensitivity;
 
         InteractionEvents.OnRotatePerformed?.Invoke(rotateDelta);
     }

@@ -6,6 +6,9 @@ public class CleaningSurfaceObject : MonoBehaviour, ICleanSurfaceObject
     [SerializeField] private Texture2D dirtMaskBase;
     [SerializeField] private Material material;
 
+    [Header("Cleaning Settings")]
+    [SerializeField] private int maxPaintDistance = 7;
+
     private Texture2D templateDirtMask;
     private float dirtAmountTotal;
     private float dirtAmount;
@@ -52,8 +55,6 @@ public class CleaningSurfaceObject : MonoBehaviour, ICleanSurfaceObject
             Mathf.Abs(paintPixelPosition.x - lastPaintPixelPosition.x) +
             Mathf.Abs(paintPixelPosition.y - lastPaintPixelPosition.y);
 
-        int maxPaintDistance = 7;
-
         if (paintPixelDistance < maxPaintDistance)
             return;
 
@@ -93,10 +94,13 @@ public class CleaningSurfaceObject : MonoBehaviour, ICleanSurfaceObject
 
     public float GetCleanProgress()
     {
-        if (dirtAmountTotal <= 0)
-            return 0;
+        if (dirtAmountTotal <= 0) return 0;
 
-        return Mathf.Clamp01(1f - (dirtAmount / dirtAmountTotal));
+        float progress = 1f - (dirtAmount / dirtAmountTotal);
+
+        if (progress >= 0.99f) return 1f;
+
+        return Mathf.Clamp01(progress);
     }
 
     public bool IsCleanable()
@@ -107,5 +111,19 @@ public class CleaningSurfaceObject : MonoBehaviour, ICleanSurfaceObject
             return parentPart.IsCleanable();
         }
         return false;
+    }
+
+    public void ForceClean()
+    {
+        if (dirtAmountTotal <= 0) return;
+        dirtAmount = 0;
+
+        Color[] clearPixels = new Color[templateDirtMask.width * templateDirtMask.height];
+        for (int i = 0; i < clearPixels.Length; i++)
+        {
+            clearPixels[i] = new Color(0, 0, 0, 0);
+        }
+        templateDirtMask.SetPixels(clearPixels);
+        templateDirtMask.Apply();
     }
 }

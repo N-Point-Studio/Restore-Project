@@ -15,37 +15,57 @@ public class LevelSelectionController : BaseMenuController
     [SerializeField] private Artefact3DItem[] artefact3DItems;
     [SerializeField] private PedestalAnimator[] emptyPedestals;
 
-    [Header("Animation Settings")]
-    [SerializeField] private float hideAnimDuration = 0.4f;
-
     [Header("Target Scene")]
     [SerializeField] private string targetScene;
 
+    [Header("Animation Timings")]
+    [SerializeField] private float hideAnimDuration = 0.4f;
+    [SerializeField] private float initialSequenceDelay = 0.5f;
+    [SerializeField] private float completionRevealDelay = 2.0f;
+    [SerializeField] private float unlockSequenceDelay = 0.3f;
+    [SerializeField] private float unlockDropDelay = 1.5f;
+    [SerializeField] private float restoreAnimDuration = 0.5f;
+    
+
+    // Inject
     private ActiveArtefactData activeArtefactData;
     private PlayerProgressionData playerProgressionData;
     private SceneLoader sceneLoader;
     private InputSystemService input;
+    private GameConfigData config;
 
     private Artefact3DItem clickedItem;
     private bool isCameraMoving = false;
+
+    private WaitForSeconds waitInitialSequence;
+    private WaitForSeconds waitCompletionReveal;
+    private WaitForSeconds waitUnlockSequence;
+    private WaitForSeconds waitUnlockDrop;
 
     [Inject]
     public void Construct(
         ActiveArtefactData activeArtefactData, 
         PlayerProgressionData playerProgressionData,
         SceneLoader sceneLoader,
-        InputSystemService input        
+        InputSystemService input,
+        GameConfigData config        
         )
     {
         this.activeArtefactData = activeArtefactData;
         this.playerProgressionData = playerProgressionData;
         this.sceneLoader = sceneLoader;
         this.input = input;
+        this.config = config;
         artefactDetailController.SetInputSystemService(this.input);
     }
 
     protected override void Awake()
     {
+        waitInitialSequence = new WaitForSeconds(initialSequenceDelay);
+        waitCompletionReveal = new WaitForSeconds(completionRevealDelay);
+        waitUnlockSequence = new WaitForSeconds(unlockSequenceDelay);
+        waitUnlockDrop = new WaitForSeconds(unlockDropDelay);
+
         base.Awake();
 
         MainMenuEvents.OnArtefactPlay += OnRequestArtefactPlay;
@@ -138,7 +158,7 @@ public class LevelSelectionController : BaseMenuController
     private void OnRequestArtefactPlay(ArtefactData data)
     {
         playerProgressionData.SetCurrentActiveArtefact(data.BaseData.Id);
-        _ = sceneLoader.LoadSceneAsync(targetScene, 2f, "Unboxing Artefact...");
+        _ = sceneLoader.LoadSceneAsync(targetScene, config.minLoadingScreenDuration, "Unboxing Artefact...");
     }
 
     private void OnRequestArtefactDetail(ArtefactData data)
@@ -198,7 +218,7 @@ public class LevelSelectionController : BaseMenuController
         for (int i = 0; i < artefact3DItems.Length; i++)
         {
             if (artefact3DItems[i] != null && artefact3DItems[i] != clickedItem)
-                artefact3DItems[i].AnimateItem(true, 0.5f);
+                artefact3DItems[i].AnimateItem(true, restoreAnimDuration);
         }
 
         if (emptyPedestals != null)
@@ -206,7 +226,7 @@ public class LevelSelectionController : BaseMenuController
             for (int i = 0; i < emptyPedestals.Length; i++)
             {
                 PedestalAnimator empty = emptyPedestals[i];
-                if (empty != null) empty.AnimatePedestal(true, 0.5f);
+                if (empty != null) empty.AnimatePedestal(true, restoreAnimDuration);
             }
         }
 
@@ -229,7 +249,7 @@ public class LevelSelectionController : BaseMenuController
 
     private IEnumerator PlayPendingAnimationsSequence()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return waitInitialSequence;
 
         if (artefact3DItems == null || artefact3DItems.Length == 0) 
         {
@@ -246,18 +266,19 @@ public class LevelSelectionController : BaseMenuController
             
             if (targetItem != null)
             {
-                // 1. Suruh kamera maju ke Artefak
+                // 1. Move camera forward to Artefact
                 isCameraMoving = true;
                 MainMenuEvents.TriggerCameraFocusToArtefact(targetItem.transform);
                 
-                // 2. Tunggu sampai event Blend kamera selesai! (Tidak hardcode lagi)
+                // 2. Wait until the camera blend event finishes
                 yield return new WaitUntil(() => !isCameraMoving);
+
+                MainMenuEvents.TriggerShowBackground(true);
 
                 AppLogger.Log($"[Animation] Playing REVEAL animation for {data.artefactId}");
                 targetItem.PlayCompletionAnimation();
                 
-                // Tunggu animasi partikel/ledakan selesai (ini tetap hardcode)
-                yield return new WaitForSeconds(2.0f); 
+                yield return waitCompletionReveal;
                 
                 activeArtefactData.MarkCompletionAnimSeen(data.artefactId);
 
@@ -265,7 +286,7 @@ public class LevelSelectionController : BaseMenuController
                 if (aData != null) OpenArtefactDetailAutomatically(aData);
             }
             
-            yield break; // Berhenti di sini, tunggu pemain close jurnal
+            yield break;
         }
 
         yield return StartCoroutine(PlayPendingUnlocksSequence());
@@ -277,7 +298,7 @@ public class LevelSelectionController : BaseMenuController
         
         if (pendingUnlocks.Count > 0)
         {
-            yield return new WaitForSeconds(0.3f); // Jeda kecil biar rapi setelah jurnal ditutup
+            yield return waitUnlockSequence; // Small delay to keep it neat after the journal is closed
             
             for (int i = 0; i < pendingUnlocks.Count; i++)
             {
@@ -286,7 +307,7 @@ public class LevelSelectionController : BaseMenuController
                 
                 if (targetItem != null)
                 {
-                    // 1. Kamera pindah ke meja Box Baru
+                    // 1. Move camera to the new Box pedestal
                     isCameraMoving = true;
                     MainMenuEvents.TriggerCameraFocusToArtefact(targetItem.transform);
                     
@@ -295,14 +316,14 @@ public class LevelSelectionController : BaseMenuController
                     AppLogger.Log($"[Animation] Playing UNLOCK animation for {data.artefactId}");
                     targetItem.PlayUnlockAnimation();
                     
-                    // Tunggu animasi box jatuh
-                    yield return new WaitForSeconds(1.5f); 
+                    // Wait for the box drop animation
+                    yield return waitUnlockDrop;
                 }
                 
                 activeArtefactData.MarkUnlockAnimSeen(data.artefactId);
             }
             
-            // Setelah semua box baru jatuh, kamera mundur ke Overview
+            // After all new boxes fall, move camera back to Overview
             isCameraMoving = true;
             MainMenuEvents.TriggerCameraToLevelSelection();
             yield return new WaitUntil(() => !isCameraMoving);

@@ -12,6 +12,13 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
     [SerializeField] private SurfaceDetectionType toolType;
     [SerializeField] private AudioSource audioSource;
 
+    [Header("Animation Settings")]
+    [SerializeField] private float returnAnimDuration = 0.5f;
+
+    [Header("Audio Variations")]
+    [SerializeField] private AudioClip[] sfxClips;
+    [SerializeField] private Vector2 pitchRange = new Vector2(0.9f, 1.1f);
+
     private void Awake()
     {
         initialPosition = transform.position;
@@ -26,6 +33,11 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
     {
         returnSequence?.Kill();
         col.enabled = false;
+
+        if (audioSource != null && audioSource.loop)
+        {
+            audioSource.pitch = Random.Range(pitchRange.x, pitchRange.y);
+        }
     }
 
     public void Return()
@@ -36,8 +48,8 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
         returnSequence?.Kill();
         returnSequence = DOTween.Sequence();
 
-        returnSequence.Join(transform.DOMove(initialPosition, 0.5f).SetEase(Ease.OutBack));
-        returnSequence.Join(transform.DORotateQuaternion(initialRotation, 0.5f).SetEase(Ease.OutBack));
+        returnSequence.Join(transform.DOMove(initialPosition, returnAnimDuration).SetEase(Ease.OutBack));
+        returnSequence.Join(transform.DORotateQuaternion(initialRotation, returnAnimDuration).SetEase(Ease.OutBack));
         returnSequence.OnComplete(() => isReturning = false);
     }
 
@@ -66,15 +78,28 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
 
     public void PlaySfx(bool isPlaying)
     {
-        if (isPlaying && audioSource.isPlaying) return;
-
-        if (isPlaying)
+        if (!isPlaying)
         {
-            audioSource.Play();
+            if (audioSource.loop) audioSource.Stop();
+            return;
+        }
+
+        if (audioSource.loop && audioSource.isPlaying) return;
+
+        if (!audioSource.loop)
+        {
+            audioSource.pitch = Random.Range(pitchRange.x, pitchRange.y);
+            AudioClip clipToPlay = audioSource.clip;
+            if (sfxClips != null && sfxClips.Length > 0)
+            {
+                clipToPlay = sfxClips[Random.Range(0, sfxClips.Length)];
+            }
+
+            if (clipToPlay != null) audioSource.PlayOneShot(clipToPlay);
         }
         else
         {
-            audioSource.Stop();
+            audioSource.Play();
         }
     }
 

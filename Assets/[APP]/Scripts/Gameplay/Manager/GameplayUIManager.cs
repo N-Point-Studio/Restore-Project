@@ -19,7 +19,8 @@ public class GameplayUIManager : MonoBehaviour
     [SerializeField] private PopUpConfirmationController quitConfirmationController;
 
     [Header("Settings")]
-    [SerializeField] private float wrapUpThreshold;
+    [SerializeField] private float wrapUpThreshold = 95f;
+    [SerializeField] private float delayUntilAutoWrappedUp = 1.5f;
 
     private CleaningService cleaningService;
     private FragmentService fragmentService;
@@ -27,6 +28,8 @@ public class GameplayUIManager : MonoBehaviour
     private TutorialService tutorialService;
 
     private bool canWrapUp;
+    private bool isAutoWrapUpTriggered = false;
+    private bool isTutorialTriggered = false;
 
     public static event Action OnGameWrapped;
     public static event Action<bool> OnGameFinished;
@@ -97,7 +100,6 @@ public class GameplayUIManager : MonoBehaviour
 
         quitConfirmationController.OnConfirm -= OnConfirmQuit;
         quitConfirmationController.OnCancel -= OnCancelQuit;
-
     }
 
     private void UpdateProgress(ProgressType type, float value)
@@ -106,6 +108,8 @@ public class GameplayUIManager : MonoBehaviour
         {
             if (progressBars[i].ProgressType == type)
             {
+                if (!progressBars[i].gameObject.activeSelf) continue;
+                
                 progressBars[i].SetValue(value);
                 CheckOverallProgress();
                 break;
@@ -143,13 +147,31 @@ public class GameplayUIManager : MonoBehaviour
         float overall = total / count;
 
         canWrapUp = overall >= wrapUpThreshold;
+        bool isFullyCompleted = overall >= 99f;
 
-        mainUIController.EnableWrapUp(canWrapUp);
-        mainUIController.ShowButtonWrap(canWrapUp);
+        bool showButton = canWrapUp && !isFullyCompleted && !isAutoWrapUpTriggered;
+        mainUIController.EnableWrapUp(showButton);
+        mainUIController.ShowButtonWrap(showButton);
 
-        if (canWrapUp)
+        // 2. TRIGGER TUTORIAL
+        if (canWrapUp && !isTutorialTriggered)
         {
+            isTutorialTriggered = true;
             tutorialService.StartTutorial(TutorialIDs.WRAP_UP_SHOW, 1, 0);
+        }
+
+        if (isFullyCompleted && !isAutoWrapUpTriggered)
+        {
+            isAutoWrapUpTriggered = true;
+            mainUIController.ShowButtonWrap(false);
+            
+            DG.Tweening.DOVirtual.DelayedCall(delayUntilAutoWrappedUp, () => 
+            {
+                if (mainUIController != null && mainUIController.IsActive)
+                {
+                    OnWrapUp();
+                }
+            });
         }
     }
 
@@ -188,7 +210,15 @@ public class GameplayUIManager : MonoBehaviour
 
     private void OnWrapUp()
     {
+        if (endgameController.IsActive) return;
+        
         AppLogger.Log("Wrap up!");
+        
+        if (cleaningService != null)
+        {
+            cleaningService.ForceCleanAll();
+        }
+
         toolCamera.gameObject.SetActive(false);
         mainUIController.SetActive(false);
         endgameController.SetActive(true);
