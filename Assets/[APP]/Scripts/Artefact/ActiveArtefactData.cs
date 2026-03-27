@@ -41,11 +41,11 @@ public class ActiveArtefactData : ISaveable
 
         EvaluateUnlockRequirements();
 
-        for (int i = 0; i < artefactProgress.Count; i++)
-        {
-            artefactProgress[i].hasSeenUnlockAnim = true;
-            artefactProgress[i].hasSeenCompletionAnim = true;
-        }
+        // for (int i = 0; i < artefactProgress.Count; i++)
+        // {
+        //     artefactProgress[i].hasSeenUnlockAnim = true;
+        //     artefactProgress[i].hasSeenCompletionAnim = true;
+        // }
     }
 
     public void ResetData()

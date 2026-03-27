@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Modules.SoundSystems;
 
 [RequireComponent(typeof(Toggle))]
 public class UISoundEffectTriggerToggle : UISoundEffectTrigger
@@ -21,7 +22,14 @@ public class UISoundEffectTriggerToggle : UISoundEffectTrigger
     protected override void PlaySound()
     {
         base.PlaySound();
-        AudioEvents.TriggerPlayToggleSFX();
+        if (customKey != AudioKey.None)
+        {
+            AudioEvents.TriggerPlayCustomSFX(customKey);
+        }
+        else
+        {
+            AudioEvents.TriggerPlayToggleSFX();
+        }
     }
 
     protected void OnToggleValueChanged(bool isOn)

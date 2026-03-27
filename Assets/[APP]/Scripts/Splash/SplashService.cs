@@ -57,37 +57,30 @@ public class SplashService : IStartable
 
         // Loop to display all splash sprites alternately
         for (int i = 0; i < splashSprites.Length; i++)
-        {
-            if (splashSprites[i] == null) continue;
+            {
+                if (splashSprites[i] == null) continue;
 
-            // 1. Change logo image and reset size (Scale) to original size (1x)
-            splashImage.sprite = splashSprites[i];
-            splashImage.transform.localScale = Vector3.one;
+                splashImage.sprite = splashSprites[i];
+                splashImage.transform.localScale = Vector3.one;
 
-            // Start scaling effect (slow zoom-in) to 1.1x size while logo is displayed
-            // Using Ease.Linear for constant/smooth movement
-            splashImage.transform.DOScale(1.1f, totalAnimationDuration).SetEase(Ease.Linear);
+                // ---> TAMBAH .SetLink(splashImage.gameObject) <---
+                splashImage.transform.DOScale(1.1f, totalAnimationDuration).SetEase(Ease.Linear).SetLink(splashImage.gameObject);
 
-            // 2. Fade In
-            canvasGroup.DOFade(1f, fadeDuration);
-            await Task.Delay((int)(fadeDuration * 1000));
+                // ---> TAMBAH .SetLink(canvasGroup.gameObject) <---
+                canvasGroup.DOFade(1f, fadeDuration).SetLink(canvasGroup.gameObject);
+                await Task.Delay((int)(fadeDuration * 1000));
 
-            // 3. Hold (Hold logo on screen)
-            await Task.Delay(holdDurationMs);
+                await Task.Delay(holdDurationMs);
 
-            // 4. Fade Out
-            canvasGroup.DOFade(0f, fadeDuration);
-            await Task.Delay((int)(fadeDuration * 1000));
+                // ---> TAMBAH .SetLink(canvasGroup.gameObject) <---
+                canvasGroup.DOFade(0f, fadeDuration).SetLink(canvasGroup.gameObject);
+                await Task.Delay((int)(fadeDuration * 1000));
 
-            // Clean up scaling tween animation attached to splashImage (just in case)
-            splashImage.transform.DOKill();
+                splashImage.transform.DOKill();
+                await Task.Delay(250); 
+            }
 
-            // Small black screen pause before next logo appears
-            await Task.Delay(250); 
-        }
-
-        // 5. Move to the next Scene after the entire splash is finished
-        await LoadNextScene();
+            await LoadNextScene();
     }
 
     private async Task LoadNextScene()

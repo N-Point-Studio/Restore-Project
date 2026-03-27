@@ -19,7 +19,6 @@ public class ProgressBarUI : MonoBehaviour
     [SerializeField] private Image checkList;
     [SerializeField] private TextMeshProUGUI progressText;
     [SerializeField] private TextMeshProUGUI progressTitle;
-    [SerializeField] private int minimum = 0;
     [SerializeField] private int maximum = 100;
     [SerializeField] private AudioKey audioKey;
     private int currentValue = 0;

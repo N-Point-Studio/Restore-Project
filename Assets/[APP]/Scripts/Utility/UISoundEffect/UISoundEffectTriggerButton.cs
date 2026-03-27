@@ -1,3 +1,4 @@
+using Modules.SoundSystems;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,6 +27,13 @@ public class UISoundEffectTriggerButton : UISoundEffectTrigger
     protected override void PlaySound()
     {
         base.PlaySound();
-        AudioEvents.TriggerPlayButtonSFX(isConfirm);
+        if (customKey != AudioKey.None)
+        {
+            AudioEvents.TriggerPlayCustomSFX(customKey);
+        }
+        else
+        {
+            AudioEvents.TriggerPlayButtonSFX(isConfirm);
+        }
     }
 }

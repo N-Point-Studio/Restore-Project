@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Modules;
 using UnityEngine;
 using VContainer;
@@ -92,9 +93,13 @@ public class GameplayManager : IInitializable, IDisposable
             {
                 artefactData = activeArtefactData.GetArtefactDatabase().GetItem(targetId);
                 AppLogger.Log($"[Gameplay Manager] Artefact:{artefactData.BaseData.Id} Loaded!");
-                var artefactFragments = artefactData.ArtefactFragmentDatas;
-                foreach (var artefact in artefactFragments)
+
+                AudioEvents.TriggerPlayBGMGameplay(artefactData.CustomGameplayBGM);
+
+                List<ArtefactFragmentData> artefactFragments = artefactData.ArtefactFragmentDatas;
+                for (int i = 0; i < artefactFragments.Count; i++)
                 {
+                    ArtefactFragmentData artefact = artefactFragments[i];
                     Spawn(artefact.Prefab, artefact.SpawnTransform.Position, artefact.SpawnTransform.Rotation);
                 }
             }
@@ -105,7 +110,7 @@ public class GameplayManager : IInitializable, IDisposable
         }
     }
 
-    void Spawn(GameObject prefab, Vector3 position, Vector3 rotation)
+    private void Spawn(GameObject prefab, Vector3 position, Vector3 rotation)
     {
         if (prefab == null)
         {

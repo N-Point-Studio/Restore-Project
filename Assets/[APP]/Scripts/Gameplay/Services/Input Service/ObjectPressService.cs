@@ -20,8 +20,8 @@ public class ObjectPressService : IInitializable, IDisposable
 
     public void Dispose()
     {
-        inputSystemService.OnLeftPressStarted += HandleLeftPressStart;
-        inputSystemService.OnLeftPressEnded += HandleLeftPressEnd;
+        inputSystemService.OnLeftPressStarted -= HandleLeftPressStart;
+        inputSystemService.OnLeftPressEnded -= HandleLeftPressEnd;
     }
 
     private void HandleLeftPressStart(Vector2 currentPos) => OnPressStarted?.Invoke();

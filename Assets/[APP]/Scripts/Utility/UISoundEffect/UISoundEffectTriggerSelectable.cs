@@ -1,3 +1,4 @@
+using Modules.SoundSystems;
 using UnityEngine;
 
 public class UISoundEffectTriggerSelectable : UISoundEffectTrigger
@@ -7,6 +8,13 @@ public class UISoundEffectTriggerSelectable : UISoundEffectTrigger
     public void PlayTriggerSound()
     {
         base.PlaySound();
-        AudioEvents.TriggerPlayButtonSFX(isConfirm);
+        if (customKey != AudioKey.None)
+        {
+            AudioEvents.TriggerPlayCustomSFX(customKey);
+        }
+        else
+        {
+            AudioEvents.TriggerPlayButtonSFX(isConfirm);
+        }
     }
 }

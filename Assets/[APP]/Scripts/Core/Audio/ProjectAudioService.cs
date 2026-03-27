@@ -49,7 +49,6 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
 
     void IStartable.Start()
     {
-        HandleOnPlayBGMMainMenu();
     }
 
     public void PlaySFX(AudioKey audioType)
@@ -102,7 +101,7 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         PlaySFX(AudioKey.UI_Button_Click);
     }
 
-    private void HandleOnPlayBGMGameplay()
+    private void HandleOnPlayBGMGameplay(AudioKey bgmKey)
     {
         try
         {
@@ -142,7 +141,6 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
     {
         PlaySFX(AudioKey.SFX_Assemble);
     }
-
 
     private void HandleOnPlayCustomSFX(AudioKey audioKey)
     {

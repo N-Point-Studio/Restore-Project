@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Modules.SoundSystems;
 
 [CreateAssetMenu(fileName = nameof(ArtefactData), menuName = "App/Data/Artefact Data")]
 public class ArtefactData : ScriptableObject
@@ -11,6 +12,10 @@ public class ArtefactData : ScriptableObject
     [TextArea(2, 4)]
     [SerializeField] private string[] stickyNoteTexts;
     public string[] StickyNoteTexts => stickyNoteTexts;
+
+    [Header("Audio Settings")]
+    [SerializeField] private AudioKey customGameplayBGM = AudioKey.BGM_Game;
+    public AudioKey CustomGameplayBGM => customGameplayBGM;
 
     [Header("Journal Content (Prefabs)")]
     [SerializeField] private JournalPageAnimator preRestorationPagePrefab;
