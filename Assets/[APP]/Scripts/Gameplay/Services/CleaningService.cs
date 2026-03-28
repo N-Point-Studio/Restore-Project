@@ -76,6 +76,25 @@ public class CleaningService : IInitializable, IDisposable
         isCleaning = false;
     }
 
+    public void ForceCleanAll()
+    {
+        foreach (CleaningSurfaceObject surface in cleaningSurfaces)
+        {
+            if (surface != null) surface.ForceClean();
+        }
+
+        List<CleaningHardObject> chunksToDestroy = new List<CleaningHardObject>(cleaningChunks);
+        
+        for (int i = 0; i < chunksToDestroy.Count; i++)
+        {
+            CleaningHardObject chunk = chunksToDestroy[i];
+            if (chunk != null) chunk.ForceClean();
+        }
+
+        OnSurfaceCleaningUpdate?.Invoke(1f);
+        OnHardCleaningUpdate?.Invoke(1f);
+    }
+
     private float CalculateSurfaceProgress()
     {
         if (cleaningSurfaces.Count == 0)

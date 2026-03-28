@@ -17,7 +17,8 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
 
     private AudioKey? lastPlayedSoundType;
     private float lastPlayedSoundTime;
-    private const float SOUND_COOLDOWN_DURATION = 0.1f; // 100ms cooldown
+    private float soundCooldownDuration = 0.1f;
+    private float bgmFadeDuration = 1f;
 
     void IInitializable.Initialize()
     {
@@ -27,8 +28,6 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         AudioEvents.OnPlaySliderSFX += HandleOnOnPlaySliderSFX;
         AudioEvents.OnPlayBGMGameplay += HandleOnPlayBGMGameplay;
         AudioEvents.OnPlayBGMMainMenu += HandleOnPlayBGMMainMenu;
-        AudioEvents.OnPlayBrushSFX += HandleOnPlayBrushSFX;
-        AudioEvents.OnPlayChiselSFX += HandleOnPlayChiselSFX;
         AudioEvents.OnPlayAssembleSFX += HandleOnPlayAssembleSFX;
         AudioEvents.OnPlayCustomSFX += HandleOnPlayCustomSFX;
     }
@@ -42,8 +41,6 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         AudioEvents.OnPlayBGMGameplay -= HandleOnPlayBGMGameplay;
         AudioEvents.OnPlayBGMMainMenu -= HandleOnPlayBGMMainMenu;
         AudioEvents.OnPlayCustomSFX -= HandleOnPlayCustomSFX;
-        AudioEvents.OnPlayBrushSFX -= HandleOnPlayBrushSFX;
-        AudioEvents.OnPlayChiselSFX -= HandleOnPlayChiselSFX;
         AudioEvents.OnPlayAssembleSFX -= HandleOnPlayAssembleSFX;
     }
 
@@ -53,13 +50,13 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
 
     public void PlaySFX(AudioKey audioType)
     {
-        if (audioType == AudioKey.UI_Button_Click)// || audioType == AudioKey.UI_Cancel || audioType == AudioKey.UI_Hover)
+        if (audioType == AudioKey.UI_Click || audioType == AudioKey.UI_Cancel || audioType == AudioKey.UI_Hover)
         {
             float currentTime = Time.unscaledTime;
 
             // Check if the same sound type was played recently
             if (lastPlayedSoundType == audioType &&
-                currentTime - lastPlayedSoundTime < SOUND_COOLDOWN_DURATION)
+                currentTime - lastPlayedSoundTime < soundCooldownDuration)
             {
                 return; // Skip playing the sound to prevent stacking
             }
@@ -81,32 +78,32 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
 
     private void HandleOnUIComponentSelected()
     {
-        PlaySFX(AudioKey.UI_Button_Click);
-        // PlaySFX(AudioKey.UI_Hover);
+        PlaySFX(AudioKey.UI_Hover);
     }
 
     private void HandleOnOnPlayButtonSFX(bool isConfirm)
     {
-        PlaySFX(isConfirm ? AudioKey.UI_Button_Click : AudioKey.UI_Button_Click);
-        // PlaySFX(isConfirm ? AudioKey.UI_Button_Click : AudioKey.UI_Button_Cancel);
+        PlaySFX(isConfirm ? AudioKey.UI_Click : AudioKey.UI_Cancel);
     }
 
     private void HandleOnOnPlayToggleSFX()
     {
-        PlaySFX(AudioKey.UI_Button_Click);
+        PlaySFX(AudioKey.UI_Click);
     }
 
     private void HandleOnOnPlaySliderSFX()
     {
-        PlaySFX(AudioKey.UI_Button_Click);
+        PlaySFX(AudioKey.UI_Click);
     }
 
     private void HandleOnPlayBGMGameplay(AudioKey bgmKey)
     {
         try
         {
+            AudioKey keyToPlay = bgmKey != AudioKey.None ? bgmKey : AudioKey.BGM_Game;
+
             if (soundSystem != null)
-                soundSystem.PlayAudio(AudioKey.BGM_Game, volume: 1f, loop: true, fadeInSeconds: 1f, fadeOutSeconds: 1f);
+                soundSystem.PlayAudio(keyToPlay, volume: 1f, loop: true, fadeInSeconds: bgmFadeDuration, fadeOutSeconds: bgmFadeDuration);
         }
         catch (Exception e)
         {
@@ -119,22 +116,12 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         try
         {
             if (soundSystem != null)
-                soundSystem.PlayAudio(AudioKey.BGM_Home, volume: 1f, loop: true, fadeInSeconds: 1f, fadeOutSeconds: 1f);
+                soundSystem.PlayAudio(AudioKey.BGM_Home, volume: 1f, loop: true, fadeInSeconds: bgmFadeDuration, fadeOutSeconds: bgmFadeDuration);
         }
         catch (Exception e)
         {
             AppLogger.LogWarning($"[ProjectAudioService] Failed to play BGM Main Menu: {e.Message}");
         }
-    }
-
-    private void HandleOnPlayBrushSFX()
-    {
-        PlaySFX(AudioKey.SFX_Brush);
-    }
-
-    private void HandleOnPlayChiselSFX()
-    {
-        PlaySFX(AudioKey.SFX_Chisel);
     }
 
     private void HandleOnPlayAssembleSFX()

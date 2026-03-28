@@ -8,8 +8,10 @@ public class GameplayManager : IInitializable, IDisposable
 {
     private readonly PlayerProgressionData playerProgressionData;
     private readonly SceneLoader sceneLoader;
-    private ActiveArtefactData activeArtefactData;
-    private InputSystemService inputSystemService;
+    private readonly ActiveArtefactData activeArtefactData;
+    private readonly InputSystemService inputSystemService;
+    private readonly GameConfigData config;
+    
     private ArtefactData artefactData;
     public Action OnGameStarted;
 
@@ -20,13 +22,15 @@ public class GameplayManager : IInitializable, IDisposable
     ActiveArtefactData activeArtefactData,
     SceneLoader sceneLoader,
     InputSystemService inputSystemService,
-    string targetScene)
+    string targetScene,
+    GameConfigData config)
     {
         this.playerProgressionData = playerProgressionData;
         this.activeArtefactData = activeArtefactData;
         this.sceneLoader = sceneLoader;
         this.inputSystemService = inputSystemService;
         this.targetScene = targetScene;
+        this.config = config;
 
         InitializeSession();
     }
@@ -50,7 +54,7 @@ public class GameplayManager : IInitializable, IDisposable
 
     private void HandleGameFinished(bool isCompleted)
     {
-        string loadingText = isCompleted ? "Saving Artefact..." : "Returning to Menu...";
+        string loadingText = isCompleted ? "Displaying Artefact..." : "Returning to Menu...";
 
         StartSceneTransition(loadingText);
     }
@@ -74,9 +78,11 @@ public class GameplayManager : IInitializable, IDisposable
 
     public void StartSceneTransition(string loadingMessage)
     {
+        Time.timeScale = 1f;
+
         AppLogger.Log($"[Gameplay Manager] Back to menu using SceneLoader. Message: {loadingMessage}");
 
-        _ = sceneLoader.LoadSceneAsync(targetScene, 2f, loadingMessage);
+        _ = sceneLoader.LoadSceneAsync(targetScene, config.minLoadingScreenDuration, loadingMessage);
     }
 
     private void InitializeSession()
@@ -94,7 +100,6 @@ public class GameplayManager : IInitializable, IDisposable
                 artefactData = activeArtefactData.GetArtefactDatabase().GetItem(targetId);
                 AppLogger.Log($"[Gameplay Manager] Artefact:{artefactData.BaseData.Id} Loaded!");
 
-                AudioEvents.TriggerPlayBGMGameplay(artefactData.CustomGameplayBGM);
 
                 List<ArtefactFragmentData> artefactFragments = artefactData.ArtefactFragmentDatas;
                 for (int i = 0; i < artefactFragments.Count; i++)
@@ -102,6 +107,8 @@ public class GameplayManager : IInitializable, IDisposable
                     ArtefactFragmentData artefact = artefactFragments[i];
                     Spawn(artefact.Prefab, artefact.SpawnTransform.Position, artefact.SpawnTransform.Rotation);
                 }
+                
+                AudioEvents.TriggerPlayBGMGameplay(artefactData.CustomGameplayBGM);
             }
             else
             {

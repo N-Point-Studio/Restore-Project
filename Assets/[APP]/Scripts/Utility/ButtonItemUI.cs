@@ -53,6 +53,7 @@ public class ButtonItemUI : UIBehaviour, IPointerEnterHandler, IPointerExitHandl
         button.onClick.AddListener(HandleOnClick);
     }
 
+    #if UNITY_EDITOR
     protected override void OnValidate()
     {
         base.OnValidate();
@@ -61,6 +62,7 @@ public class ButtonItemUI : UIBehaviour, IPointerEnterHandler, IPointerExitHandl
             textLabel.text = label;
         }
     }
+    #endif
 
     protected override void OnDestroy()
     {

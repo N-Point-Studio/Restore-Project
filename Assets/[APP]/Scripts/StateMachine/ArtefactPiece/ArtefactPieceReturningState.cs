@@ -12,15 +12,8 @@ public class ArtefactPieceReturningState : ArtefactPieceBaseState
         stateMachine.state = ArtefactPieceState.Returning;
         returnSequence = DOTween.Sequence();
 
-        returnSequence.Join(
-            stateMachine.transform.DOMove(stateMachine.InitialPosition, 0.5f)
-                .SetEase(Ease.OutBack)
-        );
-
-        returnSequence.Join(
-            stateMachine.transform.DORotateQuaternion(stateMachine.InitialRotation, 0.5f)
-                .SetEase(Ease.OutBack)
-        );
+        returnSequence.Join(stateMachine.transform.DOMove(stateMachine.InitialPosition, stateMachine.returnDuration).SetEase(Ease.OutBack));
+        returnSequence.Join(stateMachine.transform.DORotateQuaternion(stateMachine.InitialRotation, stateMachine.returnDuration).SetEase(Ease.OutBack));
 
         returnSequence.OnComplete(() =>
         {

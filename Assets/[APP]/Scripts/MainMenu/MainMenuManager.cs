@@ -50,6 +50,8 @@ public class MainMenuManager : MonoBehaviour
 
     private void Awake()
     {
+        Time.timeScale = 1f;
+        
         MainMenuEvents.OnNewGame += OnRequestNewGameGame;
         MainMenuEvents.OnContinueGame += OnRequestContinueGame;
         MainMenuEvents.OnCloseLevelSelection += OnRequestCloseLevelSelection;
@@ -57,6 +59,7 @@ public class MainMenuManager : MonoBehaviour
         MainMenuEvents.OnCloseArtefactDetail += OnRequestCloseArtefactDetail;
         MainMenuEvents.OnOpenSettings += OnRequestOpenSettings;
         MainMenuEvents.OnRequestQuit += OnRequestQuit;
+        MainMenuEvents.OnShowBackground += OnRequestShowBackground;
         popUpConfirmationController.OnConfirm += OnConfirmNewGame;
         popUpConfirmationController.OnCancel += OnCancelNewGame;
     }
@@ -99,6 +102,7 @@ public class MainMenuManager : MonoBehaviour
         MainMenuEvents.OnCloseArtefactDetail -= OnRequestCloseArtefactDetail;
         MainMenuEvents.OnOpenSettings -= OnRequestOpenSettings;
         MainMenuEvents.OnRequestQuit -= OnRequestQuit;
+        MainMenuEvents.OnShowBackground -= OnRequestShowBackground;
         popUpConfirmationController.OnConfirm -= OnConfirmNewGame;
         popUpConfirmationController.OnCancel -= OnCancelNewGame;
     }
@@ -167,6 +171,11 @@ public class MainMenuManager : MonoBehaviour
     private void OnRequestQuit()
     {
         quitController.SetActive(true);
+    }
+
+    private void OnRequestShowBackground(bool show)
+    {
+        backgroundController.SetActive(show);
     }
 
     private void OnConfirmNewGame()

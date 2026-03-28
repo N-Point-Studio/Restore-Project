@@ -25,12 +25,17 @@ public class Artefact3DItem : MonoBehaviour
     [SerializeField] private MMF_Player unlockFeedback;
     [SerializeField] private MMF_Player completionFeedback;
 
+    [Header("Animation Settings")]
+    [SerializeField] private float slideDownDistance = 3f;
+
     private ArtefactData artefactData;
     private bool isInteractable = false;
     private bool isInDetailMode = false;
     private bool hasUnpeeledNotes = false;
     private bool isSelectionModeActive = false;
     private bool isCompleted = false;
+    private Vector3 originalPosition;
+    private bool isPosInitialized = false;
 
     public string ArtefactId => artefactId;
     public bool IsInDetailMode => isInDetailMode;
@@ -106,6 +111,15 @@ public class Artefact3DItem : MonoBehaviour
                     }
                 }
             }
+        }
+    }
+
+    private void InitPositionIfNeeded()
+    {
+        if (!isPosInitialized)
+        {
+            originalPosition = transform.localPosition;
+            isPosInitialized = true;
         }
     }
 
@@ -210,13 +224,16 @@ public class Artefact3DItem : MonoBehaviour
 
     public void AnimateItem(bool show, float duration = 0.5f)
     {
+        InitPositionIfNeeded();
+
+        if (show) gameObject.SetActive(true);
+
         if (assignedPedestal != null)
         {
             PedestalAnimator animator = assignedPedestal.GetComponent<PedestalAnimator>();
             if (animator != null) 
             {
                 animator.AnimatePedestal(show, duration);
-                return;
             }
         }
 
@@ -225,8 +242,18 @@ public class Artefact3DItem : MonoBehaviour
         foreach (Renderer r in renderers)
         {
             if (r.material == null) continue;
+            
+            r.material.DOKill();
             if (r.material.HasProperty("_BaseColor")) r.material.DOFade(targetAlpha, "_BaseColor", duration);
             else if (r.material.HasProperty("_Color")) r.material.DOFade(targetAlpha, "_Color", duration);
         }
+
+        transform.DOKill();
+        Vector3 targetPos = show ? originalPosition : originalPosition + (Vector3.down * slideDownDistance);
+        transform.DOLocalMove(targetPos, duration).SetEase(show ? Ease.OutBack : Ease.InBack)
+            .OnComplete(() => 
+            {
+                if (!show) gameObject.SetActive(false);
+            });
     }
 }

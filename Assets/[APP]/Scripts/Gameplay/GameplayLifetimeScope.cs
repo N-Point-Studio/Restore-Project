@@ -10,6 +10,7 @@ public class GameplayLifetimeScope : LifetimeScope
     [SerializeField] private Transform planeReference;
     [SerializeField] private HoldProgressUI holdProgressUI;
     [SerializeField] private string targetScene;
+    
     protected override void Configure(IContainerBuilder builder)
     {
         Plane dragPlane = new(planeReference.up, planeReference.position);

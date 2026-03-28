@@ -6,6 +6,7 @@ using VContainer.Unity;
 public class ObjectDragService : IInitializable, IDisposable
 {
     private readonly InputSystemService inputSystemService;
+    private readonly GameConfigData config;
 
     private const float DragThreshold = 25f;
 
@@ -20,9 +21,10 @@ public class ObjectDragService : IInitializable, IDisposable
     public event Action<Vector2> OnDragPerformed;
 
     [Inject]
-    public ObjectDragService(InputSystemService inputSystemService)
+    public ObjectDragService(InputSystemService inputSystemService, GameConfigData config)
     {
         this.inputSystemService = inputSystemService;
+        this.config = config;
     }
 
     public void Initialize()
@@ -54,7 +56,7 @@ public class ObjectDragService : IInitializable, IDisposable
     {
         if (!isPressing) return;
 
-        if (!isDragging && Vector2.Distance(startPos, currentPos) > DragThreshold)
+        if (!isDragging && Vector2.Distance(startPos, currentPos) > config.dragThreshold)
         {
             isDragging = true;
             OnDragStarted?.Invoke(currentPos);

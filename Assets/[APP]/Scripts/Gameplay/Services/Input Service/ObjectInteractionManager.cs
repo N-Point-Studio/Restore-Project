@@ -93,7 +93,7 @@ public class ObjectInteractionManager : IInitializable, IDisposable
 
     private void HandleDragStart(Vector2 vector)
     {
-        if (currentInteract == null) return;
+        if (currentInteract == null || currentInteract.Equals(null)) return;
         currentState = GestureState.InteractingWithObject;
         Vector3 worldPos = detectionService.ScreenToWorld(vector, currentInteract);
         InteractionEvents.OnDragStarted?.Invoke(currentInteract, worldPos);
@@ -101,7 +101,7 @@ public class ObjectInteractionManager : IInitializable, IDisposable
 
     private void HandleDragPerformed(Vector2 vector)
     {
-        if (currentInteract == null) return;
+        if (currentInteract == null || currentInteract.Equals(null)) return;
 
         Vector3 worldPos = detectionService.ScreenToWorld(vector);
         InteractionEvents.OnDragPerformed?.Invoke(currentInteract, worldPos);
@@ -109,7 +109,7 @@ public class ObjectInteractionManager : IInitializable, IDisposable
 
     private void HandleDragEnded(Vector2 vector)
     {
-        if (currentInteract == null) return;
+        if (currentInteract == null || currentInteract.Equals(null)) return;
         currentState = GestureState.Idle;
 
         Vector3 worldPos = detectionService.ScreenToWorld(vector, currentInteract);

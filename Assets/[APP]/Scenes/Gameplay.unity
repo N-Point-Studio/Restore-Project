@@ -1286,9 +1286,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Inspection
   rotateSpeed: 0.5
-  zoomSpeed: 0.5
-  smoothTime: 0.1
-  minDistance: 2
   assemblyRoot: {fileID: 2092014629}
 --- !u!23 &240419236
 MeshRenderer:
@@ -1945,7 +1942,7 @@ PrefabInstance:
       objectReference: {fileID: 1716257908}
     - target: {fileID: 2373799165059659615, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2596229567394185725, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_Pivot.x
@@ -2906,7 +2903,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2373799165059659615, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2594754268444725741, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_IsActive
@@ -4875,7 +4872,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2373799165059659615, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2594754268444725741, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_IsActive
@@ -8798,6 +8795,7 @@ MonoBehaviour:
   settingsController: {fileID: 1016109584}
   quitConfirmationController: {fileID: 148767000}
   wrapUpThreshold: 95
+  delayUntilAutoWrappedUp: 1.5
 --- !u!4 &1118638521
 Transform:
   m_ObjectHideFlags: 0
@@ -10005,7 +10003,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4680592563667470313, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 207.19
       objectReference: {fileID: 0}
     - target: {fileID: 4680592563667470313, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_SizeDelta.y
@@ -10061,7 +10059,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4900491344556224843, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6200343798872231526, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchorMax.y
@@ -10351,9 +10349,8 @@ MonoBehaviour:
   checkList: {fileID: 1654973554}
   progressText: {fileID: 443557521}
   progressTitle: {fileID: 1472186820}
-  minimum: 0
   maximum: 100
-  audioKey: 7
+  audioKey: 9
   progressType: 1
 --- !u!1 &1257333841
 GameObject:
@@ -10592,9 +10589,8 @@ MonoBehaviour:
   checkList: {fileID: 1442866751}
   progressText: {fileID: 1811948777}
   progressTitle: {fileID: 1980399431}
-  minimum: 0
   maximum: 100
-  audioKey: 7
+  audioKey: 9
   progressType: 3
 --- !u!114 &1326619301 stripped
 MonoBehaviour:
@@ -14324,9 +14320,8 @@ MonoBehaviour:
   checkList: {fileID: 1164806809}
   progressText: {fileID: 173153523}
   progressTitle: {fileID: 682075258}
-  minimum: 0
   maximum: 100
-  audioKey: 7
+  audioKey: 9
   progressType: 2
 --- !u!1 &1827206372
 GameObject:
@@ -16722,6 +16717,18 @@ PrefabInstance:
       propertyPath: audioSource
       value: 
       objectReference: {fileID: 45709090886327642}
+    - target: {fileID: 1028208526922676160, guid: 80ae6037d141941a58f416b403fc984b, type: 3}
+      propertyPath: pitchRange.x
+      value: 0.85
+      objectReference: {fileID: 0}
+    - target: {fileID: 1028208526922676160, guid: 80ae6037d141941a58f416b403fc984b, type: 3}
+      propertyPath: sfxClips.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1028208526922676160, guid: 80ae6037d141941a58f416b403fc984b, type: 3}
+      propertyPath: 'sfxClips.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8300000, guid: dcdf9a00707ad4fdf96552b6a3163d15, type: 3}
     - target: {fileID: 1922392831102462939, guid: 80ae6037d141941a58f416b403fc984b, type: 3}
       propertyPath: m_Name
       value: Tool Brush
@@ -16792,7 +16799,7 @@ AudioSource:
   m_GameObject: {fileID: 45709090886327641}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 5249904505649352225, guid: c5d4cdcf6b9421d4b8b8eb388a153cbb, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: dcdf9a00707ad4fdf96552b6a3163d15, type: 3}
   m_PlayOnAwake: 0
@@ -18261,6 +18268,18 @@ PrefabInstance:
       propertyPath: audioSource
       value: 
       objectReference: {fileID: 5362181758653114990}
+    - target: {fileID: 595546400393192834, guid: 0d6ccf56e449746dc967555476cebf5b, type: 3}
+      propertyPath: pitchRange.x
+      value: 0.85
+      objectReference: {fileID: 0}
+    - target: {fileID: 595546400393192834, guid: 0d6ccf56e449746dc967555476cebf5b, type: 3}
+      propertyPath: sfxClips.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 595546400393192834, guid: 0d6ccf56e449746dc967555476cebf5b, type: 3}
+      propertyPath: 'sfxClips.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 24f8029b14dd54306a5b97ab5f288a0c, type: 3}
     - target: {fileID: 6150098715448566934, guid: 0d6ccf56e449746dc967555476cebf5b, type: 3}
       propertyPath: m_Name
       value: Tool Chisel
@@ -18331,7 +18350,7 @@ AudioSource:
   m_GameObject: {fileID: 5362181758653114989}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 5249904505649352225, guid: c5d4cdcf6b9421d4b8b8eb388a153cbb, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 24f8029b14dd54306a5b97ab5f288a0c, type: 3}
   m_PlayOnAwake: 0
