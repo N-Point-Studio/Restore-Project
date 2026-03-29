@@ -11,7 +11,7 @@ public class AssemblyService : IInitializable, IDisposable
     private readonly FragmentService fragmentService;
     private readonly TutorialService tutorialService;
     private readonly GameConfigData config;
-    
+
     private readonly List<IArtefactPart> currentAssembleList = new();
 
     [Inject]
@@ -69,8 +69,8 @@ public class AssemblyService : IInitializable, IDisposable
             fragmentService.ProgressUpdate();
             // RecenterAssembly();
 
-            tutorialService.CompleteTutorial(TutorialIDs.DRAG_TO_INSPECT, 0, 0);
-            tutorialService.StartTutorial(TutorialIDs.ZOOM_INSPECT, 0, 1);
+            tutorialService.CompleteTutorial(TutorialIDs.DRAG_TO_INSPECT, -1, 0, 0);
+            tutorialService.StartTutorial(TutorialIDs.ZOOM_INSPECT, TutorialIDs.DRAG_TO_INSPECT, 0, 1);
 
             return true;
         }

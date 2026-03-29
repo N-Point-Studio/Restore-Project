@@ -79,7 +79,7 @@ public class GameplayUIManager : MonoBehaviour
 
         yield return null;
 
-        tutorialService.StartTutorial(TutorialIDs.DRAG_TO_INSPECT, 0, 0);
+        tutorialService.StartTutorial(TutorialIDs.DRAG_TO_INSPECT, -1, 0, 0);
         HandleAssembleAvailability();
     }
 
@@ -109,7 +109,7 @@ public class GameplayUIManager : MonoBehaviour
             if (progressBars[i].ProgressType == type)
             {
                 if (!progressBars[i].gameObject.activeSelf) continue;
-                
+
                 progressBars[i].SetValue(value);
                 CheckOverallProgress();
                 break;
@@ -157,15 +157,15 @@ public class GameplayUIManager : MonoBehaviour
         if (canWrapUp && !isTutorialTriggered)
         {
             isTutorialTriggered = true;
-            tutorialService.StartTutorial(TutorialIDs.WRAP_UP_SHOW, 1, 0);
+            tutorialService.StartTutorial(TutorialIDs.WRAP_UP_SHOW, -1, 1, 0);
         }
 
         if (isFullyCompleted && !isAutoWrapUpTriggered)
         {
             isAutoWrapUpTriggered = true;
             mainUIController.ShowButtonWrap(false);
-            
-            DG.Tweening.DOVirtual.DelayedCall(delayUntilAutoWrappedUp, () => 
+
+            DG.Tweening.DOVirtual.DelayedCall(delayUntilAutoWrappedUp, () =>
             {
                 if (mainUIController != null && mainUIController.IsActive)
                 {
@@ -184,14 +184,14 @@ public class GameplayUIManager : MonoBehaviour
     private void HandleHardCleaningUpdate(float progress)
     {
         UpdateProgress(ProgressType.Mud, progress);
-        tutorialService.CompleteTutorial(TutorialIDs.CHISEL_MUD, 0, 4);
+        tutorialService.CompleteTutorial(TutorialIDs.CHISEL_MUD, TutorialIDs.BRUSH_DUST, 0, 4);
     }
 
     private void HandleSurfaceCleaningUpdate(float progress)
     {
         UpdateProgress(ProgressType.Dust, progress);
-        tutorialService.CompleteTutorial(TutorialIDs.BRUSH_DUST, 0, 3);
-        tutorialService.StartTutorial(TutorialIDs.CHISEL_MUD, 0, 4);
+        tutorialService.CompleteTutorial(TutorialIDs.BRUSH_DUST, TutorialIDs.ROTATE_INSPECT, 0, 3);
+        tutorialService.StartTutorial(TutorialIDs.CHISEL_MUD, TutorialIDs.BRUSH_DUST, 0, 4);
     }
 
     private void OnPlayerKeycodeEscapePerformed()
@@ -211,9 +211,9 @@ public class GameplayUIManager : MonoBehaviour
     private void OnWrapUp()
     {
         if (endgameController.IsActive) return;
-        
+
         AppLogger.Log("Wrap up!");
-        
+
         if (cleaningService != null)
         {
             cleaningService.ForceCleanAll();
@@ -230,7 +230,7 @@ public class GameplayUIManager : MonoBehaviour
 
         OnGameWrapped?.Invoke();
 
-        tutorialService.CompleteTutorial(TutorialIDs.WRAP_UP_CLICK, 1, 0);
+        tutorialService.CompleteTutorial(TutorialIDs.WRAP_UP_CLICK, -1, 1, 0);
     }
 
     private void OnFinishedGame()

@@ -108,8 +108,8 @@ public class Inspection : MonoBehaviour
         // Rotate vertical (up down)
         transform.Rotate(cameraRight, rotateX, Space.World);
 
-        tutorialService.CompleteTutorial(TutorialIDs.ROTATE_INSPECT, 0, 2);
-        tutorialService.StartTutorial(TutorialIDs.BRUSH_DUST, 0, 3);
+        tutorialService.CompleteTutorial(TutorialIDs.ROTATE_INSPECT, TutorialIDs.ZOOM_INSPECT, 0, 2);
+        tutorialService.StartTutorial(TutorialIDs.BRUSH_DUST, TutorialIDs.ROTATE_INSPECT, 0, 3);
     }
 
     public void OnZoomPerformed(float zoomDelta)
@@ -129,8 +129,8 @@ public class Inspection : MonoBehaviour
         _targetPosition = _mainCamera.transform.position + direction * targetDistance;
 
         // Complete zoom tutorial
-        tutorialService.CompleteTutorial(TutorialIDs.ZOOM_INSPECT, 0, 1);
-        tutorialService.StartTutorial(TutorialIDs.ROTATE_INSPECT, 0, 2);
+        tutorialService.CompleteTutorial(TutorialIDs.ZOOM_INSPECT, TutorialIDs.DRAG_TO_INSPECT, 0, 1);
+        tutorialService.StartTutorial(TutorialIDs.ROTATE_INSPECT, TutorialIDs.ZOOM_INSPECT, 0, 2);
     }
 
     public void ResetPosition()
