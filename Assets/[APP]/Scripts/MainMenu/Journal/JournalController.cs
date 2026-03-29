@@ -13,6 +13,7 @@ public class JournalController : MonoBehaviour
 
     [Header("Feel Feedbacks (Gerakan Utama)")]
     [SerializeField] private MMF_Player feedbackOpen; 
+    [SerializeField] private MMF_Player feedbackOpenFromHidden;
     [SerializeField] private MMF_Player feedbackPeek;
     [SerializeField] private MMF_Player feedbackHide;
 
@@ -161,6 +162,8 @@ public class JournalController : MonoBehaviour
 
     public void OpenBookFull()
     {
+        JournalState prevState = CurrentState;
+
         CurrentState = JournalState.Opened;
         buttonAction.gameObject.SetActive(false);
         ShowOverlay();
@@ -177,7 +180,14 @@ public class JournalController : MonoBehaviour
             if (activeRightPage != null) activeRightPage.ShowInstant();
         }
 
-        if (feedbackOpen != null) feedbackOpen.PlayFeedbacks();
+        if (prevState == JournalState.Hidden && feedbackOpenFromHidden != null)
+        {
+            feedbackOpenFromHidden.PlayFeedbacks();
+        }
+        else if (feedbackOpen != null)
+        {
+            feedbackOpen.PlayFeedbacks();
+        }
 
         if (!isContentRevealed)
         {

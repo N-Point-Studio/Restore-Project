@@ -30,6 +30,7 @@ public class GameplayUIManager : MonoBehaviour
     private bool canWrapUp;
     private bool isAutoWrapUpTriggered = false;
     private bool isTutorialTriggered = false;
+    private bool isGamePaused = false;
 
     public static event Action OnGameWrapped;
     public static event Action<bool> OnGameFinished;
@@ -69,6 +70,8 @@ public class GameplayUIManager : MonoBehaviour
 
         quitConfirmationController.OnConfirm += OnConfirmQuit;
         quitConfirmationController.OnCancel += OnCancelQuit;
+        
+        settingsController.OnSettingsClosed += OnSettingsClosed;
 
         mainUIController.SetActive(true);
     }
@@ -100,6 +103,8 @@ public class GameplayUIManager : MonoBehaviour
 
         quitConfirmationController.OnConfirm -= OnConfirmQuit;
         quitConfirmationController.OnCancel -= OnCancelQuit;
+
+        settingsController.OnSettingsClosed -= OnSettingsClosed;
     }
 
     private void UpdateProgress(ProgressType type, float value)
@@ -196,8 +201,9 @@ public class GameplayUIManager : MonoBehaviour
 
     private void OnPlayerKeycodeEscapePerformed()
     {
-        if (!pauseController.IsActive)
+        if (!isGamePaused) 
         {
+            isGamePaused = true;
             Time.timeScale = 0f;
             pauseController.SetActive(true);
 
@@ -240,22 +246,17 @@ public class GameplayUIManager : MonoBehaviour
 
     private void OnResume()
     {
+        isGamePaused = false;
         Time.timeScale = 1f;
         pauseController.SetActive(false);
 
         if (endgameController.IsActive)
         {
-            if (input != null)
-            {
-                input.ChangeInputState(InputStateType.UI);
-            }
+            if (input != null) input.ChangeInputState(InputStateType.UI);
         }
         else
         {
-            if (input != null)
-            {
-                input.ChangeInputState(InputStateType.Player);
-            }
+            if (input != null) input.ChangeInputState(InputStateType.Player);
         }
     }
 
@@ -264,6 +265,7 @@ public class GameplayUIManager : MonoBehaviour
         if (settingsController.IsActive)
             return;
 
+        pauseController.SetActive(false);
         settingsController.SetActive(true);
     }
 
@@ -271,6 +273,8 @@ public class GameplayUIManager : MonoBehaviour
     {
         if (quitConfirmationController.IsActive)
             return;
+
+        pauseController.SetActive(false);
 
         quitConfirmationController.SetActive(true);
     }
@@ -292,5 +296,18 @@ public class GameplayUIManager : MonoBehaviour
     private void OnCancelQuit()
     {
         quitConfirmationController.SetActive(false);
+
+        if (isGamePaused)
+        {
+            pauseController.SetActive(true);
+        }
+    }
+
+    private void OnSettingsClosed()
+    {
+        if (isGamePaused)
+        {
+            pauseController.SetActive(true); 
+        }
     }
 }
