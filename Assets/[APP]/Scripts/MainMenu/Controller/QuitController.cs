@@ -3,6 +3,7 @@ using DG.Tweening;
 using UnityEngine.UI;
 using VContainer;
 using Modules;
+using System;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -24,6 +25,7 @@ public class QuitController : BaseMenuController
 
     private Tween quitTween;
     private ProjectSavingSystem projectSavingSystem;
+    public event Action OnQuitCancelled;
 
     [Inject]
     public void Construct(ProjectSavingSystem projectSavingSystem)
@@ -74,6 +76,7 @@ public class QuitController : BaseMenuController
     private void OnButtonCancelClick()
     {
         SetActive(false);
+        OnQuitCancelled?.Invoke();
     }
 
     private void OnButtonConfirmClick()

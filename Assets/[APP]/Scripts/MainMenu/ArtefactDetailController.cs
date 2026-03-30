@@ -160,7 +160,7 @@ public class ArtefactDetailController : MonoBehaviour
             if (isStoryRead)
             {
                 instructionText.gameObject.SetActive(true);
-                instructionText.text = "Open the box and start restore...";
+                instructionText.text = "Open the box and\nstart restore...";
                 
                 buttonBack.SetAlternateStyle(false);
 
@@ -255,7 +255,7 @@ public class ArtefactDetailController : MonoBehaviour
             else
             {
                 instructionText.gameObject.SetActive(true);
-                instructionText.text = "Open the box and start restore...";
+                instructionText.text = "Open the box and\nstart restore...";
             }
         }
         else

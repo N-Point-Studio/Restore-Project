@@ -891,7 +891,7 @@ MonoBehaviour:
         Chance: 100
         DisplayColor: {r: 0, g: 0, b: 0, a: 1}
         Timing:
-          TimescaleMode: 0
+          TimescaleMode: 1
           ExcludeFromHoldingPauses: 0
           ContributeToTotalDuration: 1
           InitialDelay: 0
@@ -1190,7 +1190,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -3490866910626104111, guid: b55930ffb277a2a4b98b4553de50d5f1, type: 2}
+  - {fileID: -6446403116882279231, guid: fe2af6f2156f301439adaca31864db12, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1237,8 +1237,8 @@ MonoBehaviour:
   m_text: "Here\u2019s your first artifact, Nova.\nI hope this is a beautiful start
     to your journey here!\n\n-Mrs. Maya :)"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: b55930ffb277a2a4b98b4553de50d5f1, type: 2}
-  m_sharedMaterial: {fileID: -3490866910626104111, guid: b55930ffb277a2a4b98b4553de50d5f1, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: fe2af6f2156f301439adaca31864db12, type: 2}
+  m_sharedMaterial: {fileID: -6446403116882279231, guid: fe2af6f2156f301439adaca31864db12, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1262,12 +1262,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 17
-  m_fontSizeBase: 17
+  m_fontSize: 19.9
+  m_fontSizeBase: 15
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 24
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
@@ -1275,7 +1275,7 @@ MonoBehaviour:
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
   m_wordSpacing: 0
-  m_lineSpacing: -20
+  m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
@@ -1670,7 +1670,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -3490866910626104111, guid: b55930ffb277a2a4b98b4553de50d5f1, type: 2}
+  - {fileID: -6446403116882279231, guid: fe2af6f2156f301439adaca31864db12, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1717,8 +1717,8 @@ MonoBehaviour:
   m_text: "Here\u2019s your first artifact, Nova.\nI hope this is a beautiful start
     to your journey here!\n\n-Mrs. Maya :)"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: b55930ffb277a2a4b98b4553de50d5f1, type: 2}
-  m_sharedMaterial: {fileID: -3490866910626104111, guid: b55930ffb277a2a4b98b4553de50d5f1, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: fe2af6f2156f301439adaca31864db12, type: 2}
+  m_sharedMaterial: {fileID: -6446403116882279231, guid: fe2af6f2156f301439adaca31864db12, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1742,12 +1742,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 17
-  m_fontSizeBase: 17
+  m_fontSize: 19.15
+  m_fontSizeBase: 15
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 24
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
@@ -1755,7 +1755,7 @@ MonoBehaviour:
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
   m_wordSpacing: 0
-  m_lineSpacing: -20
+  m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
@@ -1941,7 +1941,7 @@ MonoBehaviour:
         Chance: 100
         DisplayColor: {r: 0, g: 0, b: 0, a: 1}
         Timing:
-          TimescaleMode: 0
+          TimescaleMode: 1
           ExcludeFromHoldingPauses: 0
           ContributeToTotalDuration: 1
           InitialDelay: 0
