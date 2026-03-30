@@ -6515,7 +6515,7 @@ MonoBehaviour:
         AnimatePositionDuration: 1
         AnimatePositionTween:
           MMTweenDefinitionType: 0
-          MMTweenCurve: 20
+          MMTweenCurve: 8
           Curve:
             serializedVersion: 2
             m_Curve:
@@ -15773,13 +15773,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2727649817193381831, guid: 7d1ba3050b6a10a42a67dd9e6d1d32ea, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 5337845887014465171, guid: 7d1ba3050b6a10a42a67dd9e6d1d32ea, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7d1ba3050b6a10a42a67dd9e6d1d32ea, type: 3}
 --- !u!222 &4820183867379566383
 CanvasRenderer:
