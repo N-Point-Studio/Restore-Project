@@ -56,7 +56,9 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
     public void FollowMouse(Vector3 worldPos)
     {
         if (isReturning) return;
-        transform.position = worldPos;
+        transform.DOKill();
+        transform.DOMove(worldPos, 0.2f).SetEase(Ease.OutQuad);
+        // transform.position = worldPos;
     }
     public void StickToSurface(Vector3 position, Quaternion rotation)
     {
