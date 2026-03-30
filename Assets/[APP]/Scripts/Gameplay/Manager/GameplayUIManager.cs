@@ -203,7 +203,7 @@ public class GameplayUIManager : MonoBehaviour
 
         if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 4)
         {
-            tutorialService.CompleteAndAdvance();
+            tutorialService.CompleteStage();
         }
     }
 
@@ -255,7 +255,7 @@ public class GameplayUIManager : MonoBehaviour
 
         if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 0)
         {
-            tutorialService.CompleteAndAdvance();
+            tutorialService.CompleteStage();
         }
     }
 
