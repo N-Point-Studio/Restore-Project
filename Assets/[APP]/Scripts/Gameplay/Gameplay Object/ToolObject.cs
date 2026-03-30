@@ -12,15 +12,12 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
     private bool isReturning;
     [SerializeField] private Texture2D brush;
     [SerializeField] private SurfaceDetectionType toolType;
-    [SerializeField] private AudioSource audioSource;
 
     [Header("Animation Settings")]
     [SerializeField] private float returnAnimDuration = 0.5f;
+    [SerializeField] private ParticleSystem vfx;
 
     [Header("Audio Variations")]
-    [SerializeField] private AudioClip[] sfxClips;
-    [SerializeField] private Vector2 pitchRange = new Vector2(0.9f, 1.1f);
-
     [SerializeField] private AudioKey audioKey;
     [SerializeField] private SoundType soundType;
 
@@ -31,6 +28,7 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
         initialPosition = transform.position;
         initialRotation = transform.rotation;
         col = GetComponent<Collider>();
+        vfx.Stop();
     }
 
     public void OnInteractDetected() { }
@@ -40,11 +38,6 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
     {
         returnSequence?.Kill();
         col.enabled = false;
-
-        // if (audioSource != null && audioSource.loop)
-        // {
-        //     audioSource.pitch = Random.Range(pitchRange.x, pitchRange.y);
-        // }
     }
 
     public void Return()
@@ -87,37 +80,25 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
     {
         if (soundType == SoundType.Once)
         {
-            AudioEvents.TriggerPlayCustomSFX(audioKey);
-            AppLogger.Log("Play sfx" + gameObject.name);
+            if (isPlaying)
+            {
+                AudioEvents.TriggerPlayCustomSFX(audioKey);
+                vfx.Play();
+
+            }
         }
         else
         {
             AudioEvents.TriggerPlayContinuousSFX(audioKey, isPlaying);
-            AppLogger.Log("Play sfx" + gameObject.name);
+            if (isPlaying)
+            {
+                vfx.Play();
+            }
+            else if (!isPlaying)
+            {
+                vfx.Stop();
+            }
         }
-        // if (!isPlaying)
-        // {
-        //     if (audioSource.loop) audioSource.Stop();
-        //     return;
-        // }
-
-        // if (audioSource.loop && audioSource.isPlaying) return;
-
-        // if (!audioSource.loop)
-        // {
-        //     audioSource.pitch = Random.Range(pitchRange.x, pitchRange.y);
-        //     AudioClip clipToPlay = audioSource.clip;
-        //     if (sfxClips != null && sfxClips.Length > 0)
-        //     {
-        //         clipToPlay = sfxClips[Random.Range(0, sfxClips.Length)];
-        //     }
-
-        //     if (clipToPlay != null) audioSource.PlayOneShot(clipToPlay);
-        // }
-        // else
-        // {
-        //     audioSource.Play();
-        // }
     }
 
     public void PlayVfx(bool isPlaying)
