@@ -11,9 +11,11 @@ public class GameplayManager : IInitializable, IDisposable
     private readonly ActiveArtefactData activeArtefactData;
     private readonly InputSystemService inputSystemService;
     private readonly GameConfigData config;
-    
+    private readonly TutorialService tutorialService;
+
     private ArtefactData artefactData;
     public Action OnGameStarted;
+    public bool isTutorialAvailable;
 
     private string targetScene = "MainMenu";
 
@@ -23,6 +25,7 @@ public class GameplayManager : IInitializable, IDisposable
     SceneLoader sceneLoader,
     InputSystemService inputSystemService,
     string targetScene,
+    TutorialService tutorialService,
     GameConfigData config)
     {
         this.playerProgressionData = playerProgressionData;
@@ -31,6 +34,8 @@ public class GameplayManager : IInitializable, IDisposable
         this.inputSystemService = inputSystemService;
         this.targetScene = targetScene;
         this.config = config;
+        this.tutorialService = tutorialService;
+        AppLogger.Log("tutorial service ada? " + tutorialService);
 
         InitializeSession();
     }
@@ -107,8 +112,10 @@ public class GameplayManager : IInitializable, IDisposable
                     ArtefactFragmentData artefact = artefactFragments[i];
                     Spawn(artefact.Prefab, artefact.SpawnTransform.Position, artefact.SpawnTransform.Rotation);
                 }
-                
+
                 AudioEvents.TriggerPlayBGMGameplay(artefactData.CustomGameplayBGM);
+
+                isTutorialAvailable = artefactData.BaseData.Id == "Artefact_Coin";
             }
             else
             {

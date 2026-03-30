@@ -11,15 +11,17 @@ public class AssemblyService : IInitializable, IDisposable
     private readonly FragmentService fragmentService;
     private readonly TutorialService tutorialService;
     private readonly GameConfigData config;
+    private readonly GameplayManager gameplayManager;
 
     private readonly List<IArtefactPart> currentAssembleList = new();
 
     [Inject]
-    public AssemblyService(Inspection inspectPoint, FragmentService fragmentService, TutorialService tutorialService, GameConfigData config)
+    public AssemblyService(Inspection inspectPoint, FragmentService fragmentService, TutorialService tutorialService, GameConfigData config, GameplayManager gameplayManager)
     {
         this.inspectPoint = inspectPoint;
         this.fragmentService = fragmentService;
         this.tutorialService = tutorialService;
+        this.gameplayManager = gameplayManager;
         this.config = config;
     }
 
@@ -67,10 +69,12 @@ public class AssemblyService : IInitializable, IDisposable
             HideAllSockets();
             inspectPoint.SetInspectionUsage(true);
             fragmentService.ProgressUpdate();
-            // RecenterAssembly();
 
-            tutorialService.CompleteTutorial(TutorialIDs.DRAG_TO_INSPECT, -1, 0, 0);
-            tutorialService.StartTutorial(TutorialIDs.ZOOM_INSPECT, TutorialIDs.DRAG_TO_INSPECT, 0, 1);
+            //start drag tutorial
+            if (gameplayManager.isTutorialAvailable)
+            {
+                tutorialService.CompleteAndAdvance();
+            }
 
             return true;
         }

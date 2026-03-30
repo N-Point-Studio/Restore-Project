@@ -26,6 +26,7 @@ public class GameplayUIManager : MonoBehaviour
     private FragmentService fragmentService;
     private InputSystemService input;
     private TutorialService tutorialService;
+    private GameplayManager gameplayManager;
 
     private bool canWrapUp;
     private bool isAutoWrapUpTriggered = false;
@@ -41,12 +42,14 @@ public class GameplayUIManager : MonoBehaviour
         FragmentService fragmentService,
         InputSystemService input,
         TutorialService tutorialService,
-        IObjectResolver container)
+        IObjectResolver container,
+        GameplayManager gameplayManager)
     {
         this.cleaningService = cleaningService;
         this.fragmentService = fragmentService;
         this.input = input;
         this.tutorialService = tutorialService;
+        this.gameplayManager = gameplayManager;
 
         fragmentService.OnProgressUpdate += HandleProgressUpdate;
         cleaningService.OnHardCleaningUpdate += HandleHardCleaningUpdate;
@@ -70,7 +73,7 @@ public class GameplayUIManager : MonoBehaviour
 
         quitConfirmationController.OnConfirm += OnConfirmQuit;
         quitConfirmationController.OnCancel += OnCancelQuit;
-        
+
         settingsController.OnSettingsClosed += OnSettingsClosed;
 
         mainUIController.SetActive(true);
@@ -82,7 +85,10 @@ public class GameplayUIManager : MonoBehaviour
 
         yield return null;
 
-        tutorialService.StartTutorial(TutorialIDs.DRAG_TO_INSPECT, -1, 0, 0);
+        if (gameplayManager.isTutorialAvailable)
+        {
+            tutorialService.StartTutorial(0, 0);
+        }
         HandleAssembleAvailability();
     }
 
@@ -162,7 +168,11 @@ public class GameplayUIManager : MonoBehaviour
         if (canWrapUp && !isTutorialTriggered)
         {
             isTutorialTriggered = true;
-            tutorialService.StartTutorial(TutorialIDs.WRAP_UP_SHOW, -1, 1, 0);
+
+            if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 0)
+            {
+                tutorialService.StartTutorial(1, 0);
+            }
         }
 
         if (isFullyCompleted && !isAutoWrapUpTriggered)
@@ -174,6 +184,7 @@ public class GameplayUIManager : MonoBehaviour
             {
                 if (mainUIController != null && mainUIController.IsActive)
                 {
+                    AppLogger.Log("Manggil auto onwrap");
                     OnWrapUp();
                 }
             });
@@ -189,19 +200,25 @@ public class GameplayUIManager : MonoBehaviour
     private void HandleHardCleaningUpdate(float progress)
     {
         UpdateProgress(ProgressType.Mud, progress);
-        tutorialService.CompleteTutorial(TutorialIDs.CHISEL_MUD, TutorialIDs.BRUSH_DUST, 0, 4);
+
+        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 4)
+        {
+            tutorialService.CompleteAndAdvance();
+        }
     }
 
     private void HandleSurfaceCleaningUpdate(float progress)
     {
         UpdateProgress(ProgressType.Dust, progress);
-        tutorialService.CompleteTutorial(TutorialIDs.BRUSH_DUST, TutorialIDs.ROTATE_INSPECT, 0, 3);
-        tutorialService.StartTutorial(TutorialIDs.CHISEL_MUD, TutorialIDs.BRUSH_DUST, 0, 4);
+        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 3)
+        {
+            tutorialService.CompleteAndAdvance();
+        }
     }
 
     private void OnPlayerKeycodeEscapePerformed()
     {
-        if (!isGamePaused) 
+        if (!isGamePaused)
         {
             isGamePaused = true;
             Time.timeScale = 0f;
@@ -236,7 +253,10 @@ public class GameplayUIManager : MonoBehaviour
 
         OnGameWrapped?.Invoke();
 
-        tutorialService.CompleteTutorial(TutorialIDs.WRAP_UP_CLICK, -1, 1, 0);
+        if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 0)
+        {
+            tutorialService.CompleteAndAdvance();
+        }
     }
 
     private void OnFinishedGame()
@@ -307,7 +327,7 @@ public class GameplayUIManager : MonoBehaviour
     {
         if (isGamePaused)
         {
-            pauseController.SetActive(true); 
+            pauseController.SetActive(true);
         }
     }
 }

@@ -1,47 +1,65 @@
-using System.Collections.Generic; // Tambahkan ini untuk HashSet
+using System.Collections;
 using VContainer;
 using NINESOFT.TUTORIAL_SYSTEM;
-using Modules;
+using UnityEngine;
 
 public class TutorialService
 {
-    private readonly PlayerProgressionData progressionData;
+    private int currentStage = 0;
+    private int currentModule = 0;
+    private bool isTutorialActive = false;
+    private bool isProcessing = false;
 
-    private readonly HashSet<int> startedTutorials = new HashSet<int>();
+    // Properti tambahan untuk dicek oleh class lain
+    public bool IsProcessing => isProcessing;
+    public int CurrentStage => currentStage;
+    public int CurrentModule => currentModule;
 
     [Inject]
-    public TutorialService(PlayerProgressionData progressionData)
-    {
-        this.progressionData = progressionData;
-    }
+    public TutorialService() { }
 
-    public void CompleteTutorial(int tutorialId, int prevTutorial, int stageIndex, int moduleIndex)
+    public void StartTutorial(int sIndex, int mIndex)
     {
-        if (!progressionData.HasTutorialShown(tutorialId) && CheckTutorialAvailability(prevTutorial))
+        // Jangan start kalau masih proses transisi dari tutorial sebelumnya
+        if (isProcessing) return;
+
+        currentStage = sIndex;
+        currentModule = mIndex;
+
+        bool success = TutorialManager.Instance.StageStarted(sIndex, mIndex);
+        if (success)
         {
-            AppLogger.Log($"[TutorialService] Completing Tutorial ID: {tutorialId}");
-            TutorialManager.Instance.StageCompleted(stageIndex, moduleIndex);
-
-            progressionData.MarkTutorialShown(tutorialId);
-
-            startedTutorials.Remove(tutorialId);
+            isTutorialActive = true;
+            Debug.Log($"<color=cyan>[Tutorial] Started: {sIndex},{mIndex}</color>");
         }
+
+        //wait sekian detik untuk bisa completeadvance
     }
 
-    public void StartTutorial(int tutorialId, int prevTutorial, int stageIndex, int moduleIndex)
+    public void CompleteAndAdvance(float transitionDelay = 0.5f)
     {
-        if (!progressionData.HasTutorialShown(tutorialId) && !startedTutorials.Contains(tutorialId) && CheckTutorialAvailability(prevTutorial))
-        {
-            AppLogger.Log($"[TutorialService] Starting Tutorial ID: {tutorialId}");
-            TutorialManager.Instance.StageStarted(stageIndex, moduleIndex);
+        // Jika sedang sibuk atau tidak aktif, blokir total
+        if (!isTutorialActive || isProcessing) return;
 
-            startedTutorials.Add(tutorialId);
-        }
+        TutorialManager.Instance.StartCoroutine(CompleteRoutine(transitionDelay));
     }
 
-    public bool CheckTutorialAvailability(int tutorialId)
+    private IEnumerator CompleteRoutine(float delay)
     {
-        if (tutorialId == -1) return true;
-        return progressionData.HasTutorialShown(tutorialId);
+        isProcessing = true; // KUNCI GERBANG
+        isTutorialActive = false;
+
+        Debug.Log($"<color=green>[Tutorial] Completing: {currentStage},{currentModule}. Delay: {delay}s</color>");
+
+        // Perintah ke NINESOFT
+        TutorialManager.Instance.StageCompleted(currentStage, currentModule);
+
+        // Tunggu transisi selesai
+        yield return new WaitForSeconds(delay);
+
+        currentModule++;
+
+        isProcessing = false; // BUKA GERBANG
+        StartTutorial(currentStage, currentModule);
     }
 }
