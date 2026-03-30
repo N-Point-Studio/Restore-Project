@@ -25,4 +25,5 @@ public class GameConfigData : ScriptableObject
     [Header("System Settings")]
     public float autoSaveCooldown = 1.0f;
     public float minLoadingScreenDuration = 2.0f;
+    public float bgmFadeDuration = 2.0f;
 }
