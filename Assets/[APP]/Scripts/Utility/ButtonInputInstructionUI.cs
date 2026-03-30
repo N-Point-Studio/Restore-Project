@@ -12,9 +12,12 @@ public class ButtonInputInstructionUI : InputInstructionUI, IPointerEnterHandler
     public Action OnClick;
 
     [Header("Text Animation Settings")]
-    [SerializeField] private RectTransform animatedTextRect;
-    [SerializeField] private TextColorChanger textColorChanger;
-    [SerializeField] private TextFontChanger textFontChanger;
+    [SerializeField] private RectTransform animatedTextRect; // Description Text RectTransform
+    [SerializeField] private TextColorChanger textDescriptionColorChanger; // Description Text Color
+    [SerializeField] private TextFontChanger textDescriptionFontChanger; // Description Text Font
+    [SerializeField] private SpriteColorChanger spriteInstructionBgColorChanger; // Instruction Background
+    [SerializeField] private TextColorChanger textInstructionColorChanger; // Instruction Text Color
+    [SerializeField] private TextFontChanger textInstructionFontChanger; // Instruction Text Font
 
     [Header("Scale Settings")]
     [SerializeField] private float hoverScale = 1.05f;
@@ -23,7 +26,9 @@ public class ButtonInputInstructionUI : InputInstructionUI, IPointerEnterHandler
     [SerializeField] private Ease tweenEase = Ease.OutQuad;
 
     [Header("Style Settings")]
+    [Tooltip("If enabled, the button will use an alternate visual dark mode/light mode style")]
     [SerializeField] private bool useAlternateStyle = false;
+    [SerializeField] private bool applyAlternateStyleOnStart = true;
 
     private Vector3 originalScale;
 
@@ -41,12 +46,18 @@ public class ButtonInputInstructionUI : InputInstructionUI, IPointerEnterHandler
         {
             originalScale = animatedTextRect.localScale;
         }
+
+        if (applyAlternateStyleOnStart)
+        {
+            SetAlternateStyle(useAlternateStyle);
+        }
     }
 
     protected override void OnDestroy()
     {
         base.OnDestroy();
         button.onClick.RemoveListener(HandleOnButtonClicked);
+        if (!gameObject.scene.isLoaded) return;
         if (animatedTextRect != null) animatedTextRect.DOKill();
     }
 
@@ -104,7 +115,11 @@ public class ButtonInputInstructionUI : InputInstructionUI, IPointerEnterHandler
 
         int stateIndex = useAlternateStyle ? 1 : 0; 
         
-        if (textColorChanger != null) textColorChanger.ChangeColorSmooth(stateIndex, tweenDuration);
-        if (textFontChanger != null) textFontChanger.ChangeFont(stateIndex);
+        if (textDescriptionColorChanger != null) textDescriptionColorChanger.ChangeColorSmooth(stateIndex, tweenDuration);
+        if (textDescriptionFontChanger != null) textDescriptionFontChanger.ChangeFont(stateIndex);
+        
+        if (spriteInstructionBgColorChanger != null) spriteInstructionBgColorChanger.ChangeColorSmooth(stateIndex, tweenDuration);
+        if (textInstructionColorChanger != null) textInstructionColorChanger.ChangeColorSmooth(stateIndex, tweenDuration);
+        if (textInstructionFontChanger != null) textInstructionFontChanger.ChangeFont(stateIndex);
     }
 }

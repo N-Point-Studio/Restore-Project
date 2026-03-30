@@ -56,6 +56,7 @@ public class GameplayUIManager : MonoBehaviour
         cleaningService.OnSurfaceCleaningUpdate += HandleSurfaceCleaningUpdate;
 
         this.input.OnPlayerKeycodeEscapePerformed += OnPlayerKeycodeEscapePerformed;
+        this.input.OnUIKeycodeEscapePerformed += OnUIKeycodeEscapePerformed;
 
         container.Inject(settingsController);
         container.Inject(endgameController);
@@ -99,6 +100,7 @@ public class GameplayUIManager : MonoBehaviour
         cleaningService.OnSurfaceCleaningUpdate -= HandleSurfaceCleaningUpdate;
 
         input.OnPlayerKeycodeEscapePerformed -= OnPlayerKeycodeEscapePerformed;
+        input.OnUIKeycodeEscapePerformed -= OnUIKeycodeEscapePerformed;
 
         mainUIController.OnWrapUp -= OnWrapUp;
         endgameController.OnFinishedGame -= OnFinishedGame;
@@ -228,6 +230,14 @@ public class GameplayUIManager : MonoBehaviour
             {
                 input.ChangeInputState(InputStateType.UI);
             }
+        }
+    }
+
+    private void OnUIKeycodeEscapePerformed()
+    {
+        if (isGamePaused && pauseController.IsActive)
+        {
+            OnResume();
         }
     }
 

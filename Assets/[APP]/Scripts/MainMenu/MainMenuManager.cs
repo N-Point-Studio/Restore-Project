@@ -60,8 +60,12 @@ public class MainMenuManager : MonoBehaviour
         MainMenuEvents.OnOpenSettings += OnRequestOpenSettings;
         MainMenuEvents.OnRequestQuit += OnRequestQuit;
         MainMenuEvents.OnShowBackground += OnRequestShowBackground;
+
         popUpConfirmationController.OnConfirm += OnConfirmNewGame;
         popUpConfirmationController.OnCancel += OnCancelNewGame;
+        
+        settingsController.OnSettingsClosed += OnSettingsClosed; 
+        quitController.OnQuitCancelled += OnQuitCancelled;
     }
 
     private void Start()
@@ -103,8 +107,12 @@ public class MainMenuManager : MonoBehaviour
         MainMenuEvents.OnOpenSettings -= OnRequestOpenSettings;
         MainMenuEvents.OnRequestQuit -= OnRequestQuit;
         MainMenuEvents.OnShowBackground -= OnRequestShowBackground;
+
         popUpConfirmationController.OnConfirm -= OnConfirmNewGame;
         popUpConfirmationController.OnCancel -= OnCancelNewGame;
+        
+        settingsController.OnSettingsClosed -= OnSettingsClosed; 
+        quitController.OnQuitCancelled -= OnQuitCancelled;
     }
 
     private void OnRequestNewGameGame()
@@ -113,6 +121,7 @@ public class MainMenuManager : MonoBehaviour
 
         if (isReturningPlayer)
         {
+            menuController.SetActive(false);
             popUpConfirmationController.SetActive(true);
         }
         else
@@ -165,11 +174,13 @@ public class MainMenuManager : MonoBehaviour
 
     private void OnRequestOpenSettings()
     {
+        menuController.SetActive(false);
         settingsController.SetActive(true);
     }
 
     private void OnRequestQuit()
     {
+        menuController.SetActive(false);
         quitController.SetActive(true);
     }
 
@@ -195,5 +206,16 @@ public class MainMenuManager : MonoBehaviour
     private void OnCancelNewGame()
     {
         popUpConfirmationController.SetActive(false);
+        menuController.SetActive(true);
+    }
+
+    private void OnSettingsClosed()
+    {
+        menuController.SetActive(true);
+    }
+
+    private void OnQuitCancelled()
+    {
+        menuController.SetActive(true);
     }
 }
