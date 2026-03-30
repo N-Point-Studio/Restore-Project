@@ -1,4 +1,6 @@
 using DG.Tweening;
+using Modules;
+using Modules.SoundSystems;
 using UnityEngine;
 
 public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
@@ -19,6 +21,11 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
     [SerializeField] private AudioClip[] sfxClips;
     [SerializeField] private Vector2 pitchRange = new Vector2(0.9f, 1.1f);
 
+    [SerializeField] private AudioKey audioKey;
+    [SerializeField] private SoundType soundType;
+
+    private bool isMoving = false;
+
     private void Awake()
     {
         initialPosition = transform.position;
@@ -34,10 +41,10 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
         returnSequence?.Kill();
         col.enabled = false;
 
-        if (audioSource != null && audioSource.loop)
-        {
-            audioSource.pitch = Random.Range(pitchRange.x, pitchRange.y);
-        }
+        // if (audioSource != null && audioSource.loop)
+        // {
+        //     audioSource.pitch = Random.Range(pitchRange.x, pitchRange.y);
+        // }
     }
 
     public void Return()
@@ -78,33 +85,48 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
 
     public void PlaySfx(bool isPlaying)
     {
-        if (!isPlaying)
+        if (soundType == SoundType.Once)
         {
-            if (audioSource.loop) audioSource.Stop();
-            return;
-        }
-
-        if (audioSource.loop && audioSource.isPlaying) return;
-
-        if (!audioSource.loop)
-        {
-            audioSource.pitch = Random.Range(pitchRange.x, pitchRange.y);
-            AudioClip clipToPlay = audioSource.clip;
-            if (sfxClips != null && sfxClips.Length > 0)
-            {
-                clipToPlay = sfxClips[Random.Range(0, sfxClips.Length)];
-            }
-
-            if (clipToPlay != null) audioSource.PlayOneShot(clipToPlay);
+            AudioEvents.TriggerPlayCustomSFX(audioKey);
+            AppLogger.Log("Play sfx" + gameObject.name);
         }
         else
         {
-            audioSource.Play();
+            AudioEvents.TriggerPlayContinuousSFX(audioKey, isPlaying);
+            AppLogger.Log("Play sfx" + gameObject.name);
         }
+        // if (!isPlaying)
+        // {
+        //     if (audioSource.loop) audioSource.Stop();
+        //     return;
+        // }
+
+        // if (audioSource.loop && audioSource.isPlaying) return;
+
+        // if (!audioSource.loop)
+        // {
+        //     audioSource.pitch = Random.Range(pitchRange.x, pitchRange.y);
+        //     AudioClip clipToPlay = audioSource.clip;
+        //     if (sfxClips != null && sfxClips.Length > 0)
+        //     {
+        //         clipToPlay = sfxClips[Random.Range(0, sfxClips.Length)];
+        //     }
+
+        //     if (clipToPlay != null) audioSource.PlayOneShot(clipToPlay);
+        // }
+        // else
+        // {
+        //     audioSource.Play();
+        // }
     }
 
     public void PlayVfx(bool isPlaying)
     {
+    }
+
+    public void Moving(bool isMoving)
+    {
+        this.isMoving = isMoving;
     }
 
     public SurfaceDetectionType ToolType => toolType;

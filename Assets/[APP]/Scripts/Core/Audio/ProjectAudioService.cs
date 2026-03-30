@@ -30,6 +30,8 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         AudioEvents.OnPlayBGMMainMenu += HandleOnPlayBGMMainMenu;
         AudioEvents.OnPlayAssembleSFX += HandleOnPlayAssembleSFX;
         AudioEvents.OnPlayCustomSFX += HandleOnPlayCustomSFX;
+
+        AudioEvents.OnPlayContinuousSFX += HandleOnPlayContinuousSFX;
     }
 
     void IDisposable.Dispose()
@@ -42,6 +44,9 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         AudioEvents.OnPlayBGMMainMenu -= HandleOnPlayBGMMainMenu;
         AudioEvents.OnPlayCustomSFX -= HandleOnPlayCustomSFX;
         AudioEvents.OnPlayAssembleSFX -= HandleOnPlayAssembleSFX;
+
+        AudioEvents.OnPlayContinuousSFX -= HandleOnPlayContinuousSFX;
+
     }
 
     void IStartable.Start()
@@ -73,6 +78,18 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         catch (Exception e)
         {
             AppLogger.LogWarning($"[ProjectAudioService] Failed to play SFX {audioType}: {e.Message}");
+        }
+    }
+
+    private void PlayContinuousSFX(AudioKey key, bool shouldPlay)
+    {
+        if (shouldPlay)
+        {
+            soundSystem.PlayAudio(key, loop: true);
+        }
+        else
+        {
+            soundSystem.StopAudio(key);
         }
     }
 
@@ -132,5 +149,10 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
     private void HandleOnPlayCustomSFX(AudioKey audioKey)
     {
         PlaySFX(audioKey);
+    }
+
+    private void HandleOnPlayContinuousSFX(AudioKey key, bool shouldPlay)
+    {
+        PlayContinuousSFX(key, shouldPlay);
     }
 }

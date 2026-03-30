@@ -51,11 +51,19 @@ public class ToolService : IInitializable, IDisposable, ITickable
             {
                 isCleaning = true;
                 var hardObject = surfaceDetectionService.HardObject;
+                var surfaceObject = surfaceDetectionService.CleanObject;
                 if (hardObject != null)
                 {
                     if (currentTool.ToolType == SurfaceDetectionType.Mesh)
                     {
                         cleaningService.TryCleaningHardSurface(hardObject);
+                        currentTool.PlaySfx(true);
+                    }
+                }
+                else if (surfaceObject != null)
+                {
+                    if (currentTool.ToolType == SurfaceDetectionType.Texture)
+                    {
                         currentTool.PlaySfx(true);
                     }
                 }
@@ -118,11 +126,11 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
                     if (mouseDelta > 0.1f)
                     {
-                        currentTool.PlaySfx(true);
+                        currentTool.Moving(true);
                     }
                     else
                     {
-                        currentTool.PlaySfx(false);
+                        currentTool.Moving(false);
                     }
                 }
             }
@@ -154,7 +162,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
             else
             {
                 audioKeepAliveTimer = 0f;
-                currentTool.PlaySfx(false);
+                // currentTool.PlaySfx(false);
             }
         }
     }

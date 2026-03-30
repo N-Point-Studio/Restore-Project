@@ -8,6 +8,7 @@ public interface ITool
     void StickToSurface(Vector3 position, Quaternion rotation);
     void PlaySfx(bool isPlaying);
     void PlayVfx(bool isPlaying);
+    void Moving(bool isMoving);
     Texture2D GetBrush();
     SurfaceDetectionType ToolType { get; }
 }
