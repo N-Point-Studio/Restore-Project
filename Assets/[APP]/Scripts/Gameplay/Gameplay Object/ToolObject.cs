@@ -60,7 +60,9 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
     }
     public void StickToSurface(Vector3 position, Quaternion rotation)
     {
-        transform.SetPositionAndRotation(position, rotation);
+        transform.DOKill();
+        transform.DOMove(position, 0.3f).SetEase(Ease.OutQuad);
+        transform.DORotateQuaternion(rotation, 0.3f).SetEase(Ease.OutQuad);
     }
 
     public void OnPressEnded() { }
