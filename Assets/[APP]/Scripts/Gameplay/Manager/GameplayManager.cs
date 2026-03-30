@@ -44,12 +44,22 @@ public class GameplayManager : IInitializable, IDisposable
     {
         GameplayUIManager.OnGameFinished += HandleGameFinished;
         GameplayUIManager.OnGameWrapped += HandleGameWrapped;
+        LoadingEvents.OnLoadingFinished += HandleLoadingFinished;
     }
 
     public void Dispose()
     {
         GameplayUIManager.OnGameFinished -= HandleGameFinished;
         GameplayUIManager.OnGameWrapped -= HandleGameWrapped;
+        LoadingEvents.OnLoadingFinished -= HandleLoadingFinished;
+    }
+
+
+    private void HandleGameFinished(bool isCompleted)
+    {
+        string loadingText = isCompleted ? "Displaying Artefact..." : "Returning to Menu...";
+
+        StartSceneTransition(loadingText);
     }
 
     private void HandleGameWrapped()
@@ -57,11 +67,12 @@ public class GameplayManager : IInitializable, IDisposable
         SaveObjectCompletion();
     }
 
-    private void HandleGameFinished(bool isCompleted)
+    private void HandleLoadingFinished()
     {
-        string loadingText = isCompleted ? "Displaying Artefact..." : "Returning to Menu...";
-
-        StartSceneTransition(loadingText);
+        if (artefactData != null)
+        {
+            AudioEvents.TriggerPlayBGMGameplay(artefactData.CustomGameplayBGM);
+        }
     }
 
     private void SaveObjectCompletion()
@@ -112,8 +123,6 @@ public class GameplayManager : IInitializable, IDisposable
                     ArtefactFragmentData artefact = artefactFragments[i];
                     Spawn(artefact.Prefab, artefact.SpawnTransform.Position, artefact.SpawnTransform.Rotation);
                 }
-
-                AudioEvents.TriggerPlayBGMGameplay(artefactData.CustomGameplayBGM);
 
                 isTutorialAvailable = artefactData.BaseData.Id == "Artefact_Coin";
             }

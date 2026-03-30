@@ -8,17 +8,19 @@ using VContainer.Unity;
 public class ProjectAudioService : IInitializable, IStartable, IDisposable
 {
     private readonly SoundSystem soundSystem;
+    private readonly GameConfigData config;
 
     [Inject]
-    public ProjectAudioService(SoundSystem soundSystem)
+    public ProjectAudioService(SoundSystem soundSystem, GameConfigData config)
     {
         this.soundSystem = soundSystem;
+        this.config = config;
     }
 
     private AudioKey? lastPlayedSoundType;
     private float lastPlayedSoundTime;
     private float soundCooldownDuration = 0.1f;
-    private float bgmFadeDuration = 1f;
+    private AudioKey currentBGM = AudioKey.None;
 
     void IInitializable.Initialize()
     {
@@ -30,8 +32,8 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         AudioEvents.OnPlayBGMMainMenu += HandleOnPlayBGMMainMenu;
         AudioEvents.OnPlayAssembleSFX += HandleOnPlayAssembleSFX;
         AudioEvents.OnPlayCustomSFX += HandleOnPlayCustomSFX;
-
         AudioEvents.OnPlayContinuousSFX += HandleOnPlayContinuousSFX;
+        AudioEvents.OnStopBGM += HandleOnStopBGM;
     }
 
     void IDisposable.Dispose()
@@ -44,9 +46,8 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         AudioEvents.OnPlayBGMMainMenu -= HandleOnPlayBGMMainMenu;
         AudioEvents.OnPlayCustomSFX -= HandleOnPlayCustomSFX;
         AudioEvents.OnPlayAssembleSFX -= HandleOnPlayAssembleSFX;
-
         AudioEvents.OnPlayContinuousSFX -= HandleOnPlayContinuousSFX;
-
+        AudioEvents.OnStopBGM -= HandleOnStopBGM;
     }
 
     void IStartable.Start()
@@ -118,9 +119,10 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         try
         {
             AudioKey keyToPlay = bgmKey != AudioKey.None ? bgmKey : AudioKey.BGM_Game;
+            currentBGM = keyToPlay;
 
             if (soundSystem != null)
-                soundSystem.PlayAudio(keyToPlay, volume: 1f, loop: true, fadeInSeconds: bgmFadeDuration, fadeOutSeconds: bgmFadeDuration);
+                soundSystem.PlayAudio(keyToPlay, volume: 1f, loop: true, fadeInSeconds: config.bgmFadeDuration, fadeOutSeconds: config.bgmFadeDuration);
         }
         catch (Exception e)
         {
@@ -132,8 +134,10 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
     {
         try
         {
+            currentBGM = AudioKey.BGM_Home;
+
             if (soundSystem != null)
-                soundSystem.PlayAudio(AudioKey.BGM_Home, volume: 1f, loop: true, fadeInSeconds: bgmFadeDuration, fadeOutSeconds: bgmFadeDuration);
+                soundSystem.PlayAudio(AudioKey.BGM_Home, volume: 1f, loop: true, fadeInSeconds: config.bgmFadeDuration, fadeOutSeconds: config.bgmFadeDuration);
         }
         catch (Exception e)
         {
@@ -154,5 +158,22 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
     private void HandleOnPlayContinuousSFX(AudioKey key, bool shouldPlay)
     {
         PlayContinuousSFX(key, shouldPlay);
+    }
+
+    private void HandleOnStopBGM()
+    {
+        try
+        {
+            if (soundSystem != null && currentBGM != AudioKey.None)
+            {
+                soundSystem.StopAudio(currentBGM); 
+                
+                currentBGM = AudioKey.None;
+            }
+        }
+        catch (Exception e)
+        {
+            AppLogger.LogWarning($"[ProjectAudioService] Failed to stop BGM: {e.Message}");
+        }
     }
 }

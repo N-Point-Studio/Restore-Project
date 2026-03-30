@@ -66,12 +66,12 @@ public class MainMenuManager : MonoBehaviour
         
         settingsController.OnSettingsClosed += OnSettingsClosed; 
         quitController.OnQuitCancelled += OnQuitCancelled;
+
+        LoadingEvents.OnLoadingFinished += HandleLoadingFinished;
     }
 
     private void Start()
     {
-        AudioEvents.TriggerPlayBGMMainMenu();
-
         bool hasPendingAnimations = 
             activeArtefactData.GetPendingCompletionAnimations().Count > 0 || 
             activeArtefactData.GetPendingUnlockAnimations().Count > 0;
@@ -113,6 +113,8 @@ public class MainMenuManager : MonoBehaviour
         
         settingsController.OnSettingsClosed -= OnSettingsClosed; 
         quitController.OnQuitCancelled -= OnQuitCancelled;
+
+        LoadingEvents.OnLoadingFinished -= HandleLoadingFinished;
     }
 
     private void OnRequestNewGameGame()
@@ -217,5 +219,10 @@ public class MainMenuManager : MonoBehaviour
     private void OnQuitCancelled()
     {
         menuController.SetActive(true);
+    }
+
+    private void HandleLoadingFinished()
+    {
+        AudioEvents.TriggerPlayBGMMainMenu();
     }
 }
