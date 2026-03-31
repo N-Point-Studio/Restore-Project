@@ -9968,7 +9968,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 84516473952733204, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -30
+      value: -20
       objectReference: {fileID: 0}
     - target: {fileID: 1701600106505507516, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_text
@@ -10406,7 +10406,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1271145303}
   - component: {fileID: 1271145302}
-  - component: {fileID: 1271145301}
   - component: {fileID: 1271145304}
   m_Layer: 0
   m_Name: Main Camera
@@ -10415,14 +10414,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &1271145301
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1271145300}
-  m_Enabled: 1
 --- !u!20 &1271145302
 Camera:
   m_ObjectHideFlags: 0

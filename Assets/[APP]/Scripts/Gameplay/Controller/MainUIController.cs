@@ -26,7 +26,7 @@ public class MainUIController : BaseMenuController
     protected override void OnDestroy()
     {
         base.OnDestroy();
-        buttonWrapUp.OnClick -= OnWrapUpClick;        
+        buttonWrapUp.OnClick -= OnWrapUpClick;
         input.OnPlayerKeycodeEnterPerformed -= OnPlayerKeycodeEnterPerformed;
     }
 
@@ -43,6 +43,10 @@ public class MainUIController : BaseMenuController
     public void ShowButtonWrap(bool isShowing)
     {
         buttonWrapUp.transform.parent.gameObject.SetActive(isShowing);
+        if (isShowing)
+        {
+            AudioEvents.TriggerPlayCustomSFX(Modules.SoundSystems.AudioKey.SFX_Finish);
+        }
     }
 
     private void OnPlayerKeycodeEnterPerformed()

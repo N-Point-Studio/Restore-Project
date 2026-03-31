@@ -150,7 +150,6 @@ public class ToolService : IInitializable, IDisposable, ITickable
         if (currentTool is IInteractObject interact)
         {
             var worldPos = objectDetectionService.ScreenToWorld(mousePos, interact);
-            currentTool.FollowMouse(worldPos);
 
             float mouseDelta = Vector2.Distance(mousePos, lastMousePos);
             lastMousePos = mousePos;
@@ -162,6 +161,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
             else
             {
                 audioKeepAliveTimer = 0f;
+                currentTool.FollowMouse(worldPos);
                 // currentTool.PlaySfx(false);
             }
         }

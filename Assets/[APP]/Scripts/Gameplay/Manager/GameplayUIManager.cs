@@ -262,6 +262,7 @@ public class GameplayUIManager : MonoBehaviour
         }
 
         OnGameWrapped?.Invoke();
+        AudioEvents.TriggerPlayCustomSFX(Modules.SoundSystems.AudioKey.SFX_Finish);
 
         if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 0)
         {
