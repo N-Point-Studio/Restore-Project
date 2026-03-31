@@ -32,7 +32,6 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         AudioEvents.OnPlayBGMMainMenu += HandleOnPlayBGMMainMenu;
         AudioEvents.OnPlayAssembleSFX += HandleOnPlayAssembleSFX;
         AudioEvents.OnPlayCustomSFX += HandleOnPlayCustomSFX;
-        AudioEvents.OnPlayContinuousSFX += HandleOnPlayContinuousSFX;
         AudioEvents.OnStopBGM += HandleOnStopBGM;
     }
 
@@ -46,7 +45,6 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         AudioEvents.OnPlayBGMMainMenu -= HandleOnPlayBGMMainMenu;
         AudioEvents.OnPlayCustomSFX -= HandleOnPlayCustomSFX;
         AudioEvents.OnPlayAssembleSFX -= HandleOnPlayAssembleSFX;
-        AudioEvents.OnPlayContinuousSFX -= HandleOnPlayContinuousSFX;
         AudioEvents.OnStopBGM -= HandleOnStopBGM;
     }
 
@@ -60,14 +58,12 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         {
             float currentTime = Time.unscaledTime;
 
-            // Check if the same sound type was played recently
             if (lastPlayedSoundType == audioType &&
                 currentTime - lastPlayedSoundTime < soundCooldownDuration)
             {
-                return; // Skip playing the sound to prevent stacking
+                return; 
             }
 
-            // Update tracking variables
             lastPlayedSoundType = audioType;
             lastPlayedSoundTime = currentTime;
         }
@@ -82,38 +78,12 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         }
     }
 
-    private void PlayContinuousSFX(AudioKey key, bool shouldPlay)
-    {
-        if (shouldPlay)
-        {
-            soundSystem.PlayAudio(key, loop: true);
-        }
-        else
-        {
-            soundSystem.StopAudio(key);
-        }
-    }
-
-    private void HandleOnUIComponentSelected()
-    {
-        PlaySFX(AudioKey.UI_Hover);
-    }
-
-    private void HandleOnOnPlayButtonSFX(bool isConfirm)
-    {
-        PlaySFX(isConfirm ? AudioKey.UI_Click : AudioKey.UI_Cancel);
-    }
-
-    private void HandleOnOnPlayToggleSFX()
-    {
-        PlaySFX(AudioKey.UI_Click);
-    }
-
-    private void HandleOnOnPlaySliderSFX()
-    {
-        PlaySFX(AudioKey.UI_Click);
-    }
-
+    private void HandleOnUIComponentSelected() => PlaySFX(AudioKey.UI_Hover);
+    private void HandleOnOnPlayButtonSFX(bool isConfirm) => PlaySFX(isConfirm ? AudioKey.UI_Click : AudioKey.UI_Cancel);
+    private void HandleOnOnPlayToggleSFX() => PlaySFX(AudioKey.UI_Click);
+    private void HandleOnOnPlaySliderSFX() => PlaySFX(AudioKey.UI_Click);
+    private void HandleOnPlayAssembleSFX() => PlaySFX(AudioKey.SFX_Assemble);
+    private void HandleOnPlayCustomSFX(AudioKey audioKey) => PlaySFX(audioKey);
     private void HandleOnPlayBGMGameplay(AudioKey bgmKey)
     {
         try
@@ -145,21 +115,6 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         }
     }
 
-    private void HandleOnPlayAssembleSFX()
-    {
-        PlaySFX(AudioKey.SFX_Assemble);
-    }
-
-    private void HandleOnPlayCustomSFX(AudioKey audioKey)
-    {
-        PlaySFX(audioKey);
-    }
-
-    private void HandleOnPlayContinuousSFX(AudioKey key, bool shouldPlay)
-    {
-        PlayContinuousSFX(key, shouldPlay);
-    }
-
     private void HandleOnStopBGM()
     {
         try
@@ -167,7 +122,6 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
             if (soundSystem != null && currentBGM != AudioKey.None)
             {
                 soundSystem.StopAudio(currentBGM); 
-                
                 currentBGM = AudioKey.None;
             }
         }

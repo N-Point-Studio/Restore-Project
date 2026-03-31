@@ -12,7 +12,6 @@ public static class AudioEvents
     public static event Action<AudioKey> OnPlayBGMGameplay;
     public static event Action<AudioKey> OnPlayCustomSFX;
     public static event Action OnPlayAssembleSFX;
-    public static event Action<AudioKey, bool> OnPlayContinuousSFX;
     public static event Action OnStopBGM;
 
     public static void TriggerPlayButtonSFX(bool isConfirm) => OnPlayButtonSFX?.Invoke(isConfirm);
@@ -23,7 +22,6 @@ public static class AudioEvents
     public static void TriggerPlayBGMGameplay(AudioKey audioKey) => OnPlayBGMGameplay?.Invoke(audioKey);
     public static void TriggerPlayCustomSFX(AudioKey audioKey) => OnPlayCustomSFX?.Invoke(audioKey);
     public static void TriggerPlayAssembleSFX() => OnPlayAssembleSFX?.Invoke();
-    public static void TriggerPlayContinuousSFX(AudioKey audioKey, bool shouldPlay) => OnPlayContinuousSFX?.Invoke(audioKey, shouldPlay);
     public static void TriggerStopBGM() => OnStopBGM?.Invoke();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -37,7 +35,6 @@ public static class AudioEvents
         OnPlayBGMGameplay = null;
         OnPlayCustomSFX = null;
         OnPlayAssembleSFX = null;
-        OnPlayContinuousSFX = null;
         OnStopBGM = null;
     }
 }

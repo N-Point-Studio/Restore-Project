@@ -22,6 +22,8 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
     [SerializeField] private SoundType soundType;
 
     private bool isMoving = false;
+    
+    private int currentAudioId = -1;
 
     private void Awake()
     {
@@ -58,8 +60,8 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
         if (isReturning) return;
         transform.DOKill();
         transform.DOMove(worldPos, 0.2f).SetEase(Ease.OutQuad);
-        // transform.position = worldPos;
     }
+    
     public void StickToSurface(Vector3 position, Quaternion rotation)
     {
         transform.DOKill();
@@ -86,28 +88,45 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
         {
             if (isPlaying)
             {
-                AudioEvents.TriggerPlayCustomSFX(audioKey);
+                SoundSystem.Instance.PlayAudio(audioKey, 1f, false, true, false);
                 vfx.Play();
-
             }
         }
-        else
+        else // Mode Continuous / Looping
         {
-            AudioEvents.TriggerPlayContinuousSFX(audioKey, isPlaying);
             if (isPlaying)
             {
+                bool isAlreadyPlaying = false;
+                if (currentAudioId != -1)
+                {
+                    Audio activeAudio = SoundSystem.Instance.GetAudio(currentAudioId);
+                    if (activeAudio != null && activeAudio.IsPlaying)
+                    {
+                        isAlreadyPlaying = true;
+                    }
+                }
+
+                if (!isAlreadyPlaying)
+                {
+                    currentAudioId = SoundSystem.Instance.PlayAudio(audioKey, 1f, true, true, false);
+                }
+                
                 vfx.Play();
             }
-            else if (!isPlaying)
+            else
             {
+                if (currentAudioId != -1)
+                {
+                    SoundSystem.Instance.StopAudio(currentAudioId);
+                    currentAudioId = -1;
+                }
+                
                 vfx.Stop();
             }
         }
     }
 
-    public void PlayVfx(bool isPlaying)
-    {
-    }
+    public void PlayVfx(bool isPlaying) { }
 
     public void Moving(bool isMoving)
     {

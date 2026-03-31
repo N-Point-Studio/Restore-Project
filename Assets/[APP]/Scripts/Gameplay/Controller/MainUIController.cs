@@ -42,8 +42,11 @@ public class MainUIController : BaseMenuController
 
     public void ShowButtonWrap(bool isShowing)
     {
+        bool wasShowing = buttonWrapUp.transform.parent.gameObject.activeSelf;
+
         buttonWrapUp.transform.parent.gameObject.SetActive(isShowing);
-        if (isShowing)
+        
+        if (isShowing && !wasShowing)
         {
             AudioEvents.TriggerPlayCustomSFX(Modules.SoundSystems.AudioKey.SFX_Finish);
         }

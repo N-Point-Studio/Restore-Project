@@ -6,7 +6,7 @@ namespace Modules.SoundSystems
     {
         // Clip Settings
         [SerializeField] private bool useDatabase;
-        [SerializeField] private string audioKey;
+        [SerializeField] private AudioKey audioKey;
         [SerializeField] private AudioClip audioClip;
         [SerializeField] private Audio.AudioType audioType;
 
@@ -14,6 +14,12 @@ namespace Modules.SoundSystems
         [SerializeField] private bool autoplay;
         [SerializeField] private bool is3DAudio;
         [SerializeField] private bool isLooped;
+
+        [Header("Anti-Spam Settings")]
+        [Tooltip("Aktifkan ini agar suara tidak menumpuk/spam saat dipanggil berkali-kali tiap frame")]
+        [SerializeField] private bool preventSpam = true; 
+        
+        private int currentAudioId = -1;
 
         public bool UseDatabase { get => useDatabase; set => useDatabase = value; }
 
@@ -39,22 +45,31 @@ namespace Modules.SoundSystems
             if (audioClip == null)
                 return;
 
+            if (preventSpam)
+            {
+                Audio activeAudio = SoundSystem.Instance.GetAudio(currentAudioId);
+                if (activeAudio != null && activeAudio.IsPlaying)
+                {
+                    return; 
+                }
+            }
+
             switch (audioType)
             {
                 case Audio.AudioType.Music:
-                    SoundSystem.Instance.PlayMusic(audioClip, 1, isLooped, is3DAudio ? transform : null);
+                    currentAudioId = SoundSystem.Instance.PlayMusic(audioClip, 1, isLooped, is3DAudio ? transform : null);
                     break;
                 case Audio.AudioType.Sound:
-                    SoundSystem.Instance.PlaySound(audioClip, 1, isLooped, is3DAudio ? transform : null);
+                    currentAudioId = SoundSystem.Instance.PlaySound(audioClip, 1, isLooped, is3DAudio ? transform : null);
                     break;
                 case Audio.AudioType.UISound:
-                    SoundSystem.Instance.PlayUISound(audioClip);
+                    currentAudioId = SoundSystem.Instance.PlayUISound(audioClip);
                     break;
                 case Audio.AudioType.Ambience:
-                    SoundSystem.Instance.PlayAmbience(audioClip, 1, isLooped, is3DAudio ? transform : null);
+                    currentAudioId = SoundSystem.Instance.PlayAmbience(audioClip, 1, isLooped, is3DAudio ? transform : null);
                     break;
                 case Audio.AudioType.Voice:
-                    SoundSystem.Instance.PlayVoice(audioClip, 1, isLooped, is3DAudio ? transform : null);
+                    currentAudioId = SoundSystem.Instance.PlayVoice(audioClip, 1, isLooped, is3DAudio ? transform : null);
                     break;
             }
         }

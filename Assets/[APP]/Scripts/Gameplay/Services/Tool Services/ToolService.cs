@@ -16,6 +16,8 @@ public class ToolService : IInitializable, IDisposable, ITickable
     private float audioKeepAliveTimer = 0f;
     private const float AUDIO_GRACE_PERIOD = 0.15f;
 
+    private bool isSfxPlaying = false;
+
     [Inject]
     public ToolService(InputSystemService inputSystemService, ObjectDetectionService objectDetectionService,
     SurfaceDetectionService surfaceDetectionService, CleaningService cleaningService)
@@ -42,6 +44,22 @@ public class ToolService : IInitializable, IDisposable, ITickable
         GameplayUIManager.OnGameWrapped -= HandleGameWrapped;
     }
 
+    private void PlayToolSfx(bool play)
+    {
+        if (currentTool == null) return;
+
+        if (play && !isSfxPlaying)
+        {
+            currentTool.PlaySfx(true);
+            isSfxPlaying = true;
+        }
+        else if (!play && isSfxPlaying)
+        {
+            currentTool.PlaySfx(false);
+            isSfxPlaying = false;
+        }
+    }
+
     private void HandlePressStarted(IInteractObject interact)
     {
         if (isFinished) return;
@@ -57,14 +75,14 @@ public class ToolService : IInitializable, IDisposable, ITickable
                     if (currentTool.ToolType == SurfaceDetectionType.Mesh)
                     {
                         cleaningService.TryCleaningHardSurface(hardObject);
-                        currentTool.PlaySfx(true);
+                        PlayToolSfx(true);
                     }
                 }
                 else if (surfaceObject != null)
                 {
                     if (currentTool.ToolType == SurfaceDetectionType.Texture)
                     {
-                        currentTool.PlaySfx(true);
+                        PlayToolSfx(true);
                     }
                 }
             }
@@ -90,11 +108,10 @@ public class ToolService : IInitializable, IDisposable, ITickable
             }
         }
 
-        if (currentTool != null)
-        {
-            currentTool.PlaySfx(false);
-        }
+        // Matikan suara via helper
+        PlayToolSfx(false);
 
+        audioKeepAliveTimer = 0f;
         cleaningService.EndClean();
         isCleaning = false;
     }
@@ -156,24 +173,31 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
             if (surfaceDetectionService.PerformRaycast(mousePos, currentTool.ToolType))
             {
+                audioKeepAliveTimer = AUDIO_GRACE_PERIOD;
                 StickToSurface(interact, mouseDelta);
+                
+                if (isCleaning)
+                {
+                    PlayToolSfx(true);
+                }
             }
             else
             {
-                audioKeepAliveTimer = 0f;
                 currentTool.FollowMouse(worldPos);
-                // currentTool.PlaySfx(false);
+                
+                if (audioKeepAliveTimer <= 0f)
+                {
+                    PlayToolSfx(false);
+                }
             }
         }
     }
 
     private void HandleGameWrapped()
     {
-        if (currentTool != null) currentTool.PlaySfx(false);
-
+        PlayToolSfx(false);
         currentTool?.Return();
     }
 
     public bool IsOnToolMode => GetCurrentTool() != null;
-
 }
