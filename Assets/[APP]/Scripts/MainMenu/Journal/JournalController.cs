@@ -33,6 +33,7 @@ public class JournalController : MonoBehaviour
     [SerializeField] private BookPanelInteractable bookInteractable;
 
     public JournalState CurrentState { get; private set; } = JournalState.Hidden;
+    public bool IsAnimating { get; private set; } = false;
     private ArtefactData currentData;
     private Action currentActionCallback;
     private bool isPostRestoration;
@@ -117,6 +118,7 @@ public class JournalController : MonoBehaviour
     public void SetBookHiddenInstant()
     {
         CurrentState = JournalState.Hidden;
+        IsAnimating = false;
         isContentRevealed = false;
 
         if (feedbackOpen != null) feedbackOpen.StopFeedbacks();
@@ -166,6 +168,7 @@ public class JournalController : MonoBehaviour
 
         CurrentState = JournalState.Opened;
         buttonAction.gameObject.SetActive(false);
+        IsAnimating = true;
         ShowOverlay();
 
         OnBookOpened?.Invoke();
@@ -193,15 +196,24 @@ public class JournalController : MonoBehaviour
         {
             if (!isPostRestoration && activeLeftPage != null)
             {
-                activeLeftPage.PlayRevealAnimation(() => buttonAction.gameObject.SetActive(true));
+                activeLeftPage.PlayRevealAnimation(() => 
+                {
+                    buttonAction.gameObject.SetActive(true);
+                    IsAnimating = false;
+                });
             }
             else if (isPostRestoration && activeRightPage != null)
             {
-                activeRightPage.PlayRevealAnimation(() => buttonAction.gameObject.SetActive(true));
+                activeRightPage.PlayRevealAnimation(() => 
+                {
+                    buttonAction.gameObject.SetActive(true);
+                    IsAnimating = false;
+                });
             }
             else
             {
                 buttonAction.gameObject.SetActive(true);
+                IsAnimating = false;
             }
             
             isContentRevealed = true;
@@ -209,12 +221,14 @@ public class JournalController : MonoBehaviour
         else
         {
             buttonAction.gameObject.SetActive(true);
+            IsAnimating = false;
         }
     }
 
     public void HideBookToPeek()
     {
         CurrentState = JournalState.Peeking;
+        IsAnimating = false;
         HideOverlay();
         buttonAction.gameObject.SetActive(false);
         
@@ -224,6 +238,7 @@ public class JournalController : MonoBehaviour
     public void HideBookCompletely()
     {
         CurrentState = JournalState.Hidden;
+        IsAnimating = false;
         HideOverlay();
         
         if (feedbackHide != null) feedbackHide.PlayFeedbacks();

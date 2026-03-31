@@ -239,6 +239,8 @@ public class ArtefactDetailController : MonoBehaviour
 
     private void OnBackClicked()
     {
+        if (journalController != null && journalController.IsAnimating) return;
+
         if (journalController.CurrentState == JournalState.Opened)
         {
             journalController.HideBookToPeek();
@@ -296,6 +298,9 @@ public class ArtefactDetailController : MonoBehaviour
     private void OnUIKeycodeEscapePerformed()
     {
         if (!IsOpen) return;
+
+        if (journalController != null && journalController.IsAnimating) return;
+        
         if (buttonBack != null && buttonBack.Button.interactable && buttonBack.gameObject.activeInHierarchy)
         {
             OnBackClicked();
