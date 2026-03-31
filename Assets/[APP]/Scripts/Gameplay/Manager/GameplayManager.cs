@@ -16,7 +16,7 @@ public class GameplayManager : IInitializable, IDisposable
     private ArtefactData artefactData;
     public Action OnGameStarted;
     public bool isTutorialAvailable;
-
+    public Vector3 finalRotation;
     private string targetScene = "MainMenu";
 
     [Inject]
@@ -114,6 +114,8 @@ public class GameplayManager : IInitializable, IDisposable
             if (!string.IsNullOrEmpty(targetId))
             {
                 artefactData = activeArtefactData.GetArtefactDatabase().GetItem(targetId);
+                finalRotation = artefactData.FinalRotation;
+                Debug.Log("final rotation: " + finalRotation);
                 AppLogger.Log($"[Gameplay Manager] Artefact:{artefactData.BaseData.Id} Loaded!");
 
 

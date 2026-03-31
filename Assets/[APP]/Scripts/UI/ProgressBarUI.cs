@@ -80,7 +80,7 @@ public class ProgressBarUI : MonoBehaviour
         else value01 = Mathf.Clamp01(value01);
 
         currentValue = Mathf.RoundToInt(value01 * maximum);
-        HandleAudioLogic(value01, previousValue01);
+        // HandleAudioLogic(value01, previousValue01);
 
         if (currentValue == 100 && lastValue != 100)
         {
@@ -99,18 +99,18 @@ public class ProgressBarUI : MonoBehaviour
         UpdateFill();
     }
 
-    private void HandleAudioLogic(float newValue, float oldValue)
-    {
-        if (soundType != SoundType.Continuous) return;
-        if (newValue > oldValue && newValue < 1f)
-        {
-            AudioEvents.TriggerPlayContinuousSFX(audioKey, true);
-        }
-        else
-        {
-            AudioEvents.TriggerPlayContinuousSFX(audioKey, false);
-        }
-    }
+    // private void HandleAudioLogic(float newValue, float oldValue)
+    // {
+    //     if (soundType != SoundType.Continuous) return;
+    //     if (newValue > oldValue && newValue < 1f)
+    //     {
+    //         AudioEvents.TriggerPlayContinuousSFX(audioKey, true);
+    //     }
+    //     else
+    //     {
+    //         AudioEvents.TriggerPlayContinuousSFX(audioKey, false);
+    //     }
+    // }
 
     public void UpdateFill()
     {

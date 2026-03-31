@@ -35,6 +35,9 @@ public class ArtefactData : ScriptableObject
     [SerializeField] private List<ArtefactFragmentData> artefactFragmentDatas;
     public List<ArtefactFragmentData> ArtefactFragmentDatas => artefactFragmentDatas;
 
+    [SerializeField] private Vector3 finalRotation;
+    public Vector3 FinalRotation => finalRotation;
+
     private string artefactGroupId;
     public string ArtefactGroupId => artefactGroupId;
 

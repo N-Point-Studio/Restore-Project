@@ -24,13 +24,15 @@ public class Inspection : MonoBehaviour
 
     private TutorialService tutorialService;
     private GameConfigData config;
+    private GameplayManager gameplayManager;
 
 
     [Inject]
-    public void Construct(TutorialService tutorialService, GameConfigData config)
+    public void Construct(TutorialService tutorialService, GameConfigData config, GameplayManager gameplayManager)
     {
         this.tutorialService = tutorialService;
         this.config = config;
+        this.gameplayManager = gameplayManager;
     }
 
     void Start()
@@ -151,7 +153,7 @@ public class Inspection : MonoBehaviour
 
         transform.DOKill();
         transform.DOMove(InitialInspectPosition, config.inspectionResetDuration).SetEase(Ease.OutBack);
-        transform.DORotateQuaternion(InitialInspectRotation, config.inspectionResetDuration).SetEase(Ease.OutBack);
+        transform.DORotateQuaternion(Quaternion.Euler(gameplayManager.finalRotation), config.inspectionResetDuration).SetEase(Ease.OutBack);
 
         _targetPosition = InitialInspectPosition;
         _zoomVelocity = Vector3.zero;
