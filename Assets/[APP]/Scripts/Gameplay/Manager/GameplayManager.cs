@@ -115,7 +115,7 @@ public class GameplayManager : IInitializable, IDisposable
             {
                 artefactData = activeArtefactData.GetArtefactDatabase().GetItem(targetId);
                 finalRotation = artefactData.FinalRotation;
-                Debug.Log("final rotation: " + finalRotation);
+                // Debug.Log("final rotation: " + finalRotation);
                 AppLogger.Log($"[Gameplay Manager] Artefact:{artefactData.BaseData.Id} Loaded!");
 
 

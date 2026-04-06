@@ -1,4 +1,5 @@
 using System;
+using Modules;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -74,14 +75,17 @@ public class ToolService : IInitializable, IDisposable, ITickable
                 {
                     if (currentTool.ToolType == SurfaceDetectionType.Mesh)
                     {
+                        AppLogger.Log("Trying to clean hard surface: " + hardObject);
                         cleaningService.TryCleaningHardSurface(hardObject);
                         PlayToolSfx(true);
                     }
                 }
-                else if (surfaceObject != null)
+
+                if (surfaceObject != null)
                 {
                     if (currentTool.ToolType == SurfaceDetectionType.Texture)
                     {
+                        AppLogger.Log("Trying to clean texture surface: " + surfaceObject);
                         PlayToolSfx(true);
                     }
                 }
@@ -175,8 +179,8 @@ public class ToolService : IInitializable, IDisposable, ITickable
             {
                 audioKeepAliveTimer = AUDIO_GRACE_PERIOD;
                 StickToSurface(interact, mouseDelta);
-                
-                if (isCleaning)
+
+                if (isCleaning && currentTool.ToolType == SurfaceDetectionType.Texture)
                 {
                     PlayToolSfx(true);
                 }
@@ -184,8 +188,8 @@ public class ToolService : IInitializable, IDisposable, ITickable
             else
             {
                 currentTool.FollowMouse(worldPos);
-                
-                if (audioKeepAliveTimer <= 0f)
+
+                if (audioKeepAliveTimer <= 0f && isCleaning && currentTool.ToolType == SurfaceDetectionType.Texture)
                 {
                     PlayToolSfx(false);
                 }

@@ -22,7 +22,7 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
     [SerializeField] private SoundType soundType;
 
     private bool isMoving = false;
-    
+
     private int currentAudioId = -1;
 
     private void Awake()
@@ -61,7 +61,7 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
         transform.DOKill();
         transform.DOMove(worldPos, 0.2f).SetEase(Ease.OutQuad);
     }
-    
+
     public void StickToSurface(Vector3 position, Quaternion rotation)
     {
         transform.DOKill();
@@ -84,6 +84,7 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
 
     public void PlaySfx(bool isPlaying)
     {
+        // Debug.Log($"PlaySfx called with isPlaying: {isPlaying} for tool: {gameObject.name}");
         if (soundType == SoundType.Once)
         {
             if (isPlaying)
@@ -110,7 +111,7 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
                 {
                     currentAudioId = SoundSystem.Instance.PlayAudio(audioKey, 1f, true, true, false);
                 }
-                
+
                 vfx.Play();
             }
             else
@@ -120,7 +121,7 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
                     SoundSystem.Instance.StopAudio(currentAudioId);
                     currentAudioId = -1;
                 }
-                
+
                 vfx.Stop();
             }
         }
