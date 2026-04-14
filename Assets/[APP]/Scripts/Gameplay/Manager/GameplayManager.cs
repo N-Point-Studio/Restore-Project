@@ -8,11 +8,15 @@ public class GameplayManager : IInitializable, IDisposable
 {
     private readonly PlayerProgressionData playerProgressionData;
     private readonly SceneLoader sceneLoader;
-    private ActiveArtefactData activeArtefactData;
-    private InputSystemService inputSystemService;
+    private readonly ActiveArtefactData activeArtefactData;
+    private readonly InputSystemService inputSystemService;
+    private readonly GameConfigData config;
+    private readonly TutorialService tutorialService;
+
     private ArtefactData artefactData;
     public Action OnGameStarted;
-
+    public bool isTutorialAvailable;
+    public Vector3 finalRotation;
     private string targetScene = "MainMenu";
 
     [Inject]
@@ -20,13 +24,18 @@ public class GameplayManager : IInitializable, IDisposable
     ActiveArtefactData activeArtefactData,
     SceneLoader sceneLoader,
     InputSystemService inputSystemService,
-    string targetScene)
+    string targetScene,
+    TutorialService tutorialService,
+    GameConfigData config)
     {
         this.playerProgressionData = playerProgressionData;
         this.activeArtefactData = activeArtefactData;
         this.sceneLoader = sceneLoader;
         this.inputSystemService = inputSystemService;
         this.targetScene = targetScene;
+        this.config = config;
+        this.tutorialService = tutorialService;
+        AppLogger.Log("tutorial service ada? " + tutorialService);
 
         InitializeSession();
     }
@@ -35,12 +44,22 @@ public class GameplayManager : IInitializable, IDisposable
     {
         GameplayUIManager.OnGameFinished += HandleGameFinished;
         GameplayUIManager.OnGameWrapped += HandleGameWrapped;
+        LoadingEvents.OnLoadingFinished += HandleLoadingFinished;
     }
 
     public void Dispose()
     {
         GameplayUIManager.OnGameFinished -= HandleGameFinished;
         GameplayUIManager.OnGameWrapped -= HandleGameWrapped;
+        LoadingEvents.OnLoadingFinished -= HandleLoadingFinished;
+    }
+
+
+    private void HandleGameFinished(bool isCompleted)
+    {
+        string loadingText = isCompleted ? "Displaying Artefact..." : "Returning to Menu...";
+
+        StartSceneTransition(loadingText);
     }
 
     private void HandleGameWrapped()
@@ -48,11 +67,12 @@ public class GameplayManager : IInitializable, IDisposable
         SaveObjectCompletion();
     }
 
-    private void HandleGameFinished(bool isCompleted)
+    private void HandleLoadingFinished()
     {
-        string loadingText = isCompleted ? "Saving Artefact..." : "Returning to Menu...";
-
-        StartSceneTransition(loadingText);
+        if (artefactData != null)
+        {
+            AudioEvents.TriggerPlayBGMGameplay(artefactData.CustomGameplayBGM);
+        }
     }
 
     private void SaveObjectCompletion()
@@ -74,9 +94,11 @@ public class GameplayManager : IInitializable, IDisposable
 
     public void StartSceneTransition(string loadingMessage)
     {
+        Time.timeScale = 1f;
+
         AppLogger.Log($"[Gameplay Manager] Back to menu using SceneLoader. Message: {loadingMessage}");
 
-        _ = sceneLoader.LoadSceneAsync(targetScene, 2f, loadingMessage);
+        _ = sceneLoader.LoadSceneAsync(targetScene, config.minLoadingScreenDuration, loadingMessage);
     }
 
     private void InitializeSession()
@@ -92,9 +114,10 @@ public class GameplayManager : IInitializable, IDisposable
             if (!string.IsNullOrEmpty(targetId))
             {
                 artefactData = activeArtefactData.GetArtefactDatabase().GetItem(targetId);
+                finalRotation = artefactData.FinalRotation;
+                Debug.Log("final rotation: " + finalRotation);
                 AppLogger.Log($"[Gameplay Manager] Artefact:{artefactData.BaseData.Id} Loaded!");
 
-                AudioEvents.TriggerPlayBGMGameplay(artefactData.CustomGameplayBGM);
 
                 List<ArtefactFragmentData> artefactFragments = artefactData.ArtefactFragmentDatas;
                 for (int i = 0; i < artefactFragments.Count; i++)
@@ -102,6 +125,8 @@ public class GameplayManager : IInitializable, IDisposable
                     ArtefactFragmentData artefact = artefactFragments[i];
                     Spawn(artefact.Prefab, artefact.SpawnTransform.Position, artefact.SpawnTransform.Rotation);
                 }
+
+                isTutorialAvailable = artefactData.BaseData.Id == "Artefact_Coin";
             }
             else
             {

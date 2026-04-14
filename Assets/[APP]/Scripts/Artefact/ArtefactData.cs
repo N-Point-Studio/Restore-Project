@@ -14,7 +14,7 @@ public class ArtefactData : ScriptableObject
     public string[] StickyNoteTexts => stickyNoteTexts;
 
     [Header("Audio Settings")]
-    [SerializeField] private AudioKey customGameplayBGM = AudioKey.BGM_Game;
+    [SerializeField] private AudioKey customGameplayBGM;
     public AudioKey CustomGameplayBGM => customGameplayBGM;
 
     [Header("Journal Content (Prefabs)")]
@@ -34,6 +34,9 @@ public class ArtefactData : ScriptableObject
 
     [SerializeField] private List<ArtefactFragmentData> artefactFragmentDatas;
     public List<ArtefactFragmentData> ArtefactFragmentDatas => artefactFragmentDatas;
+
+    [SerializeField] private Vector3 finalRotation;
+    public Vector3 FinalRotation => finalRotation;
 
     private string artefactGroupId;
     public string ArtefactGroupId => artefactGroupId;

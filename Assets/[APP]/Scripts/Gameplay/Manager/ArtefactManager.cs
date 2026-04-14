@@ -8,16 +8,17 @@ public class ArtefactManager : IInitializable, IDisposable
     private readonly ToolService toolService;
     private readonly AssemblyService assemblyService;
     private readonly HoldProgressUI holdProgressUI;
-    private const float HOLD_DURATION = 0.5f;
+    private readonly GameConfigData config;
     private bool isHoldingUI = false;
     private bool isGameFinished = false;
 
     [Inject]
-    public ArtefactManager(ToolService toolService, AssemblyService assemblyService, HoldProgressUI holdProgressUI)
+    public ArtefactManager(ToolService toolService, AssemblyService assemblyService, HoldProgressUI holdProgressUI, GameConfigData config)
     {
         this.assemblyService = assemblyService;
         this.toolService = toolService;
         this.holdProgressUI = holdProgressUI;
+        this.config = config;
     }
 
     public void Initialize()
@@ -69,7 +70,7 @@ public class ArtefactManager : IInitializable, IDisposable
         if (interact is not IArtefactPart artefactPart) return;
 
         float distance = Vector3.Distance(worldPos, assemblyService.GetInspectPoint().position);
-        bool isCloseEnough = distance < 1.5f;
+        bool isCloseEnough = distance < config.assembleSnapDistance;
 
         if (isCloseEnough && assemblyService.TryAssemble(artefactPart)) return;
         if (interact is IDragObject drag) drag.OnDragEnded(worldPos);
@@ -84,7 +85,7 @@ public class ArtefactManager : IInitializable, IDisposable
             ShowHoldProgress(interact as IArtefactPart, position);
         }
 
-        float normalized = Mathf.Clamp01(holdTime / HOLD_DURATION);
+        float normalized = Mathf.Clamp01(holdTime / config.holdDuration);
         UpdateHoldProgress(interact as IArtefactPart, normalized, position);
     }
 

@@ -30,12 +30,18 @@ MonoBehaviour:
     Take great care of this one
     :)'
   - "P.S I\u2019m so sorry about your mom\u2019s diagnosis yesterday... Glad to hear
-    your aunt is there to help her out. \n\nIs there any way I can support you through
+    your aunt is there to help her out. \nIs there any way I can support you through
     this?"
+  customGameplayBGM: 4
   preRestorationPagePrefab: {fileID: 8636906436748886089, guid: 59d4cec8c38bc594ea457d5bb96c16c0, type: 3}
   postRestorationPagePrefab: {fileID: 8866635996392126511, guid: 0afd9824e5cbe134297ab0337b6d9c9b, type: 3}
   unlockedByDefault: 0
   unlockRequirements:
   - {fileID: 11400000, guid: 1c3b6e9d8184949cf8925a6e79acfa83, type: 2}
   allowedToolTypes: -1
-  artefactFragmentDatas: []
+  artefactFragmentDatas:
+  - prefab: {fileID: 3494128292071302381, guid: 3d2d2b34b6ec7433881e0c71da096967, type: 3}
+    spawnTransform:
+      rotation: {x: 0, y: 0, z: 0}
+      position: {x: -0.37, y: -0.3695463, z: 0.85}
+  finalRotation: {x: 50, y: 0, z: 0}

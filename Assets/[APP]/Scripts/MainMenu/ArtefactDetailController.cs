@@ -28,6 +28,11 @@ public class ArtefactDetailController : MonoBehaviour
     [Header("Feedbacks")]
     [SerializeField] private MMF_Player wallTextRevealFeedback;
 
+    [Header("Animation Timings")]
+    [SerializeField] private float backButtonUnlockDelay = 1.5f;
+    [SerializeField] private float wallTextFadeDuration = 0.5f;
+    [SerializeField] private float closeMenuDuration = 0.3f;
+
     private ArtefactData currentArtefactData;
     private Artefact3DItem current3DItem; 
     private ActiveArtefactData activeArtefactData;
@@ -92,7 +97,6 @@ public class ArtefactDetailController : MonoBehaviour
         }
     }
 
-    // ---> TAMBAH PARAMETER bool forceShowBook = false <---
     public void OpenDetail(ArtefactData artefactData, ActiveArtefactData activeData, Artefact3DItem item3D, bool forceShowBook = false)
     {
         currentArtefactData = artefactData;
@@ -122,7 +126,7 @@ public class ArtefactDetailController : MonoBehaviour
             if (forceShowBook)
             {
                 if (buttonBack != null) buttonBack.Button.interactable = false; 
-                DOVirtual.DelayedCall(1.5f, () => { if (buttonBack != null) buttonBack.Button.interactable = true; });
+                DOVirtual.DelayedCall(backButtonUnlockDelay, () => { if (buttonBack != null) buttonBack.Button.interactable = true; });
 
                 buttonBack.SetAlternateStyle(true);
 
@@ -147,7 +151,7 @@ public class ArtefactDetailController : MonoBehaviour
                 }
                 else
                 {
-                    wallTextGroup.DOFade(1, 0.5f);
+                    wallTextGroup.DOFade(1, wallTextFadeDuration);
                 }
             }
         }
@@ -156,7 +160,7 @@ public class ArtefactDetailController : MonoBehaviour
             if (isStoryRead)
             {
                 instructionText.gameObject.SetActive(true);
-                instructionText.text = "Open the box and start restore...";
+                instructionText.text = "Open the box and\nstart restore...";
                 
                 buttonBack.SetAlternateStyle(false);
 
@@ -192,7 +196,7 @@ public class ArtefactDetailController : MonoBehaviour
             instructionText.gameObject.SetActive(false);
                         
             buttonBack.Button.interactable = false; 
-            DOVirtual.DelayedCall(1.5f, () => { if (buttonBack != null) buttonBack.Button.interactable = true; });
+            DOVirtual.DelayedCall(backButtonUnlockDelay, () => { if (buttonBack != null) buttonBack.Button.interactable = true; });
 
             buttonBack.SetAlternateStyle(true);
 
@@ -229,12 +233,14 @@ public class ArtefactDetailController : MonoBehaviour
         }
         else
         {
-            wallTextGroup.DOFade(1, 0.5f);
+            wallTextGroup.DOFade(1, wallTextFadeDuration);
         }
     }
 
     private void OnBackClicked()
     {
+        if (journalController != null && journalController.IsAnimating) return;
+
         if (journalController.CurrentState == JournalState.Opened)
         {
             journalController.HideBookToPeek();
@@ -246,12 +252,12 @@ public class ArtefactDetailController : MonoBehaviour
                 wallTitleText.text = currentArtefactData.BaseData.ItemName;
                 wallDescText.text = currentArtefactData.BaseData.ItemDescription;
                 wallTextGroup.gameObject.SetActive(true);
-                wallTextGroup.DOFade(1, 0.5f);
+                wallTextGroup.DOFade(1, wallTextFadeDuration);
             }
             else
             {
                 instructionText.gameObject.SetActive(true);
-                instructionText.text = "Open the box and start restore...";
+                instructionText.text = "Open the box and\nstart restore...";
             }
         }
         else
@@ -286,12 +292,15 @@ public class ArtefactDetailController : MonoBehaviour
 
     public void CloseDetail()
     {
-        canvasGroupRoot.DOFade(0f, 0.3f).OnComplete(() => root.SetActive(false));
+        canvasGroupRoot.DOFade(0f, closeMenuDuration).OnComplete(() => root.SetActive(false));
     }
 
     private void OnUIKeycodeEscapePerformed()
     {
         if (!IsOpen) return;
+
+        if (journalController != null && journalController.IsAnimating) return;
+        
         if (buttonBack != null && buttonBack.Button.interactable && buttonBack.gameObject.activeInHierarchy)
         {
             OnBackClicked();

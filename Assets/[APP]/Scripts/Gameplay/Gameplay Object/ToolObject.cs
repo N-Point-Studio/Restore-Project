@@ -1,4 +1,6 @@
 using DG.Tweening;
+using Modules;
+using Modules.SoundSystems;
 using UnityEngine;
 
 public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
@@ -10,13 +12,25 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
     private bool isReturning;
     [SerializeField] private Texture2D brush;
     [SerializeField] private SurfaceDetectionType toolType;
-    [SerializeField] private AudioSource audioSource;
+
+    [Header("Animation Settings")]
+    [SerializeField] private float returnAnimDuration = 0.5f;
+    [SerializeField] private ParticleSystem vfx;
+
+    [Header("Audio Variations")]
+    [SerializeField] private AudioKey audioKey;
+    [SerializeField] private SoundType soundType;
+
+    private bool isMoving = false;
+    
+    private int currentAudioId = -1;
 
     private void Awake()
     {
         initialPosition = transform.position;
         initialRotation = transform.rotation;
         col = GetComponent<Collider>();
+        vfx.Stop();
     }
 
     public void OnInteractDetected() { }
@@ -36,19 +50,23 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
         returnSequence?.Kill();
         returnSequence = DOTween.Sequence();
 
-        returnSequence.Join(transform.DOMove(initialPosition, 0.5f).SetEase(Ease.OutBack));
-        returnSequence.Join(transform.DORotateQuaternion(initialRotation, 0.5f).SetEase(Ease.OutBack));
+        returnSequence.Join(transform.DOMove(initialPosition, returnAnimDuration).SetEase(Ease.OutBack));
+        returnSequence.Join(transform.DORotateQuaternion(initialRotation, returnAnimDuration).SetEase(Ease.OutBack));
         returnSequence.OnComplete(() => isReturning = false);
     }
 
     public void FollowMouse(Vector3 worldPos)
     {
         if (isReturning) return;
-        transform.position = worldPos;
+        transform.DOKill();
+        transform.DOMove(worldPos, 0.2f).SetEase(Ease.OutQuad);
     }
+    
     public void StickToSurface(Vector3 position, Quaternion rotation)
     {
-        transform.SetPositionAndRotation(position, rotation);
+        transform.DOKill();
+        transform.DOMove(position, 0.3f).SetEase(Ease.OutQuad);
+        transform.DORotateQuaternion(rotation, 0.3f).SetEase(Ease.OutQuad);
     }
 
     public void OnPressEnded() { }
@@ -66,20 +84,53 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
 
     public void PlaySfx(bool isPlaying)
     {
-        if (isPlaying && audioSource.isPlaying) return;
-
-        if (isPlaying)
+        if (soundType == SoundType.Once)
         {
-            audioSource.Play();
+            if (isPlaying)
+            {
+                SoundSystem.Instance.PlayAudio(audioKey, 1f, false, true, false);
+                vfx.Play();
+            }
         }
-        else
+        else // Mode Continuous / Looping
         {
-            audioSource.Stop();
+            if (isPlaying)
+            {
+                bool isAlreadyPlaying = false;
+                if (currentAudioId != -1)
+                {
+                    Audio activeAudio = SoundSystem.Instance.GetAudio(currentAudioId);
+                    if (activeAudio != null && activeAudio.IsPlaying)
+                    {
+                        isAlreadyPlaying = true;
+                    }
+                }
+
+                if (!isAlreadyPlaying)
+                {
+                    currentAudioId = SoundSystem.Instance.PlayAudio(audioKey, 1f, true, true, false);
+                }
+                
+                vfx.Play();
+            }
+            else
+            {
+                if (currentAudioId != -1)
+                {
+                    SoundSystem.Instance.StopAudio(currentAudioId);
+                    currentAudioId = -1;
+                }
+                
+                vfx.Stop();
+            }
         }
     }
 
-    public void PlayVfx(bool isPlaying)
+    public void PlayVfx(bool isPlaying) { }
+
+    public void Moving(bool isMoving)
     {
+        this.isMoving = isMoving;
     }
 
     public SurfaceDetectionType ToolType => toolType;

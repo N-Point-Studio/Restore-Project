@@ -7,11 +7,6 @@ using System;
 public class Inspection : MonoBehaviour
 {
     public float rotateSpeed = 1f;
-    public float zoomSpeed = 0.02f;
-    public float smoothTime = 0.1f;
-
-    [Header("Zoom Limits")]
-    public float minDistance = 2f;
 
     private float _initialDistance;
 
@@ -25,15 +20,19 @@ public class Inspection : MonoBehaviour
     public Transform assemblyRoot;
     private bool isContain = false;
     private bool isGameFinished = false;
-
-    private TutorialService tutorialService;
-
     private bool isAssembling = false;
 
+    private TutorialService tutorialService;
+    private GameConfigData config;
+    private GameplayManager gameplayManager;
+
+
     [Inject]
-    public void Construct(TutorialService tutorialService)
+    public void Construct(TutorialService tutorialService, GameConfigData config, GameplayManager gameplayManager)
     {
         this.tutorialService = tutorialService;
+        this.config = config;
+        this.gameplayManager = gameplayManager;
     }
 
     void Start()
@@ -81,7 +80,7 @@ public class Inspection : MonoBehaviour
             transform.position,
             _targetPosition,
             ref _zoomVelocity,
-            smoothTime
+            config.inspectionSmoothTime
         );
     }
 
@@ -111,8 +110,11 @@ public class Inspection : MonoBehaviour
         // Rotate vertical (up down)
         transform.Rotate(cameraRight, rotateX, Space.World);
 
-        tutorialService.CompleteTutorial(TutorialIDs.ROTATE_INSPECT, 0, 2);
-        tutorialService.StartTutorial(TutorialIDs.BRUSH_DUST, 0, 3);
+        //rotate tutorial
+        if (!tutorialService.IsProcessing && tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 2)
+        {
+            tutorialService.CompleteAndAdvance();
+        }
     }
 
     public void OnZoomPerformed(float zoomDelta)
@@ -127,13 +129,15 @@ public class Inspection : MonoBehaviour
             _targetPosition
         );
 
-        float targetDistance = currentDistance + (zoomDelta * zoomSpeed);
-        targetDistance = Mathf.Clamp(targetDistance, minDistance, _initialDistance);
+        float targetDistance = currentDistance + (zoomDelta * config.inspectionZoomSpeed);
+        targetDistance = Mathf.Clamp(targetDistance, config.inspectionMinDistance, _initialDistance);
         _targetPosition = _mainCamera.transform.position + direction * targetDistance;
 
-        // Complete zoom tutorial
-        tutorialService.CompleteTutorial(TutorialIDs.ZOOM_INSPECT, 0, 1);
-        tutorialService.StartTutorial(TutorialIDs.ROTATE_INSPECT, 0, 2);
+        //zoom tutorial
+        if (!tutorialService.IsProcessing && tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 1)
+        {
+            tutorialService.CompleteAndAdvance();
+        }
     }
 
     public void ResetPosition()
@@ -148,8 +152,8 @@ public class Inspection : MonoBehaviour
         isGameFinished = true;
 
         transform.DOKill();
-        transform.DOMove(InitialInspectPosition, 1f).SetEase(Ease.OutBack);
-        transform.DORotateQuaternion(InitialInspectRotation, 1f).SetEase(Ease.OutBack);
+        transform.DOMove(InitialInspectPosition, config.inspectionResetDuration).SetEase(Ease.OutBack);
+        transform.DORotateQuaternion(Quaternion.Euler(gameplayManager.finalRotation), config.inspectionResetDuration).SetEase(Ease.OutBack);
 
         _targetPosition = InitialInspectPosition;
         _zoomVelocity = Vector3.zero;

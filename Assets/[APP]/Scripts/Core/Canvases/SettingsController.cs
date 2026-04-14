@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
@@ -12,6 +13,7 @@ public class SettingsController : BaseMenuController
 
     private ActiveSettingsData activeSettingsData;
     private ProjectSavingSystem projectSavingSystem;
+    public event Action OnSettingsClosed;    
     
     [Inject]
     public void Construct(
@@ -74,6 +76,8 @@ public class SettingsController : BaseMenuController
             projectSavingSystem.SaveAll();
         }
         SetActive(false);
+
+        OnSettingsClosed?.Invoke();
     }
 
     private void OnMasterSliderValue(float value)

@@ -1,8 +1,6 @@
 using DG.Tweening;
 using System;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using MoreMountains.Feedbacks;
 
 public enum JournalState { Hidden, Peeking, Opened }
@@ -15,6 +13,7 @@ public class JournalController : MonoBehaviour
 
     [Header("Feel Feedbacks (Gerakan Utama)")]
     [SerializeField] private MMF_Player feedbackOpen; 
+    [SerializeField] private MMF_Player feedbackOpenFromHidden;
     [SerializeField] private MMF_Player feedbackPeek;
     [SerializeField] private MMF_Player feedbackHide;
 
@@ -23,6 +22,7 @@ public class JournalController : MonoBehaviour
     [SerializeField] private Vector2 posHidden;
     [SerializeField] private Vector2 posPeek;
     [SerializeField] private Vector2 posPeekHovered;
+    [SerializeField] private float hoverAnimDuration = 0.15f;
 
     [Header("Page Containers")]
     [SerializeField] private Transform leftPageContainer;
@@ -33,6 +33,7 @@ public class JournalController : MonoBehaviour
     [SerializeField] private BookPanelInteractable bookInteractable;
 
     public JournalState CurrentState { get; private set; } = JournalState.Hidden;
+    public bool IsAnimating { get; private set; } = false;
     private ArtefactData currentData;
     private Action currentActionCallback;
     private bool isPostRestoration;
@@ -117,6 +118,7 @@ public class JournalController : MonoBehaviour
     public void SetBookHiddenInstant()
     {
         CurrentState = JournalState.Hidden;
+        IsAnimating = false;
         isContentRevealed = false;
 
         if (feedbackOpen != null) feedbackOpen.StopFeedbacks();
@@ -162,8 +164,11 @@ public class JournalController : MonoBehaviour
 
     public void OpenBookFull()
     {
+        JournalState prevState = CurrentState;
+
         CurrentState = JournalState.Opened;
         buttonAction.gameObject.SetActive(false);
+        IsAnimating = true;
         ShowOverlay();
 
         OnBookOpened?.Invoke();
@@ -178,21 +183,37 @@ public class JournalController : MonoBehaviour
             if (activeRightPage != null) activeRightPage.ShowInstant();
         }
 
-        if (feedbackOpen != null) feedbackOpen.PlayFeedbacks();
+        if (prevState == JournalState.Hidden && feedbackOpenFromHidden != null)
+        {
+            feedbackOpenFromHidden.PlayFeedbacks();
+        }
+        else if (feedbackOpen != null)
+        {
+            feedbackOpen.PlayFeedbacks();
+        }
 
         if (!isContentRevealed)
         {
             if (!isPostRestoration && activeLeftPage != null)
             {
-                activeLeftPage.PlayRevealAnimation(() => buttonAction.gameObject.SetActive(true));
+                activeLeftPage.PlayRevealAnimation(() => 
+                {
+                    buttonAction.gameObject.SetActive(true);
+                    IsAnimating = false;
+                });
             }
             else if (isPostRestoration && activeRightPage != null)
             {
-                activeRightPage.PlayRevealAnimation(() => buttonAction.gameObject.SetActive(true));
+                activeRightPage.PlayRevealAnimation(() => 
+                {
+                    buttonAction.gameObject.SetActive(true);
+                    IsAnimating = false;
+                });
             }
             else
             {
                 buttonAction.gameObject.SetActive(true);
+                IsAnimating = false;
             }
             
             isContentRevealed = true;
@@ -200,12 +221,14 @@ public class JournalController : MonoBehaviour
         else
         {
             buttonAction.gameObject.SetActive(true);
+            IsAnimating = false;
         }
     }
 
     public void HideBookToPeek()
     {
         CurrentState = JournalState.Peeking;
+        IsAnimating = false;
         HideOverlay();
         buttonAction.gameObject.SetActive(false);
         
@@ -215,6 +238,7 @@ public class JournalController : MonoBehaviour
     public void HideBookCompletely()
     {
         CurrentState = JournalState.Hidden;
+        IsAnimating = false;
         HideOverlay();
         
         if (feedbackHide != null) feedbackHide.PlayFeedbacks();
@@ -223,7 +247,7 @@ public class JournalController : MonoBehaviour
     private void AnimateHoverPeek(bool isHovering)
     {
         Vector2 targetPos = isHovering ? posPeekHovered : posPeek;
-        if (bookRect != null) bookRect.DOAnchorPos(targetPos, 0.15f).SetEase(Ease.OutQuad);
+        if (bookRect != null) bookRect.DOAnchorPos(targetPos, hoverAnimDuration).SetEase(Ease.OutQuad);
     }
 
     private void OpenBookFromPeek()

@@ -1,41 +1,78 @@
-using System.Collections.Generic; // Tambahkan ini untuk HashSet
+using System.Collections;
 using VContainer;
 using NINESOFT.TUTORIAL_SYSTEM;
-using Modules;
+using UnityEngine;
 
 public class TutorialService
 {
-    private readonly PlayerProgressionData progressionData;
-    
-    private readonly HashSet<int> startedTutorials = new HashSet<int>(); 
+    private int currentStage = 0;
+    private int currentModule = 0;
+    private bool isTutorialActive = false;
+    private bool isProcessing = false;
+
+    public bool IsProcessing => isProcessing;
+    public int CurrentStage => currentStage;
+    public int CurrentModule => currentModule;
 
     [Inject]
-    public TutorialService(PlayerProgressionData progressionData)
+    public TutorialService() { }
+
+    public void StartTutorial(int sIndex, int mIndex, float initialDelay = 0.5f)
     {
-        this.progressionData = progressionData;
+        if (isProcessing) return;
+
+        TutorialManager.Instance.StartCoroutine(StartTutorialRoutine(sIndex, mIndex, initialDelay));
     }
 
-    public void CompleteTutorial(int tutorialId, int stageIndex, int moduleIndex)
+    private IEnumerator StartTutorialRoutine(int sIndex, int mIndex, float delay)
     {
-        if (!progressionData.HasTutorialShown(tutorialId))
+        isProcessing = true;
+        isTutorialActive = false;
+
+        currentStage = sIndex;
+        currentModule = mIndex;
+
+        bool success = TutorialManager.Instance.StageStarted(sIndex, mIndex);
+
+        if (success)
         {
-            AppLogger.Log($"[TutorialService] Completing Tutorial ID: {tutorialId}");
-            TutorialManager.Instance.StageCompleted(stageIndex, moduleIndex);
-            
-            progressionData.MarkTutorialShown(tutorialId);
-            
-            startedTutorials.Remove(tutorialId); 
+            yield return new WaitForSeconds(delay);
+
+            isTutorialActive = true;
+            isProcessing = false;
+        }
+        else
+        {
+            isProcessing = false;
         }
     }
 
-    public void StartTutorial(int tutorialId, int stageIndex, int moduleIndex)
+    public void CompleteAndAdvance(float transitionDelay = 0.5f)
     {
-        if (!progressionData.HasTutorialShown(tutorialId) && !startedTutorials.Contains(tutorialId))
-        {
-            AppLogger.Log($"[TutorialService] Starting Tutorial ID: {tutorialId}");
-            TutorialManager.Instance.StageStarted(stageIndex, moduleIndex);
-            
-            startedTutorials.Add(tutorialId);
-        }
+        if (!isTutorialActive || isProcessing) return;
+
+        TutorialManager.Instance.StartCoroutine(CompleteRoutine(transitionDelay));
+    }
+
+    private IEnumerator CompleteRoutine(float delay)
+    {
+        isProcessing = true;
+        isTutorialActive = false;
+        TutorialManager.Instance.StageCompleted(currentStage, currentModule);
+
+        yield return new WaitForSeconds(delay);
+
+        currentModule++;
+
+        isProcessing = false;
+
+        StartTutorial(currentStage, currentModule);
+    }
+
+    public void CompleteStage()
+    {
+        TutorialManager.Instance.StageCompleted(currentStage, currentModule);
+        currentStage++;
+        currentModule = 0;
     }
 }

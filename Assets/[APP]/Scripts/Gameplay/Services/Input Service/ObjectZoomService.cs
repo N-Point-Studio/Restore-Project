@@ -5,12 +5,13 @@ using VContainer.Unity;
 public class ObjectZoomService : IInitializable, IDisposable
 {
     private readonly InputSystemService inputSystemService;
-    private const float ScrollSensitivity = 10f;
+    private readonly GameConfigData config;
 
     [Inject]
-    public ObjectZoomService(InputSystemService inputSystemService)
+    public ObjectZoomService(InputSystemService inputSystemService, GameConfigData config)
     {
         this.inputSystemService = inputSystemService;
+        this.config = config;
     }
 
     public void Initialize()
@@ -26,7 +27,7 @@ public class ObjectZoomService : IInitializable, IDisposable
 
     private void HandleScrollPerformed(float value)
     {
-        float zoomDelta = value * ScrollSensitivity;
+        float zoomDelta = value * config.scrollSensitivity;
         InteractionEvents.OnZoomPerformed(zoomDelta);
     }
 }

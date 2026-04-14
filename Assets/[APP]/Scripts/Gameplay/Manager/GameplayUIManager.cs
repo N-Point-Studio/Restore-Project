@@ -19,14 +19,19 @@ public class GameplayUIManager : MonoBehaviour
     [SerializeField] private PopUpConfirmationController quitConfirmationController;
 
     [Header("Settings")]
-    [SerializeField] private float wrapUpThreshold;
+    [SerializeField] private float wrapUpThreshold = 95f;
+    [SerializeField] private float delayUntilAutoWrappedUp = 1.5f;
 
     private CleaningService cleaningService;
     private FragmentService fragmentService;
     private InputSystemService input;
     private TutorialService tutorialService;
+    private GameplayManager gameplayManager;
 
     private bool canWrapUp;
+    private bool isAutoWrapUpTriggered = false;
+    private bool isTutorialTriggered = false;
+    private bool isGamePaused = false;
 
     public static event Action OnGameWrapped;
     public static event Action<bool> OnGameFinished;
@@ -37,18 +42,21 @@ public class GameplayUIManager : MonoBehaviour
         FragmentService fragmentService,
         InputSystemService input,
         TutorialService tutorialService,
-        IObjectResolver container)
+        IObjectResolver container,
+        GameplayManager gameplayManager)
     {
         this.cleaningService = cleaningService;
         this.fragmentService = fragmentService;
         this.input = input;
         this.tutorialService = tutorialService;
+        this.gameplayManager = gameplayManager;
 
         fragmentService.OnProgressUpdate += HandleProgressUpdate;
         cleaningService.OnHardCleaningUpdate += HandleHardCleaningUpdate;
         cleaningService.OnSurfaceCleaningUpdate += HandleSurfaceCleaningUpdate;
 
         this.input.OnPlayerKeycodeEscapePerformed += OnPlayerKeycodeEscapePerformed;
+        this.input.OnUIKeycodeEscapePerformed += OnUIKeycodeEscapePerformed;
 
         container.Inject(settingsController);
         container.Inject(endgameController);
@@ -67,6 +75,8 @@ public class GameplayUIManager : MonoBehaviour
         quitConfirmationController.OnConfirm += OnConfirmQuit;
         quitConfirmationController.OnCancel += OnCancelQuit;
 
+        settingsController.OnSettingsClosed += OnSettingsClosed;
+
         mainUIController.SetActive(true);
     }
 
@@ -76,7 +86,10 @@ public class GameplayUIManager : MonoBehaviour
 
         yield return null;
 
-        tutorialService.StartTutorial(TutorialIDs.DRAG_TO_INSPECT, 0, 0);
+        if (gameplayManager.isTutorialAvailable)
+        {
+            tutorialService.StartTutorial(0, 0);
+        }
         HandleAssembleAvailability();
     }
 
@@ -87,6 +100,7 @@ public class GameplayUIManager : MonoBehaviour
         cleaningService.OnSurfaceCleaningUpdate -= HandleSurfaceCleaningUpdate;
 
         input.OnPlayerKeycodeEscapePerformed -= OnPlayerKeycodeEscapePerformed;
+        input.OnUIKeycodeEscapePerformed -= OnUIKeycodeEscapePerformed;
 
         mainUIController.OnWrapUp -= OnWrapUp;
         endgameController.OnFinishedGame -= OnFinishedGame;
@@ -98,6 +112,7 @@ public class GameplayUIManager : MonoBehaviour
         quitConfirmationController.OnConfirm -= OnConfirmQuit;
         quitConfirmationController.OnCancel -= OnCancelQuit;
 
+        settingsController.OnSettingsClosed -= OnSettingsClosed;
     }
 
     private void UpdateProgress(ProgressType type, float value)
@@ -106,6 +121,8 @@ public class GameplayUIManager : MonoBehaviour
         {
             if (progressBars[i].ProgressType == type)
             {
+                if (!progressBars[i].gameObject.activeSelf) continue;
+
                 progressBars[i].SetValue(value);
                 CheckOverallProgress();
                 break;
@@ -143,13 +160,36 @@ public class GameplayUIManager : MonoBehaviour
         float overall = total / count;
 
         canWrapUp = overall >= wrapUpThreshold;
+        bool isFullyCompleted = overall >= 99f;
 
-        mainUIController.EnableWrapUp(canWrapUp);
-        mainUIController.ShowButtonWrap(canWrapUp);
+        bool showButton = canWrapUp && !isFullyCompleted && !isAutoWrapUpTriggered;
+        mainUIController.EnableWrapUp(showButton);
+        mainUIController.ShowButtonWrap(showButton);
 
-        if (canWrapUp)
+        // 2. TRIGGER TUTORIAL
+        if (canWrapUp && !isTutorialTriggered)
         {
-            tutorialService.StartTutorial(TutorialIDs.WRAP_UP_SHOW, 1, 0);
+            isTutorialTriggered = true;
+
+            if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 0)
+            {
+                tutorialService.StartTutorial(1, 0);
+            }
+        }
+
+        if (isFullyCompleted && !isAutoWrapUpTriggered)
+        {
+            isAutoWrapUpTriggered = true;
+            mainUIController.ShowButtonWrap(false);
+
+            DG.Tweening.DOVirtual.DelayedCall(delayUntilAutoWrappedUp, () =>
+            {
+                if (mainUIController != null && mainUIController.IsActive)
+                {
+                    AppLogger.Log("Manggil auto onwrap");
+                    OnWrapUp();
+                }
+            });
         }
     }
 
@@ -162,20 +202,27 @@ public class GameplayUIManager : MonoBehaviour
     private void HandleHardCleaningUpdate(float progress)
     {
         UpdateProgress(ProgressType.Mud, progress);
-        tutorialService.CompleteTutorial(TutorialIDs.CHISEL_MUD, 0, 4);
+
+        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 4)
+        {
+            tutorialService.CompleteStage();
+        }
     }
 
     private void HandleSurfaceCleaningUpdate(float progress)
     {
         UpdateProgress(ProgressType.Dust, progress);
-        tutorialService.CompleteTutorial(TutorialIDs.BRUSH_DUST, 0, 3);
-        tutorialService.StartTutorial(TutorialIDs.CHISEL_MUD, 0, 4);
+        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 3)
+        {
+            tutorialService.CompleteAndAdvance();
+        }
     }
 
     private void OnPlayerKeycodeEscapePerformed()
     {
-        if (!pauseController.IsActive)
+        if (!isGamePaused)
         {
+            isGamePaused = true;
             Time.timeScale = 0f;
             pauseController.SetActive(true);
 
@@ -186,9 +233,25 @@ public class GameplayUIManager : MonoBehaviour
         }
     }
 
+    private void OnUIKeycodeEscapePerformed()
+    {
+        if (isGamePaused && pauseController.IsActive)
+        {
+            OnResume();
+        }
+    }
+
     private void OnWrapUp()
     {
+        if (endgameController.IsActive) return;
+
         AppLogger.Log("Wrap up!");
+
+        if (cleaningService != null)
+        {
+            cleaningService.ForceCleanAll();
+        }
+
         toolCamera.gameObject.SetActive(false);
         mainUIController.SetActive(false);
         endgameController.SetActive(true);
@@ -199,8 +262,12 @@ public class GameplayUIManager : MonoBehaviour
         }
 
         OnGameWrapped?.Invoke();
+        AudioEvents.TriggerPlayCustomSFX(Modules.SoundSystems.AudioKey.SFX_Finish);
 
-        tutorialService.CompleteTutorial(TutorialIDs.WRAP_UP_CLICK, 1, 0);
+        if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 0)
+        {
+            tutorialService.CompleteStage();
+        }
     }
 
     private void OnFinishedGame()
@@ -210,22 +277,17 @@ public class GameplayUIManager : MonoBehaviour
 
     private void OnResume()
     {
+        isGamePaused = false;
         Time.timeScale = 1f;
         pauseController.SetActive(false);
 
         if (endgameController.IsActive)
         {
-            if (input != null)
-            {
-                input.ChangeInputState(InputStateType.UI);
-            }
+            if (input != null) input.ChangeInputState(InputStateType.UI);
         }
         else
         {
-            if (input != null)
-            {
-                input.ChangeInputState(InputStateType.Player);
-            }
+            if (input != null) input.ChangeInputState(InputStateType.Player);
         }
     }
 
@@ -234,6 +296,7 @@ public class GameplayUIManager : MonoBehaviour
         if (settingsController.IsActive)
             return;
 
+        pauseController.SetActive(false);
         settingsController.SetActive(true);
     }
 
@@ -241,6 +304,8 @@ public class GameplayUIManager : MonoBehaviour
     {
         if (quitConfirmationController.IsActive)
             return;
+
+        pauseController.SetActive(false);
 
         quitConfirmationController.SetActive(true);
     }
@@ -262,5 +327,18 @@ public class GameplayUIManager : MonoBehaviour
     private void OnCancelQuit()
     {
         quitConfirmationController.SetActive(false);
+
+        if (isGamePaused)
+        {
+            pauseController.SetActive(true);
+        }
+    }
+
+    private void OnSettingsClosed()
+    {
+        if (isGamePaused)
+        {
+            pauseController.SetActive(true);
+        }
     }
 }

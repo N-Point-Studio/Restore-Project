@@ -21,6 +21,12 @@ MonoBehaviour:
     - key: BGM_Game
       value: {fileID: 8300000, guid: 0446a975454d54fd1ae754cc3670c912, type: 3}
       type: 0
+    - key: BGM_Game_China
+      value: {fileID: 8300000, guid: 4ae516bc17e6fb848aba05cb6cbc26d8, type: 3}
+      type: 0
+    - key: BGM_Game_Indonesia
+      value: {fileID: 8300000, guid: a58902027e0292448b4e4ac2f9526dca, type: 3}
+      type: 0
   - id: sfx
     items:
     - key: SFX_Assemble
@@ -40,10 +46,16 @@ MonoBehaviour:
       type: 1
   - id: ui
     items:
-    - key: UI_Button_Click
+    - key: UI_Click
       value: {fileID: 8300000, guid: adcf3b2b5883d0e40a342c48e94f8b6b, type: 3}
       type: 2
-    - key: UI_Change_Page
+    - key: UI_Hover
+      value: {fileID: 8300000, guid: adcf3b2b5883d0e40a342c48e94f8b6b, type: 3}
+      type: 2
+    - key: UI_Cancel
+      value: {fileID: 8300000, guid: adcf3b2b5883d0e40a342c48e94f8b6b, type: 3}
+      type: 2
+    - key: UI_Hover_Paper
       value: {fileID: 8300000, guid: 53c0e558172e2b340af5835d9c12a7ad, type: 3}
       type: 2
   randomizePitchForDuplicates: 1

@@ -31,7 +31,11 @@ public class ProjectLoadingView : MonoBehaviour
         LoadingEvents.OnLoadingStarted?.Invoke();
     }
 
-    public void HideLoading() => loadingPanel.SetActive(false);
+    public void HideLoading()
+    {
+        loadingPanel.SetActive(false);
+        LoadingEvents.OnLoadingFinished?.Invoke();
+    }
 
     private IEnumerator AnimateLoadingText()
     {

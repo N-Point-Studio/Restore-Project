@@ -12,7 +12,7 @@ public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IArtefactPart
     public override void Enter()
     {
         stateMachine.state = ArtefactPieceState.Assembled;
-        stateMachine.transform.DOPunchRotation(new Vector3(5, 5, 0), 0.4f);
+        stateMachine.transform.DOPunchRotation(stateMachine.punchRotation, stateMachine.punchDuration);
         AudioEvents.TriggerPlayAssembleSFX();
         AssembleEvents.OnAssembleFinished?.Invoke();
     }

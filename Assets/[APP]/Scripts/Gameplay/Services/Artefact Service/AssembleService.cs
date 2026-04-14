@@ -10,16 +10,19 @@ public class AssemblyService : IInitializable, IDisposable
     private readonly Inspection inspectPoint;
     private readonly FragmentService fragmentService;
     private readonly TutorialService tutorialService;
+    private readonly GameConfigData config;
+    private readonly GameplayManager gameplayManager;
 
     private readonly List<IArtefactPart> currentAssembleList = new();
-    private float socketSnapDistance = 1f;
 
     [Inject]
-    public AssemblyService(Inspection inspectPoint, FragmentService fragmentService, TutorialService tutorialService)
+    public AssemblyService(Inspection inspectPoint, FragmentService fragmentService, TutorialService tutorialService, GameConfigData config, GameplayManager gameplayManager)
     {
         this.inspectPoint = inspectPoint;
         this.fragmentService = fragmentService;
         this.tutorialService = tutorialService;
+        this.gameplayManager = gameplayManager;
+        this.config = config;
     }
 
     public void Initialize()
@@ -44,11 +47,11 @@ public class AssemblyService : IInitializable, IDisposable
                 var renderer = partSocket.transform.GetComponent<Renderer>();
                 float distance = Vector3.Distance(worldPos, partSocket.transform.position);
 
-                if (distance <= socketSnapDistance)
+                if (distance <= config.socketSnapDistance)
                 {
                     checkPart.CorrectRotation(partSocket.transform.rotation);
                 }
-                renderer.enabled = distance <= socketSnapDistance;
+                renderer.enabled = distance <= config.socketSnapDistance;
                 return;
             }
         }
@@ -66,10 +69,12 @@ public class AssemblyService : IInitializable, IDisposable
             HideAllSockets();
             inspectPoint.SetInspectionUsage(true);
             fragmentService.ProgressUpdate();
-            // RecenterAssembly();
 
-            tutorialService.CompleteTutorial(TutorialIDs.DRAG_TO_INSPECT, 0, 0);
-            tutorialService.StartTutorial(TutorialIDs.ZOOM_INSPECT, 0, 1);
+            //start drag tutorial
+            if (gameplayManager.isTutorialAvailable)
+            {
+                tutorialService.CompleteAndAdvance();
+            }
 
             return true;
         }
@@ -153,7 +158,7 @@ public class AssemblyService : IInitializable, IDisposable
             Transform partTf = part.GetTransform();
             Vector3 targetPos = partTf.localPosition - offset;
 
-            partTf.DOLocalMove(targetPos, 0.5f)
+            partTf.DOLocalMove(targetPos, config.recenterAnimDuration)
                   .SetEase(Ease.OutCubic)
                   .SetLink(partTf.gameObject);
         }

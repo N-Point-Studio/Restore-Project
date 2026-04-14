@@ -10,6 +10,12 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
     public ArtefactPieceState state = ArtefactPieceState.None;
     public static event Action<ArtefactPieceStateMachine> OnCreated;
 
+    [Header("Animation Timings")]
+    public float moveDuration = 0.5f;
+    public float returnDuration = 0.5f;
+    public float punchDuration = 0.4f;
+    public Vector3 punchRotation = new Vector3(5, 5, 0);
+
     private void Awake()
     {
         col = GetComponent<Collider>();
@@ -69,7 +75,7 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
 
     public void CorrectRotation(Quaternion rotation)
     {
-        transform.DORotateQuaternion(rotation, 0.5f).SetEase(Ease.OutCubic);
+        transform.DORotateQuaternion(rotation, moveDuration).SetEase(Ease.OutCubic);
     }
 
     public bool IsCleanable()

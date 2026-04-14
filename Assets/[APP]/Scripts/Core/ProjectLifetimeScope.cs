@@ -5,21 +5,19 @@ using Modules.SoundSystems;
 
 public class ProjectLifetimeScope : LifetimeScope
 {
-    // Core systems
     [SerializeField] private SoundSystem soundSystem;
     [SerializeField] protected GameObject loadingPrefab;
-
-    [Header("Settings")]
     [SerializeField] private ProjectSettingsData defaultSettingsData;
-
-    // Databases
     [SerializeField] private ArtefactDatabase artefactDatabase;
+    [SerializeField] private GameConfigData gameConfigData;
 
     protected override void Configure(IContainerBuilder builder)
     {
         // Core systems
         SoundSystem soundSystemInstance = Instantiate(soundSystem, transform);
         builder.RegisterComponent(soundSystemInstance).AsSelf();
+        
+        builder.RegisterInstance(gameConfigData);
 
         // Active Container (runtime state - all Singleton)
         builder.Register<PlayerProgressionData>(Lifetime.Singleton).AsSelf();

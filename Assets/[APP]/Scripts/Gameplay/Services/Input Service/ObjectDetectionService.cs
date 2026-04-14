@@ -70,7 +70,7 @@ public class ObjectDetectionService : IInitializable, IDisposable
 
     public Vector3 ScreenToWorld(Vector2 screenPos, IInteractObject target)
     {
-        if (target is Component targetComp)
+        if (target is Component targetComp && targetComp != null && !targetComp.Equals(null))
         {
             Camera cam = Camera.main;
             float zDistance = cam.WorldToScreenPoint(targetComp.transform.position).z;

@@ -17,6 +17,7 @@ public static class MainMenuEvents
     public static event Action OnCameraToLevelSelection;
     public static event Action<Transform> OnCameraFocusToArtefact;
     public static event Action OnCameraMoveFinished;
+    public static event Action<bool> OnShowBackground;
 
     public static void TriggerOpenArtefactDetail(ArtefactData data) => OnOpenArtefactDetail?.Invoke(data);
     public static void TriggerArtefactPlay(ArtefactData artefactData) => OnArtefactPlay?.Invoke(artefactData);
@@ -30,7 +31,8 @@ public static class MainMenuEvents
     public static void TriggerCameraToLevelSelection() => OnCameraToLevelSelection?.Invoke();
     public static void TriggerCameraFocusToArtefact(Transform targetTransform) => OnCameraFocusToArtefact?.Invoke(targetTransform);
     public static void TriggerCameraMoveFinished() => OnCameraMoveFinished?.Invoke();
-
+    public static void TriggerShowBackground(bool show) => OnShowBackground?.Invoke(show);
+    
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
@@ -46,5 +48,6 @@ public static class MainMenuEvents
         OnCameraToMainMenu = null;
         OnCameraToLevelSelection = null;
         OnCameraFocusToArtefact = null;
+        OnShowBackground = null;
     }
 }

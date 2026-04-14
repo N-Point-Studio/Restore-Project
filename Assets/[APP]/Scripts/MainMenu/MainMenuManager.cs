@@ -50,6 +50,8 @@ public class MainMenuManager : MonoBehaviour
 
     private void Awake()
     {
+        Time.timeScale = 1f;
+        
         MainMenuEvents.OnNewGame += OnRequestNewGameGame;
         MainMenuEvents.OnContinueGame += OnRequestContinueGame;
         MainMenuEvents.OnCloseLevelSelection += OnRequestCloseLevelSelection;
@@ -57,14 +59,19 @@ public class MainMenuManager : MonoBehaviour
         MainMenuEvents.OnCloseArtefactDetail += OnRequestCloseArtefactDetail;
         MainMenuEvents.OnOpenSettings += OnRequestOpenSettings;
         MainMenuEvents.OnRequestQuit += OnRequestQuit;
+        MainMenuEvents.OnShowBackground += OnRequestShowBackground;
+
         popUpConfirmationController.OnConfirm += OnConfirmNewGame;
         popUpConfirmationController.OnCancel += OnCancelNewGame;
+        
+        settingsController.OnSettingsClosed += OnSettingsClosed; 
+        quitController.OnQuitCancelled += OnQuitCancelled;
+
+        LoadingEvents.OnLoadingFinished += HandleLoadingFinished;
     }
 
     private void Start()
     {
-        AudioEvents.TriggerPlayBGMMainMenu();
-
         bool hasPendingAnimations = 
             activeArtefactData.GetPendingCompletionAnimations().Count > 0 || 
             activeArtefactData.GetPendingUnlockAnimations().Count > 0;
@@ -99,8 +106,15 @@ public class MainMenuManager : MonoBehaviour
         MainMenuEvents.OnCloseArtefactDetail -= OnRequestCloseArtefactDetail;
         MainMenuEvents.OnOpenSettings -= OnRequestOpenSettings;
         MainMenuEvents.OnRequestQuit -= OnRequestQuit;
+        MainMenuEvents.OnShowBackground -= OnRequestShowBackground;
+
         popUpConfirmationController.OnConfirm -= OnConfirmNewGame;
         popUpConfirmationController.OnCancel -= OnCancelNewGame;
+        
+        settingsController.OnSettingsClosed -= OnSettingsClosed; 
+        quitController.OnQuitCancelled -= OnQuitCancelled;
+
+        LoadingEvents.OnLoadingFinished -= HandleLoadingFinished;
     }
 
     private void OnRequestNewGameGame()
@@ -109,6 +123,7 @@ public class MainMenuManager : MonoBehaviour
 
         if (isReturningPlayer)
         {
+            menuController.SetActive(false);
             popUpConfirmationController.SetActive(true);
         }
         else
@@ -161,12 +176,19 @@ public class MainMenuManager : MonoBehaviour
 
     private void OnRequestOpenSettings()
     {
+        menuController.SetActive(false);
         settingsController.SetActive(true);
     }
 
     private void OnRequestQuit()
     {
+        menuController.SetActive(false);
         quitController.SetActive(true);
+    }
+
+    private void OnRequestShowBackground(bool show)
+    {
+        backgroundController.SetActive(show);
     }
 
     private void OnConfirmNewGame()
@@ -186,5 +208,21 @@ public class MainMenuManager : MonoBehaviour
     private void OnCancelNewGame()
     {
         popUpConfirmationController.SetActive(false);
+        menuController.SetActive(true);
+    }
+
+    private void OnSettingsClosed()
+    {
+        menuController.SetActive(true);
+    }
+
+    private void OnQuitCancelled()
+    {
+        menuController.SetActive(true);
+    }
+
+    private void HandleLoadingFinished()
+    {
+        AudioEvents.TriggerPlayBGMMainMenu();
     }
 }

@@ -11,9 +11,8 @@ public static class AudioEvents
     public static event Action OnPlayBGMMainMenu;
     public static event Action<AudioKey> OnPlayBGMGameplay;
     public static event Action<AudioKey> OnPlayCustomSFX;
-    public static Action OnPlayBrushSFX;
-    public static Action OnPlayChiselSFX;
-    public static Action OnPlayAssembleSFX;
+    public static event Action OnPlayAssembleSFX;
+    public static event Action OnStopBGM;
 
     public static void TriggerPlayButtonSFX(bool isConfirm) => OnPlayButtonSFX?.Invoke(isConfirm);
     public static void TriggerPlayToggleSFX() => OnPlayToggleSFX?.Invoke();
@@ -22,21 +21,8 @@ public static class AudioEvents
     public static void TriggerPlayBGMMainMenu() => OnPlayBGMMainMenu?.Invoke();
     public static void TriggerPlayBGMGameplay(AudioKey audioKey) => OnPlayBGMGameplay?.Invoke(audioKey);
     public static void TriggerPlayCustomSFX(AudioKey audioKey) => OnPlayCustomSFX?.Invoke(audioKey);
-
-    public static void TriggerPlayBrushSFX()
-    {
-        OnPlayBrushSFX?.Invoke();
-    }
-
-    public static void TriggerPlayChiselSFX()
-    {
-        OnPlayChiselSFX?.Invoke();
-    }
-
-    public static void TriggerPlayAssembleSFX()
-    {
-        OnPlayAssembleSFX?.Invoke();
-    }
+    public static void TriggerPlayAssembleSFX() => OnPlayAssembleSFX?.Invoke();
+    public static void TriggerStopBGM() => OnStopBGM?.Invoke();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
@@ -48,8 +34,7 @@ public static class AudioEvents
         OnPlayBGMMainMenu = null;
         OnPlayBGMGameplay = null;
         OnPlayCustomSFX = null;
-        OnPlayBrushSFX = null;
-        OnPlayChiselSFX = null;
         OnPlayAssembleSFX = null;
+        OnStopBGM = null;
     }
 }

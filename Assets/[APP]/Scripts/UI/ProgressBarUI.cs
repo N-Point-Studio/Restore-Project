@@ -13,6 +13,12 @@ public enum ProgressType
     Assemble
 }
 
+public enum SoundType
+{
+    Continuous,
+    Once
+}
+
 public class ProgressBarUI : MonoBehaviour
 {
     [SerializeField] private Image fill;
@@ -21,6 +27,8 @@ public class ProgressBarUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI progressTitle;
     [SerializeField] private int maximum = 100;
     [SerializeField] private AudioKey audioKey;
+    [SerializeField] private SoundType soundType;
+
     private int currentValue = 0;
     private int lastValue = -1;
 
@@ -63,6 +71,46 @@ public class ProgressBarUI : MonoBehaviour
 
         UpdateFill();
     }
+
+    public void SetValue1(float value01)
+    {
+        float previousValue01 = (float)currentValue / maximum;
+
+        if (value01 >= 0.99f) value01 = 1f;
+        else value01 = Mathf.Clamp01(value01);
+
+        currentValue = Mathf.RoundToInt(value01 * maximum);
+        // HandleAudioLogic(value01, previousValue01);
+
+        if (currentValue == 100 && lastValue != 100)
+        {
+            if (soundType == SoundType.Once)
+            {
+                AudioEvents.TriggerPlayCustomSFX(audioKey);
+            }
+            OnProgressBarCompleted?.Invoke();
+        }
+
+        lastValue = currentValue;
+        progressText.text = currentValue.ToString();
+        checkList.enabled = currentValue == 100;
+        progressText.enabled = currentValue != 100;
+
+        UpdateFill();
+    }
+
+    // private void HandleAudioLogic(float newValue, float oldValue)
+    // {
+    //     if (soundType != SoundType.Continuous) return;
+    //     if (newValue > oldValue && newValue < 1f)
+    //     {
+    //         AudioEvents.TriggerPlayContinuousSFX(audioKey, true);
+    //     }
+    //     else
+    //     {
+    //         AudioEvents.TriggerPlayContinuousSFX(audioKey, false);
+    //     }
+    // }
 
     public void UpdateFill()
     {

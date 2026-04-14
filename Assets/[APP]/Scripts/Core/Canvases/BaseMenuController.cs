@@ -41,8 +41,11 @@ public abstract class BaseMenuController : MonoBehaviour
     {
         if (root == null) return;
 
+        if (this.isActive == isActive) return;
+
         if (canvasGroup == null)
         {
+            this.isActive = isActive;
             root.SetActive(isActive);
             return;
         }

@@ -20,6 +20,10 @@ public class SceneLoader
         float startTime = Time.time;
 
         _loadingService.ShowLoading(message);
+        
+        AudioEvents.TriggerStopBGM();
+
+        await Task.Delay(1000);
 
         AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
         

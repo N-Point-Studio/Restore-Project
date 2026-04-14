@@ -8,16 +8,19 @@ using VContainer.Unity;
 public class ProjectAudioService : IInitializable, IStartable, IDisposable
 {
     private readonly SoundSystem soundSystem;
+    private readonly GameConfigData config;
 
     [Inject]
-    public ProjectAudioService(SoundSystem soundSystem)
+    public ProjectAudioService(SoundSystem soundSystem, GameConfigData config)
     {
         this.soundSystem = soundSystem;
+        this.config = config;
     }
 
     private AudioKey? lastPlayedSoundType;
     private float lastPlayedSoundTime;
-    private const float SOUND_COOLDOWN_DURATION = 0.1f; // 100ms cooldown
+    private float soundCooldownDuration = 0.1f;
+    private AudioKey currentBGM = AudioKey.None;
 
     void IInitializable.Initialize()
     {
@@ -27,10 +30,9 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         AudioEvents.OnPlaySliderSFX += HandleOnOnPlaySliderSFX;
         AudioEvents.OnPlayBGMGameplay += HandleOnPlayBGMGameplay;
         AudioEvents.OnPlayBGMMainMenu += HandleOnPlayBGMMainMenu;
-        AudioEvents.OnPlayBrushSFX += HandleOnPlayBrushSFX;
-        AudioEvents.OnPlayChiselSFX += HandleOnPlayChiselSFX;
         AudioEvents.OnPlayAssembleSFX += HandleOnPlayAssembleSFX;
         AudioEvents.OnPlayCustomSFX += HandleOnPlayCustomSFX;
+        AudioEvents.OnStopBGM += HandleOnStopBGM;
     }
 
     void IDisposable.Dispose()
@@ -42,9 +44,8 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         AudioEvents.OnPlayBGMGameplay -= HandleOnPlayBGMGameplay;
         AudioEvents.OnPlayBGMMainMenu -= HandleOnPlayBGMMainMenu;
         AudioEvents.OnPlayCustomSFX -= HandleOnPlayCustomSFX;
-        AudioEvents.OnPlayBrushSFX -= HandleOnPlayBrushSFX;
-        AudioEvents.OnPlayChiselSFX -= HandleOnPlayChiselSFX;
         AudioEvents.OnPlayAssembleSFX -= HandleOnPlayAssembleSFX;
+        AudioEvents.OnStopBGM -= HandleOnStopBGM;
     }
 
     void IStartable.Start()
@@ -53,18 +54,16 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
 
     public void PlaySFX(AudioKey audioType)
     {
-        if (audioType == AudioKey.UI_Button_Click)// || audioType == AudioKey.UI_Cancel || audioType == AudioKey.UI_Hover)
+        if (audioType == AudioKey.UI_Click || audioType == AudioKey.UI_Cancel || audioType == AudioKey.UI_Hover)
         {
             float currentTime = Time.unscaledTime;
 
-            // Check if the same sound type was played recently
             if (lastPlayedSoundType == audioType &&
-                currentTime - lastPlayedSoundTime < SOUND_COOLDOWN_DURATION)
+                currentTime - lastPlayedSoundTime < soundCooldownDuration)
             {
-                return; // Skip playing the sound to prevent stacking
+                return; 
             }
 
-            // Update tracking variables
             lastPlayedSoundType = audioType;
             lastPlayedSoundTime = currentTime;
         }
@@ -79,34 +78,21 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         }
     }
 
-    private void HandleOnUIComponentSelected()
-    {
-        PlaySFX(AudioKey.UI_Button_Click);
-        // PlaySFX(AudioKey.UI_Hover);
-    }
-
-    private void HandleOnOnPlayButtonSFX(bool isConfirm)
-    {
-        PlaySFX(isConfirm ? AudioKey.UI_Button_Click : AudioKey.UI_Button_Click);
-        // PlaySFX(isConfirm ? AudioKey.UI_Button_Click : AudioKey.UI_Button_Cancel);
-    }
-
-    private void HandleOnOnPlayToggleSFX()
-    {
-        PlaySFX(AudioKey.UI_Button_Click);
-    }
-
-    private void HandleOnOnPlaySliderSFX()
-    {
-        PlaySFX(AudioKey.UI_Button_Click);
-    }
-
+    private void HandleOnUIComponentSelected() => PlaySFX(AudioKey.UI_Hover);
+    private void HandleOnOnPlayButtonSFX(bool isConfirm) => PlaySFX(isConfirm ? AudioKey.UI_Click : AudioKey.UI_Cancel);
+    private void HandleOnOnPlayToggleSFX() => PlaySFX(AudioKey.UI_Click);
+    private void HandleOnOnPlaySliderSFX() => PlaySFX(AudioKey.UI_Click);
+    private void HandleOnPlayAssembleSFX() => PlaySFX(AudioKey.SFX_Assemble);
+    private void HandleOnPlayCustomSFX(AudioKey audioKey) => PlaySFX(audioKey);
     private void HandleOnPlayBGMGameplay(AudioKey bgmKey)
     {
         try
         {
+            AudioKey keyToPlay = bgmKey != AudioKey.None ? bgmKey : AudioKey.BGM_Game;
+            currentBGM = keyToPlay;
+
             if (soundSystem != null)
-                soundSystem.PlayAudio(AudioKey.BGM_Game, volume: 1f, loop: true, fadeInSeconds: 1f, fadeOutSeconds: 1f);
+                soundSystem.PlayAudio(keyToPlay, volume: 1f, loop: true, fadeInSeconds: config.bgmFadeDuration, fadeOutSeconds: config.bgmFadeDuration);
         }
         catch (Exception e)
         {
@@ -118,8 +104,10 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
     {
         try
         {
+            currentBGM = AudioKey.BGM_Home;
+
             if (soundSystem != null)
-                soundSystem.PlayAudio(AudioKey.BGM_Home, volume: 1f, loop: true, fadeInSeconds: 1f, fadeOutSeconds: 1f);
+                soundSystem.PlayAudio(AudioKey.BGM_Home, volume: 1f, loop: true, fadeInSeconds: config.bgmFadeDuration, fadeOutSeconds: config.bgmFadeDuration);
         }
         catch (Exception e)
         {
@@ -127,23 +115,19 @@ public class ProjectAudioService : IInitializable, IStartable, IDisposable
         }
     }
 
-    private void HandleOnPlayBrushSFX()
+    private void HandleOnStopBGM()
     {
-        PlaySFX(AudioKey.SFX_Brush);
-    }
-
-    private void HandleOnPlayChiselSFX()
-    {
-        PlaySFX(AudioKey.SFX_Chisel);
-    }
-
-    private void HandleOnPlayAssembleSFX()
-    {
-        PlaySFX(AudioKey.SFX_Assemble);
-    }
-
-    private void HandleOnPlayCustomSFX(AudioKey audioKey)
-    {
-        PlaySFX(audioKey);
+        try
+        {
+            if (soundSystem != null && currentBGM != AudioKey.None)
+            {
+                soundSystem.StopAudio(currentBGM); 
+                currentBGM = AudioKey.None;
+            }
+        }
+        catch (Exception e)
+        {
+            AppLogger.LogWarning($"[ProjectAudioService] Failed to stop BGM: {e.Message}");
+        }
     }
 }

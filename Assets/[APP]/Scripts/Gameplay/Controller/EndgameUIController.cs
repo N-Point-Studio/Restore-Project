@@ -1,19 +1,29 @@
 using System;
+using TMPro;
 using UnityEngine;
 using VContainer;
 
 public class EndgameUIController : BaseMenuController
 {
+    [SerializeField] private TMP_Text textArtefactName;
     [SerializeField] private ButtonInputInstructionUI buttonFinish;
 
-    private InputSystemService input;
+    private InputSystemService input;    
+    private PlayerProgressionData playerProgressionData;
+    private ActiveArtefactData activeArtefactData;
 
     public event Action OnFinishedGame;
 
     [Inject]
-    public void Construct(InputSystemService input)
+    public void Construct(
+        InputSystemService input, 
+        PlayerProgressionData playerProgressionData, 
+        ActiveArtefactData activeArtefactData)
     {
         this.input = input;
+        this.playerProgressionData = playerProgressionData;
+        this.activeArtefactData = activeArtefactData;
+        
         this.input.OnUIKeycodeEnterPerformed += OnUIKeycodeEnterPerformed;
     }
 
@@ -28,6 +38,41 @@ public class EndgameUIController : BaseMenuController
         base.OnDestroy();
         buttonFinish.OnClick -= OnFinishClick;        
         input.OnUIKeycodeEnterPerformed -= OnUIKeycodeEnterPerformed;
+    }
+
+    public override void SetActive(bool isActive)
+    {
+        base.SetActive(isActive);
+        
+        if (isActive)
+        {
+            RefreshArtefactName();
+        }
+    }
+
+    private void RefreshArtefactName()
+    {
+        if (playerProgressionData != null && activeArtefactData != null)
+        {
+            string targetId = playerProgressionData.CurrentActiveArtefactId;
+            
+            if (!string.IsNullOrEmpty(targetId))
+            {
+                ArtefactData data = activeArtefactData.GetArtefactDatabase().GetItem(targetId);
+                if (data != null)
+                {
+                    SetArtefactName(data.BaseData.ItemName);
+                }
+            }
+        }
+    }
+
+    public void SetArtefactName(string name)
+    {
+        if (textArtefactName != null)
+        {
+            textArtefactName.text = name;
+        }
     }
 
     private void OnFinishClick()
