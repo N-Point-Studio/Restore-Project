@@ -5,6 +5,7 @@ public class MousePainter : MonoBehaviour
 {
     public Camera cam;
     public Shader paintingShader;
+    public Texture2D brushTexture;
 
     private RenderTexture paintingMap;
     private Material paintingMaterial;
@@ -19,6 +20,7 @@ public class MousePainter : MonoBehaviour
 
         paintingMaterial = new Material(paintingShader);
         paintingMaterial.SetColor("_Color", Color.red);
+        paintingMaterial.SetTexture("_BrushTex", brushTexture);
 
         paintableMaterial = rend.material;
 
@@ -29,7 +31,7 @@ public class MousePainter : MonoBehaviour
         GL.Clear(true, true, Color.clear);
         RenderTexture.active = null;
 
-        paintableMaterial.SetTexture("_PaintMask", paintingMap);
+        paintableMaterial.SetTexture("_Mask", paintingMap);
     }
 
     private void Update()
@@ -50,6 +52,7 @@ public class MousePainter : MonoBehaviour
                 paintingMaterial.SetVector("_PaintPosition", uv);
 
                 RenderTexture temp = RenderTexture.GetTemporary(paintingMap.width, paintingMap.height);
+
 
                 Graphics.Blit(paintingMap, temp);
                 Graphics.Blit(temp, paintingMap, paintingMaterial);
