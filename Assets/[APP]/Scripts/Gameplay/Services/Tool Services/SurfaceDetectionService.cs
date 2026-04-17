@@ -40,6 +40,7 @@ public class SurfaceDetectionService
         if (hit.collider.TryGetComponent(out ICleanable cleanable))
         {
             hasHit = cleanable.IsCleanable();
+            Debug.Log($"Raycast hit: {cleanable}, IsCleanable: {hasHit}");
         }
         EssentialDetecting(hit);
 

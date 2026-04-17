@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 25292377}
   - component: {fileID: 25292376}
   - component: {fileID: 25292375}
+  - component: {fileID: 25292380}
   - component: {fileID: 25292379}
   m_Layer: 0
   m_Name: Sphere
@@ -185,7 +186,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e7c22a018d704439a8a22a7dad5d0a1e, type: 2}
+  - {fileID: 8817811986718002121, guid: 10f1060b18f7ba34f92053a256e89d10, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -226,7 +227,7 @@ Transform:
   m_GameObject: {fileID: 25292374}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.316, y: 1.09, z: -7.92}
+  m_LocalPosition: {x: 0, y: 1.09, z: -7.92}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -241,9 +242,38 @@ MonoBehaviour:
   m_GameObject: {fileID: 25292374}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6437cbfdc1bc44f09be2e894b10fac8, type: 3}
+  m_Script: {fileID: 11500000, guid: b8893d828409943e5a6ade1c8670ac35, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SimplePaintCBManager
+  m_EditorClassIdentifier: Assembly-CSharp::Tool
+  brushRadius: 0.1
+  brushHardness: 0.5
+--- !u!54 &25292380
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 25292374}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &476513738
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -626,7 +656,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1467474262
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1047,14 +1077,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1827324906}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0.38268343, y: 0, z: 0, w: 0.92387956}
   m_LocalPosition: {x: 0, y: 1.13, z: -6.41}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1467474265}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 45, y: 0, z: 0}
 --- !u!114 &1827324911
 MonoBehaviour:
   m_ObjectHideFlags: 0
