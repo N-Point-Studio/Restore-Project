@@ -49,24 +49,26 @@ public class MousePainter : MonoBehaviour
             {
                 if (hit.collider.gameObject != gameObject) return;
 
-                Debug.Log("Hit UV: " + hit.textureCoord); // Ini untuk debugging, kita akan pakai hit.point
-                // SET POSISI 3D DARI HIT POINT, BUKAN UV
+                // Set parameter jarak
                 paintingMaterial.SetVector("_PaintPosition", hit.point);
+
+                // --- INI YANG BARU ---
+                // Kirim arah sorotan kamera ke shader
+                paintingMaterial.SetVector("_PaintDirection", ray.direction);
+
                 paintingMaterial.SetFloat("_Radius", brushRadius);
                 paintingMaterial.SetFloat("_Hardness", brushHardness);
 
-                // Aktifkan RenderTexture
                 RenderTexture.active = paintingMap;
                 paintingMaterial.SetPass(0);
-
-                // --- INTI PERUBAHAN ---
-                // Gambar langsung MESH dari objek ini. Vertex shader akan memipihkannya 
-                // menjadi 2D di atas RenderTexture, namun Fragment shader tetap mengeksekusi radius 3D!
                 Graphics.DrawMeshNow(mesh, transform.localToWorldMatrix);
-
-                // Matikan aktif RenderTexture
                 RenderTexture.active = null;
             }
         }
+    }
+
+    private void OnGUI()
+    {
+        GUI.DrawTexture(new Rect(10, 10, 256, 256), paintingMap, ScaleMode.ScaleToFit, false, 1);
     }
 }
