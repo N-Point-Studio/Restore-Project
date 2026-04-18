@@ -7945,8 +7945,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.30891353, y: 0.06652666, z: 0.046746705}
-  m_Center: {x: 0.0038629258, y: 0.24937364, z: -0.0038899134}
+  m_Size: {x: 0.33999828, y: 0.09342381, z: 0.02882598}
+  m_Center: {x: 0.0052758097, y: 0.26282996, z: -0.0044083623}
 --- !u!114 &780471592
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7959,7 +7959,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8893d828409943e5a6ade1c8670ac35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tool
-  brushRadius: 0.1
+  brushRadius: 0.05
   brushHardness: 0.5
 --- !u!54 &780471593
 Rigidbody:
@@ -8868,6 +8868,7 @@ GameObject:
   - component: {fileID: 892896139}
   - component: {fileID: 892896138}
   - component: {fileID: 892896143}
+  - component: {fileID: 892896144}
   m_Layer: 6
   m_Name: Jar_Crack_2
   m_TagString: Untagged
@@ -8897,13 +8898,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 892896136}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 643630eb9fbaf45299272e31e5f7377c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CleaningObject
-  cam: {fileID: 1271145302}
-  paintingShader: {fileID: 4800000, guid: e40998dd5517743c286bde38e2a73dc3, type: 3}
+  cam: {fileID: 0}
+  paintingShader: {fileID: 0}
 --- !u!114 &892896139
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8917,7 +8918,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MousePainter
   cam: {fileID: 1271145302}
-  paintingShader: {fileID: 4800000, guid: 6039c6ba4857a4608ad984c9ddaf6f96, type: 3}
+  paintingShader: {fileID: 4800000, guid: e40998dd5517743c286bde38e2a73dc3, type: 3}
   brushRadius: 0.1
   brushHardness: 0.5
 --- !u!64 &892896140
@@ -8967,7 +8968,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e7c22a018d704439a8a22a7dad5d0a1e, type: 2}
+  - {fileID: 2100000, guid: 37472ccad77794e41950d94d20927040, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -9026,6 +9027,24 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &892896144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 892896136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f64afa58edb6f40b78bba02e9c82973a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LightmapCleaning
+  cam: {fileID: 1271145302}
+  brushRadius: 0.1
+  brushHardness: 0.5
+  maskTexture: {fileID: 2800000, guid: e91c549daafa645488dbb8c7768d28f5, type: 3}
+  paintingShader: {fileID: 4800000, guid: 39556aae266844a23825a3bc61854e0d, type: 3}
+  color: {r: 1, g: 1, b: 1, a: 0}
 --- !u!1 &893493418
 GameObject:
   m_ObjectHideFlags: 0
@@ -13201,9 +13220,7 @@ MonoBehaviour:
   m_RequiresDepthTextureOption: 2
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 0
-  m_Cameras:
-  - {fileID: 303234688}
-  - {fileID: 1809664374}
+  m_Cameras: []
   m_RendererIndex: -1
   m_VolumeLayerMask:
     serializedVersion: 2
@@ -17411,6 +17428,7 @@ GameObject:
   - component: {fileID: 1736785980}
   - component: {fileID: 1736785985}
   - component: {fileID: 1736785986}
+  - component: {fileID: 1736785987}
   m_Layer: 6
   m_Name: InspectPosition (1)
   m_TagString: Untagged
@@ -17503,7 +17521,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CleaningObject
   cam: {fileID: 0}
-  paintingShader: {fileID: 4800000, guid: e40998dd5517743c286bde38e2a73dc3, type: 3}
+  paintingShader: {fileID: 0}
 --- !u!135 &1736785986
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -17525,6 +17543,28 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5000003
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!64 &1736785987
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1736785978}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1749164423
 GameObject:
   m_ObjectHideFlags: 0

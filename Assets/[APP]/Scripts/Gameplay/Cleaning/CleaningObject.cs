@@ -24,7 +24,7 @@ public class CleaningObject : MonoBehaviour
         paintingMaterial = new Material(paintingShader);
         paintableMaterial = rend.material;
 
-        paintingMap = new RenderTexture(1024, 1024, 0, RenderTextureFormat.R8);
+        paintingMap = new RenderTexture(1024, 1024, 0, RenderTextureFormat.ARGB32);
         paintingMap.Create();
 
         cb = new CommandBuffer();
@@ -35,24 +35,24 @@ public class CleaningObject : MonoBehaviour
         Graphics.ExecuteCommandBuffer(cb);
         cb.Clear();
 
-        paintableMaterial.SetTexture("_Mask", paintingMap);
+        paintableMaterial.SetTexture("_SubMask", paintingMap);
         paintingMaterial.SetVector("_CameraPosition", cam.transform.position);
     }
 
     private void Update()
     {
-        // if (Mouse.current.leftButton.isPressed)
-        // {
-        //     Vector2 mousePos = Mouse.current.position.ReadValue();
-        //     Ray ray = cam.ScreenPointToRay(mousePos);
+        if (Mouse.current.leftButton.isPressed)
+        {
+            Vector2 mousePos = Mouse.current.position.ReadValue();
+            Ray ray = cam.ScreenPointToRay(mousePos);
 
-        //     if (Physics.Raycast(ray, out hit))
-        //     {
-        //         if (hit.collider.gameObject != gameObject) return;
-        //         Debug.Log($"[Shader] Hit detected at {hit.point} with normal {hit.normal}");
-        //         ReceivePaint(hit.point, hit.normal, 0.1f, 0.5f);
-        //     }
-        // }
+            if (Physics.Raycast(ray, out hit))
+            {
+                if (hit.collider.gameObject != gameObject) return;
+                Debug.Log($"[Shader] Hit detected at {hit.point} with normal {hit.normal}");
+                ReceivePaint(hit.point, hit.normal, 0.1f, 0.5f);
+            }
+        }
     }
 
     public void ReceivePaint(Vector3 hitPoint, Vector3 hitNormal, float radius, float hardness)

@@ -1,0 +1,32 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CalculateProgress
+
+// Input tekstur
+Texture2D<float4> MaskTexture;
+Texture2D<float4> PaintTexture;
+
+// Buffer untuk menyimpan hasil hitungan
+// [0] = Total piksel target (masking)
+// [1] = Total piksel yang sudah di-paint
+RWStructuredBuffer<uint> ResultBuffer; 
+
+[numthreads(8, 8, 1)]
+void CalculateProgress (uint3 id : SV_DispatchThreadID)
+{
+    // Mengambil nilai warna (misal channel merah/grayscale)
+    float maskVal = MaskTexture[id.xy].g;
+    float paintVal = PaintTexture[id.xy].g;
+
+    // Jika area ini adalah area kotoran/mask (threshold > 0.1)
+    if (maskVal > 0.1)
+    {
+        // InterlockedAdd memastikan perhitungan paralel tidak bentrok
+        InterlockedAdd(ResultBuffer[0], 1);
+
+        // Jika player sudah mengecat area ini (threshold > 0.1)
+        if (paintVal > 0.1)
+        {
+            InterlockedAdd(ResultBuffer[1], 1);
+        }
+    }
+}

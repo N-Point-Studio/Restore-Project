@@ -15,7 +15,7 @@ public class Tool : MonoBehaviour
     {
         Debug.Log($"Collision detected with {collision.gameObject.name}");
         // Cek apakah objek yang ditabrak punya script PaintableArtifact
-        CleaningObject artifact = collision.gameObject.GetComponent<CleaningObject>();
+        LightmapCleaning artifact = collision.gameObject.GetComponent<LightmapCleaning>();
 
         if (artifact != null)
         {

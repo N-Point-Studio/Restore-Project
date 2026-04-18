@@ -8,7 +8,6 @@ Shader "Custom/MaskPaintingShader"
         _Hardness("Hardness", Float) = 0.5
         _NormalThreshold("Normal Threshold", Range(-1, 1)) = -0.2 
         
-        // [BARU] Tambahkan properti untuk posisi kamera
         _CameraPosition("Camera Position", Vector) = (0,0,0,0)
     }
 
@@ -46,11 +45,41 @@ Shader "Custom/MaskPaintingShader"
                 float _Radius;
                 float _Hardness;
                 float _NormalThreshold;
-                // [BARU] Deklarasi variabel
                 float4 _CameraPosition; 
             CBUFFER_END
 
-            Varyings vert(Attributes IN) {
+            // ==========================================
+            // HELPER FUNCTIONS
+            // ==========================================
+
+            // 1. Menghitung mask berdasarkan jarak (radius & hardness)
+            float GetDistanceMask(float3 worldPos, float3 paintPos, float radius, float hardness) 
+            {
+                float dist = distance(worldPos, paintPos);
+                return 1.0 - smoothstep(radius * hardness, radius, dist);
+            }
+
+            // 2. Menghitung mask berdasarkan kecocokan arah normal dengan arah cat
+            float GetDirectionMask(float3 normalWS, float3 paintDir, float threshold) 
+            {
+                float dotNormal = dot(normalWS, -normalize(paintDir));
+                return smoothstep(threshold, threshold + 0.1, dotNormal);
+            }
+
+            // 3. Menghitung mask berdasarkan apakah permukaan menghadap kamera
+            float GetCameraFacingMask(float3 normalWS, float3 worldPos, float3 cameraPos) 
+            {
+                float3 viewDir = normalize(cameraPos - worldPos);
+                // Menggunakan logika cut-off tajam seperti sebelumnya
+                return dot(normalWS, viewDir) > 0 ? 1.0 : 0.0; 
+            }
+
+            // ==========================================
+            // MAIN FUNCTIONS
+            // ==========================================
+
+            Varyings vert(Attributes IN) 
+            {
                 Varyings OUT;
                 OUT.worldPos = TransformObjectToWorld(IN.positionOS.xyz);
                 OUT.normalWS = TransformObjectToWorldNormal(IN.normalOS);
@@ -63,23 +92,17 @@ Shader "Custom/MaskPaintingShader"
                 return OUT;
             }
             
-            half4 frag(Varyings IN) : SV_Target {
-                float dist = distance(IN.worldPos, _PaintPosition.xyz);
-                float draw = 1.0 - smoothstep(_Radius * _Hardness, _Radius, dist);
-
-                float dotNormal = dot(IN.normalWS, -normalize(_PaintDirection));
-                float normalMask = smoothstep(_NormalThreshold, _NormalThreshold + 0.1, dotNormal);
-
-                // [BARU] Hitung arah kamera ke pixel dan pastikan permukaannya menghadap kamera
-                float3 viewDir = normalize(_CameraPosition.xyz - IN.worldPos);
-                float cameraDot = dot(IN.normalWS, viewDir);
+            half4 frag(Varyings IN) : SV_Target 
+            {
+                // Panggil masing-masing function
+                float distanceMask = GetDistanceMask(IN.worldPos, _PaintPosition.xyz, _Radius, _Hardness);
+                float directionMask = GetDirectionMask(IN.normalWS, _PaintDirection, _NormalThreshold);
                 
-                // Jika cameraDot > 0, berarti menghadap kamera. Jika < 0, membelakangi kamera.
-                // Kita gunakan smoothstep tipis agar transisinya tidak terlalu kasar di pinggiran.
-                float cameraFacingMask = smoothstep(-0.05, 0.05, cameraDot);
+                // Gunakan _WorldSpaceCameraPos dari Unity atau _CameraPosition bawaan properti kamu
+                float cameraMask = GetCameraFacingMask(IN.normalWS, IN.worldPos, _CameraPosition.xyz);
 
-                // Kalikan dengan cameraFacingMask
-                float finalPaint = draw * normalMask * cameraFacingMask;
+                // Gabungkan semua mask
+                float finalPaint = distanceMask * directionMask * cameraMask;
                 
                 return float4(finalPaint, finalPaint, finalPaint, 1.0);
             }
