@@ -2,12 +2,15 @@ Shader "Custom/MaskPaintingBrushShader"
 {
     Properties
     {
-        _BrushTexture("Brush Texture", 2D) = "white" {}
-        // [BARU] Properti untuk memutar brush
-        _BrushRotation("Brush Rotation (Degrees)", Range(0, 360)) = 0 
-
         _PaintPosition("Paint Position (World)", Vector) = (0,0,0,0)
         _PaintDirection("Paint Direction", Vector) = (0,-1,0,0) 
+        
+        // --- PROPERTI ROTASI & BRUSH ---
+        _ToolUp("Tool Up Direction", Vector) = (0,1,0,0) // Arah atas dari objek sikat
+        _BrushTexture("Brush Texture", 2D) = "white" {}
+        _Strength("Strength", Range(0, 1)) = 0.1
+        // -------------------------------
+
         _Radius("Radius", Float) = 0.1
         _Hardness("Hardness", Float) = 0.5
         _NormalThreshold("Normal Threshold", Range(-1, 1)) = -0.2 
@@ -49,11 +52,12 @@ Shader "Custom/MaskPaintingBrushShader"
             CBUFFER_START(UnityPerMaterial)
                 float4 _PaintPosition;
                 float3 _PaintDirection;
+                float3 _ToolUp; // Variabel penampung rotasi
                 float _Radius;
                 float _Hardness;
                 float _NormalThreshold;
                 float4 _CameraPosition; 
-                float _BrushRotation; // [BARU]
+                float _Strength;
             CBUFFER_END
 
             // ==========================================
@@ -78,33 +82,26 @@ Shader "Custom/MaskPaintingBrushShader"
                 return dot(normalWS, viewDir) > 0 ? 1.0 : 0.0; 
             }
 
-            // [BARU] 4. Membuat UV lokal untuk Brush agar menempel dan berputar sesuai Normal
-            float2 GetBrushUV(float3 worldPos, float3 paintPos, float3 normalWS, float radius, float rotationDeg) 
+            // Memproyeksikan tekstur 2D sesuai arah objek sikat
+            float GetBrushTextureMask(float3 worldPos, float3 paintPos, float3 paintDir, float3 toolUp, float radius)
             {
-                // Jarak dari titik tengah cat
                 float3 offset = worldPos - paintPos;
 
-                // Membangun sumbu lokal (Tangent dan Bitangent) berdasarkan arah Normal
-                // Menggunakan trik "Up Vector" agar cross product tidak error saat normal menghadap tepat ke atas/bawah
-                float3 up = abs(normalWS.y) > 0.999 ? float3(0, 0, 1) : float3(0, 1, 0);
-                float3 right = normalize(cross(up, normalWS));
-                float3 forward = cross(normalWS, right);
+                // Gunakan toolUp asli dari objek sebagai patokan sumbu Y stempel
+                float3 tangent = normalize(cross(toolUp, paintDir));
+                float3 bitangent = cross(paintDir, tangent);
 
-                // Proyeksikan posisi 3D ke sumbu 2D brush kita
-                float2 localUV = float2(dot(offset, right), dot(offset, forward));
+                float u = dot(offset, tangent);
+                float v = dot(offset, bitangent);
 
-                // Aplikasikan rotasi tambahan pada UV
-                float rad = radians(rotationDeg);
-                float s, c;
-                sincos(rad, s, c);
-                localUV = float2(
-                    localUV.x * c - localUV.y * s,
-                    localUV.x * s + localUV.y * c
-                );
+                float2 brushUV = float2(u, v) / (radius * 2.0) + 0.5;
 
-                // Normalisasikan ukuran UV agar 0..1 berdasarkan radius
-                localUV /= (radius * 2.0);
-                return localUV + 0.5;
+                // Potong batas luar agar tekstur brush tidak bocor/tiling
+                if (brushUV.x < 0.0 || brushUV.x > 1.0 || brushUV.y < 0.0 || brushUV.y > 1.0)
+                    return 0.0;
+
+                float brushMask = SAMPLE_TEXTURE2D_LOD(_BrushTexture, sampler_BrushTexture, brushUV, 0).r;
+                return brushMask;
             }
 
             // ==========================================
@@ -127,19 +124,14 @@ Shader "Custom/MaskPaintingBrushShader"
             
             half4 frag(Varyings IN) : SV_Target 
             {
-                // [BARU] Dapatkan UV Brush yang sudah diproyeksikan dan dirotasi
-                float2 brushUV = GetBrushUV(IN.worldPos, _PaintPosition.xyz, IN.normalWS, _Radius, _BrushRotation);
-                
-                // [BARU] Sample Teksturnya (mengambil channel .r, asumsikan tekstur grayscale/hitam putih)
-                float brushTexMask = SAMPLE_TEXTURE2D(_BrushTexture, sampler_BrushTexture, brushUV).r;
-
-                // Ambil sisa mask
                 float distanceMask = GetDistanceMask(IN.worldPos, _PaintPosition.xyz, _Radius, _Hardness);
                 float directionMask = GetDirectionMask(IN.normalWS, _PaintDirection, _NormalThreshold);
                 float cameraMask = GetCameraFacingMask(IN.normalWS, IN.worldPos, _CameraPosition.xyz);
+                
+                // Masukkan parameter _ToolUp ke dalam fungsi
+                float textureMask = GetBrushTextureMask(IN.worldPos, _PaintPosition.xyz, _PaintDirection, _ToolUp, _Radius);
 
-                // Kalikan semua mask, termasuk Brush Texture
-                float finalPaint = distanceMask * directionMask * cameraMask * brushTexMask;
+                float finalPaint = distanceMask * directionMask * cameraMask * textureMask * _Strength;
                 
                 return float4(finalPaint, finalPaint, finalPaint, 1.0);
             }

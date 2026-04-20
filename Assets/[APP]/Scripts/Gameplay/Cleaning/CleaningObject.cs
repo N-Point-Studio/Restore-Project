@@ -6,6 +6,15 @@ public class CleaningObject : MonoBehaviour
 {
     public Camera cam;
     public Shader paintingShader;
+
+    [Header("Brush Settings")]
+    [Tooltip("Masukkan objek sikat/kain lap 3D kamu ke sini!")]
+    public Transform cleaningTool;
+
+    public Texture2D brushTexture;
+    [Range(0.01f, 2.0f)] public float brushSize = 0.5f;
+    [Range(0.01f, 1.0f)] public float paintStrength = 0.1f;
+
     private RenderTexture paintingMap;
     private Material paintingMaterial;
     private Material paintableMaterial;
@@ -14,8 +23,6 @@ public class CleaningObject : MonoBehaviour
     private CommandBuffer cb;
     private RaycastHit hit;
 
-
-
     void Start()
     {
         rend = GetComponent<Renderer>();
@@ -23,6 +30,9 @@ public class CleaningObject : MonoBehaviour
 
         paintingMaterial = new Material(paintingShader);
         paintableMaterial = rend.material;
+
+        if (brushTexture != null)
+            paintingMaterial.SetTexture("_BrushTexture", brushTexture);
 
         paintingMap = new RenderTexture(1024, 1024, 0, RenderTextureFormat.ARGB32);
         paintingMap.Create();
@@ -36,7 +46,6 @@ public class CleaningObject : MonoBehaviour
         cb.Clear();
 
         paintableMaterial.SetTexture("_SubMask", paintingMap);
-        paintingMaterial.SetVector("_CameraPosition", cam.transform.position);
     }
 
     private void Update()
@@ -49,19 +58,32 @@ public class CleaningObject : MonoBehaviour
             if (Physics.Raycast(ray, out hit))
             {
                 if (hit.collider.gameObject != gameObject) return;
-                Debug.Log($"[Shader] Hit detected at {hit.point} with normal {hit.normal}");
-                ReceivePaint(hit.point, hit.normal, 0.1f, 0.5f);
+
+                paintingMaterial.SetVector("_CameraPosition", cam.transform.position);
+
+                // --- LOGIKA ROTASI SIKAT ---
+                // Ambil arah "Atas" dari objek sikat 3D. 
+                // Jika kamu belum pasang objek sikat di Inspector, default ke atas dunia.
+                Vector3 toolUpDir = cleaningTool != null ? cleaningTool.up : Vector3.up;
+
+                // Kirim data ke fungsi ReceivePaint
+                ReceivePaint(hit.point, hit.normal, brushSize, 0.5f, toolUpDir);
             }
         }
     }
 
-    public void ReceivePaint(Vector3 hitPoint, Vector3 hitNormal, float radius, float hardness)
+    // Parameter terakhir diubah dari float (sudut) menjadi Vector3 (arah atas alat)
+    public void ReceivePaint(Vector3 hitPoint, Vector3 hitNormal, float radius, float hardness, Vector3 toolUp)
     {
         paintingMaterial.SetVector("_PaintPosition", hitPoint);
         paintingMaterial.SetVector("_PaintDirection", -hitNormal);
 
         paintingMaterial.SetFloat("_Radius", radius);
         paintingMaterial.SetFloat("_Hardness", hardness);
+        paintingMaterial.SetFloat("_Strength", paintStrength);
+
+        // Kirim arah rotasi alat ke Shader
+        paintingMaterial.SetVector("_ToolUp", toolUp);
 
         cb.Clear();
         cb.SetRenderTarget(paintingMap);
@@ -71,22 +93,9 @@ public class CleaningObject : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Selalu bebaskan memori GPU saat objek hancur atau pindah scene
-        if (paintingMap != null)
-        {
-            paintingMap.Release();
-            Destroy(paintingMap);
-        }
-
-        if (cb != null)
-        {
-            cb.Release();
-        }
-
-        if (paintingMaterial != null)
-        {
-            Destroy(paintingMaterial);
-        }
+        if (paintingMap != null) { paintingMap.Release(); Destroy(paintingMap); }
+        if (cb != null) cb.Release();
+        if (paintingMaterial != null) Destroy(paintingMaterial);
     }
 
     private void OnGUI()

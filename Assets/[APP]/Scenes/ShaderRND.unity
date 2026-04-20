@@ -139,7 +139,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!135 &25292375
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -554,13 +554,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1052500692}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7930523, y: -0, z: -0, w: 0.6091536}
+  m_LocalRotation: {x: 0.19639751, y: -0, z: -0, w: 0.98052436}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 104.94299, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 22.653, y: 0, z: 0}
 --- !u!114 &1052500695
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -940,7 +940,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1669626274
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -953,8 +953,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a41006817493840feb7f9f8f1757b38f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PaintManager
-  texturePaint: {fileID: 4800000, guid: b90336299b7ec471388850842d3cd864, type: 3}
-  extendIslands: {fileID: 4800000, guid: 65893d0c2a9964ff5801cbad21b4d871, type: 3}
 --- !u!4 &1669626275
 Transform:
   m_ObjectHideFlags: 0
@@ -983,6 +981,7 @@ GameObject:
   - component: {fileID: 1827324908}
   - component: {fileID: 1827324907}
   - component: {fileID: 1827324911}
+  - component: {fileID: 1827324912}
   m_Layer: 0
   m_Name: Quad
   m_TagString: Untagged
@@ -1077,15 +1076,31 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1827324906}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.38268343, y: 0, z: 0, w: 0.92387956}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.13, z: -6.41}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1467474265}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 45, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1827324911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1827324906}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e9367aa918b34679894fa49344e9da5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MousePainter
+  cam: {fileID: 970458624}
+  paintingShader: {fileID: 4800000, guid: 6039c6ba4857a4608ad984c9ddaf6f96, type: 3}
+  brushRadius: 0.1
+  brushHardness: 0.1
+--- !u!114 &1827324912
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1094,13 +1109,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1827324906}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e9367aa918b34679894fa49344e9da5, type: 3}
+  m_Script: {fileID: 11500000, guid: 242d7b3bd82a34fc19774ace8f1da28e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MousePainter
+  m_EditorClassIdentifier: Assembly-CSharp::UVPainter
   cam: {fileID: 970458624}
-  paintingShader: {fileID: 4800000, guid: 6039c6ba4857a4608ad984c9ddaf6f96, type: 3}
-  brushRadius: 0.1
-  brushHardness: 0.5
+  paintingShader: {fileID: 4800000, guid: fc4453f84baad409eb95f21d651b97e5, type: 3}
+  brushTexture: {fileID: 2800000, guid: fd0523ff6a921744c8eb12d6d609a2ba, type: 3}
+  brushScale: 0.1
+  brushStrength: 0.5
+  paintingColor: {r: 1, g: 1, b: 1, a: 1}
+  maskTexturePropertyName: _Mask
 --- !u!23 &88243436703282451
 MeshRenderer:
   m_ObjectHideFlags: 0

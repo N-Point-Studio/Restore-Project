@@ -7910,7 +7910,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &780471590
 Transform:
   m_ObjectHideFlags: 0
@@ -7945,8 +7945,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.33999828, y: 0.09342381, z: 0.02882598}
-  m_Center: {x: 0.0052758097, y: 0.26282996, z: -0.0044083623}
+  m_Size: {x: 0.33999828, y: 0.09342381, z: 0.517307}
+  m_Center: {x: 0.005275808, y: 0.26283193, z: -0.018883588}
 --- !u!114 &780471592
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7959,7 +7959,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8893d828409943e5a6ade1c8670ac35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tool
-  brushRadius: 0.05
+  brushRadius: 0.07
   brushHardness: 0.5
 --- !u!54 &780471593
 Rigidbody:
@@ -8867,8 +8867,9 @@ GameObject:
   - component: {fileID: 892896140}
   - component: {fileID: 892896139}
   - component: {fileID: 892896138}
-  - component: {fileID: 892896143}
   - component: {fileID: 892896144}
+  - component: {fileID: 892896143}
+  - component: {fileID: 892896145}
   m_Layer: 6
   m_Name: Jar_Crack_2
   m_TagString: Untagged
@@ -8903,8 +8904,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 643630eb9fbaf45299272e31e5f7377c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CleaningObject
-  cam: {fileID: 0}
-  paintingShader: {fileID: 0}
+  cam: {fileID: 1271145302}
+  paintingShader: {fileID: 4800000, guid: 735fb71ec45d14533816122333090d94, type: 3}
+  cleaningTool: {fileID: 5104603792022998271}
+  brushTexture: {fileID: 2800000, guid: 9f9e4aca8bab2b74aaed6715f75873ef, type: 3}
+  brushSize: 0.2
+  paintStrength: 0.01
 --- !u!114 &892896139
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8919,7 +8924,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MousePainter
   cam: {fileID: 1271145302}
   paintingShader: {fileID: 4800000, guid: e40998dd5517743c286bde38e2a73dc3, type: 3}
-  brushRadius: 0.1
+  brushRadius: 0.01
   brushHardness: 0.5
 --- !u!64 &892896140
 MeshCollider:
@@ -9034,7 +9039,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 892896136}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f64afa58edb6f40b78bba02e9c82973a, type: 3}
   m_Name: 
@@ -9042,9 +9047,28 @@ MonoBehaviour:
   cam: {fileID: 1271145302}
   brushRadius: 0.1
   brushHardness: 0.5
-  maskTexture: {fileID: 2800000, guid: e91c549daafa645488dbb8c7768d28f5, type: 3}
   paintingShader: {fileID: 4800000, guid: 39556aae266844a23825a3bc61854e0d, type: 3}
   color: {r: 1, g: 1, b: 1, a: 0}
+--- !u!114 &892896145
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 892896136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 242d7b3bd82a34fc19774ace8f1da28e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WorldSpacePainter
+  cam: {fileID: 1271145302}
+  paintingShader: {fileID: 4800000, guid: fc4453f84baad409eb95f21d651b97e5, type: 3}
+  brushTexture: {fileID: 2800000, guid: 9f9e4aca8bab2b74aaed6715f75873ef, type: 3}
+  brushScale: 0.2
+  brushStrength: 0.05
+  paintingColor: {r: 1, g: 1, b: 1, a: 1}
+  cleaningTool: {fileID: 5104603792022998271}
+  maskTexturePropertyName: _SubMask
 --- !u!1 &893493418
 GameObject:
   m_ObjectHideFlags: 0
@@ -17522,6 +17546,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CleaningObject
   cam: {fileID: 0}
   paintingShader: {fileID: 0}
+  cleaningTool: {fileID: 0}
+  brushTexture: {fileID: 0}
+  brushSize: 0.5
+  paintStrength: 0.05
 --- !u!135 &1736785986
 SphereCollider:
   m_ObjectHideFlags: 0
