@@ -9063,6 +9063,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WorldSpacePainter
   cam: {fileID: 1271145302}
   paintingShader: {fileID: 4800000, guid: fc4453f84baad409eb95f21d651b97e5, type: 3}
+  maskShader: {fileID: 4800000, guid: 7f76a06dfd72c430981f5384b78c4e70, type: 3}
   brushTexture: {fileID: 2800000, guid: 115f6ace71e744a3fad92c438b210dfa, type: 3}
   brushScale: 0.4
   brushStrength: 0.05
@@ -9070,8 +9071,9 @@ MonoBehaviour:
   cleaningTool: {fileID: 5104603792022998271}
   maskTexturePropertyName: _SubMask
   maskTexture: {fileID: 2800000, guid: e91c549daafa645488dbb8c7768d28f5, type: 3}
-  progressShader: {fileID: 7200000, guid: 381317306db6346679cdf4784eb2e943, type: 3}
-  currentProgress: 0
+  cShader: {fileID: 7200000, guid: 381317306db6346679cdf4784eb2e943, type: 3}
+  maskPixel: 0
+  paintedPixel: 0
 --- !u!1 &893493418
 GameObject:
   m_ObjectHideFlags: 0
@@ -12701,23 +12703,23 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 84516473952733204, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 84516473952733204, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 84516473952733204, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 66.07
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 84516473952733204, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 41.035
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 84516473952733204, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -20
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1701600106505507516, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_text
@@ -12821,7 +12823,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6200343798872231526, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 82.07
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6200343798872231526, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -12829,23 +12831,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6407055669889038493, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6407055669889038493, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6407055669889038493, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 113.12
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6407055669889038493, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 94.07
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6407055669889038493, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -9.115
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6829846748616176537, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_text
