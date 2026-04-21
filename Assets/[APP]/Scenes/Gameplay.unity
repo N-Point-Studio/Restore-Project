@@ -2862,7 +2862,7 @@ PrefabInstance:
       objectReference: {fileID: 1716257908}
     - target: {fileID: 2373799165059659615, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2596229567394185725, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_Pivot.x
@@ -3902,7 +3902,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2373799165059659615, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2594754268444725741, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_IsActive
@@ -6272,7 +6272,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2373799165059659615, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2594754268444725741, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_IsActive
@@ -9063,12 +9063,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WorldSpacePainter
   cam: {fileID: 1271145302}
   paintingShader: {fileID: 4800000, guid: fc4453f84baad409eb95f21d651b97e5, type: 3}
-  brushTexture: {fileID: 2800000, guid: 9f9e4aca8bab2b74aaed6715f75873ef, type: 3}
-  brushScale: 0.2
+  brushTexture: {fileID: 2800000, guid: 115f6ace71e744a3fad92c438b210dfa, type: 3}
+  brushScale: 0.4
   brushStrength: 0.05
   paintingColor: {r: 1, g: 1, b: 1, a: 1}
   cleaningTool: {fileID: 5104603792022998271}
   maskTexturePropertyName: _SubMask
+  maskTexture: {fileID: 2800000, guid: e91c549daafa645488dbb8c7768d28f5, type: 3}
+  progressShader: {fileID: 7200000, guid: 381317306db6346679cdf4784eb2e943, type: 3}
+  currentProgress: 0
 --- !u!1 &893493418
 GameObject:
   m_ObjectHideFlags: 0
@@ -12750,7 +12753,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4680592563667470313, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 207.19
       objectReference: {fileID: 0}
     - target: {fileID: 4680592563667470313, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_SizeDelta.y
@@ -12806,7 +12809,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4900491344556224843, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6200343798872231526, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchorMax.y

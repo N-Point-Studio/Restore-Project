@@ -12,6 +12,9 @@ Shader "Custom/MaskDecalBrushShader"
         _PaintingColor("Painting Color", Color) = (1, 1, 1, 1)
         _PaintDirection("Paint Direction (Normal)", Vector) = (0, -1, 0, 0) 
         _ToolDirection("Tool Direction", Vector) = (0, 1, 0, 0)
+
+        [Header(Mask Properties)]
+        _MaskTexture("Mask Texture", 2D) = "white" {}
     }
 
     SubShader
@@ -44,10 +47,14 @@ Shader "Custom/MaskDecalBrushShader"
                 float4 positionHCS : SV_POSITION;
                 float3 worldPos : TEXCOORD0;
                 float3 normalWS : TEXCOORD1;
+                float2 uv : TEXCOORD2;
             };
 
             TEXTURE2D(_BrushTexture);
             SAMPLER(sampler_BrushTexture);
+
+            TEXTURE2D(_MaskTexture);
+            SAMPLER(sampler_MaskTexture);
 
             CBUFFER_START(UnityPerMaterial)
                 float _BrushScale;
@@ -71,6 +78,7 @@ Shader "Custom/MaskDecalBrushShader"
                 #endif
                 
                 OUT.positionHCS = float4(uvClipSpace, 0.0, 1.0);
+                OUT.uv = IN.uv;
                 return OUT;
             }
 
@@ -101,12 +109,30 @@ Shader "Custom/MaskDecalBrushShader"
 
                 return _PaintingColor * brushAlpha;
             }
+            
+            // half4 frag(Varyings IN) : SV_Target
+            // {
+            //     half4 brush = GetBrushUV(IN.worldPos);
+
+            //     // sample mask (pakai UV mesh)
+            //     float mask = SAMPLE_TEXTURE2D(_MaskTexture, sampler_MaskTexture, IN.uv).g;
+
+            //     // normal facing check
+            //     float facingStrength = dot(normalize(IN.normalWS), normalize(_PaintDirection)) > 0.1 ? 1.0 : 0.0;
+
+            //     // apply mask
+            //     brush *= mask;
+
+            //     // return brush * facingStrength;
+            //     return lerp(0, brush * facingStrength, mask);
+            // }
 
             half4 frag(Varyings IN) : SV_Target
             {
                 half4 brush = GetBrushUV(IN.worldPos);
+                half mask = SAMPLE_TEXTURE2D(_MaskTexture, sampler_MaskTexture, IN.uv).g;
                 float facingStrength = dot(normalize(IN.normalWS), normalize(_PaintDirection)) > 0.1 ? 1.0 : 0.0;
-                return GetBrushUV(IN.worldPos) * facingStrength;
+                return GetBrushUV(IN.worldPos) * facingStrength * mask;
             }
             ENDHLSL
         }
