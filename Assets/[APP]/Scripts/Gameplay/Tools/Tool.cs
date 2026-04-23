@@ -1,35 +1,92 @@
+using DG.Tweening;
 using UnityEngine;
 
-public class Tool : MonoBehaviour
+public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPressObject
 {
-    [Range(0.01f, 1f)] public float brushRadius = 0.1f;
-    [Range(0f, 1f)] public float brushHardness = 0.5f;
 
-    // Menggunakan OnCollisionStay agar objek terus terhapus selama spons digesek
+    [Header("Tool type")]
+    // [SerializeField] protected SurfaceDetectionType toolType;
 
-    void OnCollisionEnter(Collision collision)
+    [Header("Animation Settings")]
+    [SerializeField] protected float returnAnimDuration = 0.5f;
+    [SerializeField] protected float followMouseSpeed = 0.1f;
+    [SerializeField] protected float SurfaceMoveSpeed = 0.1f;
+    [SerializeField] protected float SurfaceRotateSpeed = 0.1f;
+
+    [Header("Initial Placement")]
+    [SerializeField] protected ToolOrigin origin;
+    protected Vector3 initialPosition;
+    protected Quaternion initialRotation;
+    protected Collider col;
+    protected Sequence returnSequence;
+    protected bool isReturning;
+    protected bool isUsed;
+    protected bool isStickingToSurface;
+
+    protected virtual void Awake()
     {
-        Debug.Log($"Collision detected with {collision.gameObject.name}");
+        initialPosition = transform.position;
+        initialRotation = transform.rotation;
+        col = GetComponent<Collider>();
     }
-    private void OnCollisionStay(Collision collision)
-    {
-        Debug.Log($"Collision detected with {collision.gameObject.name}");
-        // Cek apakah objek yang ditabrak punya script PaintableArtifact
-        LightmapCleaning artifact = collision.gameObject.GetComponent<LightmapCleaning>();
+    public void OnPressStarted() => PressStarted();
+    public void OnPressEnded() => PressEnded();
 
-        if (artifact != null)
-        {
-            // collision.contacts berisi daftar titik persentuhan. 
-            // Jika sponsnya ceper dan nempel sempurna, titik kontaknya bisa lebih dari satu!
-            foreach (ContactPoint contact in collision.contacts)
-            {
-                // Kirim posisi persis dan normal dari titik tabrakan tersebut ke Artefak
-                // contact.normal.Normalize(); // Pastikan normalnya sudah dinormalisasi
-                Vector3 minusNormal = -contact.normal.normalized; // Arahkan ke dalam permukaan
-                artifact.ReceivePaint(contact.point, contact.normal, brushRadius, brushHardness);
-                Debug.Log($"[Shader] Contact Point: {contact.point}, Normal: {contact.normal}");
-                //Contact Point: (0.04, 2.86, -0.02), Normal: (-0.01, -0.18, 0.98)
-            }
-        }
+    public void OnInteractDetected() => InteractDetected();
+    public void OnInteractEnded() => InteractEnded();
+    public bool IsStickingToSurface => IsStickingToSurface;
+    public IInteractObject GetOrigin() => origin as IInteractObject;
+
+
+    public void SetColliderEnable(bool isActive)
+    {
+        col.enabled = isActive;
     }
+
+    public void Use()
+    {
+        origin.SetCollider(true);
+        returnSequence?.Kill();
+        col.enabled = false;
+        isUsed = true;
+    }
+
+    public void Return()
+    {
+        col.enabled = true;
+        isReturning = true;
+        isUsed = false;
+
+        returnSequence?.Kill();
+        returnSequence = DOTween.Sequence();
+
+        returnSequence.Join(transform.DOMove(initialPosition, returnAnimDuration).SetEase(Ease.OutBack));
+        returnSequence.Join(transform.DORotateQuaternion(initialRotation, returnAnimDuration).SetEase(Ease.OutBack));
+        returnSequence.OnComplete(() => isReturning = false);
+        origin.SetCollider(false);
+    }
+
+    public void FollowMouse(Vector3 worldPos)
+    {
+        if (isReturning) return;
+        transform.DOKill();
+        transform.DOMove(worldPos, followMouseSpeed).SetEase(Ease.OutQuad);
+    }
+
+    public void StickToSurface(Vector3 position, Quaternion rotation)
+    {
+        transform.DOKill();
+        transform.DOMove(position, SurfaceMoveSpeed).SetEase(Ease.OutQuad);
+        transform.DORotateQuaternion(rotation, SurfaceRotateSpeed).SetEase(Ease.OutQuad);
+    }
+
+    public void SetStickToSurface(bool isSticking)
+    {
+        isStickingToSurface = isSticking;
+    }
+
+    protected abstract void InteractDetected();
+    protected abstract void InteractEnded();
+    protected abstract void PressStarted();
+    protected abstract void PressEnded();
 }

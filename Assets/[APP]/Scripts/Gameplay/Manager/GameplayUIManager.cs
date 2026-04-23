@@ -195,7 +195,7 @@ public class GameplayUIManager : MonoBehaviour
 
     private void HandleProgressUpdate(float progress)
     {
-        AppLogger.Log("Assemble should be");
+        // AppLogger.Log("Assemble should be");
         UpdateProgress(ProgressType.Assemble, progress);
     }
 

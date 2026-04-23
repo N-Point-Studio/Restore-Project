@@ -30,14 +30,14 @@ public class ObjectHoldService : IInitializable, IDisposable, ITickable
     public void Initialize()
     {
         inputSystemService.OnLeftPressStarted += HandlePressStarted;
-        inputSystemService.OnMouseMoved += HandleMouseMoved;
+        InteractionEvents.OnMouseMoved += HandleMouseMoved;
         inputSystemService.OnLeftPressEnded += HandlePressEnded;
     }
 
     public void Dispose()
     {
         inputSystemService.OnLeftPressStarted -= HandlePressStarted;
-        inputSystemService.OnMouseMoved -= HandleMouseMoved;
+        InteractionEvents.OnMouseMoved -= HandleMouseMoved;
         inputSystemService.OnLeftPressEnded -= HandlePressEnded;
     }
 

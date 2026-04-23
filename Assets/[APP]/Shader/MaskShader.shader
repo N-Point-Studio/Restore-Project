@@ -2,6 +2,8 @@ Shader "Custom/MaskShader"
 {
     Properties
     {
+        // BARU: Tambahkan properti Mask Texture di sini
+        _MaskTexture("Mask Texture", 2D) = "white" {}
     }
 
     SubShader
@@ -29,8 +31,14 @@ Shader "Custom/MaskShader"
                 float4 positionHCS : SV_POSITION;
                 float2 uv : TEXCOORD0;
                 float3 normal : TEXCOORD1;
-                float worldPos : TEXCOORD2;
+                
+                // PERBAIKAN: Ubah jadi float3 karena TransformObjectToWorld mengembalikan nilai float3 (x,y,z)
+                float3 worldPos : TEXCOORD2; 
             };
+
+            // BARU: Deklarasi Texture dan Sampler agar bisa dibaca oleh HLSL
+            TEXTURE2D(_MaskTexture);
+            SAMPLER(sampler_MaskTexture);
 
             CBUFFER_START(UnityPerMaterial)
                 half4 _BaseColor;
@@ -56,7 +64,8 @@ Shader "Custom/MaskShader"
 
             half4 frag(Varyings IN) : SV_Target
             {
-                return (1,1,1,1);
+                half maskValue = SAMPLE_TEXTURE2D(_MaskTexture, sampler_MaskTexture, IN.uv).g;
+                return half4(1.0, 1.0, 1.0, 1.0) * maskValue;
             }
             ENDHLSL
         }

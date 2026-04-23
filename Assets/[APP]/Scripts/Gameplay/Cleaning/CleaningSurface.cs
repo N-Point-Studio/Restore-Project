@@ -1,7 +1,8 @@
+using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class CleaningSurface : MonoBehaviour, IClean
+public class CleaningSurface : MonoBehaviour, ICleanSurface
 {
     [Header("Shader Setting")]
     [SerializeField] private Shader paintingShader;
@@ -15,10 +16,7 @@ public class CleaningSurface : MonoBehaviour, IClean
     private Mesh mesh;
     private CommandBuffer cb;
 
-    [Header("Brush Setting (Optional)")]
-    [SerializeField] private Texture2D brushTexture;
-    [Range(0, 1)][SerializeField] private float brushScale = 0.5f;
-    [Range(0, 1)][SerializeField] private float brushStrength = 0.5f;
+    [Header("Mask Color Setting")]
     [SerializeField] private Color paintingColor = Color.white;
 
     [Header("Computeshader components")]
@@ -26,18 +24,21 @@ public class CleaningSurface : MonoBehaviour, IClean
     private ComputeBuffer cBuffer;
     private int[] analysisResult;
     private int kernelMain, kernelInit;
-    private int maskPixel = 0;
-    private int paintedPixel = 0;
+    public int maskPixel = 0;
+    public int paintedPixel = 0;
+    public float progress = 0;
 
     [Header("Material Integration")]
-    [SerializeField] private string maskTexturePropertyName = "_BaseMap";
+    [SerializeField] private string maskTexturePropertyName = "_SubMask";
     [SerializeField] private Texture2D maskTexture;
 
+    public static event Action<ICleanSurface> OnCreated;
 
     void Start()
     {
         SetupShader();
         maskPixel = CalculateTexture(maskMap);
+        OnCreated?.Invoke(this);
     }
 
     private void SetupShader()
@@ -48,10 +49,6 @@ public class CleaningSurface : MonoBehaviour, IClean
         paintingMaterial = new Material(paintingShader);
         maskMaterial = new Material(maskShader);
         paintableMaterial = rend.material;
-
-
-        if (brushTexture != null)
-            paintingMaterial.SetTexture("_BrushTexture", brushTexture);
 
         paintingMap = new RenderTexture(1024, 1024, 0, RenderTextureFormat.ARGB32);
         paintingMap.Create();
@@ -101,8 +98,9 @@ public class CleaningSurface : MonoBehaviour, IClean
         return analysisResult[0];
     }
 
-    public void Clean(Vector3 hitPoint, Vector3 hitNormal, Vector3 direction, float scale = 0.5f, float strength = 0.5f)
+    public void CleanSurface(Vector3 hitPoint, Texture2D brush, Vector3 hitNormal, Vector3 direction, float scale = 0.5f, float strength = 0.5f)
     {
+        paintingMaterial.SetTexture("_BrushTexture", brush);
         paintingMaterial.SetVector("_BrushPosition", hitPoint);
         paintingMaterial.SetVector("_PaintDirection", hitNormal);
         paintingMaterial.SetFloat("_BrushScale", scale);
@@ -116,16 +114,26 @@ public class CleaningSurface : MonoBehaviour, IClean
         Graphics.ExecuteCommandBuffer(cb);
 
         paintedPixel = CalculateTexture(paintingMap);
+
+        // progress = maskPixel == 0 ? 0 : (float)paintedPixel / (float)maskPixel * 100;
+        // return progress;
     }
 
-    public int GetCleaningProgress()
+    public float GetCleaningProgress()
     {
-        return maskPixel == 0 ? 0 : Mathf.RoundToInt(((float)paintedPixel / maskPixel) * 100);
+        if (maskPixel == 0) return 0f;
+
+        float currentProgress = ((float)paintedPixel / maskPixel) * 100f;
+
+        // Kunci nilai dari 0 sampai 100 agar tidak tembus
+        progress = Mathf.Clamp(currentProgress, 0f, 100f);
+
+        return progress;
     }
 
     public bool IsCleanable()
     {
-        var parent = GetComponentInParent<ICleanSurfaceObject>();
+        var parent = GetComponentInParent<IClean>();
         if (parent != null) return parent.IsCleanable();
         return false;
     }
@@ -137,5 +145,22 @@ public class CleaningSurface : MonoBehaviour, IClean
         if (paintingMaterial != null) Destroy(paintingMaterial);
         if (maskMaterial != null) Destroy(maskMaterial);
         cb?.Release();
+    }
+
+    public void ForceClean()
+    {
+
+    }
+
+    public void OnInteractDetected()
+    {
+    }
+
+    public void OnInteractEnded()
+    {
+    }
+
+    public void SetColliderEnable(bool isActive)
+    {
     }
 }

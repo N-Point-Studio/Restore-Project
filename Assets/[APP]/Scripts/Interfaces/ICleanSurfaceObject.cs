@@ -13,5 +13,11 @@ public interface ICleanSurfaceObject : ICleanable
 public interface IClean
 {
     bool IsCleanable();
-    int GetCleaningProgress();
+    public void ForceClean();
+}
+
+public interface ICleanSurface : IClean
+{
+    void CleanSurface(Vector3 hitPoint, Texture2D brush, Vector3 hitNormal, Vector3 direction, float scale, float strength);
+    float GetCleaningProgress();
 }

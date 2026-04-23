@@ -11,7 +11,7 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
     private Sequence returnSequence;
     private bool isReturning;
     [SerializeField] private Texture2D brush;
-    [SerializeField] private SurfaceDetectionType toolType;
+    // [SerializeField] private SurfaceDetectionType toolType;
 
     [Header("Animation Settings")]
     [SerializeField] private float returnAnimDuration = 0.5f;
@@ -134,5 +134,5 @@ public class ToolObject : MonoBehaviour, IInteractObject, ITool, IPressObject
         this.isMoving = isMoving;
     }
 
-    public SurfaceDetectionType ToolType => toolType;
+    // public SurfaceDetectionType ToolType => toolType;
 }

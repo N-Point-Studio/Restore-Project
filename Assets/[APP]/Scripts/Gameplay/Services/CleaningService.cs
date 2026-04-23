@@ -9,6 +9,10 @@ public class CleaningService : IInitializable, IDisposable
 {
     private readonly HashSet<CleaningHardObject> cleaningChunks = new();
     private readonly HashSet<CleaningSurfaceObject> cleaningSurfaces = new();
+
+    private readonly HashSet<ICleanSurface> cleanSurfaces = new();
+    private readonly HashSet<ICleanChunk> cleanChunks = new();
+
     public bool isCleaning;
 
     private int totalHardObjects;
@@ -19,62 +23,116 @@ public class CleaningService : IInitializable, IDisposable
 
     public void Initialize()
     {
-        CleaningHardObject.OnCreated += RegisterChunk;
-        CleaningHardObject.OnDestroy += CalculateChunks;
-        CleaningSurfaceObject.OnCreated += RegisterSurface;
+        //new 
+        CleaningChunk.OnCreated += RegisterChunk;
+        CleaningChunk.OnDestroyed += CalculateChunks;
+        CleaningSurface.OnCreated += RegisterSurface;
+
+        //old
+        // CleaningHardObject.OnCreated += RegisterChunk;
+        // CleaningHardObject.OnDestroy += CalculateChunks;
+        // CleaningSurfaceObject.OnCreated += RegisterSurface;
     }
 
     public void Dispose()
     {
-        CleaningHardObject.OnCreated -= RegisterChunk;
-        CleaningHardObject.OnDestroy -= CalculateChunks;
-        CleaningSurfaceObject.OnCreated -= RegisterSurface;
+        //new
+        CleaningChunk.OnCreated -= RegisterChunk;
+        CleaningChunk.OnDestroyed -= CalculateChunks;
+        CleaningSurface.OnCreated -= RegisterSurface;
+
+        //old
+        // CleaningHardObject.OnCreated -= RegisterChunk;
+        // CleaningHardObject.OnDestroy -= CalculateChunks;
+        // CleaningSurfaceObject.OnCreated -= RegisterSurface;
     }
 
-    public void RegisterSurface(CleaningSurfaceObject cleanObj)
+    private void RegisterChunk(CleaningChunk chunk)
     {
-        cleaningSurfaces.Add(cleanObj);
+        cleanChunks.Add(chunk);
+        totalHardObjects++;
     }
 
-    public void RegisterChunk(CleaningHardObject cleanObj)
+    private void CalculateChunks(CleaningChunk chunk)
     {
-        if (cleaningChunks.Add(cleanObj))
-        {
-            totalHardObjects++;
-        }
-    }
-
-    public void CalculateChunks(CleaningHardObject cleanObj)
-    {
-        if (cleaningChunks.Remove(cleanObj))
+        if (cleanChunks.Remove(chunk))
         {
             destroyedHardObjects++;
         }
     }
 
-    public void TryCleaning(ICleanSurfaceObject clean, Vector2 textureSurface, Texture2D brush)
+    private void RegisterSurface(ICleanSurface surface)
     {
-        if (clean == null || brush == null)
-            return;
+        Debug.Log("Registering clean surface: " + surface);
+        cleanSurfaces.Add(surface);
+    }
 
-        isCleaning = true;
+    // public void RegisterSurface(CleaningSurfaceObject cleanObj)
+    // {
+    //     cleaningSurfaces.Add(cleanObj);
+    // }
 
-        clean.TryClean(textureSurface, brush);
+    // public void RegisterChunk(CleaningHardObject cleanObj)
+    // {
+    //     if (cleaningChunks.Add(cleanObj))
+    //     {
+    //         totalHardObjects++;
+    //     }
+    // }
+
+    // public void CalculateChunks(CleaningHardObject cleanObj)
+    // {
+    //     if (cleaningChunks.Remove(cleanObj))
+    //     {
+    //         destroyedHardObjects++;
+    //     }
+    // }
+
+    public void CleanSurface(ICleanSurface surface, Texture2D brush, Vector3 hitPoint, Vector3 hitNormal, Vector3 direction, float scale, float strength, Color color)
+    {
+        // Debug.Log("Cleaning surface with brush tool: " + surface);
+        if (!cleanSurfaces.Contains(surface)) return;
+        surface?.CleanSurface(hitPoint, brush, hitNormal, direction, scale, strength);
         OnSurfaceCleaningUpdate?.Invoke(CalculateSurfaceProgress());
     }
 
-    public void TryCleaningHardSurface(ICleanHardObject clean)
+    public void CleanChunk(ICleanChunk chunk)
     {
-        isCleaning = true;
-
-        clean.Hit();
+        if (!cleanChunks.Contains(chunk)) return;
+        chunk?.Hit();
         OnHardCleaningUpdate?.Invoke(GetHardProgress());
     }
 
-    public void EndClean()
-    {
-        isCleaning = false;
-    }
+    // public void CleanChunk(ICleanHardObject chunk)
+    // {
+    //     isCleaning = true;
+    //     chunk.Hit();
+    //     OnHardCleaningUpdate?.Invoke(GetHardProgress());
+    // }
+
+    // public void TryCleaning(ICleanSurfaceObject clean, Vector2 textureSurface, Texture2D brush)
+    // {
+    //     if (clean == null || brush == null)
+    //         return;
+
+    //     isCleaning = true;
+
+    //     clean.TryClean(textureSurface, brush);
+    //     OnSurfaceCleaningUpdate?.Invoke(CalculateSurfaceProgress());
+    // }
+
+    // public void TryCleaningHardSurface(ICleanHardObject clean)
+    // {
+    //     isCleaning = true;
+
+    //     clean.Hit();
+    //     OnHardCleaningUpdate?.Invoke(GetHardProgress());
+    // }
+
+    // public void EndClean()
+    // {
+    //     isCleaning = false;
+    // }
 
     public void ForceCleanAll()
     {
@@ -84,7 +142,7 @@ public class CleaningService : IInitializable, IDisposable
         }
 
         List<CleaningHardObject> chunksToDestroy = new List<CleaningHardObject>(cleaningChunks);
-        
+
         for (int i = 0; i < chunksToDestroy.Count; i++)
         {
             CleaningHardObject chunk = chunksToDestroy[i];
@@ -97,17 +155,17 @@ public class CleaningService : IInitializable, IDisposable
 
     private float CalculateSurfaceProgress()
     {
-        if (cleaningSurfaces.Count == 0)
+        if (cleanSurfaces.Count == 0)
             return 1f;
 
         float total = 0;
 
-        foreach (var surface in cleaningSurfaces)
+        foreach (var surface in cleanSurfaces)
         {
-            total += surface.GetCleanProgress();
+            total += surface.GetCleaningProgress();
         }
-
-        return total / cleaningSurfaces.Count;
+        float averagePercentage = total / cleanSurfaces.Count;
+        return averagePercentage / 100;
     }
 
     public float GetHardProgress()
