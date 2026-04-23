@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using VContainer;
 using VContainer.Unity;
 
@@ -38,10 +39,25 @@ public class ObjectDetectionService : IInitializable, IDisposable
     private void HandleLeftPressStarted(Vector2 vector)
     {
         OnInteractDetected?.Invoke(interactable);
+
+        if (interactable is IDragObject)
+        {
+            CursorController.instance?.SetCursorState(CursorState.GrabClose);
+        }
     }
 
     private void HandleLeftPressEnded(Vector2 vector)
     {
+        if (interactable != null)
+        {
+            if (interactable is IDragObject) CursorController.instance?.SetCursorState(CursorState.GrabOpen);
+            else CursorController.instance?.SetCursorState(CursorState.Hover);
+        }
+        else
+        {
+            CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
+        }
+
         interactable = null;
     }
 
@@ -59,6 +75,19 @@ public class ObjectDetectionService : IInitializable, IDisposable
             interactable?.OnInteractEnded();
             interactable = newTarget;
             newTarget?.OnInteractDetected();
+        }
+
+        if (Mouse.current != null && !Mouse.current.leftButton.isPressed && !Mouse.current.rightButton.isPressed)
+        {
+            if (interactable != null)
+            {
+                if (interactable is IDragObject) CursorController.instance?.SetCursorState(CursorState.GrabOpen);
+                else CursorController.instance?.SetCursorState(CursorState.Hover);
+            }
+            else
+            {
+                CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
+            }
         }
     }
 

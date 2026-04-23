@@ -56,6 +56,11 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
         if (col != null) col.enabled = false;
     }
 
+    private void OnDisable()
+    {
+        CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
+    }
+
     public void Initialize(string noteText, Artefact3DItem boss)
     {
         SetupOriginalValues();
@@ -86,6 +91,9 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
         transform.DOKill();
         transform.DOScale(originalScale * hoverScaleMultiplier, hoverAnimDuration).SetEase(Ease.OutBack);
         transform.DOLocalRotate(originalRotation + new Vector3(0, 0, hoverRotationZ), hoverAnimDuration).SetEase(Ease.OutBack);
+
+        // Change to Grab Open cursor since it's a sticky note
+        CursorController.instance?.SetCursorState(CursorState.GrabOpen); 
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -95,6 +103,8 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
         transform.DOKill();
         transform.DOScale(originalScale, hoverAnimDuration).SetEase(Ease.OutQuad);
         transform.DOLocalRotate(originalRotation, hoverAnimDuration).SetEase(Ease.OutQuad);
+
+        CursorController.instance?.SetCursorState(CursorState.DefaultRounded); // Reset
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -105,6 +115,9 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
         transform.DOKill();
         
+        // Change cursor to grabbed on click!
+        CursorController.instance?.SetCursorState(CursorState.GrabClose);
+
         if (peelFeedback != null)
         {
             ToggleCollider(false); 
@@ -124,5 +137,8 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
         peelFeedback.Events.OnComplete.RemoveListener(OnPeelAnimationFinished);
         gameObject.SetActive(false);
         OnNotePeeled?.Invoke(this);
+        
+        // Reset after animation
+        CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
     }
 }

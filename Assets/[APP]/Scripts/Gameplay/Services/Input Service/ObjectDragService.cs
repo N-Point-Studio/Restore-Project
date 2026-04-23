@@ -8,8 +8,6 @@ public class ObjectDragService : IInitializable, IDisposable
     private readonly InputSystemService inputSystemService;
     private readonly GameConfigData config;
 
-    private const float DragThreshold = 25f;
-
     private Vector2 startPos;
     private Vector2 lastPos;
 

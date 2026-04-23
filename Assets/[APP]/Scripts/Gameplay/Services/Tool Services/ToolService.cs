@@ -95,6 +95,9 @@ public class ToolService : IInitializable, IDisposable, ITickable
                 currentTool?.Return();
                 currentTool = null;
                 isCleaning = false;
+
+                CursorController.instance?.UnlockCursorState();
+                CursorController.instance?.SetCursorState(CursorState.DefaultRounded); 
             }
         }
     }
@@ -109,10 +112,11 @@ public class ToolService : IInitializable, IDisposable, ITickable
                 currentTool?.Return();
                 currentTool = tool;
                 currentTool?.Use();
+
+                CursorController.instance?.LockCursorState(CursorState.Crosshair);
             }
         }
 
-        // Matikan suara via helper
         PlayToolSfx(false);
 
         audioKeepAliveTimer = 0f;
@@ -201,6 +205,10 @@ public class ToolService : IInitializable, IDisposable, ITickable
     {
         PlayToolSfx(false);
         currentTool?.Return();
+
+        // --- UNLOCK CURSOR ---
+        CursorController.instance?.UnlockCursorState();
+        CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
     }
 
     public bool IsOnToolMode => GetCurrentTool() != null;

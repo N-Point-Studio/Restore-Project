@@ -8,9 +8,27 @@ public class BookPanelInteractable : MonoBehaviour, IPointerEnterHandler, IPoint
     public Action OnBookHoverExit;
     public Action OnBookClicked;
 
-    public void OnPointerEnter(PointerEventData eventData) => OnBookHoverEnter?.Invoke();
+    private void OnDisable()
+    {
+        CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
+    }
+
+    public void OnPointerEnter(PointerEventData eventData) 
+    {
+        OnBookHoverEnter?.Invoke();
+        CursorController.instance?.SetCursorState(CursorState.Hover);
+    }
     
-    public void OnPointerExit(PointerEventData eventData) => OnBookHoverExit?.Invoke();
+    public void OnPointerExit(PointerEventData eventData) 
+    {
+        OnBookHoverExit?.Invoke();
+        CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
+    }
     
-    public void OnPointerClick(PointerEventData eventData) => OnBookClicked?.Invoke();
+    public void OnPointerClick(PointerEventData eventData) 
+    {
+        OnBookClicked?.Invoke();
+        // Optional: Reset on click if opening the book changes the UI context
+        CursorController.instance?.SetCursorState(CursorState.DefaultRounded); 
+    }
 }

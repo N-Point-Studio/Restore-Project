@@ -71,17 +71,25 @@ public class ButtonItemUI : UIBehaviour, IPointerEnterHandler, IPointerExitHandl
         rectTransform.DOKill(); 
     }
 
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+        CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
+    }
+
     #region Pointer Events (Hover & Press)
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (!isInteractable || !enableHoverEffects) return;
         ApplyVisualState(true);
+        CursorController.instance?.SetCursorState(CursorState.Hover); // Change to Hover
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         if (!isInteractable || !enableHoverEffects) return;
         ApplyVisualState(isSelected);
+        CursorController.instance?.SetCursorState(CursorState.DefaultRounded); // Reset to Default
     }
 
     public void OnPointerDown(PointerEventData eventData)
