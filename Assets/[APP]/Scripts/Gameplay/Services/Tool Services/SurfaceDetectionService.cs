@@ -43,6 +43,7 @@ public class SurfaceDetectionService
 
         if (CleanableChunk != null)
         {
+            Debug.Log("chunk: " + CleanableChunk);
             return true;
         }
 

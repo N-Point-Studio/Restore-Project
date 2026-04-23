@@ -4,7 +4,7 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class ObjectDetectionService : IInitializable, IDisposable
+public class ObjectDetectionService : IInitializable, IDisposable, ITickable
 {
     // private readonly InputSystemService inputSystemService;
     private readonly Camera cam;
@@ -14,6 +14,7 @@ public class ObjectDetectionService : IInitializable, IDisposable
 
     private readonly Plane plane;
     private bool isUsed = false;
+    private Vector2 mousePos;
 
     [Inject]
     public ObjectDetectionService(InputSystemService inputSystemService, Camera cam, Plane plane)
@@ -60,24 +61,7 @@ public class ObjectDetectionService : IInitializable, IDisposable
 
     private void HandleMouseMove(Vector2 screenPos)
     {
-        if (isUsed) return;
-
-        IInteractObject newTarget = null;
-
-        if (TryRaycast(screenPos, out var hit))
-        {
-            hit.collider.TryGetComponent(out newTarget);
-        }
-
-        if (newTarget != interactable)
-        {
-            interactable?.OnInteractEnded();
-            interactable = newTarget;
-            newTarget?.OnInteractDetected();
-            // AppLogger.Log("Mouse moved, new interactable: " + newTarget);
-        }
-
-        OnInteractDetected?.Invoke(newTarget);
+        mousePos = screenPos;
     }
 
     public bool TryRaycast(Vector2 screenPos, out RaycastHit hit)
@@ -109,5 +93,27 @@ public class ObjectDetectionService : IInitializable, IDisposable
         }
 
         return Vector3.zero;
+    }
+
+    public void Tick()
+    {
+
+        if (isUsed) return;
+        IInteractObject newTarget = null;
+
+        if (TryRaycast(mousePos, out var hit))
+        {
+            hit.collider.TryGetComponent(out newTarget);
+        }
+
+        if (newTarget != interactable)
+        {
+            interactable?.OnInteractEnded();
+            interactable = newTarget;
+            newTarget?.OnInteractDetected();
+            // AppLogger.Log("Mouse moved, new interactable: " + newTarget);
+        }
+
+        OnInteractDetected?.Invoke(newTarget);
     }
 }
