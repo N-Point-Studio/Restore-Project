@@ -26,7 +26,6 @@ public class LevelSelectionController : BaseMenuController
     [SerializeField] private float unlockDropDelay = 1.5f;
     [SerializeField] private float restoreAnimDuration = 0.5f;
     
-
     // Inject
     private ActiveArtefactData activeArtefactData;
     private PlayerProgressionData playerProgressionData;
@@ -170,9 +169,6 @@ public class LevelSelectionController : BaseMenuController
         backButtonItemUI.gameObject.SetActive(false);
         clickedItem = Array.Find(artefact3DItems, x => x != null && x.ArtefactId == data.BaseData.Id);
 
-        if (clickedItem == null)
-            AppLogger.LogWarning($"[LevelSelection] Artefact3DItem with ID {data.BaseData.Id} was not found in the Scene!");
-
         for (int i = 0; i < artefact3DItems.Length; i++)
         {
             if (artefact3DItems[i] != null && artefact3DItems[i] != clickedItem)
@@ -216,9 +212,9 @@ public class LevelSelectionController : BaseMenuController
 
     private void OnCloseArtefactDetail()
     {
-        // backButtonItemUI.gameObject.SetActive(true);
         artefactDetailController.CloseDetail(); 
 
+        // Animate all pedestals up (including the new one so the box has a place to land!)
         for (int i = 0; i < artefact3DItems.Length; i++)
         {
             if (artefact3DItems[i] != null && artefact3DItems[i] != clickedItem)
@@ -277,12 +273,13 @@ public class LevelSelectionController : BaseMenuController
             
             if (targetItem != null)
             {
-                // 1. Move camera forward to Artefact
                 isCameraMoving = true;
                 MainMenuEvents.TriggerCameraFocusToArtefact(targetItem.transform);
                 
-                // 2. Wait until the camera blend event finishes
                 yield return new WaitUntil(() => !isCameraMoving);
+                
+                // Let the camera settle for a split-second before playing the animation
+                yield return new WaitForSeconds(0.25f);
 
                 MainMenuEvents.TriggerShowBackground(true);
 
@@ -311,7 +308,11 @@ public class LevelSelectionController : BaseMenuController
         
         if (pendingUnlocks.Count > 0)
         {
-            yield return waitUnlockSequence; // Small delay to keep it neat after the journal is closed
+            isCameraMoving = true;
+            MainMenuEvents.TriggerCameraToLevelSelection();
+            yield return new WaitUntil(() => !isCameraMoving);
+
+            yield return waitUnlockSequence; 
             
             for (int i = 0; i < pendingUnlocks.Count; i++)
             {
@@ -320,23 +321,23 @@ public class LevelSelectionController : BaseMenuController
                 
                 if (targetItem != null)
                 {
-                    // 1. Move camera to the new Box pedestal
                     isCameraMoving = true;
                     MainMenuEvents.TriggerCameraFocusToArtefact(targetItem.transform);
                     
                     yield return new WaitUntil(() => !isCameraMoving);
+                    
+                    // Let the camera settle for a split-second before dropping the box
+                    yield return new WaitForSeconds(0.25f);
 
                     AppLogger.Log($"[Animation] Playing UNLOCK animation for {data.artefactId}");
                     targetItem.PlayUnlockAnimation();
                     
-                    // Wait for the box drop animation
                     yield return waitUnlockDrop;
                 }
                 
                 activeArtefactData.MarkUnlockAnimSeen(data.artefactId);
             }
             
-            // After all new boxes fall, move camera back to Overview
             isCameraMoving = true;
             MainMenuEvents.TriggerCameraToLevelSelection();
             yield return new WaitUntil(() => !isCameraMoving);
