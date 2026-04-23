@@ -1,13 +1,14 @@
 using System;
 using UnityEngine;
 
-public class CleaningHardObject : MonoBehaviour, IInteractObject, ICleanHardObject
+public class CleaningHardObject : MonoBehaviour, IInteractObject, ICleanHardObject, IDragObject
 {
     [SerializeField] private int maxHitTimes = 3;
     [SerializeField] private Texture[] damageTextures;
     private Renderer targetRenderer;
 
     private int currentHit;
+    private IDragObject parentDragObject; // Reference to parent
 
     public static event Action<CleaningHardObject> OnCreated;
     public static event Action<CleaningHardObject> OnDestroy;
@@ -18,6 +19,11 @@ public class CleaningHardObject : MonoBehaviour, IInteractObject, ICleanHardObje
     private void Awake()
     {
         targetRenderer = GetComponent<Renderer>();
+        
+        if (transform.parent != null)
+        {
+            parentDragObject = transform.parent.GetComponentInParent<IDragObject>();
+        }
     }
 
     private void Start()
@@ -61,17 +67,9 @@ public class CleaningHardObject : MonoBehaviour, IInteractObject, ICleanHardObje
         DestroyObject();
     }
 
-    public void OnInteractDetected()
-    {
-    }
-
-    public void OnInteractEnded()
-    {
-    }
-
-    public void SetColliderEnable(bool isActive)
-    {
-    }
+    public void OnInteractDetected() { }
+    public void OnInteractEnded() { }
+    public void SetColliderEnable(bool isActive) { }
 
     public bool IsCleanable()
     {
@@ -82,4 +80,8 @@ public class CleaningHardObject : MonoBehaviour, IInteractObject, ICleanHardObje
         }
         return false;
     }
+
+    public void OnDragStarted(Vector3 worldPos) => parentDragObject?.OnDragStarted(worldPos);
+    public void OnDragPerformed(Vector3 worldPos) => parentDragObject?.OnDragPerformed(worldPos);
+    public void OnDragEnded(Vector3 worldPos) => parentDragObject?.OnDragEnded(worldPos);
 }
