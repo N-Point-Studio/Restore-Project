@@ -1,5 +1,3 @@
-
-using System;
 using Modules;
 using UnityEngine;
 using VContainer;
@@ -52,6 +50,10 @@ public class MainMenuManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         
+        CursorController.instance?.UnlockCursorState();
+        CursorController.instance?.ClearOverrideCursor();
+        CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
+
         MainMenuEvents.OnNewGame += OnRequestNewGameGame;
         MainMenuEvents.OnContinueGame += OnRequestContinueGame;
         MainMenuEvents.OnCloseLevelSelection += OnRequestCloseLevelSelection;
@@ -86,13 +88,11 @@ public class MainMenuManager : MonoBehaviour
         else if (hasPendingAnimations)
         {
             AppLogger.Log("[MainMenuManager] Player returned from gameplay! Opening Level Selection immediately.");
-            
             levelSelectionController.OpenLevelSelectionAndPlayAnimations();
         }
         else
         {
             AppLogger.Log("[MainMenuManager] Entering normal Main Menu.");
-            
             menuController.SetActive(true);
         }
     }
@@ -194,7 +194,6 @@ public class MainMenuManager : MonoBehaviour
     private void OnConfirmNewGame()
     {
         AppLogger.Log("[MainMenuManager] Veteran player resetting game -> Reload Splash");
-
         playerProgressionData.ClearData();
         activeArtefactData.ResetData(); 
         
