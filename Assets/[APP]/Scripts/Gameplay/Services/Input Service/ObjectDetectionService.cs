@@ -43,7 +43,7 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
         this.isUsed = isUsed;
     }
 
-    private void HandleLeftPressEnded(Vector2 vector)
+    public IInteractObject GetCurrentInteract()
     {
         if (interactable != null)
         {
