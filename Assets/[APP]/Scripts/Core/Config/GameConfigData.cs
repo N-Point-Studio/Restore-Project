@@ -26,4 +26,7 @@ public class GameConfigData : ScriptableObject
     public float autoSaveCooldown = 1.0f;
     public float minLoadingScreenDuration = 2.0f;
     public float bgmFadeDuration = 2.0f;
+
+    [Header("Tutorial Settings")]
+    public string tutorialItemId = "Artefact_Coin";
 }
