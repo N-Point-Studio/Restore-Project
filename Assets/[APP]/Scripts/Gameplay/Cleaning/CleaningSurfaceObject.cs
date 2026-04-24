@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class CleaningSurfaceObject : MonoBehaviour, ICleanSurfaceObject
+public class CleaningSurfaceObject : MonoBehaviour, ICleanSurfaceObject, IInteractObject, IDragObject
 {
     [SerializeField] private Texture2D dirtMaskBase;
     [SerializeField] private Material material;
@@ -14,6 +14,16 @@ public class CleaningSurfaceObject : MonoBehaviour, ICleanSurfaceObject
     private float dirtAmount;
     private Vector2Int lastPaintPixelPosition;
     public static event Action<CleaningSurfaceObject> OnCreated;
+
+    private IDragObject parentDragObject;
+
+    private void Awake()
+    {
+        if (transform.parent != null)
+        {
+            parentDragObject = transform.parent.GetComponentInParent<IDragObject>();
+        }
+    }
 
     private void Start()
     {
@@ -126,4 +136,16 @@ public class CleaningSurfaceObject : MonoBehaviour, ICleanSurfaceObject
         templateDirtMask.SetPixels(clearPixels);
         templateDirtMask.Apply();
     }
+
+    public void OnInteractDetected() { }
+    public void OnInteractEnded() { }
+    public void SetColliderEnable(bool isActive)
+    {
+        Collider col = GetComponent<Collider>();
+        if (col != null) col.enabled = isActive;
+    }
+
+    public void OnDragStarted(Vector3 worldPos) => parentDragObject?.OnDragStarted(worldPos);
+    public void OnDragPerformed(Vector3 worldPos) => parentDragObject?.OnDragPerformed(worldPos);
+    public void OnDragEnded(Vector3 worldPos) => parentDragObject?.OnDragEnded(worldPos);
 }

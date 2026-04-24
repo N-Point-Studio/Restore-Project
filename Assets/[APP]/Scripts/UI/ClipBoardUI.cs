@@ -33,6 +33,9 @@ public class ClipBoardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     private void OnDisable()
     {
         ProgressBarUI.OnProgressBarCompleted -= ProgressCompleted;
+        
+        // Safety: Reset cursor if the clipboard is disabled while hovering
+        CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
     }
 
     private void ProgressCompleted()
@@ -53,12 +56,18 @@ public class ClipBoardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     {
         isHovering = true;
         MoveTo(hoverPosition);
+        
+        // Set cursor to Hover state
+        CursorController.instance?.SetCursorState(CursorState.Hover);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         isHovering = false;
         MoveTo(startPosition);
+        
+        // Reset cursor back to default
+        CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
     }
 
     private void MoveTo(Vector2 target)

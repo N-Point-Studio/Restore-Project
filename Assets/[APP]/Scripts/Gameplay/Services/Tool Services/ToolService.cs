@@ -70,6 +70,8 @@ public class ToolService : IInitializable, IDisposable
                 currentToolObject?.Return();
                 currentToolObject = tool;
                 currentToolObject?.Use();
+                CursorController.instance?.UnlockCursorState();
+                CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
             }
         }
         else if (currentInteract is IClean clean)
@@ -84,6 +86,7 @@ public class ToolService : IInitializable, IDisposable
                 currentToolObject?.Return();
                 currentToolObject = null;
                 isCleaning = false;
+                CursorController.instance?.LockCursorState(CursorState.Crosshair);
             }
         }
         else if (currentToolObject != null)
@@ -93,6 +96,7 @@ public class ToolService : IInitializable, IDisposable
                 currentToolObject?.Return();
                 currentToolObject = null;
                 isCleaning = false;
+                CursorController.instance?.LockCursorState(CursorState.Crosshair);
             }
         }
     }
@@ -243,6 +247,10 @@ public class ToolService : IInitializable, IDisposable
     {
         PlayToolSfx(false);
         currentTool?.Return();
+
+        // --- UNLOCK CURSOR ---
+        CursorController.instance?.UnlockCursorState();
+        CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
     }
 
     public bool IsOnToolMode => GetCurrentTool() != null;

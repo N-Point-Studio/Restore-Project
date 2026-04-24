@@ -76,7 +76,7 @@ public class MainMenuCameraManager : MonoBehaviour
 
     private IEnumerator WaitUntilBlendFinished()
     {
-        yield return null;
+        yield return new WaitForSeconds(0.1f);
 
         while (brain.IsBlending)
         {

@@ -34,7 +34,9 @@ public class Artefact3DItem : MonoBehaviour
     private bool hasUnpeeledNotes = false;
     private bool isSelectionModeActive = false;
     private bool isCompleted = false;
+    
     private Vector3 originalPosition;
+    private Vector3 originalScale; // Track the original scale
     private bool isPosInitialized = false;
 
     public string ArtefactId => artefactId;
@@ -81,9 +83,6 @@ public class Artefact3DItem : MonoBehaviour
             if (boxTransform != null) boxTransform.gameObject.SetActive(!isCompleted && isUnlocked);
         }
 
-        // artefactTransform.gameObject.SetActive(isCompleted);
-        // boxTransform.gameObject.SetActive(!isCompleted && isUnlocked);
-
         isInteractable = isUnlocked || isCompleted;
         hasUnpeeledNotes = isUnlocked && !isCompleted && !isStoryRead;
 
@@ -119,6 +118,7 @@ public class Artefact3DItem : MonoBehaviour
         if (!isPosInitialized)
         {
             originalPosition = transform.localPosition;
+            originalScale = transform.localScale; // Save the scale
             isPosInitialized = true;
         }
     }
@@ -141,11 +141,8 @@ public class Artefact3DItem : MonoBehaviour
      public bool CanInteract(bool isSensorBox)
     {
         if (!isSelectionModeActive) return false;
-
         if (!isInteractable || artefactData == null) return false;
-
         if (isInDetailMode && isCompleted) return false;
-
         if (isSensorBox && isInDetailMode && hasUnpeeledNotes) return false;
         
         return true;
@@ -170,10 +167,6 @@ public class Artefact3DItem : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Visibility of Pedestal
-    /// </summary>
-    /// <param name="isVisible"></param>
     public void ShowPedestal(bool isVisible)
     {
         if (assignedPedestal != null)
@@ -182,21 +175,10 @@ public class Artefact3DItem : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Visibility of Artefact and Box
-    /// </summary>
-    /// <param name="isVisible"></param>
     public void SetVisibility(bool isVisible)
     {
-        if (artefactTransform != null)
-        {
-            artefactTransform.gameObject.SetActive(isVisible);
-        }
-
-        if (boxTransform != null)
-        {
-            boxTransform.gameObject.SetActive(isVisible);
-        }
+        if (artefactTransform != null) artefactTransform.gameObject.SetActive(isVisible);
+        if (boxTransform != null) boxTransform.gameObject.SetActive(isVisible);
     }
 
     public void PlayUnlockAnimation()
@@ -249,8 +231,16 @@ public class Artefact3DItem : MonoBehaviour
         }
 
         transform.DOKill();
+        
         Vector3 targetPos = show ? originalPosition : originalPosition + (Vector3.down * slideDownDistance);
-        transform.DOLocalMove(targetPos, duration).SetEase(show ? Ease.OutBack : Ease.InBack)
+        // Calculate target scale (Shrink to 0 when hiding)
+        Vector3 targetScale = show ? originalScale : Vector3.zero; 
+
+        // Apply Position Lerp
+        transform.DOLocalMove(targetPos, duration).SetEase(show ? Ease.OutBack : Ease.InBack);
+        
+        // Apply Scale Lerp at the exact same time
+        transform.DOScale(targetScale, duration).SetEase(show ? Ease.OutBack : Ease.InBack)
             .OnComplete(() => 
             {
                 if (!show) gameObject.SetActive(false);

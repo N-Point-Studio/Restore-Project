@@ -12,6 +12,11 @@ public class ArtefactManager : IInitializable, IDisposable
     private bool isHoldingUI = false;
     private bool isGameFinished = false;
 
+    // --- OPTIMIZATION CACHES ---
+    private IArtefactPart currentDraggedPart;
+    private IInteractObject currentHoldInteract;
+    private IArtefactPart currentHoldPart;
+
     [Inject]
     public ArtefactManager(ToolService toolService, AssemblyService assemblyService, HoldProgressUI holdProgressUI, GameConfigData config)
     {
@@ -52,22 +57,38 @@ public class ArtefactManager : IInitializable, IDisposable
         isGameFinished = true;
     }
 
+    private IArtefactPart ResolveArtefactPart(IInteractObject interact)
+    {
+        if (interact is IArtefactPart part) return part;
+        if (interact is MonoBehaviour mono) return mono.GetComponentInParent<IArtefactPart>();
+        return null;
+    }
+
+    // --- DRAG LOGIC ---
+
     private void HandleDragStarted(IInteractObject interact, Vector3 worldPos)
     {
+        // Cache the artefact part exactly ONCE when the drag begins
+        currentDraggedPart = ResolveArtefactPart(interact);
+
         if (interact is IDragObject drag) { drag.OnDragStarted(worldPos); }
     }
 
     private void HandleDragPerformed(IInteractObject interact, Vector3 worldPos)
     {
         if (interact is IDragObject drag) { drag.OnDragPerformed(worldPos); }
-        if (interact is IArtefactPart part) assemblyService.TryCheckSlot(part, worldPos);
+        
+        // Re-use the cached part (Zero overhead!)
+        if (currentDraggedPart != null) assemblyService.TryCheckSlot(currentDraggedPart, worldPos);
     }
 
     private void HandleDragEnded(IInteractObject interact, Vector3 worldPos)
     {
-        if (toolService.IsOnToolMode) return;
+        // Read the cache before we clear it
+        IArtefactPart artefactPart = currentDraggedPart;
+        currentDraggedPart = null; // Clear the cache to prevent memory leaks
 
-        if (interact is not IArtefactPart artefactPart) return;
+        if (toolService.IsOnToolMode || artefactPart == null) return;
 
         float distance = Vector3.Distance(worldPos, assemblyService.GetInspectPoint().position);
         bool isCloseEnough = distance < config.assembleSnapDistance;
@@ -76,38 +97,63 @@ public class ArtefactManager : IInitializable, IDisposable
         if (interact is IDragObject drag) drag.OnDragEnded(worldPos);
     }
 
+    // --- HOLD LOGIC ---
+
     private void HandleHoldPerformed(IInteractObject interact, float holdTime, Vector2 position)
     {
         if (toolService.IsOnToolMode || isGameFinished) return;
 
+        // Only do the heavy lookup if we changed the object we are holding
+        if (currentHoldInteract != interact)
+        {
+            currentHoldInteract = interact;
+            currentHoldPart = ResolveArtefactPart(interact);
+        }
+
+        if (currentHoldPart == null) return;
+
         if (!isHoldingUI)
         {
-            ShowHoldProgress(interact as IArtefactPart, position);
+            isHoldingUI = true; 
+            ShowHoldProgress(currentHoldPart, position);
         }
 
         float normalized = Mathf.Clamp01(holdTime / config.holdDuration);
-        UpdateHoldProgress(interact as IArtefactPart, normalized, position);
+        UpdateHoldProgress(currentHoldPart, normalized, position);
     }
 
     private void HandleHoldCompleted(IInteractObject interact, Vector2 position)
     {
         if (toolService.IsOnToolMode || isGameFinished) return;
 
-        HideHoldProgress(interact as IArtefactPart);
+        IArtefactPart partToDetach = currentHoldPart;
+
+        // Clear caches
+        currentHoldInteract = null;
+        currentHoldPart = null;
+
+        HideHoldProgress(partToDetach);
         isHoldingUI = false;
 
-        if (interact is IArtefactPart part)
+        if (partToDetach != null)
         {
-            assemblyService.Detach(part);
+            assemblyService.Detach(partToDetach);
         }
     }
 
     private void HandleHoldCanceled(IInteractObject interact, Vector2 position)
     {
         if (toolService.IsOnToolMode || isGameFinished) return;
-        HideHoldProgress(interact as IArtefactPart);
+        
+        HideHoldProgress(currentHoldPart);
         isHoldingUI = false;
+
+        // Clear caches
+        currentHoldInteract = null;
+        currentHoldPart = null;
     }
+
+    // --- UI HELPERS ---
 
     private void ShowHoldProgress(IArtefactPart part, Vector2 position)
     {

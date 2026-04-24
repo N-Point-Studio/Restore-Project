@@ -1,10 +1,12 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.EnhancedTouch; // Added for Touch
 using VContainer;
 using VContainer.Unity;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch; // Added for Touch
 
-public class InputSystemService : IInitializable, IDisposable
+public class InputSystemService : IInitializable, IDisposable, ITickable // Added ITickable
 {
     private readonly PlayerInputSystem inputSystem;
     private GameInput Input => inputSystem.Input;
@@ -22,6 +24,9 @@ public class InputSystemService : IInitializable, IDisposable
     public event Action OnUIKeycodeEscapePerformed;
     public event Action OnUIKeycodeRPerformed;
 
+    // Pinch Zoom Variables
+    private float previousPinchDistance;
+
     [Inject]
     public InputSystemService(PlayerInputSystem inputSystem)
     {
@@ -30,6 +35,9 @@ public class InputSystemService : IInitializable, IDisposable
 
     public void Initialize()
     {
+        // Enable Enhanced Touch Support
+        EnhancedTouchSupport.Enable();
+
         Input.Player.Press.started += HandleLeftPressStarted;
         Input.Player.Press.canceled += HandleLeftPressCanceled;
         Input.Player.SecondaryPress.started += HandleRightPressStarted;
@@ -46,6 +54,8 @@ public class InputSystemService : IInitializable, IDisposable
 
     public void Dispose()
     {
+        EnhancedTouchSupport.Disable(); // Disable when destroyed
+
         Input.Player.Press.started -= HandleLeftPressStarted;
         Input.Player.Press.canceled -= HandleLeftPressCanceled;
         Input.Player.SecondaryPress.started -= HandleRightPressStarted;
@@ -58,6 +68,35 @@ public class InputSystemService : IInitializable, IDisposable
         Input.UI.KeycodeEnter.performed -= HandleUIKeycodeEnterPerformed;
         Input.UI.KeycodeEscape.performed -= HandleUIKeycodeEscapePerformed;
         Input.UI.KeycodeR.performed -= HandleUIKeycodeRPerformed;
+    }
+
+    public void Tick()
+    {
+        // Handle Pinch-to-Zoom for Touchscreens
+        if (Touch.activeTouches.Count == 2)
+        {
+            Touch touch0 = Touch.activeTouches[0];
+            Touch touch1 = Touch.activeTouches[1];
+
+            float currentPinchDistance = Vector2.Distance(touch0.screenPosition, touch1.screenPosition);
+
+            // If either finger just started touching, set the initial distance
+            if (touch0.phase == UnityEngine.InputSystem.TouchPhase.Began || touch1.phase == UnityEngine.InputSystem.TouchPhase.Began)
+            {
+                previousPinchDistance = currentPinchDistance;
+            }
+            // If both fingers are moving or stationary, calculate the delta
+            else if (touch0.phase == UnityEngine.InputSystem.TouchPhase.Moved || touch1.phase == UnityEngine.InputSystem.TouchPhase.Moved)
+            {
+                float pinchDelta = currentPinchDistance - previousPinchDistance;
+
+                // Trigger the scroll event, mapping the pixel distance to a scroll-like float
+                // You may need to multiply this by a small number (e.g., 0.05f) depending on your zoom sensitivity
+                OnScrollPerformed?.Invoke(pinchDelta * 0.1f);
+
+                previousPinchDistance = currentPinchDistance;
+            }
+        }
     }
 
     public void ChangeInputState(InputStateType state)
@@ -74,11 +113,18 @@ public class InputSystemService : IInitializable, IDisposable
     private void HandleScrollPerformed(InputAction.CallbackContext context) => OnScrollPerformed?.Invoke(context.ReadValue<float>());
     private void HandlePlayerKeycodeEscapePerformed(InputAction.CallbackContext context) => OnPlayerKeycodeEscapePerformed?.Invoke();
     private void HandlePlayerKeycodeEnterPerformed(InputAction.CallbackContext context) => OnPlayerKeycodeEnterPerformed?.Invoke();
-    public Vector2 GetMousePosition() { return Input.Player.ScreenPos.ReadValue<Vector2>(); }
+
+    public Vector2 GetMousePosition()
+    {
+        if (Touch.activeTouches.Count > 0)
+        {
+            return Touch.activeTouches[0].screenPosition;
+        }
+        return Input.Player.ScreenPos.ReadValue<Vector2>();
+    }
 
     // UI
     private void HandleUIKeycodeEnterPerformed(InputAction.CallbackContext context) => OnUIKeycodeEnterPerformed?.Invoke();
     private void HandleUIKeycodeEscapePerformed(InputAction.CallbackContext context) => OnUIKeycodeEscapePerformed?.Invoke();
     private void HandleUIKeycodeRPerformed(InputAction.CallbackContext context) => OnUIKeycodeRPerformed?.Invoke();
-
 }

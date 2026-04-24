@@ -35,11 +35,15 @@ public class ObjectRotateService : IInitializable, IDisposable
     {
         isRotating = true;
         lastMousePos = inputSystemService.GetMousePosition();
+        
+        CursorController.instance?.SetOverrideCursor(CursorState.Rotate);
     }
 
     private void HandleRightEnded()
     {
         isRotating = false;
+        
+        CursorController.instance?.ClearOverrideCursor();
     }
 
     private void HandleMouseMove(Vector2 currentPos)

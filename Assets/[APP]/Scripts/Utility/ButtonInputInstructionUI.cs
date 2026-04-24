@@ -61,6 +61,11 @@ public class ButtonInputInstructionUI : InputInstructionUI, IPointerEnterHandler
         if (animatedTextRect != null) animatedTextRect.DOKill();
     }
 
+    protected virtual void OnDisable()
+    {
+        CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
+    }
+
     private void HandleOnButtonClicked()
     {
         if (button != null && !button.interactable) return;
@@ -78,12 +83,14 @@ public class ButtonInputInstructionUI : InputInstructionUI, IPointerEnterHandler
     {
         if (button == null || !button.interactable) return;
         ApplyVisualState(true, false);
+        CursorController.instance?.SetCursorState(CursorState.Hover); // Set Hover Cursor
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         if (button == null || !button.interactable) return;
         ApplyVisualState(false, false);
+        CursorController.instance?.SetCursorState(CursorState.DefaultRounded); // Reset Cursor
     }
 
     public void OnPointerDown(PointerEventData eventData)

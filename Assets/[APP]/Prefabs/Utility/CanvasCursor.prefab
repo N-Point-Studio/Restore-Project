@@ -52,8 +52,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17fd690f57fe3804f81f8eb17b94e083, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cursorTextureDefault: {fileID: 2800000, guid: 6a94f5ddaf9b1084aa1d3af81c363b35, type: 3}
-  clickPosition: {x: 0, y: 0}
+  cursorConfigs:
+  - state: 0
+    texture: {fileID: 2800000, guid: bfe62dfd99e5e8547a71baf42d42a8ea, type: 3}
+    alignment: 0
+    customClickPosition: {x: 0, y: 0}
+  - state: 1
+    texture: {fileID: 2800000, guid: 29d91aac7b057af4b8caec9e194c6b54, type: 3}
+    alignment: 1
+    customClickPosition: {x: 0, y: 0}
+  - state: 2
+    texture: {fileID: 2800000, guid: 61e58228d31a6464e94dda4f0693905d, type: 3}
+    alignment: 1
+    customClickPosition: {x: 0, y: 0}
+  - state: 3
+    texture: {fileID: 2800000, guid: 22950bc464d8a144c91420fd5f3ad6fd, type: 3}
+    alignment: 1
+    customClickPosition: {x: 0, y: 0}
+  - state: 4
+    texture: {fileID: 2800000, guid: 3b82bdfd4c60fce48b3b72b23d37c9be, type: 3}
+    alignment: 0
+    customClickPosition: {x: 0, y: 0}
+  - state: 5
+    texture: {fileID: 2800000, guid: 4f5bf03e73aa0884c821fb7c5d3fc0d1, type: 3}
+    alignment: 1
+    customClickPosition: {x: 0, y: 0}
   hideOnController: 1
 --- !u!223 &3721114052365804606
 Canvas:
