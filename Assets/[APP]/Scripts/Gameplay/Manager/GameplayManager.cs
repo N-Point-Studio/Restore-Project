@@ -14,7 +14,6 @@ public class GameplayManager : IInitializable, IDisposable
     private readonly TutorialService tutorialService;
 
     private ArtefactData artefactData;
-    public Action OnGameStarted;
     public bool isTutorialAvailable;
     public Vector3 finalRotation;
     private string targetScene = "MainMenu";
@@ -35,7 +34,6 @@ public class GameplayManager : IInitializable, IDisposable
         this.targetScene = targetScene;
         this.config = config;
         this.tutorialService = tutorialService;
-        AppLogger.Log("tutorial service ada? " + tutorialService);
 
         InitializeSession();
     }
@@ -54,11 +52,9 @@ public class GameplayManager : IInitializable, IDisposable
         LoadingEvents.OnLoadingFinished -= HandleLoadingFinished;
     }
 
-
     private void HandleGameFinished(bool isCompleted)
     {
         string loadingText = isCompleted ? "Displaying Artefact..." : "Returning to Menu...";
-
         StartSceneTransition(loadingText);
     }
 
@@ -77,18 +73,13 @@ public class GameplayManager : IInitializable, IDisposable
 
     private void SaveObjectCompletion()
     {
-        if (playerProgressionData == null || activeArtefactData == null)
-        {
-            AppLogger.LogWarning("Service Data not available - Cannot save data!");
-            return;
-        }
+        if (playerProgressionData == null || activeArtefactData == null) return;
 
         string currentArtefactId = playerProgressionData.CurrentActiveArtefactId;
 
         if (!string.IsNullOrEmpty(currentArtefactId))
         {
             activeArtefactData.CompleteArtefact(currentArtefactId);
-            AppLogger.Log($"[Gameplay Manager] Artefact{currentArtefactId} has been completed");
         }
     }
 
@@ -96,7 +87,9 @@ public class GameplayManager : IInitializable, IDisposable
     {
         Time.timeScale = 1f;
 
-        AppLogger.Log($"[Gameplay Manager] Back to menu using SceneLoader. Message: {loadingMessage}");
+        CursorController.instance?.UnlockCursorState();
+        CursorController.instance?.ClearOverrideCursor();
+        CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
 
         _ = sceneLoader.LoadSceneAsync(targetScene, config.minLoadingScreenDuration, loadingMessage);
     }
@@ -115,9 +108,6 @@ public class GameplayManager : IInitializable, IDisposable
             {
                 artefactData = activeArtefactData.GetArtefactDatabase().GetItem(targetId);
                 finalRotation = artefactData.FinalRotation;
-                // Debug.Log("final rotation: " + finalRotation);
-                AppLogger.Log($"[Gameplay Manager] Artefact:{artefactData.BaseData.Id} Loaded!");
-
 
                 List<ArtefactFragmentData> artefactFragments = artefactData.ArtefactFragmentDatas;
                 for (int i = 0; i < artefactFragments.Count; i++)
@@ -126,27 +116,15 @@ public class GameplayManager : IInitializable, IDisposable
                     Spawn(artefact.Prefab, artefact.SpawnTransform.Position, artefact.SpawnTransform.Rotation);
                 }
 
-                isTutorialAvailable = artefactData.BaseData.Id == "Artefact_Coin";
-            }
-            else
-            {
-                AppLogger.LogWarning("[Gameplay Manager] Empty artefact ID!");
+                isTutorialAvailable = artefactData.BaseData.Id == config.tutorialItemId;
             }
         }
     }
 
     private void Spawn(GameObject prefab, Vector3 position, Vector3 rotation)
     {
-        if (prefab == null)
-        {
-            AppLogger.LogError("[Gameplay Manager] Prefab is NULL!");
-            return;
-        }
-
+        if (prefab == null) return;
         Quaternion rot = Quaternion.Euler(rotation);
-
         GameObject obj = UnityEngine.Object.Instantiate(prefab, position, rot);
-
-        AppLogger.Log($"[Gameplay Manager] Spawned: {obj.name}");
     }
 }
