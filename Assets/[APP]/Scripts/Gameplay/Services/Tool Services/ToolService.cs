@@ -91,7 +91,7 @@ public class ToolService : IInitializable, IDisposable
         }
         else if (currentToolObject != null)
         {
-            if (currentInteract == currentToolObject.GetOrigin() || currentInteract == null)
+            if (currentInteract == currentToolObject.GetOrigin())
             {
                 ReturnCurrentTool();
             }
