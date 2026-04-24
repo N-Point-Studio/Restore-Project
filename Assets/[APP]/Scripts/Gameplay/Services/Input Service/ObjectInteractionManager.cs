@@ -1,5 +1,4 @@
 using System;
-using Modules;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -26,11 +25,9 @@ public class ObjectInteractionManager : IInitializable, IDisposable
         ObjectDragService swipe, ObjectHoldService hold, CleaningService cleaningService)
     {
         this.detectionService = detectionService;
-
-        pressService = press;
-        dragService = swipe;
-        holdService = hold;
-
+        this.pressService = press;
+        this.dragService = swipe;
+        this.holdService = hold;
         this.cleaningService = cleaningService;
     }
 
@@ -68,42 +65,41 @@ public class ObjectInteractionManager : IInitializable, IDisposable
 
     private void HandleInteractDetected(IInteractObject interact)
     {
-        // if (currentState == GestureState.InteractingWithObject) return;
-        // if (currentInteract == interact) return;
         currentInteract = interact;
-        // currentState = GestureState.InteractingWithObject;
-        // AppLogger.Log("Interact detected: " + interact);
-        // InteractionEvents.OnPressStarted?.Invoke(currentInteract);
     }
 
-    // public IInteractObject GetCurrentInteract()
-    // {
-    //     return currentInteract;
-    // }
+    private bool IsInteractValid()
+    {
+        if (currentInteract == null) return false;
+        if (currentInteract is MonoBehaviour mono && mono == null) return false; // Destroyed check
+        return true;
+    }
 
+    // --- PRESS EVENTS ---
     private void HandlePressStarted()
     {
-        if (currentInteract == null) return;
-        // detectionService.SetInteractObjectUsed(true);
         InteractionEvents.OnPressStart?.Invoke();
-        currentState = GestureState.InteractingWithObject;
-        detectionService.SetInteractObjectUsed(true);
+
+        if (IsInteractValid())
+        {
+            currentState = GestureState.InteractingWithObject;
+            detectionService.SetInteractObjectUsed(true);
+        }
     }
 
     private void HandlePressEnded()
     {
-        if (currentInteract == null) return;
-        // detectionService.SetInteractObjectUsed(false);
         InteractionEvents.OnPressEnd?.Invoke();
+
         currentState = GestureState.Idle;
         detectionService.SetInteractObjectUsed(false);
-        // InteractionEvents.OnPressEnded?.Invoke(currentInteract);
     }
 
+    // --- DRAG EVENTS ---
     private void HandleDragStart(Vector2 vector)
     {
-        // if (currentInteract == null || currentInteract.Equals(null)) return;
-        if (currentInteract == null) return;
+        if (!IsInteractValid()) return;
+        
         currentState = GestureState.InteractingWithObject;
         detectionService.SetInteractObjectUsed(true);
 
@@ -113,8 +109,8 @@ public class ObjectInteractionManager : IInitializable, IDisposable
 
     private void HandleDragPerformed(Vector2 vector)
     {
-        // if (currentInteract == null || currentInteract.Equals(null)) return;
-        if (currentInteract == null) return;
+        // Safely ignore drags if the object broke mid-drag
+        if (!IsInteractValid()) return;
 
         Vector3 worldPos = detectionService.ScreenToWorld(vector);
         InteractionEvents.OnDragPerformed?.Invoke(currentInteract, worldPos);
@@ -122,20 +118,22 @@ public class ObjectInteractionManager : IInitializable, IDisposable
 
     private void HandleDragEnded(Vector2 vector)
     {
-        // if (currentInteract == null || currentInteract.Equals(null)) return;
-        if (currentInteract == null) return;
-
-        Vector3 worldPos = detectionService.ScreenToWorld(vector, currentInteract);
-        InteractionEvents.OnDragEnded?.Invoke(currentInteract, worldPos);
+        if (IsInteractValid())
+        {
+            Vector3 worldPos = detectionService.ScreenToWorld(vector, currentInteract);
+            InteractionEvents.OnDragEnded?.Invoke(currentInteract, worldPos);
+        }
 
         currentState = GestureState.Idle;
         detectionService.SetInteractObjectUsed(false);
     }
 
+    // --- HOLD EVENTS ---
     private void HandleHoldPerformed(float val, Vector2 position)
     {
         if (cleaningService.isCleaning) return;
-        if (currentInteract == null) return;
+        if (!IsInteractValid()) return;
+        
         currentState = GestureState.InteractingWithObject;
         InteractionEvents.OnHoldPerformed?.Invoke(currentInteract, val, position);
     }
@@ -143,18 +141,21 @@ public class ObjectInteractionManager : IInitializable, IDisposable
     private void HandleHoldCompleted(Vector2 position)
     {
         if (cleaningService.isCleaning) return;
-        if (currentInteract == null) return;
+        if (!IsInteractValid()) return;
+        
         currentState = GestureState.InteractingWithObject;
         InteractionEvents.OnHoldCompleted?.Invoke(currentInteract, position);
-
     }
 
     private void HandleHoldCanceled(Vector2 position)
     {
         if (cleaningService.isCleaning) return;
-        if (currentInteract == null) return;
+        
+        if (IsInteractValid())
+        {
+            InteractionEvents.OnHoldCanceled?.Invoke(currentInteract, position);
+        }
+        
         currentState = GestureState.Idle;
-        InteractionEvents.OnHoldCanceled?.Invoke(currentInteract, position);
-
     }
 }

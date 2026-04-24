@@ -59,34 +59,35 @@ public class ArtefactManager : IInitializable, IDisposable
 
     private IArtefactPart ResolveArtefactPart(IInteractObject interact)
     {
+        if (interact == null) return null;
+        
+        // FIX: Safely check if the underlying object was destroyed!
+        if (interact is MonoBehaviour mono)
+        {
+            if (mono == null) return null; 
+            return mono.GetComponentInParent<IArtefactPart>();
+        }
+        
         if (interact is IArtefactPart part) return part;
-        if (interact is MonoBehaviour mono) return mono.GetComponentInParent<IArtefactPart>();
         return null;
     }
 
-    // --- DRAG LOGIC ---
-
     private void HandleDragStarted(IInteractObject interact, Vector3 worldPos)
     {
-        // Cache the artefact part exactly ONCE when the drag begins
         currentDraggedPart = ResolveArtefactPart(interact);
-
         if (interact is IDragObject drag) { drag.OnDragStarted(worldPos); }
     }
 
     private void HandleDragPerformed(IInteractObject interact, Vector3 worldPos)
     {
         if (interact is IDragObject drag) { drag.OnDragPerformed(worldPos); }
-        
-        // Re-use the cached part (Zero overhead!)
         if (currentDraggedPart != null) assemblyService.TryCheckSlot(currentDraggedPart, worldPos);
     }
 
     private void HandleDragEnded(IInteractObject interact, Vector3 worldPos)
     {
-        // Read the cache before we clear it
         IArtefactPart artefactPart = currentDraggedPart;
-        currentDraggedPart = null; // Clear the cache to prevent memory leaks
+        currentDraggedPart = null; 
 
         if (toolService.IsOnToolMode || artefactPart == null) return;
 
@@ -97,13 +98,10 @@ public class ArtefactManager : IInitializable, IDisposable
         if (interact is IDragObject drag) drag.OnDragEnded(worldPos);
     }
 
-    // --- HOLD LOGIC ---
-
     private void HandleHoldPerformed(IInteractObject interact, float holdTime, Vector2 position)
     {
         if (toolService.IsOnToolMode || isGameFinished) return;
 
-        // Only do the heavy lookup if we changed the object we are holding
         if (currentHoldInteract != interact)
         {
             currentHoldInteract = interact;
@@ -128,7 +126,6 @@ public class ArtefactManager : IInitializable, IDisposable
 
         IArtefactPart partToDetach = currentHoldPart;
 
-        // Clear caches
         currentHoldInteract = null;
         currentHoldPart = null;
 
@@ -148,12 +145,9 @@ public class ArtefactManager : IInitializable, IDisposable
         HideHoldProgress(currentHoldPart);
         isHoldingUI = false;
 
-        // Clear caches
         currentHoldInteract = null;
         currentHoldPart = null;
     }
-
-    // --- UI HELPERS ---
 
     private void ShowHoldProgress(IArtefactPart part, Vector2 position)
     {
