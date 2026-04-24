@@ -28,14 +28,14 @@ public class ObjectDragService : IInitializable, IDisposable
     public void Initialize()
     {
         inputSystemService.OnLeftPressStarted += HandlePressStarted;
-        inputSystemService.OnMouseMoved += HandlePressMoved;
+        InteractionEvents.OnMouseMoved += HandlePressMoved;
         inputSystemService.OnLeftPressEnded += HandlePressEnded;
     }
 
     public void Dispose()
     {
         inputSystemService.OnLeftPressStarted -= HandlePressStarted;
-        inputSystemService.OnMouseMoved -= HandlePressMoved;
+        InteractionEvents.OnMouseMoved -= HandlePressMoved;
         inputSystemService.OnLeftPressEnded -= HandlePressEnded;
     }
 

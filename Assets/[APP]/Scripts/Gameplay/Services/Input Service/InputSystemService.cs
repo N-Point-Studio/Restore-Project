@@ -11,8 +11,6 @@ public class InputSystemService : IInitializable, IDisposable, ITickable // Adde
     private readonly PlayerInputSystem inputSystem;
     private GameInput Input => inputSystem.Input;
 
-    // Player
-    public event Action<Vector2> OnMouseMoved;
     public event Action<Vector2> OnLeftPressStarted;
     public event Action<Vector2> OnLeftPressEnded;
     public event Action OnRightPressStarted;
@@ -66,7 +64,7 @@ public class InputSystemService : IInitializable, IDisposable, ITickable // Adde
         Input.Player.Scroll.performed -= HandleScrollPerformed;
         Input.Player.KeycodeEscape.performed -= HandlePlayerKeycodeEscapePerformed;
         Input.Player.KeycodeEnter.performed -= HandlePlayerKeycodeEnterPerformed;
-        
+
         Input.UI.KeycodeEnter.performed -= HandleUIKeycodeEnterPerformed;
         Input.UI.KeycodeEscape.performed -= HandleUIKeycodeEscapePerformed;
         Input.UI.KeycodeR.performed -= HandleUIKeycodeRPerformed;
@@ -111,7 +109,7 @@ public class InputSystemService : IInitializable, IDisposable, ITickable // Adde
     private void HandleLeftPressCanceled(InputAction.CallbackContext context) => OnLeftPressEnded?.Invoke(GetMousePosition());
     private void HandleRightPressStarted(InputAction.CallbackContext context) => OnRightPressStarted?.Invoke();
     private void HandleRightPressCanceled(InputAction.CallbackContext context) => OnRightPressEnded?.Invoke();
-    private void HandleMouseMoved(InputAction.CallbackContext context) => OnMouseMoved?.Invoke(context.ReadValue<Vector2>());
+    private void HandleMouseMoved(InputAction.CallbackContext context) => InteractionEvents.OnMouseMoved?.Invoke(context.ReadValue<Vector2>());
     private void HandleScrollPerformed(InputAction.CallbackContext context) => OnScrollPerformed?.Invoke(context.ReadValue<float>());
     private void HandlePlayerKeycodeEscapePerformed(InputAction.CallbackContext context) => OnPlayerKeycodeEscapePerformed?.Invoke();
     private void HandlePlayerKeycodeEnterPerformed(InputAction.CallbackContext context) => OnPlayerKeycodeEnterPerformed?.Invoke();

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
-public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDragObject, ICleanSurfaceObject, IArtefactPart
+public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDragObject, IClean, IArtefactPart
 {
     private Collider col;
     private Renderer rd;
@@ -33,22 +33,12 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
     public string pieceId;
     public List<ConnectionSocket> sockets;
 
-    // === CleaningObject ===
-    [SerializeField] CleaningSurfaceObject cleaning;
-
-
     //=== IInteractObject, IDragObject ===
     public void OnInteractDetected() => (currentState as IInteractObject)?.OnInteractDetected();
     public void OnInteractEnded() => (currentState as IInteractObject)?.OnInteractEnded();
     public void OnDragStarted(Vector3 worldPos) => (currentState as IDragObject)?.OnDragStarted(worldPos);
     public void OnDragPerformed(Vector3 worldPos) => (currentState as IDragObject)?.OnDragPerformed(worldPos);
     public void OnDragEnded(Vector3 worldPos) => (currentState as IDragObject)?.OnDragEnded(worldPos);
-
-    //=== ICleanObject ===
-    public void TryClean(Vector2 uv, Texture2D brush)
-    {
-        if (state != ArtefactPieceState.Idle) cleaning.TryClean(uv, brush);
-    }
 
     //=== IAssemble ===
     public Transform GetTransform() => transform;
@@ -81,5 +71,9 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
     public bool IsCleanable()
     {
         return state == ArtefactPieceState.Assembled;
+    }
+
+    public void ForceClean()
+    {
     }
 }

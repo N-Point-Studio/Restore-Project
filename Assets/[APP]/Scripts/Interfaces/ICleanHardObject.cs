@@ -6,3 +6,8 @@ public interface ICleanHardObject : ICleanable
     int MaxHit { get; }
     void Hit();
 }
+
+public interface ICleanChunk : IClean
+{
+    void Hit();
+}

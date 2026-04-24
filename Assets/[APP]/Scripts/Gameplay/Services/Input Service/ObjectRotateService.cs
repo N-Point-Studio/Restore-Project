@@ -21,14 +21,14 @@ public class ObjectRotateService : IInitializable, IDisposable
     {
         inputSystemService.OnRightPressStarted += HandleRightStarted;
         inputSystemService.OnRightPressEnded += HandleRightEnded;
-        inputSystemService.OnMouseMoved += HandleMouseMove;
+        InteractionEvents.OnMouseMoved += HandleMouseMove;
     }
 
     public void Dispose()
     {
         inputSystemService.OnRightPressStarted -= HandleRightStarted;
         inputSystemService.OnRightPressEnded -= HandleRightEnded;
-        inputSystemService.OnMouseMoved -= HandleMouseMove;
+        InteractionEvents.OnMouseMoved -= HandleMouseMove;
     }
 
     private void HandleRightStarted()

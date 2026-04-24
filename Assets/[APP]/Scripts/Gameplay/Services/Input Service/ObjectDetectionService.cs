@@ -1,42 +1,55 @@
 using System;
+using Modules;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using VContainer;
 using VContainer.Unity;
 
-public class ObjectDetectionService : IInitializable, IDisposable
+public class ObjectDetectionService : IInitializable, IDisposable, ITickable
 {
-    private readonly InputSystemService inputSystemService;
+    // private readonly InputSystemService inputSystemService;
     private readonly Camera cam;
     private IInteractObject interactable;
     public Action<IInteractObject> OnInteractDetected;
-    public Action OnInteractCanceled;
+    // public Action OnInteractCanceled;
 
     private readonly Plane plane;
+    private bool isUsed = false;
+    private Vector2 mousePos;
 
     [Inject]
     public ObjectDetectionService(InputSystemService inputSystemService, Camera cam, Plane plane)
     {
-        this.inputSystemService = inputSystemService;
+        // this.inputSystemService = inputSystemService;
         this.cam = cam;
         this.plane = plane;
     }
 
     public void Initialize()
     {
-        inputSystemService.OnLeftPressStarted += HandleLeftPressStarted;
-        inputSystemService.OnMouseMoved += HandleMouseMove;
-        inputSystemService.OnLeftPressEnded += HandleLeftPressEnded;
+        // inputSystemService.OnLeftPressStarted += HandleLeftPressStarted;
+        InteractionEvents.OnMouseMoved += HandleMouseMove;
+        // inputSystemService.OnLeftPressEnded += HandleLeftPressEnded;
     }
 
     public void Dispose()
     {
-        inputSystemService.OnLeftPressStarted -= HandleLeftPressStarted;
-        inputSystemService.OnMouseMoved -= HandleMouseMove;
-        inputSystemService.OnLeftPressEnded -= HandleLeftPressEnded;
+        // inputSystemService.OnLeftPressStarted -= HandleLeftPressStarted;
+        InteractionEvents.OnMouseMoved -= HandleMouseMove;
+        // inputSystemService.OnLeftPressEnded -= HandleLeftPressEnded;
     }
 
-    private void HandleLeftPressStarted(Vector2 vector)
+    // private void HandleLeftPressStarted(Vector2 vector)
+    // {
+    //     OnInteractDetected?.Invoke(interactable);
+    // }
+
+    // private void HandleLeftPressEnded(Vector2 vector)
+    // {
+    //     interactable = null;
+    // }
+
+    public void SetInteractObjectUsed(bool isUsed)
     {
         OnInteractDetected?.Invoke(interactable);
 
@@ -44,9 +57,11 @@ public class ObjectDetectionService : IInitializable, IDisposable
         {
             CursorController.instance?.SetCursorState(CursorState.GrabClose);
         }
+        if (interactable == null) return;
+        this.isUsed = isUsed;
     }
 
-    private void HandleLeftPressEnded(Vector2 vector)
+    public IInteractObject GetCurrentInteract()
     {
         if (interactable != null)
         {
@@ -59,6 +74,7 @@ public class ObjectDetectionService : IInitializable, IDisposable
         }
 
         interactable = null;
+        return interactable;
     }
 
     private void HandleMouseMove(Vector2 screenPos)
@@ -89,6 +105,7 @@ public class ObjectDetectionService : IInitializable, IDisposable
                 CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
             }
         }
+        mousePos = screenPos;
     }
 
     public bool TryRaycast(Vector2 screenPos, out RaycastHit hit)
@@ -120,5 +137,27 @@ public class ObjectDetectionService : IInitializable, IDisposable
         }
 
         return Vector3.zero;
+    }
+
+    public void Tick()
+    {
+
+        if (isUsed) return;
+        IInteractObject newTarget = null;
+
+        if (TryRaycast(mousePos, out var hit))
+        {
+            hit.collider.TryGetComponent(out newTarget);
+        }
+
+        if (newTarget != interactable)
+        {
+            interactable?.OnInteractEnded();
+            interactable = newTarget;
+            newTarget?.OnInteractDetected();
+            // AppLogger.Log("Mouse moved, new interactable: " + newTarget);
+        }
+
+        OnInteractDetected?.Invoke(newTarget);
     }
 }

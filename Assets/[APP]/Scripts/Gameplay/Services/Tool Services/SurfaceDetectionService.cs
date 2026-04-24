@@ -1,25 +1,20 @@
 using UnityEngine;
 using VContainer;
 
-public enum SurfaceDetectionType
-{
-    Texture,
-    Mesh
-}
-
 public class SurfaceDetectionService
 {
-    private Vector3 raycastNormal;
-    private Vector3 raycastPos;
-    private float tipRotation;
-    private Vector2 textureSurface;
-    private bool hasHit;
-
     private readonly Camera cam;
     private readonly int pieceLayerMask;
+    public Vector3 RaycastNormal { get; private set; }
+    public Vector3 RaycastPos { get; private set; } = Vector3.positiveInfinity;
+    public float TipRotation { get; private set; }
+    public Vector2 TextureSurface { get; private set; }
+    public bool HasHit { get; private set; }
 
-    private ICleanSurfaceObject currentSurfaceDetected;
-    private ICleanHardObject currentHardDetected;
+    public ICleanSurfaceObject CleanObject { get; private set; }
+    public ICleanHardObject HardObject { get; private set; }
+    public ICleanSurface CleanableSurface { get; private set; }
+    public ICleanChunk CleanableChunk { get; private set; }
 
     [Inject]
     public SurfaceDetectionService(Camera cam)
@@ -28,7 +23,7 @@ public class SurfaceDetectionService
         pieceLayerMask = LayerMask.GetMask("Dirts");
     }
 
-    public bool PerformRaycast(Vector2 screenPos, SurfaceDetectionType type)
+    public bool DetectSurface(Vector2 screenPos)
     {
         ResetDetection();
 
@@ -37,45 +32,47 @@ public class SurfaceDetectionService
         if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, pieceLayerMask))
             return false;
 
-        if (hit.collider.TryGetComponent(out ICleanable cleanable))
+        if (hit.collider.TryGetComponent(out IClean cleanable))
         {
-            hasHit = cleanable.IsCleanable();
+            HasHit = cleanable.IsCleanable();
         }
+
         EssentialDetecting(hit);
 
-        // cek interface
-        currentSurfaceDetected = hit.collider.GetComponentInParent<ICleanSurfaceObject>();
-        currentHardDetected = hit.collider.GetComponent<ICleanHardObject>();
+        CleanableChunk = hit.collider.GetComponent<ICleanChunk>();
 
-        return true;
+        if (CleanableChunk != null)
+        {
+            return HasHit;
+        }
+
+        CleanableSurface = hit.collider.GetComponentInParent<ICleanSurface>();
+
+        if (CleanableSurface != null && CleanableSurface.IsCleanable())
+        {
+            return HasHit;
+        }
+
+        return false;
     }
 
     private void ResetDetection()
     {
-        hasHit = false;
-        currentSurfaceDetected = null;
-        currentHardDetected = null;
-        raycastPos = Vector3.positiveInfinity;
+        HasHit = false;
+        CleanObject = null;
+        HardObject = null;
+        CleanableSurface = null;
+        RaycastPos = Vector3.positiveInfinity;
     }
 
     private void EssentialDetecting(RaycastHit hit)
     {
-        raycastNormal = hit.normal;
-        raycastPos = hit.point;
+        RaycastNormal = hit.normal;
+        RaycastPos = hit.point;
 
         Vector3 projectedUp = Vector3.ProjectOnPlane(Vector3.up, hit.normal);
-        tipRotation = Vector3.SignedAngle(Vector3.up, projectedUp, hit.normal);
+        TipRotation = Vector3.SignedAngle(Vector3.up, projectedUp, hit.normal);
 
-        textureSurface = hit.textureCoord;
+        TextureSurface = hit.textureCoord;
     }
-
-    public Vector3 RaycastNormal => raycastNormal;
-    public Vector3 RaycastPos => raycastPos;
-    public float TipRotation => tipRotation;
-    public Vector2 TextureSurface => textureSurface;
-
-    public bool HasHit => hasHit;
-
-    public ICleanSurfaceObject CleanObject => currentSurfaceDetected;
-    public ICleanHardObject HardObject => currentHardDetected;
 }
