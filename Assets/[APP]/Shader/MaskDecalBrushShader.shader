@@ -125,11 +125,15 @@ Shader "Custom/MaskDecalBrushShader"
             
             half4 frag(Varyings IN) : SV_Target
             {
+                half maskValue = SAMPLE_TEXTURE2D(_MaskTexture, sampler_MaskTexture, IN.uv).g;
+                
+                maskValue = step(0.5, maskValue); 
+                
                 half4 brush = GetBrushUV(IN.worldPos);
                 float d = dot(normalize(IN.normalWS), normalize(_PaintDirection));
                 float facingStrength = d > _AngleTolerance ? 1.0 : 0.0;
                 
-                return brush * facingStrength;
+                return lerp(0, brush * facingStrength, maskValue);
             }
             ENDHLSL
         }

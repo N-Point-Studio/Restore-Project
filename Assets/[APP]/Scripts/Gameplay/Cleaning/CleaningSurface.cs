@@ -50,29 +50,36 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface
         maskMaterial = new Material(maskShader);
         paintableMaterial = rend.material;
 
-        paintingMap = new RenderTexture(1024, 1024, 0, RenderTextureFormat.ARGB32);
-        paintingMap.Create();
+        paintingMap = CreateRenderTexture(1024);
+        maskMap = CreateRenderTexture(1024);
 
-        maskMap = new RenderTexture(1024, 1024, 0, RenderTextureFormat.ARGB32);
-        maskMap.Create();
+        if (maskTexture != null)
+        {
+            maskMaterial.SetTexture("_MaskTexture", maskTexture);
+            paintingMaterial.SetTexture("_MaskTexture", maskTexture);
+            paintableMaterial.SetTexture("_Mask", maskTexture);
+        }
 
-        cb = new CommandBuffer();
-        cb.name = "SurfaceWorldPainter-" + name;
+        cb = new CommandBuffer { name = $"SurfaceWorldPainter-{name}" };
 
         cb.SetRenderTarget(paintingMap);
         cb.ClearRenderTarget(true, true, Color.black);
 
         cb.SetRenderTarget(maskMap);
         cb.ClearRenderTarget(true, true, Color.black);
-
         cb.DrawMesh(mesh, transform.localToWorldMatrix, maskMaterial, 0, 0);
 
         Graphics.ExecuteCommandBuffer(cb);
         cb.Clear();
 
         paintableMaterial.SetTexture(maskTexturePropertyName, paintingMap);
-        maskMaterial.SetTexture("_MaskTexture", maskMap);
-        paintableMaterial.SetTexture("_Mask", maskTexture);
+    }
+
+    private RenderTexture CreateRenderTexture(int size)
+    {
+        RenderTexture rt = new RenderTexture(size, size, 0, RenderTextureFormat.ARGB32);
+        rt.Create();
+        return rt;
     }
 
     int CalculateTexture(RenderTexture rt)
@@ -122,12 +129,8 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface
     public float GetCleaningProgress()
     {
         if (maskPixel == 0) return 0f;
-
         float currentProgress = ((float)paintedPixel / maskPixel) * 100f;
-
-        // Kunci nilai dari 0 sampai 100 agar tidak tembus
         progress = Mathf.Clamp(currentProgress, 0f, 100f);
-
         return progress;
     }
 
@@ -149,7 +152,6 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface
 
     public void ForceClean()
     {
-
     }
 
     public void OnInteractDetected()
@@ -163,4 +165,10 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface
     public void SetColliderEnable(bool isActive)
     {
     }
+
+    // private void OnGUI()
+    // {
+    //     GUI.DrawTexture(new Rect(10, 10, 256, 256), paintingMap, ScaleMode.ScaleToFit, false, 1);
+    //     GUI.DrawTexture(new Rect(10, 300, 256, 256), maskMap, ScaleMode.ScaleToFit, false, 1);
+    // }
 }

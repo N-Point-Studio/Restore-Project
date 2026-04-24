@@ -12,6 +12,11 @@ Shader "Custom/MaskShader"
 
         Pass
         {
+            Cull Off
+            ZTest Always
+            ZWrite Off
+            Blend One One
+
             HLSLPROGRAM
 
             #pragma vertex vert
@@ -65,6 +70,9 @@ Shader "Custom/MaskShader"
             half4 frag(Varyings IN) : SV_Target
             {
                 half maskValue = SAMPLE_TEXTURE2D(_MaskTexture, sampler_MaskTexture, IN.uv).g;
+                
+                maskValue = step(0.5, maskValue); 
+                
                 return half4(1.0, 1.0, 1.0, 1.0) * maskValue;
             }
             ENDHLSL

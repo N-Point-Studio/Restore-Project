@@ -43,15 +43,14 @@ public class SurfaceDetectionService
 
         if (CleanableChunk != null)
         {
-            Debug.Log("chunk: " + CleanableChunk);
-            return true;
+            return HasHit;
         }
 
         CleanableSurface = hit.collider.GetComponentInParent<ICleanSurface>();
 
         if (CleanableSurface != null && CleanableSurface.IsCleanable())
         {
-            return true;
+            return HasHit;
         }
 
         return false;
