@@ -1,5 +1,4 @@
 using System;
-using Modules;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using VContainer;
@@ -7,11 +6,9 @@ using VContainer.Unity;
 
 public class ObjectDetectionService : IInitializable, IDisposable, ITickable
 {
-    // private readonly InputSystemService inputSystemService;
     private readonly Camera cam;
     private IInteractObject interactable;
     public Action<IInteractObject> OnInteractDetected;
-    // public Action OnInteractCanceled;
 
     private readonly Plane plane;
     private bool isUsed = false;
@@ -20,34 +17,19 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
     [Inject]
     public ObjectDetectionService(InputSystemService inputSystemService, Camera cam, Plane plane)
     {
-        // this.inputSystemService = inputSystemService;
         this.cam = cam;
         this.plane = plane;
     }
 
     public void Initialize()
     {
-        // inputSystemService.OnLeftPressStarted += HandleLeftPressStarted;
         InteractionEvents.OnMouseMoved += HandleMouseMove;
-        // inputSystemService.OnLeftPressEnded += HandleLeftPressEnded;
     }
 
     public void Dispose()
     {
-        // inputSystemService.OnLeftPressStarted -= HandleLeftPressStarted;
         InteractionEvents.OnMouseMoved -= HandleMouseMove;
-        // inputSystemService.OnLeftPressEnded -= HandleLeftPressEnded;
     }
-
-    // private void HandleLeftPressStarted(Vector2 vector)
-    // {
-    //     OnInteractDetected?.Invoke(interactable);
-    // }
-
-    // private void HandleLeftPressEnded(Vector2 vector)
-    // {
-    //     interactable = null;
-    // }
 
     public void SetInteractObjectUsed(bool isUsed)
     {
@@ -79,6 +61,13 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
 
     private void HandleMouseMove(Vector2 screenPos)
     {
+        // This prevents dropping the artefact or tool if the finger slips off the collider.
+        if (isUsed) 
+        {
+            mousePos = screenPos; // Keep updating position for drag math
+            return;
+        }
+
         IInteractObject newTarget = null;
 
         if (TryRaycast(screenPos, out var hit))
@@ -91,6 +80,10 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
             interactable?.OnInteractEnded();
             interactable = newTarget;
             newTarget?.OnInteractDetected();
+            
+            // Touch screens send Position and Press in the exact same frame. 
+            // If we wait for Tick() to notify the manager, the Press event will be ignored!
+            OnInteractDetected?.Invoke(newTarget);
         }
 
         if (Mouse.current != null && !Mouse.current.leftButton.isPressed && !Mouse.current.rightButton.isPressed)
@@ -118,11 +111,11 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
     {
         if (target is Component targetComp && targetComp != null && !targetComp.Equals(null))
         {
-            Camera cam = Camera.main;
-            float zDistance = cam.WorldToScreenPoint(targetComp.transform.position).z;
+            Camera camera = this.cam != null ? this.cam : Camera.main;
+            float zDistance = camera.WorldToScreenPoint(targetComp.transform.position).z;
 
             Vector3 screenPosWithDepth = new Vector3(screenPos.x, screenPos.y, zDistance);
-            return cam.ScreenToWorldPoint(screenPosWithDepth);
+            return camera.ScreenToWorldPoint(screenPosWithDepth);
         }
         return Vector3.zero;
     }
@@ -141,8 +134,8 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
 
     public void Tick()
     {
-
         if (isUsed) return;
+        
         IInteractObject newTarget = null;
 
         if (TryRaycast(mousePos, out var hit))
@@ -155,9 +148,8 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
             interactable?.OnInteractEnded();
             interactable = newTarget;
             newTarget?.OnInteractDetected();
-            // AppLogger.Log("Mouse moved, new interactable: " + newTarget);
+            
+            OnInteractDetected?.Invoke(newTarget);
         }
-
-        OnInteractDetected?.Invoke(newTarget);
     }
 }

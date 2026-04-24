@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class CleaningSurface : MonoBehaviour, ICleanSurface
+public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, IDragObject
 {
     [Header("Shader Setting")]
     [SerializeField] private Shader paintingShader;
@@ -33,6 +33,16 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface
     [SerializeField] private Texture2D maskTexture;
 
     public static event Action<ICleanSurface> OnCreated;
+
+    private IDragObject parentDragObject;
+
+    private void Awake()
+    {
+        if (transform.parent != null)
+        {
+            parentDragObject = transform.parent.GetComponentInParent<IDragObject>();
+        }
+    }
 
     void Start()
     {
@@ -121,9 +131,6 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface
         Graphics.ExecuteCommandBuffer(cb);
 
         paintedPixel = CalculateTexture(paintingMap);
-
-        // progress = maskPixel == 0 ? 0 : (float)paintedPixel / (float)maskPixel * 100;
-        // return progress;
     }
 
     public float GetCleaningProgress()
@@ -152,23 +159,23 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface
 
     public void ForceClean()
     {
+        if (cb != null && paintingMap != null)
+        {
+            cb.Clear();
+            cb.SetRenderTarget(paintingMap);
+            cb.ClearRenderTarget(true, true, paintingColor);
+            Graphics.ExecuteCommandBuffer(cb);
+
+            paintedPixel = maskPixel;
+            progress = 100f;
+        }
     }
 
-    public void OnInteractDetected()
-    {
-    }
+    public void OnInteractDetected() { }
+    public void OnInteractEnded() { }
+    public void SetColliderEnable(bool isActive) { }
 
-    public void OnInteractEnded()
-    {
-    }
-
-    public void SetColliderEnable(bool isActive)
-    {
-    }
-
-    // private void OnGUI()
-    // {
-    //     GUI.DrawTexture(new Rect(10, 10, 256, 256), paintingMap, ScaleMode.ScaleToFit, false, 1);
-    //     GUI.DrawTexture(new Rect(10, 300, 256, 256), maskMap, ScaleMode.ScaleToFit, false, 1);
-    // }
+    public void OnDragStarted(Vector3 worldPos) => parentDragObject?.OnDragStarted(worldPos);
+    public void OnDragPerformed(Vector3 worldPos) => parentDragObject?.OnDragPerformed(worldPos);
+    public void OnDragEnded(Vector3 worldPos) => parentDragObject?.OnDragEnded(worldPos);
 }

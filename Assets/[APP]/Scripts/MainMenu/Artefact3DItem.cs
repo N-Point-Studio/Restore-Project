@@ -36,11 +36,12 @@ public class Artefact3DItem : MonoBehaviour
     private bool isCompleted = false;
     
     private Vector3 originalPosition;
-    private Vector3 originalScale; // Track the original scale
+    private Vector3 originalScale; 
     private bool isPosInitialized = false;
 
     public string ArtefactId => artefactId;
     public bool IsInDetailMode => isInDetailMode;
+    
     public bool CheckUnpeeledNotes()
     {
         if (stickyNoteObjects == null) return false;
@@ -118,7 +119,7 @@ public class Artefact3DItem : MonoBehaviour
         if (!isPosInitialized)
         {
             originalPosition = transform.localPosition;
-            originalScale = transform.localScale; // Save the scale
+            originalScale = transform.localScale; 
             isPosInitialized = true;
         }
     }
@@ -185,7 +186,7 @@ public class Artefact3DItem : MonoBehaviour
     {
         if (boxTransform != null) 
         {
-            boxTransform.localScale = Vector3.zero;
+            boxTransform.localScale = Vector3.one;
             boxTransform.gameObject.SetActive(true); 
         }
 
@@ -194,13 +195,28 @@ public class Artefact3DItem : MonoBehaviour
 
     public void PlayCompletionAnimation()
     {
+        // 1. Smoothly reveal the Artefact
         if (artefactTransform != null) 
         {
-            artefactTransform.localScale = Vector3.zero; 
+            artefactTransform.localScale = Vector3.zero; // Start invisible
             artefactTransform.gameObject.SetActive(true);
+            
+            // Bounce up to full size with a tiny delay so the box has time to shrink
+            artefactTransform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack).SetDelay(0.15f);
         }
-        if (boxTransform != null) boxTransform.gameObject.SetActive(false);
         
+        // 2. Smoothly shrink the Box
+        if (boxTransform != null) 
+        {
+            // Shrink to zero, then deactivate it once the animation finishes
+            boxTransform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack).OnComplete(() => 
+            {
+                boxTransform.gameObject.SetActive(false);
+                boxTransform.localScale = Vector3.one; // Reset scale secretly for the next time it's used
+            });
+        }
+        
+        // 3. Play any particle effects or sounds you set up in Feel
         if (completionFeedback != null) completionFeedback.PlayFeedbacks();
     }
 
@@ -233,13 +249,12 @@ public class Artefact3DItem : MonoBehaviour
         transform.DOKill();
         
         Vector3 targetPos = show ? originalPosition : originalPosition + (Vector3.down * slideDownDistance);
-        // Calculate target scale (Shrink to 0 when hiding)
         Vector3 targetScale = show ? originalScale : Vector3.zero; 
 
         // Apply Position Lerp
         transform.DOLocalMove(targetPos, duration).SetEase(show ? Ease.OutBack : Ease.InBack);
         
-        // Apply Scale Lerp at the exact same time
+        // Apply Scale Lerp
         transform.DOScale(targetScale, duration).SetEase(show ? Ease.OutBack : Ease.InBack)
             .OnComplete(() => 
             {
