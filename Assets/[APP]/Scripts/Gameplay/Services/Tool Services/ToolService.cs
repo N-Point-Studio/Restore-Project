@@ -3,27 +3,25 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class ToolService : IInitializable, IDisposable
+public class ToolService : IInitializable, IDisposable, ITickable
 {
     private readonly ObjectDetectionService objectDetectionService;
     private readonly SurfaceDetectionService surfaceDetectionService;
     private readonly CleaningService cleaningService;
-    private ITool currentTool;
-    public bool isCleaning;
-    public bool isFinished = false;
-    private Vector2 lastMousePos;
-    private float audioKeepAliveTimer = 0f;
-    private const float AUDIO_GRACE_PERIOD = 0.15f;
+
+    public bool isCleaning { get; private set; }
+    public bool isFinished { get; set; } = false;
+    public bool IsOnToolMode => currentToolObject != null;
 
     private IToolObject currentToolObject;
     private IInteractObject currentInteract;
-
+    private Vector2 mousePos;
     private bool isSfxPlaying = false;
 
     [Inject]
     public ToolService(ObjectDetectionService objectDetectionService,
-    SurfaceDetectionService surfaceDetectionService,
-    CleaningService cleaningService)
+        SurfaceDetectionService surfaceDetectionService,
+        CleaningService cleaningService)
     {
         this.objectDetectionService = objectDetectionService;
         this.surfaceDetectionService = surfaceDetectionService;
@@ -52,6 +50,23 @@ public class ToolService : IInitializable, IDisposable
         GameplayUIManager.OnGameWrapped -= HandleGameWrapped;
     }
 
+    public void Tick()
+    {
+        if (currentToolObject == null) return;
+
+        if (surfaceDetectionService.DetectSurface(mousePos))
+        {
+            StickToSurfaces();
+        }
+        else
+        {
+            var worldPos = objectDetectionService.ScreenToWorld(mousePos, currentToolObject as IInteractObject);
+            currentToolObject.FollowMouse(worldPos);
+            PlayToolSfx(false);
+            PlayToolVfx(false);
+        }
+    }
+
     private void HandleObjectDetected(IInteractObject obj)
     {
         currentInteract = obj;
@@ -61,175 +76,152 @@ public class ToolService : IInitializable, IDisposable
     {
         if (isFinished && currentInteract == null) return;
 
-        // 1. When clicking a Tool to pick it up
-        if (currentInteract is IToolObject tool)
+        switch (currentInteract)
         {
-            if (currentToolObject != tool)
-            {
-                ReturnCurrentTool(); // Safely put away old tool if holding one
+            // 1. Interaksi dengan Tool (Pick up)
+            case IToolObject tool:
+                EquipTool(tool);
+                break;
 
-                currentToolObject = tool;
-                currentTool = tool as ITool; // Sync interface references
+            // 2. Interaksi dengan Objek yang bisa dibersihkan
+            case IClean clean when clean.IsCleanable():
+                isCleaning = true;
+                ProcessCleaning();
+                break;
 
-                currentToolObject?.Use();
-
-                CursorController.instance?.LockCursorState(CursorState.Crosshair);
-            }
-        }
-        // 2. When clicking a cleanable surface/chunk
-        else if (currentInteract is IClean clean)
-        {
-            isCleaning = true;
-            if (clean != null && clean.IsCleanable())
-            {
-                CleaningTarget();
-            }
-            else
-            {
+            // 3. Klik area asal tool (Kembalikan tool)
+            case var _ when IsOnToolMode && currentInteract == currentToolObject.GetOrigin():
                 ReturnCurrentTool();
-            }
-        }
-        else if (currentToolObject != null)
-        {
-            if (currentInteract == currentToolObject.GetOrigin())
-            {
-                ReturnCurrentTool();
-            }
+                break;
         }
     }
 
-    private void ReturnCurrentTool()
+    private void HandleMouseMove(Vector2 newMousePos)
     {
-        currentToolObject?.Return();
-        currentToolObject = null;
-        currentTool = null;
-        isCleaning = false;
+        mousePos = newMousePos;
 
-        CursorController.instance?.UnlockCursorState();
-        CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
-    }
-
-    private void CleaningTarget()
-    {
-        if (surfaceDetectionService.HasHit)
+        if (isCleaning)
         {
-            if (currentToolObject is IBrushTool brush)
-            {
-                CleanSurface(brush);
-            }
-            else
-            {
-                CleanChunk();
-            }
+            ProcessCleaning();
         }
     }
 
     private void HandlePressEnd()
     {
         if (isFinished) return;
+
         isCleaning = false;
+        PlayToolSfx(false);
+        PlayToolVfx(false);
     }
 
-    private void HandleMouseMove(Vector2 mousePos)
+    private void EquipTool(IToolObject tool)
+    {
+        if (currentToolObject == tool) return;
+
+        ReturnCurrentTool();
+
+        currentToolObject = tool;
+        currentToolObject.Use();
+
+        CursorController.instance?.LockCursorState(CursorState.Crosshair);
+    }
+
+    private void ReturnCurrentTool()
     {
         if (currentToolObject == null) return;
-        var worldPos = objectDetectionService.ScreenToWorld(mousePos, currentToolObject as IInteractObject);
-        float mouseDelta = Vector2.Distance(mousePos, lastMousePos);
-        lastMousePos = mousePos;
 
-        if (surfaceDetectionService.DetectSurface(mousePos))
+        currentToolObject.Return();
+        currentToolObject = null;
+
+        isCleaning = false;
+        PlayToolSfx(false);
+
+        CursorController.instance?.UnlockCursorState();
+        CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
+    }
+
+    private void ProcessCleaning()
+    {
+        if (!surfaceDetectionService.HasHit) return;
+
+        if (currentToolObject is IBrushTool brush)
         {
-            StickToSurfaces(mouseDelta);
+            CleanSurface(brush);
         }
         else
         {
-            currentToolObject.FollowMouse(worldPos);
+            CleanChunk();
         }
+        PlayToolVfx(true);
     }
 
-    private void PlayToolSfx(bool play)
+    private void StickToSurfaces()
     {
-        if (currentTool == null) return;
+        Vector3 targetPos = surfaceDetectionService.RaycastPos;
+        Vector3 targetNormal = surfaceDetectionService.RaycastNormal;
+        Quaternion targetRotation = Quaternion.LookRotation(-targetNormal, Vector3.up);
 
-        if (play && !isSfxPlaying)
-        {
-            currentTool.PlaySfx(true);
-            isSfxPlaying = true;
-        }
-        else if (!play && isSfxPlaying)
-        {
-            currentTool.PlaySfx(false);
-            isSfxPlaying = false;
-        }
+        currentToolObject.StickToSurface(targetPos, targetRotation);
     }
 
     private void CleanSurface(IBrushTool brushTool)
     {
-        var brush = brushTool.GetBrush;
-        var brushScale = brushTool.BrushScale;
-        var brushStrength = brushTool.BrushStrength;
-        var brushColor = brushTool.BrushColor;
-        var brushTransform = brushTool.BrushTransform.up;
         var surface = surfaceDetectionService.CleanableSurface;
-        var hitPoint = surfaceDetectionService.RaycastPos;
-        var hitNormal = surfaceDetectionService.RaycastNormal;
 
-        if (surface != null)
-        {
-            if (surfaceDetectionService.HasHit)
-            {
-                isCleaning = true;
-                PlayToolSfx(true);
-            }
-            else
-            {
-                ReturnCurrentTool();
-                return; // Exit early to prevent cleaning on nothing
-            }
+        if (surface == null) return;
 
-            cleaningService.CleanSurface(surface, brush, hitPoint, hitNormal, brushTransform, brushScale, brushStrength, brushColor);
-        }
+        PlayToolSfx(true);
+        cleaningService.CleanSurface(
+            surface,
+            brushTool.GetBrush,
+            surfaceDetectionService.RaycastPos,
+            surfaceDetectionService.RaycastNormal,
+            brushTool.BrushTransform.up,
+            brushTool.BrushScale,
+            brushTool.BrushStrength,
+            brushTool.BrushColor
+        );
     }
 
     private void CleanChunk()
     {
-        if (isFinished) return;
-
-        PlayToolSfx(false);
-
-        audioKeepAliveTimer = 0f;
-        isCleaning = false;
-
-        if (currentInteract == null) return;
+        if (isFinished || currentInteract == null) return;
 
         var chunk = surfaceDetectionService.CleanableChunk;
-        if (chunk != null) cleaningService.CleanChunk(chunk);
+        if (chunk == null) return;
+
+        isCleaning = false;
+        PlayToolSfx(true);
+        cleaningService.CleanChunk(chunk);
     }
 
-    public ITool GetCurrentTool()
+    private void PlayToolVfx(bool play)
     {
-        return currentTool;
+        if (currentToolObject == null) return;
+        currentToolObject.PlayVfx(play);
     }
 
-    private void StickToSurfaces(float mouseDelta)
+    private void PlayToolSfx(bool play)
     {
-        Vector3 targetPos = surfaceDetectionService.RaycastPos;
-        Vector3 targetNormal = surfaceDetectionService.RaycastNormal;
+        if (currentToolObject == null) return;
 
-        Quaternion targetRotation = Quaternion.LookRotation(-targetNormal, Vector3.up);
-        currentToolObject.StickToSurface(targetPos, targetRotation);
-
-        if (isCleaning)
+        if (play && !isSfxPlaying)
         {
-            CleaningTarget();
+            currentToolObject.PlaySfx(true);
+            isSfxPlaying = true;
+        }
+        else if (!play && isSfxPlaying)
+        {
+            currentToolObject.PlaySfx(false);
+            isSfxPlaying = false;
         }
     }
 
     private void HandleGameWrapped()
     {
         PlayToolSfx(false);
+        PlayToolVfx(false);
         ReturnCurrentTool();
     }
-
-    public bool IsOnToolMode => GetCurrentTool() != null;
 }

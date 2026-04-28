@@ -11,4 +11,5 @@ public class ToolChisel : Tool
     protected override void InteractEnded() { }
     protected override void PressEnded() { }
     protected override void PressStarted() { }
+    protected override void ToolVFX(bool isPlaying) { }
 }

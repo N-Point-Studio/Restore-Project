@@ -1,12 +1,9 @@
 using DG.Tweening;
+using Modules.SoundSystems;
 using UnityEngine;
 
 public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPressObject
 {
-
-    [Header("Tool type")]
-    // [SerializeField] protected SurfaceDetectionType toolType;
-
     [Header("Animation Settings")]
     [SerializeField] protected float returnAnimDuration = 0.5f;
     [SerializeField] protected float followMouseSpeed = 0.1f;
@@ -22,6 +19,12 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
     protected bool isReturning;
     protected bool isUsed;
     protected bool isStickingToSurface;
+    protected bool isSfxOn = false;
+    private int currentAudioId = -1;
+
+    [Header("Audio settings")]
+    [SerializeField] private AudioKey audioKey;
+    [SerializeField] private SoundType soundType;
 
     protected virtual void Awake()
     {
@@ -35,7 +38,10 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
     public void OnInteractDetected() => InteractDetected();
     public void OnInteractEnded() => InteractEnded();
     public bool IsStickingToSurface => IsStickingToSurface;
-    public IInteractObject GetOrigin() => origin as IInteractObject;
+
+
+    public AudioKey ToolSFX => audioKey;
+    public IInteractObject GetOrigin() => origin;
 
 
     public void SetColliderEnable(bool isActive)
@@ -71,6 +77,7 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         if (isReturning) return;
         transform.DOKill();
         transform.DOMove(worldPos, followMouseSpeed).SetEase(Ease.OutQuad);
+        // ToolMove();
     }
 
     public void StickToSurface(Vector3 position, Quaternion rotation)
@@ -89,4 +96,46 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
     protected abstract void InteractEnded();
     protected abstract void PressStarted();
     protected abstract void PressEnded();
+    protected abstract void ToolVFX(bool isPlaying);
+
+    public void PlaySfx(bool isPlaying)
+    {
+        if (soundType == SoundType.Once)
+        {
+            if (isPlaying)
+            {
+                SoundSystem.Instance.PlayAudio(audioKey, 1f, false, true, false);
+            }
+        }
+        else
+        {
+            if (isPlaying)
+            {
+                bool isAlreadyPlaying = false;
+                if (currentAudioId != -1)
+                {
+                    Audio activeAudio = SoundSystem.Instance.GetAudio(currentAudioId);
+                    if (activeAudio != null && activeAudio.IsPlaying)
+                    {
+                        isAlreadyPlaying = true;
+                    }
+                }
+
+                if (!isAlreadyPlaying)
+                {
+                    currentAudioId = SoundSystem.Instance.PlayAudio(audioKey, 1f, true, true, false);
+                }
+            }
+            else
+            {
+                if (currentAudioId != -1)
+                {
+                    SoundSystem.Instance.StopAudio(currentAudioId);
+                    currentAudioId = -1;
+                }
+            }
+        }
+    }
+
+    public void PlayVfx(bool isPlaying) { ToolVFX(isPlaying); }
 }

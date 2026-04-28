@@ -1,17 +1,5 @@
+using Modules.SoundSystems;
 using UnityEngine;
-
-public interface ITool
-{
-    void FollowMouse(Vector3 worldPos);
-    void Use();
-    void Return();
-    void StickToSurface(Vector3 position, Quaternion rotation);
-    void PlaySfx(bool isPlaying);
-    void PlayVfx(bool isPlaying);
-    void Moving(bool isMoving);
-    Texture2D GetBrush();
-    // SurfaceDetectionType ToolType { get; }
-}
 
 public interface IToolObject
 {
@@ -22,6 +10,8 @@ public interface IToolObject
     void SetStickToSurface(bool isSticking);
     bool IsStickingToSurface { get; }
     IInteractObject GetOrigin();
+    void PlaySfx(bool isPlaying);
+    void PlayVfx(bool isPlaying);
 }
 
 public interface IToolOrigin

@@ -6,7 +6,6 @@ Shader "Custom/MaskDecalBrushShader"
         [NoScaleOffset] _BrushTexture("Brush Texture", 2D) = "white" {}
         _BrushScale("Brush Scale", Range(0, 1)) = 0.5
         
-        // BARU: Pisahkan kedalaman brush dari scale-nya
         _BrushDepth("Brush Depth", Range(0.01, 1)) = 0.1 
         
         _BrushStrength("Brush Strength", Range(0, 1)) = 0.5
@@ -15,11 +14,9 @@ Shader "Custom/MaskDecalBrushShader"
         _BrushPosition("Brush Position (World)", Vector) = (0, 0, 0, 0)
         _PaintingColor("Painting Color", Color) = (1, 1, 1, 1)
         
-        // Asumsi: _PaintDirection adalah Normal dari permukaan yang diklik (hit.normal)
         _PaintDirection("Paint Direction (Normal)", Vector) = (0, 1, 0, 0) 
         _ToolDirection("Tool Direction", Vector) = (0, 0, 1, 0)
-        
-        // BARU: Kontrol seberapa ketat brush mendeteksi sisi yang miring
+
         _AngleTolerance("Angle Tolerance", Range(0, 1)) = 0.5
 
         [Header(Mask Properties)]
@@ -67,13 +64,13 @@ Shader "Custom/MaskDecalBrushShader"
 
             CBUFFER_START(UnityPerMaterial)
                 float _BrushScale;
-                float _BrushDepth; // BARU
+                float _BrushDepth;
                 float _BrushStrength;
                 float3 _BrushPosition; 
                 float4 _PaintingColor;
                 float3 _PaintDirection; 
                 float4 _ToolDirection;
-                float _AngleTolerance; // BARU
+                float _AngleTolerance;
             CBUFFER_END
 
             Varyings vert(Attributes IN)
@@ -113,7 +110,6 @@ Shader "Custom/MaskDecalBrushShader"
 
                 float depth = abs(dot(offset, _PaintDirection));
                 
-                // DIUBAH: Sekarang nembusnya pakai _BrushDepth, bukan _BrushScale
                 float depthFade = step(depth, _BrushDepth); 
 
                 half brushAlpha = SAMPLE_TEXTURE2D(_BrushTexture, sampler_BrushTexture, brushUV).r;
@@ -127,14 +123,15 @@ Shader "Custom/MaskDecalBrushShader"
             {
                 half maskValue = SAMPLE_TEXTURE2D(_MaskTexture, sampler_MaskTexture, IN.uv).g;
                 
-                maskValue = step(0.5, maskValue); 
+                float canPaint = step(0.01, maskValue); 
                 
                 half4 brush = GetBrushUV(IN.worldPos);
                 float d = dot(normalize(IN.normalWS), normalize(_PaintDirection));
                 float facingStrength = d > _AngleTolerance ? 1.0 : 0.0;
                 
-                return lerp(0, brush * facingStrength, maskValue);
+                return lerp(0, brush * facingStrength, canPaint);
             }
+            
             ENDHLSL
         }
     }
