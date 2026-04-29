@@ -178,4 +178,16 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
     public void OnDragStarted(Vector3 worldPos) => parentDragObject?.OnDragStarted(worldPos);
     public void OnDragPerformed(Vector3 worldPos) => parentDragObject?.OnDragPerformed(worldPos);
     public void OnDragEnded(Vector3 worldPos) => parentDragObject?.OnDragEnded(worldPos);
+
+    public void ShowClue(bool isShowing)
+    {
+        if (isShowing)
+        {
+            paintableMaterial.SetFloat("_ClueStrength", 1);
+        }
+        else
+        {
+            paintableMaterial.SetFloat("_ClueStrength", 0);
+        }
+    }
 }

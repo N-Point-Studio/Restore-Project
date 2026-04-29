@@ -18,6 +18,8 @@ public class InputSystemService : IInitializable, IDisposable, ITickable // Adde
     public event Action<float> OnScrollPerformed;
     public event Action OnPlayerKeycodeEscapePerformed;
     public event Action OnPlayerKeycodeEnterPerformed;
+    public event Action OnPlayerKeycodeTabPerformed;
+    public event Action OnPlayerKeycodeTabCanceled;
 
     // UI
     public event Action OnUIKeycodeEnterPerformed;
@@ -46,6 +48,8 @@ public class InputSystemService : IInitializable, IDisposable, ITickable // Adde
         Input.Player.Scroll.performed += HandleScrollPerformed;
         Input.Player.KeycodeEscape.performed += HandlePlayerKeycodeEscapePerformed;
         Input.Player.KeycodeEnter.performed += HandlePlayerKeycodeEnterPerformed;
+        Input.Player.KeycodeTab.performed += HandlePlayerKeycodeTabPerformed;
+        Input.Player.KeycodeTab.canceled += HandlePlayerKeycodeTabCanceled;
 
         Input.UI.KeycodeEnter.performed += HandleUIKeycodeEnterPerformed;
         Input.UI.KeycodeEscape.performed += HandleUIKeycodeEscapePerformed;
@@ -64,6 +68,8 @@ public class InputSystemService : IInitializable, IDisposable, ITickable // Adde
         Input.Player.Scroll.performed -= HandleScrollPerformed;
         Input.Player.KeycodeEscape.performed -= HandlePlayerKeycodeEscapePerformed;
         Input.Player.KeycodeEnter.performed -= HandlePlayerKeycodeEnterPerformed;
+        Input.Player.KeycodeTab.performed -= HandlePlayerKeycodeTabPerformed;
+        Input.Player.KeycodeTab.canceled -= HandlePlayerKeycodeTabCanceled;
 
         Input.UI.KeycodeEnter.performed -= HandleUIKeycodeEnterPerformed;
         Input.UI.KeycodeEscape.performed -= HandleUIKeycodeEscapePerformed;
@@ -122,6 +128,10 @@ public class InputSystemService : IInitializable, IDisposable, ITickable // Adde
         }
         return Input.Player.ScreenPos.ReadValue<Vector2>();
     }
+
+    private void HandlePlayerKeycodeTabPerformed(InputAction.CallbackContext context) => OnPlayerKeycodeTabPerformed?.Invoke();
+    private void HandlePlayerKeycodeTabCanceled(InputAction.CallbackContext context) => OnPlayerKeycodeTabCanceled?.Invoke();
+
 
     // UI
     private void HandleUIKeycodeEnterPerformed(InputAction.CallbackContext context) => OnUIKeycodeEnterPerformed?.Invoke();

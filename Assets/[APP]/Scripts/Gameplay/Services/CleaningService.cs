@@ -9,6 +9,7 @@ public class CleaningService : IInitializable, IDisposable
 {
     private readonly HashSet<ICleanSurface> cleanSurfaces = new();
     private readonly HashSet<ICleanChunk> cleanChunks = new();
+    private InputSystemService inputSystemService;
 
     public bool isCleaning;
 
@@ -18,11 +19,20 @@ public class CleaningService : IInitializable, IDisposable
     public event Action<float> OnSurfaceCleaningUpdate;
     public event Action<float> OnHardCleaningUpdate;
 
+    [Inject]
+    public void Construct(InputSystemService input)
+    {
+        inputSystemService = input;
+    }
+
     public void Initialize()
     {
         CleaningChunk.OnCreated += RegisterChunk;
         CleaningChunk.OnDestroyed += CalculateChunks;
         CleaningSurface.OnCreated += RegisterSurface;
+
+        inputSystemService.OnPlayerKeycodeTabPerformed += HandleKeycodeTabPerformed;
+        inputSystemService.OnPlayerKeycodeTabCanceled += HandleKeycodeTabCanceled;
     }
 
     public void Dispose()
@@ -30,6 +40,9 @@ public class CleaningService : IInitializable, IDisposable
         CleaningChunk.OnCreated -= RegisterChunk;
         CleaningChunk.OnDestroyed -= CalculateChunks;
         CleaningSurface.OnCreated -= RegisterSurface;
+
+        inputSystemService.OnPlayerKeycodeTabPerformed -= HandleKeycodeTabPerformed;
+        inputSystemService.OnPlayerKeycodeTabCanceled -= HandleKeycodeTabCanceled;
     }
 
     private void RegisterChunk(CleaningChunk chunk)
@@ -50,6 +63,23 @@ public class CleaningService : IInitializable, IDisposable
     {
         Debug.Log("Registering clean surface: " + surface);
         cleanSurfaces.Add(surface);
+    }
+
+    private void HandleKeycodeTabPerformed()
+    {
+        foreach (ICleanSurface surface in cleanSurfaces)
+        {
+            if (surface.GetCleaningProgress() > 85f)
+                surface.ShowClue(true);
+        }
+    }
+
+    private void HandleKeycodeTabCanceled()
+    {
+        foreach (ICleanSurface surface in cleanSurfaces)
+        {
+            surface.ShowClue(false);
+        }
     }
 
     public void CleanSurface(ICleanSurface surface, Texture2D brush, Vector3 hitPoint, Vector3 hitNormal, Vector3 direction, float scale, float strength, Color color)

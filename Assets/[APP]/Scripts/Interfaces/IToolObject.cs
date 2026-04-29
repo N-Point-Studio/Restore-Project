@@ -21,3 +21,8 @@ public interface IBrushTool
     Color BrushColor { get; }
     Transform BrushTransform { get; }
 }
+
+public interface IClickTool
+{
+    void PlayAnimation();
+}

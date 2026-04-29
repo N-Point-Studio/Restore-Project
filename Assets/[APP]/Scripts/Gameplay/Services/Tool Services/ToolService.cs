@@ -78,18 +78,20 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
         switch (currentInteract)
         {
-            // 1. Interaksi dengan Tool (Pick up)
             case IToolObject tool:
                 EquipTool(tool);
                 break;
 
-            // 2. Interaksi dengan Objek yang bisa dibersihkan
             case IClean clean when clean.IsCleanable():
                 isCleaning = true;
                 ProcessCleaning();
                 break;
 
-            // 3. Klik area asal tool (Kembalikan tool)
+            case IClean clean when !clean.IsCleanable():
+                isCleaning = false;
+                ReturnCurrentTool();
+                break;
+
             case var _ when IsOnToolMode && currentInteract == currentToolObject.GetOrigin():
                 ReturnCurrentTool();
                 break;
@@ -193,6 +195,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
         isCleaning = false;
         PlayToolSfx(true);
+        if (currentToolObject is IClickTool tool) tool.PlayAnimation();
         cleaningService.CleanChunk(chunk);
     }
 
