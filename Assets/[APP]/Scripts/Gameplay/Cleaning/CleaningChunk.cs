@@ -1,30 +1,27 @@
 using System;
+using DG.Tweening;
 using UnityEngine;
 
 public class CleaningChunk : MonoBehaviour, IInteractObject, ICleanChunk, IDragObject
 {
     [SerializeField] private int maxHit = 3;
 
-    [Header("Thickness Settings")]
-    [SerializeField] private float minThickness = 0.05f;
-    [SerializeField] private float maxThickness = 0.1f;
-
     [Header("Chunk VFX")]
     [SerializeField] private ParticleSystem debuVFX;
     [SerializeField] private ParticleSystem chunkVFX;
 
     private int currentHit;
-    private bool isDestroying = false; // Penanda agar tidak di-hit double
+    private bool isDestroying = false;
 
     public static event Action<CleaningChunk> OnCreated;
     public static event Action<CleaningChunk> OnDestroyed;
 
     private Renderer rend;
-    private Collider col; // Tambahkan referensi collider
+    private Collider col;
     private Material myMaterial;
-    int thicknessFalloff = Shader.PropertyToID("_ThicknessFalloff");
 
-    // Parent reference for dragging
+    private int crackThresholdID = Shader.PropertyToID("_Treshold");
+
     private IDragObject parentDragObject;
 
     private void Awake()
@@ -35,11 +32,12 @@ public class CleaningChunk : MonoBehaviour, IInteractObject, ICleanChunk, IDragO
         }
 
         rend = GetComponent<Renderer>();
-        col = GetComponent<Collider>(); // Ambil komponen collider
+        col = GetComponent<Collider>();
 
         if (rend != null)
         {
             myMaterial = rend.material;
+            myMaterial.SetFloat(crackThresholdID, 1f);
         }
     }
 
@@ -47,33 +45,56 @@ public class CleaningChunk : MonoBehaviour, IInteractObject, ICleanChunk, IDragO
     {
         OnCreated?.Invoke(this);
 
-        // Pastikan VFX tidak menyala di awal (jaga-jaga jika Play On Awake aktif di Inspector)
         if (debuVFX != null) debuVFX.Stop();
         if (chunkVFX != null) chunkVFX.Stop();
     }
 
     public void Hit()
     {
-        // Jika sedang dalam proses hancur, abaikan hit
         if (isDestroying) return;
 
         currentHit++;
 
-        if (myMaterial != null)
-        {
-            float t = 1f;
-            if (maxHit > 1)
-            {
-                t = (float)(currentHit - 1) / (maxHit - 1);
-            }
 
-            float currentFalloff = Mathf.Lerp(minThickness, maxThickness, t);
-            myMaterial.SetFloat(thicknessFalloff, currentFalloff);
+        if (debuVFX != null)
+        {
+            debuVFX.Stop();
+            debuVFX.Play();
+        }
+
+        if (chunkVFX != null)
+        {
+            chunkVFX.Stop();
+            chunkVFX.Play();
         }
 
         if (currentHit >= maxHit)
         {
             DestroyChunk();
+            return;
+        }
+
+        if (myMaterial != null)
+        {
+            float crackValue = 1f;
+            if (maxHit == 2)
+            {
+                crackValue = 0f;
+            }
+            else
+            {
+                if (currentHit == 1)
+                {
+                    crackValue = 0.3f;
+                }
+                else
+                {
+                    float t = (float)(currentHit - 1) / (maxHit - 2);
+                    crackValue = Mathf.Lerp(0.3f, 0f, t);
+                }
+            }
+
+            myMaterial.SetFloat(crackThresholdID, crackValue);
         }
     }
 
@@ -87,24 +108,18 @@ public class CleaningChunk : MonoBehaviour, IInteractObject, ICleanChunk, IDragO
     private void DestroyChunk()
     {
         if (isDestroying) return;
-        isDestroying = true; // Tandai bahwa objek sedang proses hancur
+        isDestroying = true;
 
-        // Beritahu sistem bahwa chunk ini sudah hancur/dibersihkan
         OnDestroyed?.Invoke(this);
 
-        // 1. Sembunyikan Visual
         if (rend != null) rend.enabled = false;
-
-        // 2. Matikan Collision
         if (col != null) col.enabled = false;
 
-        // 3. Play VFX
-        float destroyDelay = 2f; // Default delay jika VFX kosong
+        float destroyDelay = 2f;
 
         if (debuVFX != null)
         {
             debuVFX.Play();
-            // Ambil durasi terpanjang dari partikel untuk delay destroy
             destroyDelay = Mathf.Max(destroyDelay, debuVFX.main.duration + debuVFX.main.startLifetime.constantMax);
         }
 
@@ -114,7 +129,6 @@ public class CleaningChunk : MonoBehaviour, IInteractObject, ICleanChunk, IDragO
             destroyDelay = Mathf.Max(destroyDelay, chunkVFX.main.duration + chunkVFX.main.startLifetime.constantMax);
         }
 
-        // 4. Hancurkan GameObject setelah VFX selesai
         Destroy(gameObject, destroyDelay);
     }
 
@@ -139,7 +153,6 @@ public class CleaningChunk : MonoBehaviour, IInteractObject, ICleanChunk, IDragO
 
     public void ForceClean() { DestroyChunk(); }
 
-    // Forward IDragObject commands to the Artefact
     public void OnDragStarted(Vector3 worldPos) => parentDragObject?.OnDragStarted(worldPos);
     public void OnDragPerformed(Vector3 worldPos) => parentDragObject?.OnDragPerformed(worldPos);
     public void OnDragEnded(Vector3 worldPos) => parentDragObject?.OnDragEnded(worldPos);

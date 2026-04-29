@@ -1,4 +1,3 @@
-using Modules.SoundSystems;
 using UnityEngine;
 
 public interface IToolObject
@@ -12,11 +11,6 @@ public interface IToolObject
     IInteractObject GetOrigin();
     void PlaySfx(bool isPlaying);
     void PlayVfx(bool isPlaying);
-}
-
-public interface IToolOrigin
-{
-    void CheckOrigin(bool isCheck);
 }
 
 public interface IBrushTool

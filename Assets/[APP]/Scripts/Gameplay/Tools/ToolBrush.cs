@@ -16,7 +16,6 @@ public class ToolBrush : Tool, IBrushTool
     protected override void Awake()
     {
         base.Awake();
-        // Di awal main, pastikan partikel tidak mengeluarkan emission
         SetVfxEmission(0f, 0f);
     }
 
