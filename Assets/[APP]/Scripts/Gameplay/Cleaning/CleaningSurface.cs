@@ -188,10 +188,12 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
         if (isShowing)
         {
             paintableMaterial.SetFloat("_ClueStrength", 1);
+            paintableMaterial.SetFloat("_BlackoutStrength", 0.2f);
         }
         else
         {
             paintableMaterial.SetFloat("_ClueStrength", 0);
+            paintableMaterial.SetFloat("_BlackoutStrength", 1f);
         }
     }
 

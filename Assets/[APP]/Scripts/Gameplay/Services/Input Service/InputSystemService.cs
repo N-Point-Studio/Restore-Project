@@ -129,8 +129,8 @@ public class InputSystemService : IInitializable, IDisposable, ITickable // Adde
         return Input.Player.ScreenPos.ReadValue<Vector2>();
     }
 
-    private void HandlePlayerKeycodeTabPerformed(InputAction.CallbackContext context) => OnPlayerKeycodeTabPerformed?.Invoke();
-    private void HandlePlayerKeycodeTabCanceled(InputAction.CallbackContext context) => OnPlayerKeycodeTabCanceled?.Invoke();
+    private void HandlePlayerKeycodeTabPerformed(InputAction.CallbackContext context) => InteractionEvents.OnTabPerformed?.Invoke();
+    private void HandlePlayerKeycodeTabCanceled(InputAction.CallbackContext context) => InteractionEvents.OnTabCanceled?.Invoke();
 
 
     // UI

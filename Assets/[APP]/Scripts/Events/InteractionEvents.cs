@@ -5,6 +5,9 @@ public static class InteractionEvents
 {
     public static Action<Vector2> OnMouseMoved;
 
+    public static Action OnTabPerformed;
+    public static Action OnTabCanceled;
+
     public static Action<IInteractObject> OnPressStarted;
     public static Action OnPressStart;
     public static Action<IInteractObject> OnPressEnded;

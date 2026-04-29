@@ -31,8 +31,8 @@ public class CleaningService : IInitializable, IDisposable
         CleaningChunk.OnDestroyed += CalculateChunks;
         CleaningSurface.OnCreated += RegisterSurface;
 
-        inputSystemService.OnPlayerKeycodeTabPerformed += HandleKeycodeTabPerformed;
-        inputSystemService.OnPlayerKeycodeTabCanceled += HandleKeycodeTabCanceled;
+        InteractionEvents.OnTabPerformed += HandleKeycodeTabPerformed;
+        InteractionEvents.OnTabCanceled += HandleKeycodeTabCanceled;
     }
 
     public void Dispose()
@@ -41,8 +41,8 @@ public class CleaningService : IInitializable, IDisposable
         CleaningChunk.OnDestroyed -= CalculateChunks;
         CleaningSurface.OnCreated -= RegisterSurface;
 
-        inputSystemService.OnPlayerKeycodeTabPerformed -= HandleKeycodeTabPerformed;
-        inputSystemService.OnPlayerKeycodeTabCanceled -= HandleKeycodeTabCanceled;
+        InteractionEvents.OnTabPerformed -= HandleKeycodeTabPerformed;
+        InteractionEvents.OnTabCanceled -= HandleKeycodeTabCanceled;
     }
 
     private void RegisterChunk(CleaningChunk chunk)
@@ -69,7 +69,7 @@ public class CleaningService : IInitializable, IDisposable
     {
         foreach (ICleanSurface surface in cleanSurfaces)
         {
-            if (surface.GetCleaningProgress() > 85f)
+            if (surface.GetCleaningProgress() > 10f)
                 surface.ShowClue(true);
         }
     }
