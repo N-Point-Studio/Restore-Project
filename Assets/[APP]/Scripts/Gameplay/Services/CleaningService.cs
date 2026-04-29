@@ -137,4 +137,9 @@ public class CleaningService : IInitializable, IDisposable
 
         return (float)destroyedHardObjects / totalHardObjects;
     }
+
+    public bool IsDustRemoved(ICleanSurface surface)
+    {
+        return surface.IsDustRemoved();
+    }
 }

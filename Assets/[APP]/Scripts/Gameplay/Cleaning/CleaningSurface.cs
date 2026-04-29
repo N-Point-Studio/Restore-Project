@@ -27,6 +27,7 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
     public int maskPixel = 0;
     public int paintedPixel = 0;
     public float progress = 0;
+    public bool isDirtRemoved = false;
 
     [Header("Material Integration")]
     [SerializeField] private string maskTexturePropertyName = "_SubMask";
@@ -117,6 +118,8 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
 
     public void CleanSurface(Vector3 hitPoint, Texture2D brush, Vector3 hitNormal, Vector3 direction, float scale = 0.5f, float strength = 0.5f)
     {
+        var tempPercentage = paintedPixel;
+
         paintingMaterial.SetTexture("_BrushTexture", brush);
         paintingMaterial.SetVector("_BrushPosition", hitPoint);
         paintingMaterial.SetVector("_PaintDirection", hitNormal);
@@ -131,6 +134,7 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
         Graphics.ExecuteCommandBuffer(cb);
 
         paintedPixel = CalculateTexture(paintingMap);
+        isDirtRemoved = paintedPixel > tempPercentage;
     }
 
     public float GetCleaningProgress()
@@ -189,5 +193,10 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
         {
             paintableMaterial.SetFloat("_ClueStrength", 0);
         }
+    }
+
+    public bool IsDustRemoved()
+    {
+        return isDirtRemoved;
     }
 }

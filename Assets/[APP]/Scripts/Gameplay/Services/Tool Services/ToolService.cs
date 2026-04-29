@@ -155,7 +155,6 @@ public class ToolService : IInitializable, IDisposable, ITickable
         {
             CleanChunk();
         }
-        PlayToolVfx(true);
     }
 
     private void StickToSurfaces()
@@ -184,6 +183,15 @@ public class ToolService : IInitializable, IDisposable, ITickable
             brushTool.BrushStrength,
             brushTool.BrushColor
         );
+
+        if (cleaningService.IsDustRemoved(surface))
+        {
+            PlayToolVfx(true);
+        }
+        else
+        {
+            PlayToolVfx(false);
+        }
     }
 
     private void CleanChunk()
@@ -195,6 +203,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
         isCleaning = false;
         PlayToolSfx(true);
+        PlayToolVfx(true);
         if (currentToolObject is IClickTool tool) tool.PlayAnimation();
         cleaningService.CleanChunk(chunk);
     }

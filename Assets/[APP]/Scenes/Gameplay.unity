@@ -19217,6 +19217,7 @@ MonoBehaviour:
   maskPixel: 0
   paintedPixel: 0
   progress: 0
+  isDirtRemoved: 0
   maskTexturePropertyName: _SubMask
   maskTexture: {fileID: 2800000, guid: e91c549daafa645488dbb8c7768d28f5, type: 3}
 --- !u!1 &893493418
@@ -22848,23 +22849,23 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 84516473952733204, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 84516473952733204, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 84516473952733204, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 66.07
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 84516473952733204, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 41.035
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 84516473952733204, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -20
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1701600106505507516, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_text
@@ -22968,7 +22969,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6200343798872231526, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 82.07
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6200343798872231526, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -22976,23 +22977,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6407055669889038493, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6407055669889038493, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6407055669889038493, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 113.12
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6407055669889038493, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 94.07
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6407055669889038493, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -9.115
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6829846748616176537, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_text
@@ -37243,7 +37244,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10301, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 1cb323269985f420b8f2ff8220362446, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -37666,39 +37667,43 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 414602451487423449, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1028971242236806993, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1222025986982595595, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1670227231106103437, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1734396419149098551, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
+      propertyPath: brushPreviewShader
+      value: 
+      objectReference: {fileID: 4800000, guid: eedad2bd07705489e8acd56dca6b9a56, type: 3}
     - target: {fileID: 1846068303051538916, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1903681637875831080, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2450578425645770511, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2617394985965498065, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2701565015572005502, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2750810606759805354, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -37706,23 +37711,23 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: bfba27d915aae43a3b5e4ba8ffdd7c48, type: 2}
     - target: {fileID: 3246222997504932092, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3456799814219158407, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4053772710425220155, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4305634912928055075, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4588977329305116129, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4817910611224023873, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -37730,11 +37735,11 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: bfba27d915aae43a3b5e4ba8ffdd7c48, type: 2}
     - target: {fileID: 5015192644843999776, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5464535631655444450, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5670894415580107499, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_LocalPosition.x
@@ -37778,27 +37783,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6142648334650052131, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6289863799594982476, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6748801168204466143, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7041953111702276089, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7382387915874892764, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7839040800651363017, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8926846074902999173, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
       propertyPath: m_Name
@@ -47413,7 +47418,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 3
       scalar: 2
-      minScalar: 1
+      minScalar: 0.5
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -47465,7 +47470,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.05
+      scalar: 0.02
       minScalar: 0.01
       maxCurve:
         serializedVersion: 2
@@ -47907,7 +47912,7 @@ ParticleSystem:
     gravityModifier:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.1
+      scalar: 0.02
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -48166,7 +48171,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 3
+      scalar: 1
       minScalar: 10
       maxCurve:
         serializedVersion: 2
