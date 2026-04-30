@@ -9,9 +9,17 @@ public class ToolBrush : Tool, IBrushTool
     [Range(0, 1)][SerializeField] private float brushStrength = 0.5f;
     [SerializeField] private Color paintingColor = Color.white;
 
+    [Header("Animation Smoothing")]
+    [SerializeField] private float animationSmoothSpeed = 10f;
+    private float currentMoveX = 0f;
+    private float currentMoveY = 0f;
+    private float targetMoveX = 0f;
+    private float targetMoveY = 0f;
+
     [Header("VFX")]
     [SerializeField] private ParticleSystem smokeVFX;
     [SerializeField] private ParticleSystem dustVFX;
+    private Vector3 lastPosition;
 
     private readonly int MoveHorizontal = Animator.StringToHash("MoveHorizontal");
     private readonly int MoveVertical = Animator.StringToHash("MoveVertical");
@@ -20,6 +28,37 @@ public class ToolBrush : Tool, IBrushTool
     {
         base.Awake();
         SetVfxEmission(0f, 0f);
+        lastPosition = transform.position;
+    }
+
+    private void Update()
+    {
+        Vector3 delta = transform.position - lastPosition;
+
+        Vector2 movement = new Vector2(delta.x, delta.y);
+
+        if (movement.magnitude < 0.0001f)
+        {
+            movement = Vector2.zero;
+        }
+        else
+        {
+            movement = movement.normalized;
+        }
+
+        targetMoveX = movement.x;
+        targetMoveY = movement.y;
+
+        lastPosition = transform.position;
+
+        if (animator != null && animator.isActiveAndEnabled)
+        {
+            currentMoveX = Mathf.Lerp(currentMoveX, targetMoveX, Time.deltaTime * animationSmoothSpeed);
+            currentMoveY = Mathf.Lerp(currentMoveY, targetMoveY, Time.deltaTime * animationSmoothSpeed);
+
+            animator.SetFloat(MoveHorizontal, currentMoveX);
+            animator.SetFloat(MoveVertical, currentMoveY);
+        }
     }
 
     protected override void InteractDetected() { }
@@ -51,26 +90,6 @@ public class ToolBrush : Tool, IBrushTool
         else
         {
             SetVfxEmission(0f, 0f);
-        }
-    }
-
-    protected override void Moving()
-    {
-        // Kalau sedang tidak nempel surface (FollowMouse), paksa balik ke Idle (0, 0)
-        if (animator != null && animator.isActiveAndEnabled)
-        {
-            animator.SetFloat(MoveHorizontal, 0f);
-            animator.SetFloat(MoveVertical, 0f);
-        }
-    }
-
-    protected override void StickSurface(float x, float y)
-    {
-        // Masukkan kalkulasi x dan y dari Tool.cs ke Animator
-        if (animator != null && animator.isActiveAndEnabled)
-        {
-            animator.SetFloat(MoveHorizontal, x);
-            animator.SetFloat(MoveVertical, y);
         }
     }
 

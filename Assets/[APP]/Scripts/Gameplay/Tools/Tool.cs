@@ -28,7 +28,6 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
 
     [Header("Animation Settings")]
     [SerializeField] protected Animator animator;
-    private Vector3 movement;
 
     protected virtual void Awake()
     {
@@ -36,7 +35,6 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         initialRotation = transform.rotation;
         col = GetComponent<Collider>();
         animator.enabled = false;
-        movement = transform.position;
     }
     public void OnPressStarted() => PressStarted();
     public void OnPressEnded() => PressEnded();
@@ -85,22 +83,13 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         if (isReturning) return;
         transform.DOKill();
         transform.DOMove(worldPos, followMouseSpeed).SetEase(Ease.OutQuad);
-        // Moving();
     }
 
     public void StickToSurface(Vector3 position, Quaternion rotation)
     {
-        var pos = position;
-
         transform.DOKill();
         transform.DOMove(position, SurfaceMoveSpeed).SetEase(Ease.OutQuad);
         transform.DORotateQuaternion(rotation, SurfaceRotateSpeed).SetEase(Ease.OutQuad);
-
-        if (movement != pos)
-        {
-
-        }
-        //StickSurface
     }
 
     public void SetStickToSurface(bool isSticking)
@@ -113,8 +102,6 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
     protected abstract void PressStarted();
     protected abstract void PressEnded();
     protected abstract void ToolVFX(bool isPlaying);
-    protected abstract void Moving();
-    protected abstract void StickSurface(float x, float y);
 
     public void PlaySfx(bool isPlaying)
     {

@@ -22,9 +22,7 @@ public class ToolChisel : Tool, IChiselTool
 
     protected override void InteractDetected() { }
     protected override void InteractEnded() { }
-    protected override void Moving() { }
     protected override void PressEnded() { }
     protected override void PressStarted() { }
-    protected override void StickSurface(float x, float y) { }
     protected override void ToolVFX(bool isPlaying) { }
 }
