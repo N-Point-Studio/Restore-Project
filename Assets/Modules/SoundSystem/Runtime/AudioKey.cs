@@ -8,6 +8,7 @@ namespace Modules.SoundSystems
         BGM_Game,
         BGM_Game_China,
         BGM_Game_Indonesia,
+        BGM_Game_Egypt,
         SFX_Assemble,
         SFX_Camera,
         SFX_Brush,

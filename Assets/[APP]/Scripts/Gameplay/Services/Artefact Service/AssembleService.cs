@@ -37,15 +37,41 @@ public class AssemblyService : IInitializable, IDisposable
 
     public Transform GetInspectPoint() => inspectPoint.transform;
 
+    public bool CanSnap(IArtefactPart checkPart, Vector3 worldPos)
+    {
+        Camera cam = Camera.main;
+
+        if (IsInspectEmpty())
+        {
+            float distance = GetFlattenedDistance(cam, worldPos, inspectPoint.transform.position);
+            return distance < config.assembleSnapDistance;
+        }
+
+        foreach (var part in currentAssembleList)
+        {
+            var partSocket = part.GetAvailableSocketFor(checkPart.PieceId);
+            if (partSocket != null)
+            {
+                float distance = GetFlattenedDistance(cam, worldPos, partSocket.transform.position);
+                return distance <= config.socketSnapDistance;
+            }
+        }
+        
+        return false;
+    }
+
     public void TryCheckSlot(IArtefactPart checkPart, Vector3 worldPos)
     {
+        Camera cam = Camera.main;
+
         foreach (var part in currentAssembleList)
         {
             var partSocket = part.GetAvailableSocketFor(checkPart.PieceId);
             if (partSocket != null)
             {
                 var renderer = partSocket.transform.GetComponent<Renderer>();
-                float distance = Vector3.Distance(worldPos, partSocket.transform.position);
+                
+                float distance = GetFlattenedDistance(cam, worldPos, partSocket.transform.position);
 
                 if (distance <= config.socketSnapDistance)
                 {
@@ -55,6 +81,17 @@ public class AssemblyService : IInitializable, IDisposable
                 return;
             }
         }
+    }
+
+    private float GetFlattenedDistance(Camera cam, Vector3 posA, Vector3 posB)
+    {
+        if (cam == null) return Vector3.Distance(posA, posB);
+        
+        Vector3 localA = cam.transform.InverseTransformPoint(posA);
+        Vector3 localB = cam.transform.InverseTransformPoint(posB);
+        localA.z = localB.z; // Flatten the depth
+        
+        return Vector3.Distance(localA, localB);
     }
 
     public bool TryAssemble(IArtefactPart assembleObject)
@@ -70,7 +107,6 @@ public class AssemblyService : IInitializable, IDisposable
             inspectPoint.SetInspectionUsage(true);
             fragmentService.ProgressUpdate();
 
-            //start drag tutorial
             if (gameplayManager.isTutorialAvailable)
             {
                 tutorialService.CompleteAndAdvance();

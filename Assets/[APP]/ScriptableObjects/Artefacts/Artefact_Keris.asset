@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4ecdad67285e4111b58296d98da9caa, type: 3}
+  m_Name: Artefact_Keris
+  m_EditorClassIdentifier: Assembly-CSharp::ArtefactData
+  baseData:
+    id: Artefact_Keris
+    itemName: Keris
+    itemDescription: Lorem Ipsum Dolor Sith Amet
+    itemIcon: {fileID: 0}
+    exclude: 0
+  stickyNoteTexts:
+  - 'Your first Indonesian artifact here, Nova!
+
+
+    Take great care of this one
+
+    -Ms.
+    Maya'
+  - P.S So your mom was an archeologist? Her love for history definitely shows in
+    you! How is she doing?
+  customGameplayBGM: 4
+  preRestorationPagePrefab: {fileID: 8636906436748886089, guid: 293edd6c68f3d8f4798da19eb07562f0, type: 3}
+  postRestorationPagePrefab: {fileID: 8866635996392126511, guid: 588a4135716dd79419f9c908add737aa, type: 3}
+  unlockedByDefault: 0
+  unlockRequirements:
+  - {fileID: 11400000, guid: be5bcc866d7c24e92a67ef37e57beff7, type: 2}
+  allowedToolTypes: -1
+  artefactFragmentDatas: []
+  finalRotation: {x: 0, y: 0, z: 0}
