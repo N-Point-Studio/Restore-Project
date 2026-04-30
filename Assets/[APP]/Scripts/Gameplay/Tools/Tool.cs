@@ -36,6 +36,7 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         initialRotation = transform.rotation;
         col = GetComponent<Collider>();
         animator.enabled = false;
+        movement = transform.position;
     }
     public void OnPressStarted() => PressStarted();
     public void OnPressEnded() => PressEnded();
@@ -89,10 +90,16 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
 
     public void StickToSurface(Vector3 position, Quaternion rotation)
     {
+        var pos = position;
+
         transform.DOKill();
         transform.DOMove(position, SurfaceMoveSpeed).SetEase(Ease.OutQuad);
         transform.DORotateQuaternion(rotation, SurfaceRotateSpeed).SetEase(Ease.OutQuad);
 
+        if (movement != pos)
+        {
+
+        }
         //StickSurface
     }
 
