@@ -1,19 +1,17 @@
 using UnityEngine;
 using DG.Tweening;
 
-public class ToolChisel : Tool, IClickTool
+public class ToolChisel : Tool, IChiselTool
 {
-    // [SerializeField] private float offsetForward = 0.005f;
-    public void PlayAnimation()
+    private const float CrossFadeDuration = 0.1f;
+    private readonly int GougeHash = Animator.StringToHash("Chisel_Gouge");
+
+    public void PlayGouge()
     {
-        // transform.DOKill(true);
-
-        // float originalZ = transform.localPosition.z;
-
-        // Sequence seq = DOTween.Sequence();
-
-        // seq.Append(transform.DOLocalMoveZ(originalZ + offsetForward, 0.08f).SetEase(Ease.OutQuad));
-        // seq.Append(transform.DOLocalMoveZ(originalZ, 0.12f).SetEase(Ease.InQuad));
+        if (animator != null && animator.isActiveAndEnabled)
+        {
+            animator.CrossFadeInFixedTime(GougeHash, CrossFadeDuration);
+        }
     }
 
     protected override void Awake()
@@ -24,7 +22,9 @@ public class ToolChisel : Tool, IClickTool
 
     protected override void InteractDetected() { }
     protected override void InteractEnded() { }
+    protected override void Moving() { }
     protected override void PressEnded() { }
     protected override void PressStarted() { }
+    protected override void StickSurface(float x, float y) { }
     protected override void ToolVFX(bool isPlaying) { }
 }

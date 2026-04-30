@@ -204,7 +204,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
         isCleaning = false;
         PlayToolSfx(true);
         PlayToolVfx(true);
-        if (currentToolObject is IClickTool tool) tool.PlayAnimation();
+        if (currentToolObject is IChiselTool tool) tool.PlayGouge();
         cleaningService.CleanChunk(chunk);
     }
 

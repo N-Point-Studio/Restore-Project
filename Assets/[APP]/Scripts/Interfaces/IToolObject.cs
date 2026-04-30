@@ -22,7 +22,7 @@ public interface IBrushTool
     Transform BrushTransform { get; }
 }
 
-public interface IClickTool
+public interface IChiselTool
 {
-    void PlayAnimation();
+    void PlayGouge();
 }

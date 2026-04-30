@@ -23,14 +23,19 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
     private int currentAudioId = -1;
 
     [Header("Audio settings")]
-    [SerializeField] private AudioKey audioKey;
-    [SerializeField] private SoundType soundType;
+    [SerializeField] protected AudioKey audioKey;
+    [SerializeField] protected SoundType soundType;
+
+    [Header("Animation Settings")]
+    [SerializeField] protected Animator animator;
+    private Vector3 movement;
 
     protected virtual void Awake()
     {
         initialPosition = transform.position;
         initialRotation = transform.rotation;
         col = GetComponent<Collider>();
+        animator.enabled = false;
     }
     public void OnPressStarted() => PressStarted();
     public void OnPressEnded() => PressEnded();
@@ -55,6 +60,7 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         returnSequence?.Kill();
         col.enabled = false;
         isUsed = true;
+        animator.enabled = true;
     }
 
     public void Return()
@@ -62,6 +68,7 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         col.enabled = true;
         isReturning = true;
         isUsed = false;
+        animator.enabled = false;
 
         returnSequence?.Kill();
         returnSequence = DOTween.Sequence();
@@ -77,7 +84,7 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         if (isReturning) return;
         transform.DOKill();
         transform.DOMove(worldPos, followMouseSpeed).SetEase(Ease.OutQuad);
-        // ToolMove();
+        // Moving();
     }
 
     public void StickToSurface(Vector3 position, Quaternion rotation)
@@ -85,6 +92,8 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         transform.DOKill();
         transform.DOMove(position, SurfaceMoveSpeed).SetEase(Ease.OutQuad);
         transform.DORotateQuaternion(rotation, SurfaceRotateSpeed).SetEase(Ease.OutQuad);
+
+        //StickSurface
     }
 
     public void SetStickToSurface(bool isSticking)
@@ -97,6 +106,8 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
     protected abstract void PressStarted();
     protected abstract void PressEnded();
     protected abstract void ToolVFX(bool isPlaying);
+    protected abstract void Moving();
+    protected abstract void StickSurface(float x, float y);
 
     public void PlaySfx(bool isPlaying)
     {

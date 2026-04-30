@@ -13,6 +13,9 @@ public class ToolBrush : Tool, IBrushTool
     [SerializeField] private ParticleSystem smokeVFX;
     [SerializeField] private ParticleSystem dustVFX;
 
+    private readonly int MoveHorizontal = Animator.StringToHash("MoveHorizontal");
+    private readonly int MoveVertical = Animator.StringToHash("MoveVertical");
+
     protected override void Awake()
     {
         base.Awake();
@@ -48,6 +51,26 @@ public class ToolBrush : Tool, IBrushTool
         else
         {
             SetVfxEmission(0f, 0f);
+        }
+    }
+
+    protected override void Moving()
+    {
+        // Kalau sedang tidak nempel surface (FollowMouse), paksa balik ke Idle (0, 0)
+        if (animator != null && animator.isActiveAndEnabled)
+        {
+            animator.SetFloat(MoveHorizontal, 0f);
+            animator.SetFloat(MoveVertical, 0f);
+        }
+    }
+
+    protected override void StickSurface(float x, float y)
+    {
+        // Masukkan kalkulasi x dan y dari Tool.cs ke Animator
+        if (animator != null && animator.isActiveAndEnabled)
+        {
+            animator.SetFloat(MoveHorizontal, x);
+            animator.SetFloat(MoveVertical, y);
         }
     }
 
