@@ -12,7 +12,6 @@ public class ArtefactManager : IInitializable, IDisposable
     private bool isHoldingUI = false;
     private bool isGameFinished = false;
 
-    // --- OPTIMIZATION CACHES ---
     private IArtefactPart currentDraggedPart;
     private IInteractObject currentHoldInteract;
     private IArtefactPart currentHoldPart;
@@ -61,7 +60,6 @@ public class ArtefactManager : IInitializable, IDisposable
     {
         if (interact == null) return null;
         
-        // FIX: Safely check if the underlying object was destroyed!
         if (interact is MonoBehaviour mono)
         {
             if (mono == null) return null; 
@@ -91,10 +89,10 @@ public class ArtefactManager : IInitializable, IDisposable
 
         if (toolService.IsOnToolMode || artefactPart == null) return;
 
-        float distance = Vector3.Distance(worldPos, assemblyService.GetInspectPoint().position);
-        bool isCloseEnough = distance < config.assembleSnapDistance;
+        bool isCloseEnough = assemblyService.CanSnap(artefactPart, worldPos);
 
         if (isCloseEnough && assemblyService.TryAssemble(artefactPart)) return;
+        
         if (interact is IDragObject drag) drag.OnDragEnded(worldPos);
     }
 

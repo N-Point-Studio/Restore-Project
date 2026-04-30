@@ -22,11 +22,18 @@ MonoBehaviour:
       the winged scarab to the wrappings of a mummy. Winged scarabs, meant to guarantee
       the rebirth of the deceased, were very popular funerary amulets.'
     itemIcon: {fileID: 21300000, guid: e9d3de414e2f6174aaf09ec0720bdcbd, type: 3}
-    exclude: 1
-  stickyNoteTexts: []
-  preRestorationPagePrefab: {fileID: 0}
-  postRestorationPagePrefab: {fileID: 0}
+    exclude: 0
+  stickyNoteTexts:
+  - "Anyway, the latest pieces from Egypt just arrived...\n\nGood luck! \n-Ms. Maya"
+  - "P.S I\u2019m so sorry about your mom\u2019s diagnosis yesterday... Glad to hear
+    your aunt is there to help her out. \n\nIs there any way I can support you through
+    this?"
+  customGameplayBGM: 5
+  preRestorationPagePrefab: {fileID: 8636906436748886089, guid: baf0f97423e7a6943b9110caf23df1b4, type: 3}
+  postRestorationPagePrefab: {fileID: 8866635996392126511, guid: dc0a3121fb20bf6448a8f50eafe3ac94, type: 3}
   unlockedByDefault: 0
-  unlockRequirements: []
+  unlockRequirements:
+  - {fileID: 11400000, guid: 438a20ec48c10f140a4418156d10a0cd, type: 2}
   allowedToolTypes: -1
   artefactFragmentDatas: []
+  finalRotation: {x: 0, y: 0, z: 0}

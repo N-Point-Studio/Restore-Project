@@ -66,6 +66,11 @@ public class CursorController : MonoBehaviour
 
     private void Awake()
     {
+#if !UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+        Destroy(gameObject);
+        return;
+#endif
+
         if (instance == null)
         {
             instance = this;
@@ -83,6 +88,10 @@ public class CursorController : MonoBehaviour
 
     private void Start()
     {
+        // Skip setup on mobile
+#if !UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+        return;
+#endif
         SetCursorState(CursorState.DefaultRounded); 
         UpdateControllerStatus();
     }

@@ -123,8 +123,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 16.512987, y: -35.773003}
-  m_SizeDelta: {x: -63.877, y: -71.546}
+  m_AnchoredPosition: {x: 16.512987, y: -28.3874}
+  m_SizeDelta: {x: -63.877, y: -86.3172}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6754475517997798808
 CanvasRenderer:
@@ -154,8 +154,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Here\u2019s your first artifact, Nova.\LI hope this is a beautiful start
-    to your journey here!\n\n-Mrs. Maya :)"
+  m_text: "Here\u2019s your next artifact. Another Indonesian artifact! Take good
+    care of this one, Nova :)\n\nGood luck!\n\n-Ms. Maya"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: fe2af6f2156f301439adaca31864db12, type: 2}
   m_sharedMaterial: {fileID: -6446403116882279231, guid: fe2af6f2156f301439adaca31864db12, type: 2}
@@ -182,7 +182,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23
+  m_fontSize: 21.75
   m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -326,8 +326,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.147995, y: -26.412994}
-  m_SizeDelta: {x: -63.322, y: -52.826}
+  m_AnchoredPosition: {x: -0.62939453, y: -18.638702}
+  m_SizeDelta: {x: -64.8768, y: -68.3746}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4796160544175303849
 CanvasRenderer:
@@ -357,8 +357,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Here\u2019s your first artifact, Nova.\LI hope this is a beautiful start
-    to your journey here!\n\n-Mrs. Maya :)"
+  m_text: "p.s I want to make sure of something: did your mom really move to the
+    Netherlands in the 80\u2019s for work? She always sounded so cool to me... Like,
+    she\u2019s an Indonesian archeologist abroad when only a small amount of Indonesians
+    were able to afford any kind of higher education back in her times!"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: fe2af6f2156f301439adaca31864db12, type: 2}
   m_sharedMaterial: {fileID: -6446403116882279231, guid: fe2af6f2156f301439adaca31864db12, type: 2}
@@ -385,11 +387,11 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23
+  m_fontSize: 16.8
   m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 18
+  m_fontSizeMin: 16.5
   m_fontSizeMax: 23
   m_fontStyle: 0
   m_HorizontalAlignment: 1
