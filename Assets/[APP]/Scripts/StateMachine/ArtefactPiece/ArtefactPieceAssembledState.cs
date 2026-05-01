@@ -37,4 +37,6 @@ public class ArtefactPieceAssembledState : ArtefactPieceBaseState, IArtefactPart
     }
 
     public void CorrectRotation(Quaternion rotation) => stateMachine.CorrectRotation(rotation);
+
+    public bool IsSlotEmpty() => stateMachine.IsSlotEmpty();
 }

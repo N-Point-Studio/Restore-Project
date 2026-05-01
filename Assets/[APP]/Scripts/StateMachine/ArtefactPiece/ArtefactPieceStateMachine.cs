@@ -76,4 +76,13 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
     public void ForceClean()
     {
     }
+
+    public bool IsSlotEmpty()
+    {
+        foreach (var socket in sockets)
+        {
+            if (socket.isOccupied) return false;
+        }
+        return true;
+    }
 }
