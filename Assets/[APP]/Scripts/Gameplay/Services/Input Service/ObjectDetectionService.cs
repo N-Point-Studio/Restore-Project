@@ -13,7 +13,7 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
     private readonly Plane plane;
     private bool isUsed = false;
     private Vector2 mousePos;
-    
+
     private float cachedDragDepth;
 
     [Inject]
@@ -28,17 +28,17 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
 
     private bool IsValidPosition(Vector2 pos)
     {
-        return !float.IsInfinity(pos.x) && !float.IsInfinity(pos.y) && 
+        return !float.IsInfinity(pos.x) && !float.IsInfinity(pos.y) &&
                !float.IsNaN(pos.x) && !float.IsNaN(pos.y);
     }
 
     public void SetInteractObjectUsed(bool isUsed)
     {
-        this.isUsed = isUsed; 
-        
+        this.isUsed = isUsed;
+
         OnInteractDetected?.Invoke(interactable);
-        
-        if (interactable is IDragObject) 
+
+        if (interactable is IDragObject)
         {
             if (isUsed) CursorController.instance?.SetCursorState(CursorState.GrabClose);
             else CursorController.instance?.SetCursorState(CursorState.GrabOpen);
@@ -99,7 +99,7 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
         Ray ray = cam.ScreenPointToRay(screenPos);
         return Physics.Raycast(ray, out hit);
     }
-    
+
     public void CacheDragDepth(IInteractObject target)
     {
         if (target is Component targetComp && targetComp != null)
@@ -144,7 +144,7 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
     public void Tick()
     {
         if (isUsed || !IsValidPosition(mousePos)) return;
-        
+
         IInteractObject newTarget = null;
         if (TryRaycast(mousePos, out var hit)) hit.collider.TryGetComponent(out newTarget);
 

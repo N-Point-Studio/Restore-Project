@@ -9,4 +9,5 @@ public interface IArtefactPart : IAssemble
     List<ConnectionSocket> GetSockets();
     void CorrectRotation(Quaternion rotation);
     ArtefactPieceState CurrentState { get; }
+    bool IsSlotEmpty();
 }

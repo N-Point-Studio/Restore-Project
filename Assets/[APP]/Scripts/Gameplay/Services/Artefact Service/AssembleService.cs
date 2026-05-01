@@ -56,7 +56,7 @@ public class AssemblyService : IInitializable, IDisposable
                 return distance <= config.socketSnapDistance;
             }
         }
-        
+
         return false;
     }
 
@@ -70,7 +70,7 @@ public class AssemblyService : IInitializable, IDisposable
             if (partSocket != null)
             {
                 var renderer = partSocket.transform.GetComponent<Renderer>();
-                
+
                 float distance = GetFlattenedDistance(cam, worldPos, partSocket.transform.position);
 
                 if (distance <= config.socketSnapDistance)
@@ -86,11 +86,11 @@ public class AssemblyService : IInitializable, IDisposable
     private float GetFlattenedDistance(Camera cam, Vector3 posA, Vector3 posB)
     {
         if (cam == null) return Vector3.Distance(posA, posB);
-        
+
         Vector3 localA = cam.transform.InverseTransformPoint(posA);
         Vector3 localB = cam.transform.InverseTransformPoint(posB);
         localA.z = localB.z; // Flatten the depth
-        
+
         return Vector3.Distance(localA, localB);
     }
 
@@ -148,7 +148,18 @@ public class AssemblyService : IInitializable, IDisposable
 
     public void Detach(IArtefactPart part)
     {
-        if (currentAssembleList.Contains(part))
+        if (!currentAssembleList.Contains(part))
+            return;
+
+        if (currentAssembleList.Count == 0)
+        {
+            inspectPoint.ResetPosition();
+            fragmentService.ProgressUpdate();
+            inspectPoint.SetInspectionUsage(false);
+            return;
+        }
+
+        if (currentAssembleList.Count == 2)
         {
             foreach (var assemble in currentAssembleList)
             {
@@ -158,15 +169,35 @@ public class AssemblyService : IInitializable, IDisposable
 
             part.GetTransform().SetParent(null);
             part.OnDetached();
-            fragmentService.ProgressUpdate();
             currentAssembleList.Remove(part);
-        }
-        if (currentAssembleList.Count == 0)
-        {
-            inspectPoint.ResetPosition();
             fragmentService.ProgressUpdate();
-            inspectPoint.SetInspectionUsage(false);
+            return;
         }
+
+        foreach (var assemble in currentAssembleList)
+        {
+            assemble.ReleaseSocketWith(part.PieceId);
+            part.ReleaseSocketWith(assemble.PieceId);
+        }
+
+        List<IArtefactPart> toDetach = new();
+
+        foreach (var assemble in currentAssembleList)
+        {
+            if (assemble.IsSlotEmpty())
+            {
+                toDetach.Add(assemble);
+            }
+        }
+
+        foreach (var item in toDetach)
+        {
+            item.GetTransform().SetParent(null);
+            item.OnDetached();
+            currentAssembleList.Remove(item);
+        }
+
+        fragmentService.ProgressUpdate();
     }
 
     private Vector3 CalculateCenter()

@@ -47,4 +47,6 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IDragObject, IArte
     public Transform GetTransform() => stateMachine.transform;
 
     public void CorrectRotation(Quaternion rotation) => stateMachine.CorrectRotation(rotation);
+
+    public bool IsSlotEmpty() => stateMachine.IsSlotEmpty();
 }
