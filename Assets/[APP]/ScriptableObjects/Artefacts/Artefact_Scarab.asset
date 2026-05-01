@@ -35,5 +35,17 @@ MonoBehaviour:
   unlockRequirements:
   - {fileID: 11400000, guid: 438a20ec48c10f140a4418156d10a0cd, type: 2}
   allowedToolTypes: -1
-  artefactFragmentDatas: []
-  finalRotation: {x: 0, y: 0, z: 0}
+  artefactFragmentDatas:
+  - prefab: {fileID: 53471993624062409, guid: 95bc42bef9ac249ec97aa4481504590f, type: 3}
+    spawnTransform:
+      rotation: {x: 0, y: -10.354, z: 0}
+      position: {x: 0.33, y: 0.629, z: 2.92}
+  - prefab: {fileID: 2925109091762957537, guid: 350fec65d1c714ec287dcb65a397ae4c, type: 3}
+    spawnTransform:
+      rotation: {x: 0, y: -18.556, z: 0}
+      position: {x: 1.36, y: 0.6694431, z: 2.89}
+  - prefab: {fileID: 2570862238850917623, guid: 723009185e4eb46ceb6d344b31b3036d, type: 3}
+    spawnTransform:
+      rotation: {x: -0.89, y: 0.629, z: 2.91}
+      position: {x: 0, y: -12.307, z: 0}
+  finalRotation: {x: 400, y: 180, z: 0}

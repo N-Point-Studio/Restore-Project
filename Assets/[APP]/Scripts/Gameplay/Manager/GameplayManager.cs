@@ -12,6 +12,7 @@ public class GameplayManager : IInitializable, IDisposable
     private readonly InputSystemService inputSystemService;
     private readonly GameConfigData config;
     private readonly TutorialService tutorialService;
+    private readonly Light directionalLight;
 
     private ArtefactData artefactData;
     public bool isTutorialAvailable;
@@ -25,6 +26,7 @@ public class GameplayManager : IInitializable, IDisposable
     InputSystemService inputSystemService,
     string targetScene,
     TutorialService tutorialService,
+    Light directionalLight,
     GameConfigData config)
     {
         this.playerProgressionData = playerProgressionData;
@@ -34,6 +36,7 @@ public class GameplayManager : IInitializable, IDisposable
         this.targetScene = targetScene;
         this.config = config;
         this.tutorialService = tutorialService;
+        this.directionalLight = directionalLight;
 
         InitializeSession();
     }
@@ -43,6 +46,8 @@ public class GameplayManager : IInitializable, IDisposable
         GameplayUIManager.OnGameFinished += HandleGameFinished;
         GameplayUIManager.OnGameWrapped += HandleGameWrapped;
         LoadingEvents.OnLoadingFinished += HandleLoadingFinished;
+        InteractionEvents.OnTabPerformed += HandleTabPerformed;
+        InteractionEvents.OnTabCanceled += HandleTabCanceled;
     }
 
     public void Dispose()
@@ -50,7 +55,20 @@ public class GameplayManager : IInitializable, IDisposable
         GameplayUIManager.OnGameFinished -= HandleGameFinished;
         GameplayUIManager.OnGameWrapped -= HandleGameWrapped;
         LoadingEvents.OnLoadingFinished -= HandleLoadingFinished;
+        InteractionEvents.OnTabPerformed -= HandleTabPerformed;
+        InteractionEvents.OnTabCanceled -= HandleTabCanceled;
     }
+
+    private void HandleTabPerformed()
+    {
+        directionalLight.enabled = false;
+    }
+
+    private void HandleTabCanceled()
+    {
+        directionalLight.enabled = true;
+    }
+
 
     private void HandleGameFinished(bool isCompleted)
     {

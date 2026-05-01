@@ -69,7 +69,7 @@ public class CleaningService : IInitializable, IDisposable
     {
         foreach (ICleanSurface surface in cleanSurfaces)
         {
-            if (surface.GetCleaningProgress() > 10f)
+            if (surface.GetCleaningProgress() > 1f)
                 surface.ShowClue(true);
         }
     }
