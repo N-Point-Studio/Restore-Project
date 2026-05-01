@@ -10,7 +10,8 @@ public class GameplayLifetimeScope : LifetimeScope
     [SerializeField] private Transform planeReference;
     [SerializeField] private HoldProgressUI holdProgressUI;
     [SerializeField] private string targetScene;
-    
+    [SerializeField] private Light mainLight;
+
     protected override void Configure(IContainerBuilder builder)
     {
         Plane dragPlane = new(planeReference.up, planeReference.position);
@@ -22,6 +23,7 @@ public class GameplayLifetimeScope : LifetimeScope
         builder.RegisterComponent(inspect);
         builder.RegisterInstance(pivotPoint);
         builder.RegisterInstance(holdProgressUI);
+        builder.RegisterInstance(mainLight);
 
         builder.RegisterEntryPoint<FragmentService>(Lifetime.Scoped).AsSelf();
         builder.RegisterEntryPoint<AssemblyService>(Lifetime.Scoped).AsSelf();

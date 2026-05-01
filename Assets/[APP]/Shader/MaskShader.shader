@@ -71,7 +71,7 @@ Shader "Custom/MaskShader"
             {
                 half maskValue = SAMPLE_TEXTURE2D(_MaskTexture, sampler_MaskTexture, IN.uv).g;
                 
-                maskValue = step(0.01, maskValue); 
+                // maskValue = step(0.01, maskValue); 
                 
                 return half4(1.0, 1.0, 1.0, 1.0) * maskValue;
             }

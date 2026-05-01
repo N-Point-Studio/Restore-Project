@@ -66,9 +66,9 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
 
         if (maskTexture != null)
         {
-            maskMaterial.SetTexture("_MaskTexture", maskTexture);
-            paintingMaterial.SetTexture("_MaskTexture", maskTexture);
-            paintableMaterial.SetTexture("_Mask", maskTexture);
+            // maskMaterial.SetTexture("_MaskTexture", maskTexture);
+            // paintingMaterial.SetTexture("_MaskTexture", maskTexture);
+            // paintableMaterial.SetTexture("_Mask", maskTexture);
         }
 
         cb = new CommandBuffer { name = $"SurfaceWorldPainter-{name}" };
@@ -84,6 +84,8 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
         cb.Clear();
 
         paintableMaterial.SetTexture(maskTexturePropertyName, paintingMap);
+        paintableMaterial.SetTexture("_Mask", maskMap);
+        paintingMaterial.SetTexture("_MaskTexture", maskMap);
     }
 
     private RenderTexture CreateRenderTexture(int size)
@@ -188,12 +190,12 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
         if (isShowing)
         {
             paintableMaterial.SetFloat("_ClueStrength", 1);
-            paintableMaterial.SetFloat("_BlackoutStrength", 0.2f);
+            // paintableMaterial.SetFloat("_BlackoutStrength", 0.2f);
         }
         else
         {
             paintableMaterial.SetFloat("_ClueStrength", 0);
-            paintableMaterial.SetFloat("_BlackoutStrength", 1f);
+            // paintableMaterial.SetFloat("_BlackoutStrength", 1f);
         }
     }
 
@@ -201,4 +203,10 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
     {
         return isDirtRemoved;
     }
+
+    // private void OnGUI()
+    // {
+    //     GUI.DrawTexture(new Rect(10, 10, 256, 256), maskMap, ScaleMode.ScaleToFit, false, 1);
+    //     GUI.DrawTexture(new Rect(10, 400, 256, 256), paintingMap, ScaleMode.ScaleToFit, false, 1);
+    // }
 }

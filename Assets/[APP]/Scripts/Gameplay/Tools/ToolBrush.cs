@@ -85,7 +85,7 @@ public class ToolBrush : Tool, IBrushTool
     {
         if (isPlaying)
         {
-            SetVfxEmission(8f, 5f);
+            SetVfxEmission(2f, 8f);
         }
         else
         {
