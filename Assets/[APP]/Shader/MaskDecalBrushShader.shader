@@ -123,13 +123,13 @@ Shader "Custom/MaskDecalBrushShader"
             {
                 half maskValue = SAMPLE_TEXTURE2D(_MaskTexture, sampler_MaskTexture, IN.uv).g;
                 
-                // float canPaint = step(0.01, maskValue); 
+                float canPaint = step(0.01, maskValue); 
                 
                 half4 brush = GetBrushUV(IN.worldPos);
                 float d = dot(normalize(IN.normalWS), normalize(_PaintDirection));
                 float facingStrength = d > _AngleTolerance ? 1.0 : 0.0;
                 // return brush * facingStrength;
-                return lerp(0, brush * facingStrength, maskValue);
+                return lerp(0, brush * facingStrength, canPaint);
             }
             
             ENDHLSL
