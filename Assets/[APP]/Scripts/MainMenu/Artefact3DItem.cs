@@ -9,7 +9,9 @@ public class Artefact3DItem : MonoBehaviour
 
     [Header("3D Visuals")]
     [SerializeField] private Transform artefactTransform;
+    public Transform ArtefactTransform => artefactTransform;
     [SerializeField] private Transform boxTransform;
+    public Transform BoxTransform => boxTransform;
 
     [Header("Sensors")]
     [SerializeField] private ArtefactSensor boxSensor;
