@@ -181,7 +181,8 @@ public class ToolService : IInitializable, IDisposable, ITickable
             brushTool.BrushTransform.up,
             brushTool.BrushScale,
             brushTool.BrushStrength,
-            brushTool.BrushColor
+            brushTool.BrushColor,
+            brushTool.BrushDepth
         );
 
         if (cleaningService.IsDustRemoved(surface))

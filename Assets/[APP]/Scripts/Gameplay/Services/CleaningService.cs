@@ -10,11 +10,13 @@ public class CleaningService : IInitializable, IDisposable
     private readonly HashSet<ICleanSurface> cleanSurfaces = new();
     private readonly HashSet<ICleanChunk> cleanChunks = new();
     private InputSystemService inputSystemService;
+    // private GameplayManager gameplayManager;
 
     public bool isCleaning;
 
     private int totalHardObjects;
     private int destroyedHardObjects;
+    private float overallProgress;
 
     public event Action<float> OnSurfaceCleaningUpdate;
     public event Action<float> OnHardCleaningUpdate;
@@ -23,6 +25,7 @@ public class CleaningService : IInitializable, IDisposable
     public void Construct(InputSystemService input)
     {
         inputSystemService = input;
+        // this.gameplayManager = gameplayManager;
     }
 
     public void Initialize()
@@ -33,6 +36,8 @@ public class CleaningService : IInitializable, IDisposable
 
         InteractionEvents.OnTabPerformed += HandleKeycodeTabPerformed;
         InteractionEvents.OnTabCanceled += HandleKeycodeTabCanceled;
+
+        GameplayUIManager.OnOverallProgressUpdated += HandleOveralProgressUpdated;
     }
 
     public void Dispose()
@@ -43,6 +48,13 @@ public class CleaningService : IInitializable, IDisposable
 
         InteractionEvents.OnTabPerformed -= HandleKeycodeTabPerformed;
         InteractionEvents.OnTabCanceled -= HandleKeycodeTabCanceled;
+
+        GameplayUIManager.OnOverallProgressUpdated -= HandleOveralProgressUpdated;
+    }
+
+    private void HandleOveralProgressUpdated(float obj)
+    {
+        overallProgress = obj;
     }
 
     private void RegisterChunk(CleaningChunk chunk)
@@ -67,22 +79,23 @@ public class CleaningService : IInitializable, IDisposable
 
     private void HandleKeycodeTabPerformed()
     {
+        if (overallProgress < GameplayUIManager.wrapUpThreshold) return;
         foreach (ICleanSurface surface in cleanSurfaces)
         {
-            if (surface.GetCleaningProgress() > 1f)
-                surface.ShowClue(true);
+            surface.ShowClue(true);
         }
     }
 
     private void HandleKeycodeTabCanceled()
     {
+        if (overallProgress < GameplayUIManager.wrapUpThreshold) return;
         foreach (ICleanSurface surface in cleanSurfaces)
         {
             surface.ShowClue(false);
         }
     }
 
-    public void CleanSurface(ICleanSurface surface, Texture2D brush, Vector3 hitPoint, Vector3 hitNormal, Vector3 direction, float scale, float strength, Color color)
+    public void CleanSurface(ICleanSurface surface, Texture2D brush, Vector3 hitPoint, Vector3 hitNormal, Vector3 direction, float scale, float strength, Color color, float brushDepth)
     {
         if (!cleanSurfaces.Contains(surface)) return;
         surface?.CleanSurface(hitPoint, brush, hitNormal, direction, scale, strength);

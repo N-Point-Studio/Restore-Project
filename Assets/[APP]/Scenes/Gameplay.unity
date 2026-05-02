@@ -3570,6 +3570,7 @@ MonoBehaviour:
   holdProgressUI: {fileID: 2138818198}
   targetScene: MainMenu
   mainLight: {fileID: 283972144}
+  gameplayUIManager: {fileID: 1118638520}
 --- !u!4 &371522738
 Transform:
   m_ObjectHideFlags: 0
@@ -6854,6 +6855,7 @@ MonoBehaviour:
   brushScale: 0.4
   brushStrength: 0.03
   paintingColor: {r: 1, g: 1, b: 1, a: 1}
+  brushDepth: 0.03
   animationSmoothSpeed: 10
   smokeVFX: {fileID: 7628072206149073594}
   dustVFX: {fileID: 2086948842956416677}

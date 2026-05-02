@@ -8,6 +8,7 @@ public class ToolBrush : Tool, IBrushTool
     [Range(0, 1)][SerializeField] private float brushScale = 0.5f;
     [Range(0, 1)][SerializeField] private float brushStrength = 0.5f;
     [SerializeField] private Color paintingColor = Color.white;
+    [SerializeField] private float brushDepth = 0.03f;
 
     [Header("Animation Smoothing")]
     [SerializeField] private float animationSmoothSpeed = 10f;
@@ -98,4 +99,5 @@ public class ToolBrush : Tool, IBrushTool
     public float BrushStrength => brushStrength;
     public Color BrushColor => paintingColor;
     public Transform BrushTransform => transform;
+    public float BrushDepth => brushDepth;
 }

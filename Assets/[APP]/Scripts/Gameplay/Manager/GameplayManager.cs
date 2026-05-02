@@ -18,6 +18,8 @@ public class GameplayManager : IInitializable, IDisposable
     public bool isTutorialAvailable;
     public Vector3 finalRotation;
     private string targetScene = "MainMenu";
+    public float overallProgress;
+
 
     [Inject]
     public GameplayManager(PlayerProgressionData playerProgressionData,
@@ -48,6 +50,8 @@ public class GameplayManager : IInitializable, IDisposable
         LoadingEvents.OnLoadingFinished += HandleLoadingFinished;
         InteractionEvents.OnTabPerformed += HandleTabPerformed;
         InteractionEvents.OnTabCanceled += HandleTabCanceled;
+
+        GameplayUIManager.OnOverallProgressUpdated += HandleOveralProgressUpdated;
     }
 
     public void Dispose()
@@ -57,16 +61,23 @@ public class GameplayManager : IInitializable, IDisposable
         LoadingEvents.OnLoadingFinished -= HandleLoadingFinished;
         InteractionEvents.OnTabPerformed -= HandleTabPerformed;
         InteractionEvents.OnTabCanceled -= HandleTabCanceled;
+
+        GameplayUIManager.OnOverallProgressUpdated -= HandleOveralProgressUpdated;
+    }
+
+    private void HandleOveralProgressUpdated(float overall)
+    {
+        overallProgress = overall;
     }
 
     private void HandleTabPerformed()
     {
-        directionalLight.enabled = false;
+        if (overallProgress >= GameplayUIManager.wrapUpThreshold) directionalLight.enabled = false;
     }
 
     private void HandleTabCanceled()
     {
-        directionalLight.enabled = true;
+        if (overallProgress >= GameplayUIManager.wrapUpThreshold) directionalLight.enabled = true;
     }
 
 

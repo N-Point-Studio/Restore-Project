@@ -171,6 +171,7 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
             cb.SetRenderTarget(paintingMap);
             cb.ClearRenderTarget(true, true, paintingColor);
             Graphics.ExecuteCommandBuffer(cb);
+            paintableMaterial.SetFloat("_DirtStrength", 0f);
 
             paintedPixel = maskPixel;
             progress = 100f;

@@ -19,7 +19,7 @@ public class GameplayUIManager : MonoBehaviour
     [SerializeField] private PopUpConfirmationController quitConfirmationController;
 
     [Header("Settings")]
-    [SerializeField] private float wrapUpThreshold = 95f;
+    [SerializeField] public static float wrapUpThreshold = 95f;
     [SerializeField] private float delayUntilAutoWrappedUp = 1.5f;
 
     private CleaningService cleaningService;
@@ -35,6 +35,8 @@ public class GameplayUIManager : MonoBehaviour
 
     public static event Action OnGameWrapped;
     public static event Action<bool> OnGameFinished;
+    public static event Action<float> OnOverallProgressUpdated;
+
 
     [Inject]
     public void Construct(
@@ -159,6 +161,7 @@ public class GameplayUIManager : MonoBehaviour
         if (count == 0) return;
         float overall = total / count;
 
+        OnOverallProgressUpdated?.Invoke(overall);
         canWrapUp = overall >= wrapUpThreshold;
         bool isFullyCompleted = overall >= 99f;
 

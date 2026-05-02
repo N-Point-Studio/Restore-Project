@@ -20,6 +20,7 @@ public interface IBrushTool
     float BrushStrength { get; }
     Color BrushColor { get; }
     Transform BrushTransform { get; }
+    float BrushDepth { get; }
 }
 
 public interface IChiselTool

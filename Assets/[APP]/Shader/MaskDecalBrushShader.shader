@@ -6,7 +6,7 @@ Shader "Custom/MaskDecalBrushShader"
         [NoScaleOffset] _BrushTexture("Brush Texture", 2D) = "white" {}
         _BrushScale("Brush Scale", Range(0, 1)) = 0.5
         
-        _BrushDepth("Brush Depth", Range(0.01, 1)) = 0.1 
+        _BrushDepth("Brush Depth", Range(0.01, 1)) = 0.3
         
         _BrushStrength("Brush Strength", Range(0, 1)) = 0.5
 

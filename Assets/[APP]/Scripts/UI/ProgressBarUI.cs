@@ -50,7 +50,7 @@ public class ProgressBarUI : MonoBehaviour
 
     public void SetValue(float value01)
     {
-        if (value01 >= 0.99f)
+        if (value01 >= 0.999f)
             value01 = 1f;
         else
             value01 = Mathf.Clamp01(value01);
@@ -72,51 +72,11 @@ public class ProgressBarUI : MonoBehaviour
         UpdateFill();
     }
 
-    public void SetValue1(float value01)
-    {
-        float previousValue01 = (float)currentValue / maximum;
-
-        if (value01 >= 0.99f) value01 = 1f;
-        else value01 = Mathf.Clamp01(value01);
-
-        currentValue = Mathf.RoundToInt(value01 * maximum);
-        // HandleAudioLogic(value01, previousValue01);
-
-        if (currentValue == 100 && lastValue != 100)
-        {
-            if (soundType == SoundType.Once)
-            {
-                AudioEvents.TriggerPlayCustomSFX(audioKey);
-            }
-            OnProgressBarCompleted?.Invoke();
-        }
-
-        lastValue = currentValue;
-        progressText.text = currentValue.ToString();
-        checkList.enabled = currentValue == 100;
-        progressText.enabled = currentValue != 100;
-
-        UpdateFill();
-    }
-
-    // private void HandleAudioLogic(float newValue, float oldValue)
-    // {
-    //     if (soundType != SoundType.Continuous) return;
-    //     if (newValue > oldValue && newValue < 1f)
-    //     {
-    //         AudioEvents.TriggerPlayContinuousSFX(audioKey, true);
-    //     }
-    //     else
-    //     {
-    //         AudioEvents.TriggerPlayContinuousSFX(audioKey, false);
-    //     }
-    // }
-
     public void UpdateFill()
     {
         var progress = (float)currentValue / maximum;
 
-        if (progress >= 0.99f)
+        if (progress >= 0.999f)
             fill.fillAmount = 1f;
         else
             fill.fillAmount = progress;
