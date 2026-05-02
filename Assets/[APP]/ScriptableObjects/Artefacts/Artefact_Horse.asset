@@ -33,5 +33,9 @@ MonoBehaviour:
   unlockRequirements:
   - {fileID: 11400000, guid: a3924d72a67c0455eb511e7925877898, type: 2}
   allowedToolTypes: -1
-  artefactFragmentDatas: []
-  finalRotation: {x: 50, y: 0, z: 0}
+  artefactFragmentDatas:
+  - prefab: {fileID: 924360214185747355, guid: c148e5a66c15f428293748fce72a4cf4, type: 3}
+    spawnTransform:
+      rotation: {x: -90, y: 0, z: -80}
+      position: {x: 0.395, y: 1.174, z: 1.894}
+  finalRotation: {x: 330, y: 0, z: -125}
