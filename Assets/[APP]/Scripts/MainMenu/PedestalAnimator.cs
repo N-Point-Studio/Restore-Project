@@ -61,6 +61,12 @@ public class PedestalAnimator : MonoBehaviour
             Renderer r = renderers[i];
             if (r.material == null) continue;
 
+            if (r.TryGetComponent(out ArtefactSensor sensor))
+            {
+                // Skip fading the pedestal if it has an assigned artefact, as the artefact will handle its own fading
+                continue;
+            }
+
             r.material.DOKill();
 
             if (r.material.HasProperty("_BaseColor"))

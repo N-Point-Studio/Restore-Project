@@ -274,7 +274,7 @@ public class LevelSelectionController : BaseMenuController
             if (targetItem != null)
             {
                 isCameraMoving = true;
-                MainMenuEvents.TriggerCameraFocusToArtefact(targetItem.transform);
+                MainMenuEvents.TriggerCameraFocusToArtefact(targetItem.ArtefactTransform);
                 
                 yield return new WaitUntil(() => !isCameraMoving);
                 
@@ -322,7 +322,7 @@ public class LevelSelectionController : BaseMenuController
                 if (targetItem != null)
                 {
                     isCameraMoving = true;
-                    MainMenuEvents.TriggerCameraFocusToArtefact(targetItem.transform);
+                    MainMenuEvents.TriggerCameraFocusToArtefact(targetItem.BoxTransform);
                     
                     yield return new WaitUntil(() => !isCameraMoving);
                     
