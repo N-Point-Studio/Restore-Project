@@ -25,7 +25,7 @@ public class LevelSelectionController : BaseMenuController
     [SerializeField] private float unlockSequenceDelay = 0.3f;
     [SerializeField] private float unlockDropDelay = 1.5f;
     [SerializeField] private float restoreAnimDuration = 0.5f;
-    
+
     // Inject
     private ActiveArtefactData activeArtefactData;
     private PlayerProgressionData playerProgressionData;
@@ -44,11 +44,11 @@ public class LevelSelectionController : BaseMenuController
 
     [Inject]
     public void Construct(
-        ActiveArtefactData activeArtefactData, 
+        ActiveArtefactData activeArtefactData,
         PlayerProgressionData playerProgressionData,
         SceneLoader sceneLoader,
         InputSystemService input,
-        GameConfigData config        
+        GameConfigData config
         )
     {
         this.activeArtefactData = activeArtefactData;
@@ -78,7 +78,7 @@ public class LevelSelectionController : BaseMenuController
     protected override void Start()
     {
         base.Start();
-        RefreshUI();        
+        RefreshUI();
         SetArtefactsInteractable(false);
     }
 
@@ -96,13 +96,13 @@ public class LevelSelectionController : BaseMenuController
     public override void SetActive(bool isActive)
     {
         base.SetActive(isActive);
-        if (isActive) 
+        if (isActive)
         {
-            input.OnUIKeycodeEscapePerformed += OnUIKeycodeEscapePerformed; 
+            input.OnUIKeycodeEscapePerformed += OnUIKeycodeEscapePerformed;
         }
-        else 
+        else
         {
-            input.OnUIKeycodeEscapePerformed -= OnUIKeycodeEscapePerformed; 
+            input.OnUIKeycodeEscapePerformed -= OnUIKeycodeEscapePerformed;
         }
     }
 
@@ -119,7 +119,7 @@ public class LevelSelectionController : BaseMenuController
         SetActive(false);
         SetArtefactsInteractable(false);
     }
-    
+
     public void OpenLevelSelectionAndPlayAnimations()
     {
         RefreshUI();
@@ -129,7 +129,7 @@ public class LevelSelectionController : BaseMenuController
 
         isPlayingSequence = true;
         if (backButtonItemUI != null) backButtonItemUI.gameObject.SetActive(false);
-        
+
         StartCoroutine(PlayPendingAnimationsSequence());
     }
 
@@ -165,7 +165,7 @@ public class LevelSelectionController : BaseMenuController
     }
 
     private void OnRequestArtefactDetail(ArtefactData data)
-    {        
+    {
         backButtonItemUI.gameObject.SetActive(false);
         clickedItem = Array.Find(artefact3DItems, x => x != null && x.ArtefactId == data.BaseData.Id);
 
@@ -212,7 +212,7 @@ public class LevelSelectionController : BaseMenuController
 
     private void OnCloseArtefactDetail()
     {
-        artefactDetailController.CloseDetail(); 
+        artefactDetailController.CloseDetail();
 
         // Animate all pedestals up (including the new one so the box has a place to land!)
         for (int i = 0; i < artefact3DItems.Length; i++)
@@ -230,7 +230,7 @@ public class LevelSelectionController : BaseMenuController
             }
         }
 
-        if (activeArtefactData.GetPendingUnlockAnimations().Count > 0)
+        if (activeArtefactData.GetPendingUnlockAnimations().Count > 0 && !isPlayingSequence)
         {
             isPlayingSequence = true;
             if (backButtonItemUI != null) backButtonItemUI.gameObject.SetActive(false);
@@ -256,28 +256,28 @@ public class LevelSelectionController : BaseMenuController
     {
         yield return waitInitialSequence;
 
-        if (artefact3DItems == null || artefact3DItems.Length == 0) 
+        if (artefact3DItems == null || artefact3DItems.Length == 0)
         {
-            SetArtefactsInteractable(true); 
+            SetArtefactsInteractable(true);
             isPlayingSequence = false;
             if (backButtonItemUI != null) backButtonItemUI.gameObject.SetActive(true);
             yield break;
         }
 
         List<ArtefactProgressData> pendingCompletions = activeArtefactData.GetPendingCompletionAnimations();
-        
+
         if (pendingCompletions.Count > 0)
         {
             ArtefactProgressData data = pendingCompletions[0];
             Artefact3DItem targetItem = Array.Find(artefact3DItems, x => x != null && x.ArtefactId == data.artefactId);
-            
+
             if (targetItem != null)
             {
                 isCameraMoving = true;
                 MainMenuEvents.TriggerCameraFocusToArtefact(targetItem.ArtefactTransform);
-                
+
                 yield return new WaitUntil(() => !isCameraMoving);
-                
+
                 // Let the camera settle for a split-second before playing the animation
                 yield return new WaitForSeconds(0.25f);
 
@@ -285,9 +285,9 @@ public class LevelSelectionController : BaseMenuController
 
                 AppLogger.Log($"[Animation] Playing REVEAL animation for {data.artefactId}");
                 targetItem.PlayCompletionAnimation();
-                
+
                 yield return waitCompletionReveal;
-                
+
                 activeArtefactData.MarkCompletionAnimSeen(data.artefactId);
 
                 isPlayingSequence = false;
@@ -295,7 +295,14 @@ public class LevelSelectionController : BaseMenuController
                 ArtefactData aData = activeArtefactData.GetArtefactDatabase().GetItem(data.artefactId);
                 if (aData != null) OpenArtefactDetailAutomatically(aData);
             }
-            
+            else
+            {
+                activeArtefactData.MarkCompletionAnimSeen(data.artefactId);
+                isPlayingSequence = false;
+                if (backButtonItemUI != null) backButtonItemUI.gameObject.SetActive(true);
+                SetArtefactsInteractable(true);
+            }
+
             yield break;
         }
 
@@ -305,44 +312,44 @@ public class LevelSelectionController : BaseMenuController
     private IEnumerator PlayPendingUnlocksSequence()
     {
         List<ArtefactProgressData> pendingUnlocks = activeArtefactData.GetPendingUnlockAnimations();
-        
+
         if (pendingUnlocks.Count > 0)
         {
             isCameraMoving = true;
             MainMenuEvents.TriggerCameraToLevelSelection();
             yield return new WaitUntil(() => !isCameraMoving);
 
-            yield return waitUnlockSequence; 
-            
+            yield return waitUnlockSequence;
+
             for (int i = 0; i < pendingUnlocks.Count; i++)
             {
                 ArtefactProgressData data = pendingUnlocks[i];
                 Artefact3DItem targetItem = Array.Find(artefact3DItems, x => x != null && x.ArtefactId == data.artefactId);
-                
+
                 if (targetItem != null)
                 {
                     isCameraMoving = true;
                     MainMenuEvents.TriggerCameraFocusToArtefact(targetItem.BoxTransform);
-                    
+
                     yield return new WaitUntil(() => !isCameraMoving);
-                    
+
                     // Let the camera settle for a split-second before dropping the box
                     yield return new WaitForSeconds(0.25f);
 
                     AppLogger.Log($"[Animation] Playing UNLOCK animation for {data.artefactId}");
                     targetItem.PlayUnlockAnimation();
-                    
+
                     yield return waitUnlockDrop;
+
+                    activeArtefactData.MarkUnlockAnimSeen(data.artefactId);
                 }
-                
-                activeArtefactData.MarkUnlockAnimSeen(data.artefactId);
             }
-            
+
             isCameraMoving = true;
             MainMenuEvents.TriggerCameraToLevelSelection();
             yield return new WaitUntil(() => !isCameraMoving);
         }
-        
+
         RefreshUI();
         SetArtefactsInteractable(true);
 
@@ -353,7 +360,7 @@ public class LevelSelectionController : BaseMenuController
     private void OnBackButtonClick()
     {
         if (isPlayingSequence) return;
-        
+
         CloseLevelSelection();
         MainMenuEvents.TriggerCloseLevelSelection();
         MainMenuEvents.TriggerCameraToMainMenu();
@@ -363,9 +370,9 @@ public class LevelSelectionController : BaseMenuController
     {
         if (isPlayingSequence) return;
 
-        if (artefactDetailController != null && artefactDetailController.IsOpen) 
+        if (artefactDetailController != null && artefactDetailController.IsOpen)
         {
-            return; 
+            return;
         }
 
         OnBackButtonClick();
