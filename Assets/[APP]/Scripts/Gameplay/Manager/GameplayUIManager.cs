@@ -20,7 +20,7 @@ public class GameplayUIManager : MonoBehaviour
 
     [Header("Settings")]
     [SerializeField] public static float wrapUpThreshold = 95f;
-    [SerializeField] public static float clueEnableTreshold = 1f;
+    [SerializeField] public static float clueEnableTreshold = 85f;
     [SerializeField] private float delayUntilAutoWrappedUp = 1.5f;
 
     private CleaningService cleaningService;

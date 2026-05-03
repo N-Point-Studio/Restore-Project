@@ -212,9 +212,9 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
         return isDirtRemoved;
     }
 
-    private void OnGUI()
-    {
-        GUI.DrawTexture(new Rect(10, 10, 256, 256), maskMap, ScaleMode.ScaleToFit, false, 1);
-        GUI.DrawTexture(new Rect(10, 400, 256, 256), paintingMap, ScaleMode.ScaleToFit, false, 1);
-    }
+    // private void OnGUI()
+    // {
+    //     GUI.DrawTexture(new Rect(10, 10, 256, 256), maskMap, ScaleMode.ScaleToFit, false, 1);
+    //     GUI.DrawTexture(new Rect(10, 400, 256, 256), paintingMap, ScaleMode.ScaleToFit, false, 1);
+    // }
 }
