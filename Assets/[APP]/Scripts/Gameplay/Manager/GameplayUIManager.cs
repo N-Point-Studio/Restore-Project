@@ -31,7 +31,7 @@ public class GameplayUIManager : MonoBehaviour
 
     private bool canWrapUp;
     private bool isAutoWrapUpTriggered = false;
-    // private bool isTutorialTriggered = false;
+    private bool isTutorialTriggered = false;
     private bool isGamePaused = false;
 
     public static event Action OnGameWrapped;
@@ -164,7 +164,7 @@ public class GameplayUIManager : MonoBehaviour
 
         OnOverallProgressUpdated?.Invoke(overall);
         canWrapUp = overall >= wrapUpThreshold;
-        bool isFullyCompleted = overall >= 99.9f;
+        bool isFullyCompleted = overall >= 99f;
 
         if (overall >= clueEnableTreshold)
         {
@@ -182,7 +182,7 @@ public class GameplayUIManager : MonoBehaviour
         // 2. TRIGGER TUTORIAL
         if (canWrapUp)
         {
-            // isTutorialTriggered = true;
+            isTutorialTriggered = true;
             Debug.Log("harusnya wrap muncul " + overall);
 
             if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 1)
