@@ -102,6 +102,15 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
+                    ""name"": ""LeftButton"",
+                    ""type"": ""Button"",
+                    ""id"": ""7634cec8-6aae-43da-b9a6-38e1ca74c642"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
                     ""name"": ""SecondaryPress"",
                     ""type"": ""Button"",
                     ""id"": ""4ea9d7c1-58fc-46a7-a976-4f38cbac5a7b"",
@@ -165,6 +174,17 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Desktop;Mobile"",
                     ""action"": ""Press"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b6ca4dfa-7376-4c9a-a995-44fe679a438a"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Desktop"",
+                    ""action"": ""LeftButton"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -344,6 +364,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         // Player
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Press = m_Player.FindAction("Press", throwIfNotFound: true);
+        m_Player_LeftButton = m_Player.FindAction("LeftButton", throwIfNotFound: true);
         m_Player_SecondaryPress = m_Player.FindAction("SecondaryPress", throwIfNotFound: true);
         m_Player_Scroll = m_Player.FindAction("Scroll", throwIfNotFound: true);
         m_Player_KeycodeEnter = m_Player.FindAction("KeycodeEnter", throwIfNotFound: true);
@@ -437,6 +458,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Player;
     private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
     private readonly InputAction m_Player_Press;
+    private readonly InputAction m_Player_LeftButton;
     private readonly InputAction m_Player_SecondaryPress;
     private readonly InputAction m_Player_Scroll;
     private readonly InputAction m_Player_KeycodeEnter;
@@ -458,6 +480,10 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Press".
         /// </summary>
         public InputAction @Press => m_Wrapper.m_Player_Press;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/LeftButton".
+        /// </summary>
+        public InputAction @LeftButton => m_Wrapper.m_Player_LeftButton;
         /// <summary>
         /// Provides access to the underlying input action "Player/SecondaryPress".
         /// </summary>
@@ -511,6 +537,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Press.started += instance.OnPress;
             @Press.performed += instance.OnPress;
             @Press.canceled += instance.OnPress;
+            @LeftButton.started += instance.OnLeftButton;
+            @LeftButton.performed += instance.OnLeftButton;
+            @LeftButton.canceled += instance.OnLeftButton;
             @SecondaryPress.started += instance.OnSecondaryPress;
             @SecondaryPress.performed += instance.OnSecondaryPress;
             @SecondaryPress.canceled += instance.OnSecondaryPress;
@@ -543,6 +572,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Press.started -= instance.OnPress;
             @Press.performed -= instance.OnPress;
             @Press.canceled -= instance.OnPress;
+            @LeftButton.started -= instance.OnLeftButton;
+            @LeftButton.performed -= instance.OnLeftButton;
+            @LeftButton.canceled -= instance.OnLeftButton;
             @SecondaryPress.started -= instance.OnSecondaryPress;
             @SecondaryPress.performed -= instance.OnSecondaryPress;
             @SecondaryPress.canceled -= instance.OnSecondaryPress;
@@ -752,6 +784,13 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPress(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "LeftButton" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLeftButton(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "SecondaryPress" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
