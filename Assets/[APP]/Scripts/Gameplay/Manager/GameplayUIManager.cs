@@ -31,7 +31,7 @@ public class GameplayUIManager : MonoBehaviour
 
     private bool canWrapUp;
     private bool isAutoWrapUpTriggered = false;
-    private bool isTutorialTriggered = false;
+    // private bool isTutorialTriggered = false;
     private bool isGamePaused = false;
 
     public static event Action OnGameWrapped;
@@ -164,20 +164,30 @@ public class GameplayUIManager : MonoBehaviour
 
         OnOverallProgressUpdated?.Invoke(overall);
         canWrapUp = overall >= wrapUpThreshold;
-        bool isFullyCompleted = overall >= 99f;
+        bool isFullyCompleted = overall >= 99.9f;
+
+        if (overall >= clueEnableTreshold)
+        {
+            // Debug.Log("harusnya clue muncul " + overall);
+            if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 0)
+            {
+                tutorialService.StartTutorial(1, 0);
+            }
+        }
 
         bool showButton = canWrapUp && !isFullyCompleted && !isAutoWrapUpTriggered;
         mainUIController.EnableWrapUp(showButton);
         mainUIController.ShowButtonWrap(showButton);
 
         // 2. TRIGGER TUTORIAL
-        if (canWrapUp && !isTutorialTriggered)
+        if (canWrapUp)
         {
-            isTutorialTriggered = true;
+            // isTutorialTriggered = true;
+            Debug.Log("harusnya wrap muncul " + overall);
 
-            if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 0)
+            if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 1)
             {
-                tutorialService.StartTutorial(1, 0);
+                tutorialService.StartTutorial(1, 1);
             }
         }
 
@@ -218,7 +228,7 @@ public class GameplayUIManager : MonoBehaviour
         UpdateProgress(ProgressType.Dust, progress);
         if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 3)
         {
-            tutorialService.CompleteAndAdvance();
+            tutorialService.CompleteAndAdvance(true);
         }
     }
 
@@ -250,6 +260,10 @@ public class GameplayUIManager : MonoBehaviour
         if (endgameController.IsActive) return;
 
         AppLogger.Log("Wrap up!");
+        if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 1)
+        {
+            tutorialService.CompleteStage();
+        }
 
         if (cleaningService != null)
         {
@@ -267,16 +281,12 @@ public class GameplayUIManager : MonoBehaviour
 
         OnGameWrapped?.Invoke();
         AudioEvents.TriggerPlayCustomSFX(Modules.SoundSystems.AudioKey.SFX_Finish);
-
-        if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 0)
-        {
-            tutorialService.CompleteStage();
-        }
     }
 
     private void OnFinishedGame()
     {
         OnGameFinished?.Invoke(true);
+        tutorialService.CompleteStage();
     }
 
     private void OnResume()

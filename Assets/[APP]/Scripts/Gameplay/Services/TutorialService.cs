@@ -47,14 +47,14 @@ public class TutorialService
         }
     }
 
-    public void CompleteAndAdvance(float transitionDelay = 0.5f)
+    public void CompleteAndAdvance(bool isNext, float transitionDelay = 0.5f)
     {
         if (!isTutorialActive || isProcessing) return;
 
-        TutorialManager.Instance.StartCoroutine(CompleteRoutine(transitionDelay));
+        TutorialManager.Instance.StartCoroutine(CompleteRoutine(transitionDelay, isNext));
     }
 
-    private IEnumerator CompleteRoutine(float delay)
+    private IEnumerator CompleteRoutine(float delay, bool isNext)
     {
         isProcessing = true;
         isTutorialActive = false;
@@ -66,7 +66,7 @@ public class TutorialService
 
         isProcessing = false;
 
-        StartTutorial(currentStage, currentModule);
+        if (isNext) StartTutorial(currentStage, currentModule);
     }
 
     public void CompleteStage()

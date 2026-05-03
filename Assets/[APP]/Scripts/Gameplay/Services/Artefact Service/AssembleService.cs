@@ -109,7 +109,7 @@ public class AssemblyService : IInitializable, IDisposable
 
             if (gameplayManager.isTutorialAvailable)
             {
-                tutorialService.CompleteAndAdvance();
+                tutorialService.CompleteAndAdvance(true);
             }
 
             return true;

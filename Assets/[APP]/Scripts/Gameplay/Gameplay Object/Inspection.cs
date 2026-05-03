@@ -113,7 +113,7 @@ public class Inspection : MonoBehaviour
         //rotate tutorial
         if (!tutorialService.IsProcessing && tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 2)
         {
-            tutorialService.CompleteAndAdvance();
+            tutorialService.CompleteAndAdvance(true);
         }
     }
 
@@ -136,7 +136,7 @@ public class Inspection : MonoBehaviour
         //zoom tutorial
         if (!tutorialService.IsProcessing && tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 1)
         {
-            tutorialService.CompleteAndAdvance();
+            tutorialService.CompleteAndAdvance(true);
         }
     }
 
