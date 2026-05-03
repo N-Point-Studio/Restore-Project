@@ -152,13 +152,16 @@ public class GameplayUIManager : MonoBehaviour
     {
         float total = 0f;
         int count = 0;
+        float surfaceProgress = 0;
 
-        for (int i = 0; i < progressBars.Count; i++)
+        foreach (var progress in progressBars)
         {
-            if (!progressBars[i].gameObject.activeSelf) continue;
-            total += progressBars[i].GetValue();
+            if (!progress.gameObject.activeSelf) continue;
+            if (progress.ProgressType == ProgressType.Dust) surfaceProgress = progress.GetValue();
+            if (progress) total += progress.GetValue();
             count++;
         }
+
         if (count == 0) return;
         float overall = total / count;
 
@@ -166,7 +169,9 @@ public class GameplayUIManager : MonoBehaviour
         canWrapUp = overall >= wrapUpThreshold;
         bool isFullyCompleted = overall >= 99f;
 
-        if (overall >= clueEnableTreshold)
+        Debug.Log("Progress surface: " + surfaceProgress);
+
+        if (surfaceProgress >= clueEnableTreshold)
         {
             // Debug.Log("harusnya clue muncul " + overall);
             if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 0)
