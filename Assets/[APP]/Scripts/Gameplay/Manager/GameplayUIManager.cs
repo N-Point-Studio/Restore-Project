@@ -5,6 +5,7 @@ using VContainer;
 using NINESOFT.TUTORIAL_SYSTEM;
 using Modules;
 using System.Collections;
+using UnityEngine.InputSystem;
 
 public class GameplayUIManager : MonoBehaviour
 {
@@ -118,6 +119,27 @@ public class GameplayUIManager : MonoBehaviour
         settingsController.OnSettingsClosed -= OnSettingsClosed;
     }
 
+    private void Update()
+    {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        // [DEBUG CHEAT] Press F1 to instantly show the Wrap Up button
+        if (Keyboard.current != null && Keyboard.current.f1Key.wasPressedThisFrame)
+        {
+            AppLogger.Log("[Cheat] F1 Pressed! Forcing Wrap Up button to appear.");
+            
+            // Bypass the normal progress checks
+            canWrapUp = true;
+            isAutoWrapUpTriggered = false; // Ensure auto-wrap doesn't conflict
+            
+            // Force the UI controller to show and enable the button
+            if (mainUIController != null)
+            {
+                mainUIController.EnableWrapUp(true);
+                mainUIController.ShowButtonWrap(true);
+            }
+        }
+#endif
+    }
     private void UpdateProgress(ProgressType type, float value)
     {
         for (int i = 0; i < progressBars.Count; i++)

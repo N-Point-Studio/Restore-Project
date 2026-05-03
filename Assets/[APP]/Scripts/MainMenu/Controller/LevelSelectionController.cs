@@ -312,44 +312,55 @@ public class LevelSelectionController : BaseMenuController
     private IEnumerator PlayPendingUnlocksSequence()
     {
         List<ArtefactProgressData> pendingUnlocks = activeArtefactData.GetPendingUnlockAnimations();
-
+        
         if (pendingUnlocks.Count > 0)
         {
             isCameraMoving = true;
             MainMenuEvents.TriggerCameraToLevelSelection();
             yield return new WaitUntil(() => !isCameraMoving);
 
-            yield return waitUnlockSequence;
-
+            yield return waitUnlockSequence; 
+            
             for (int i = 0; i < pendingUnlocks.Count; i++)
             {
                 ArtefactProgressData data = pendingUnlocks[i];
                 Artefact3DItem targetItem = Array.Find(artefact3DItems, x => x != null && x.ArtefactId == data.artefactId);
-
+                
                 if (targetItem != null)
                 {
+                    if (targetItem.BoxTransform != null && !targetItem.BoxTransform.gameObject.activeInHierarchy) 
+                    {
+                        targetItem.BoxTransform.localScale = Vector3.zero; 
+                        targetItem.BoxTransform.gameObject.SetActive(true); 
+                    }
+
                     isCameraMoving = true;
-                    MainMenuEvents.TriggerCameraFocusToArtefact(targetItem.BoxTransform);
-
+                    MainMenuEvents.TriggerCameraFocusToArtefact(targetItem.BoxTransform != null ? targetItem.BoxTransform : targetItem.ArtefactTransform);
+                    
                     yield return new WaitUntil(() => !isCameraMoving);
-
+                    
                     // Let the camera settle for a split-second before dropping the box
                     yield return new WaitForSeconds(0.25f);
 
                     AppLogger.Log($"[Animation] Playing UNLOCK animation for {data.artefactId}");
                     targetItem.PlayUnlockAnimation();
-
+                    
                     yield return waitUnlockDrop;
-
-                    activeArtefactData.MarkUnlockAnimSeen(data.artefactId);
                 }
+                else
+                {
+                    // FIX 3: Warn you if the prefab is missing from the Inspector!
+                    AppLogger.LogError($"[LevelSelection] MISSING PREFAB! Cannot play unlock animation for {data.artefactId} because it is not assigned in the Artefact3DItems array in the Inspector!");
+                }
+                
+                activeArtefactData.MarkUnlockAnimSeen(data.artefactId);
             }
-
+            
             isCameraMoving = true;
             MainMenuEvents.TriggerCameraToLevelSelection();
             yield return new WaitUntil(() => !isCameraMoving);
         }
-
+        
         RefreshUI();
         SetArtefactsInteractable(true);
 

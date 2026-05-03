@@ -37,6 +37,7 @@ public class ArtefactDetailController : MonoBehaviour
     private Artefact3DItem current3DItem; 
     private ActiveArtefactData activeArtefactData;
     private bool isCompleted;
+    private bool isClosing = false;
 
     private InputSystemService input;
 
@@ -99,6 +100,7 @@ public class ArtefactDetailController : MonoBehaviour
 
     public void OpenDetail(ArtefactData artefactData, ActiveArtefactData activeData, Artefact3DItem item3D, bool forceShowBook = false)
     {
+        isClosing = false;
         currentArtefactData = artefactData;
         activeArtefactData = activeData;
         current3DItem = item3D;
@@ -262,6 +264,9 @@ public class ArtefactDetailController : MonoBehaviour
         }
         else
         {
+            if (isClosing) return;
+            isClosing = true;
+
             if (current3DItem != null) 
             {
                 current3DItem.SetDetailMode(false, false);
@@ -280,6 +285,8 @@ public class ArtefactDetailController : MonoBehaviour
 
     private void OnContinueStoryClicked()
     {
+        if (isClosing) return;
+        isClosing = true;
         if (current3DItem != null) 
         {
             current3DItem.SetDetailMode(false, false);

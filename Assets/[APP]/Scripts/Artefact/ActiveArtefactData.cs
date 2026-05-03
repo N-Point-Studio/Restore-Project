@@ -280,6 +280,8 @@ public class ActiveArtefactData : ISaveable
 
     public void LoadFromJSON(JSONNode json)
     {
+        BuildDataCache();
+        
         artefactProgress.Clear();
 
         if (json.HasKey("artefacts"))
