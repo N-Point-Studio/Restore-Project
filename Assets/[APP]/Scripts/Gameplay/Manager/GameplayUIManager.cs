@@ -19,7 +19,8 @@ public class GameplayUIManager : MonoBehaviour
     [SerializeField] private PopUpConfirmationController quitConfirmationController;
 
     [Header("Settings")]
-    [SerializeField] public static float wrapUpThreshold = 5f;
+    [SerializeField] public static float wrapUpThreshold = 95f;
+    [SerializeField] public static float clueEnableTreshold = 1f;
     [SerializeField] private float delayUntilAutoWrappedUp = 1.5f;
 
     private CleaningService cleaningService;

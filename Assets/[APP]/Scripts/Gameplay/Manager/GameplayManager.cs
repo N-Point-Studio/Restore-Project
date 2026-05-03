@@ -72,12 +72,12 @@ public class GameplayManager : IInitializable, IDisposable
 
     private void HandleTabPerformed()
     {
-        if (overallProgress >= GameplayUIManager.wrapUpThreshold) directionalLight.enabled = false;
+        if (overallProgress >= GameplayUIManager.clueEnableTreshold) directionalLight.enabled = false;
     }
 
     private void HandleTabCanceled()
     {
-        if (overallProgress >= GameplayUIManager.wrapUpThreshold) directionalLight.enabled = true;
+        if (overallProgress >= GameplayUIManager.clueEnableTreshold) directionalLight.enabled = true;
     }
 
 

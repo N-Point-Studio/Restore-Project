@@ -7,6 +7,7 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
     [Header("Shader Setting")]
     [SerializeField] private Shader paintingShader;
     [SerializeField] private Shader maskShader;
+    [SerializeField] private bool isFullShader = false;
     private RenderTexture paintingMap;
     private RenderTexture maskMap;
     private Material paintingMaterial;
@@ -64,7 +65,7 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
         paintingMap = CreateRenderTexture(1024);
         maskMap = CreateRenderTexture(1024);
 
-        if (maskTexture != null)
+        if (!isFullShader)
         {
             maskMaterial.SetTexture("_MaskTexture", maskTexture);
             paintingMaterial.SetTexture("_MaskTexture", maskTexture);
@@ -84,13 +85,19 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
         cb.Clear();
 
         paintableMaterial.SetTexture(maskTexturePropertyName, paintingMap);
-        // paintableMaterial.SetTexture("_Mask", maskMap);
-        // paintingMaterial.SetTexture("_MaskTexture", maskMap);
+        if (isFullShader)
+        {
+            paintableMaterial.SetTexture("_Mask", maskMap);
+            paintingMaterial.SetTexture("_MaskTexture", maskMap);
+        }
     }
 
     private RenderTexture CreateRenderTexture(int size)
     {
-        RenderTexture rt = new RenderTexture(size, size, 0, RenderTextureFormat.ARGB32);
+        RenderTexture rt = new RenderTexture(size, size, 0, RenderTextureFormat.ARGB32)
+        {
+            filterMode = FilterMode.Point
+        };
         rt.Create();
         return rt;
     }

@@ -79,7 +79,7 @@ public class CleaningService : IInitializable, IDisposable
 
     private void HandleKeycodeTabPerformed()
     {
-        if (overallProgress < GameplayUIManager.wrapUpThreshold) return;
+        if (overallProgress < GameplayUIManager.clueEnableTreshold) return;
         foreach (ICleanSurface surface in cleanSurfaces)
         {
             surface.ShowClue(true);
@@ -88,7 +88,7 @@ public class CleaningService : IInitializable, IDisposable
 
     private void HandleKeycodeTabCanceled()
     {
-        if (overallProgress < GameplayUIManager.wrapUpThreshold) return;
+        if (overallProgress < GameplayUIManager.clueEnableTreshold) return;
         foreach (ICleanSurface surface in cleanSurfaces)
         {
             surface.ShowClue(false);

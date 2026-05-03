@@ -283,6 +283,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CleaningSurface
   paintingShader: {fileID: 4800000, guid: fc4453f84baad409eb95f21d651b97e5, type: 3}
   maskShader: {fileID: 4800000, guid: 7f76a06dfd72c430981f5384b78c4e70, type: 3}
+  isFullShader: 0
   paintingColor: {r: 1, g: 1, b: 1, a: 1}
   progressShader: {fileID: 7200000, guid: 381317306db6346679cdf4784eb2e943, type: 3}
   maskPixel: 0
@@ -290,7 +291,7 @@ MonoBehaviour:
   progress: 0
   isDirtRemoved: 0
   maskTexturePropertyName: _SubMask
-  maskTexture: {fileID: 2800000, guid: 83a81c5bde595486a92f8a3ccedaa962, type: 3}
+  maskTexture: {fileID: 2800000, guid: 684dbeca926324907959aec800b972e6, type: 3}
 --- !u!1001 &193173620424075670
 PrefabInstance:
   m_ObjectHideFlags: 0
