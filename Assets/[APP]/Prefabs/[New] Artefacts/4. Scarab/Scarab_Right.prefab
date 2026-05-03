@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &480382109674355461
 Transform:
   m_ObjectHideFlags: 0
@@ -48,7 +48,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1618074124637549222}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -289,6 +289,7 @@ MonoBehaviour:
   paintedPixel: 0
   progress: 0
   isDirtRemoved: 0
+  forceClearTreshold: 99
   maskTexturePropertyName: _SubMask
   maskTexture: {fileID: 2800000, guid: 525051e96d503450bae22c9d3554f794, type: 3}
 --- !u!1001 &1064023739221292147

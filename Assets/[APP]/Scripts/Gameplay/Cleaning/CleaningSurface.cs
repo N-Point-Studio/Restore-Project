@@ -31,10 +31,12 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
     public bool isDirtRemoved = false;
 
     [Header("Material Integration")]
+    [SerializeField] private float forceClearTreshold = 99f;
     [SerializeField] private string maskTexturePropertyName = "_SubMask";
     [SerializeField] private Texture2D maskTexture;
 
     public static event Action<ICleanSurface> OnCreated;
+    public static event Action<ICleanSurface> OnForceClean;
 
     private IDragObject parentDragObject;
 
@@ -144,6 +146,11 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
 
         paintedPixel = CalculateTexture(paintingMap);
         isDirtRemoved = paintedPixel > tempPercentage;
+        if (GetCleaningProgress() > forceClearTreshold)
+        {
+            ForceClean();
+            OnForceClean?.Invoke(this);
+        }
     }
 
     public float GetCleaningProgress()

@@ -33,11 +33,13 @@ public class CleaningService : IInitializable, IDisposable
         CleaningChunk.OnCreated += RegisterChunk;
         CleaningChunk.OnDestroyed += CalculateChunks;
         CleaningSurface.OnCreated += RegisterSurface;
+        CleaningSurface.OnForceClean += HandleOnForceClean;
 
         InteractionEvents.OnTabPerformed += HandleKeycodeTabPerformed;
         InteractionEvents.OnTabCanceled += HandleKeycodeTabCanceled;
 
         GameplayUIManager.OnOverallProgressUpdated += HandleOveralProgressUpdated;
+
     }
 
     public void Dispose()
@@ -45,11 +47,17 @@ public class CleaningService : IInitializable, IDisposable
         CleaningChunk.OnCreated -= RegisterChunk;
         CleaningChunk.OnDestroyed -= CalculateChunks;
         CleaningSurface.OnCreated -= RegisterSurface;
+        CleaningSurface.OnForceClean -= HandleOnForceClean;
 
         InteractionEvents.OnTabPerformed -= HandleKeycodeTabPerformed;
         InteractionEvents.OnTabCanceled -= HandleKeycodeTabCanceled;
 
         GameplayUIManager.OnOverallProgressUpdated -= HandleOveralProgressUpdated;
+    }
+
+    private void HandleOnForceClean(ICleanSurface surface)
+    {
+        OnSurfaceCleaningUpdate?.Invoke(CalculateSurfaceProgress());
     }
 
     private void HandleOveralProgressUpdated(float obj)
