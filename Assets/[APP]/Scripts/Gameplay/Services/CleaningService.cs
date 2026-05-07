@@ -81,13 +81,15 @@ public class CleaningService : IInitializable, IDisposable
 
     private void RegisterSurface(ICleanSurface surface)
     {
-        Debug.Log("Registering clean surface: " + surface);
+        // Debug.Log("Registering clean surface: " + surface);
         cleanSurfaces.Add(surface);
     }
 
     private void HandleKeycodeTabPerformed()
     {
+        // AppLogger.Log("Tab kepencet di celaning service " + overallProgress + " < " + GameplayUIManager.clueEnableTreshold);
         if (overallProgress < GameplayUIManager.clueEnableTreshold) return;
+        // AppLogger.Log("[HARUSNYA] Tab nyala cleaning");
         foreach (ICleanSurface surface in cleanSurfaces)
         {
             surface.ShowClue(true);

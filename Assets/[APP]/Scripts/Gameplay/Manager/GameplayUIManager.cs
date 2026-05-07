@@ -125,12 +125,12 @@ public class GameplayUIManager : MonoBehaviour
         // [DEBUG CHEAT] Press F1 to instantly show the Wrap Up button
         if (Keyboard.current != null && Keyboard.current.f1Key.wasPressedThisFrame)
         {
-            AppLogger.Log("[Cheat] F1 Pressed! Forcing Wrap Up button to appear.");
-            
+            // AppLogger.Log("[Cheat] F1 Pressed! Forcing Wrap Up button to appear.");
+
             // Bypass the normal progress checks
             canWrapUp = true;
             isAutoWrapUpTriggered = false; // Ensure auto-wrap doesn't conflict
-            
+
             // Force the UI controller to show and enable the button
             if (mainUIController != null)
             {
@@ -187,11 +187,11 @@ public class GameplayUIManager : MonoBehaviour
         if (count == 0) return;
         float overall = total / count;
 
-        OnOverallProgressUpdated?.Invoke(overall);
+        OnOverallProgressUpdated?.Invoke(surfaceProgress);
         canWrapUp = overall >= wrapUpThreshold;
         bool isFullyCompleted = overall >= 99f;
 
-        Debug.Log("Progress surface: " + surfaceProgress);
+        // Debug.Log("Progress surface: " + surfaceProgress);
 
         if (surfaceProgress >= clueEnableTreshold)
         {
@@ -210,7 +210,7 @@ public class GameplayUIManager : MonoBehaviour
         if (canWrapUp)
         {
             isTutorialTriggered = true;
-            Debug.Log("harusnya wrap muncul " + overall);
+            // Debug.Log("harusnya wrap muncul " + overall);
 
             if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 1)
             {
@@ -227,7 +227,7 @@ public class GameplayUIManager : MonoBehaviour
             {
                 if (mainUIController != null && mainUIController.IsActive)
                 {
-                    AppLogger.Log("Manggil auto onwrap");
+                    // AppLogger.Log("Manggil auto onwrap");
                     OnWrapUp();
                 }
             });

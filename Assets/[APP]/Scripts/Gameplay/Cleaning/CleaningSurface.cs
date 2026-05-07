@@ -216,6 +216,7 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
 
     public bool IsDustRemoved()
     {
+        if (progress == 100) return false;
         return isDirtRemoved;
     }
 

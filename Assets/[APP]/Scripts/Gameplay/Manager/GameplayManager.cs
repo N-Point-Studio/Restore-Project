@@ -72,8 +72,11 @@ public class GameplayManager : IInitializable, IDisposable
 
     private void HandleTabPerformed()
     {
+        // AppLogger.Log("Tab nyala" + overallProgress + " < " + GameplayUIManager.clueEnableTreshold);
         if (overallProgress >= GameplayUIManager.clueEnableTreshold)
         {
+            // AppLogger.Log("[HARUSNYA] Tab nyala");
+
             directionalLight.enabled = false;
             if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 0)
             {
