@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1854843511793317096}
   - component: {fileID: 4167356189360771819}
+  - component: {fileID: 727818065344814118}
   m_Layer: 0
   m_Name: SoundSystem
   m_TagString: Untagged
@@ -46,3 +47,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   database: {fileID: 11400000, guid: cc7ebe41d5b20224dbf9d3c908c37b35, type: 2}
   audioMixer: {fileID: 24100000, guid: c5d4cdcf6b9421d4b8b8eb388a153cbb, type: 2}
+--- !u!81 &727818065344814118
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7384963590484129123}
+  m_Enabled: 1

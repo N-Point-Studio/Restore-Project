@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5be51871efa6c3e4eae1703925c8f5ac, type: 3}
+  m_Name: Restoria_String_Localization
+  m_EditorClassIdentifier: Unity.Localization.Editor::UnityEditor.Localization.StringTableCollection
+  m_SharedTableData: {fileID: 11400000, guid: cb92ced7c936e1d488319505859ec2f0, type: 2}
+  m_Tables:
+  - {fileID: 11400000, guid: 5121a76cbb4b2244e9b7974ff16a2bb9, type: 2}
+  - {fileID: 11400000, guid: 9b78f92c34285d848bc08ab12b637869, type: 2}
+  m_Extensions:
+  - rid: 3086047859624902743
+  m_Group: String Table
+  references:
+    version: 2
+    RefIds:
+    - rid: 3086047859624902743
+      type: {class: GoogleSheetsExtension, ns: UnityEditor.Localization.Plugins.Google, asm: Unity.Localization.Editor}
+      data:
+        m_Collection: {fileID: 11400000}
+        m_SheetsServiceProvider: {fileID: 11400000, guid: 0bccee98f7d4ece44ac73a428db6f666, type: 2}
+        m_SpreadsheetId: 1lXQHuffKOHffNlUE8c5BKYYvaDaxu5YUxSj5OhP_OGc
+        m_SheetId: 830018888
+        m_Columns:
+        - rid: 3086047859624902745
+        - rid: 3086047859624902746
+        - rid: 3086047859624902747
+        m_RemoveMissingPulledKeys: 1
+    - rid: 3086047859624902745
+      type: {class: KeyColumn, ns: UnityEditor.Localization.Plugins.Google.Columns, asm: Unity.Localization.Editor}
+      data:
+        m_Column: A
+    - rid: 3086047859624902746
+      type: {class: LocaleColumn, ns: UnityEditor.Localization.Plugins.Google.Columns, asm: Unity.Localization.Editor}
+      data:
+        m_Column: B
+        m_LocaleIdentifier:
+          m_Code: en-US
+        m_IncludeComments: 0
+    - rid: 3086047859624902747
+      type: {class: LocaleColumn, ns: UnityEditor.Localization.Plugins.Google.Columns, asm: Unity.Localization.Editor}
+      data:
+        m_Column: C
+        m_LocaleIdentifier:
+          m_Code: id-ID
+        m_IncludeComments: 0
