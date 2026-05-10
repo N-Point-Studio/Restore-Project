@@ -39,9 +39,6 @@ public class PedestalAnimator : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// show = true (Appears & Moves Up), show = false (Fades & Moves Down)
-    /// </summary>
     public void AnimatePedestal(bool show, float duration = -1f)
     {
         InitializeIfNeeded();
@@ -49,8 +46,16 @@ public class PedestalAnimator : MonoBehaviour
         
         transform.DOKill();
 
+        if (show) gameObject.SetActive(true);
+
         Vector3 targetPos = show ? originalPosition : originalPosition + (Vector3.down * slideDownDistance);
-        transform.DOLocalMove(targetPos, animDuration).SetEase(show ? Ease.OutBack : Ease.InBack);
+        
+        transform.DOLocalMove(targetPos, animDuration)
+            .SetEase(show ? Ease.OutBack : Ease.InBack)
+            .OnComplete(() => 
+            {
+                if (!show) gameObject.SetActive(false);
+            });
 
         float targetAlpha = show ? 1f : 0f;
         
@@ -63,7 +68,6 @@ public class PedestalAnimator : MonoBehaviour
 
             if (r.TryGetComponent(out ArtefactSensor sensor))
             {
-                // Skip fading the pedestal if it has an assigned artefact, as the artefact will handle its own fading
                 continue;
             }
 
