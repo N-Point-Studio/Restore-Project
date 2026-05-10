@@ -49,6 +49,9 @@ public class ArtefactData : ScriptableObject
     [SerializeField] private Vector3 finalRotation;
     public Vector3 FinalRotation => finalRotation;
 
+    [SerializeField] private float clueTreshold;
+    public float ClueTreshold => clueTreshold;
+
     private string artefactGroupId;
     public string ArtefactGroupId => artefactGroupId;
 

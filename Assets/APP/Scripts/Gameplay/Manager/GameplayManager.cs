@@ -17,6 +17,7 @@ public class GameplayManager : IInitializable, IDisposable
     private ArtefactData artefactData;
     public bool isTutorialAvailable;
     public Vector3 finalRotation;
+    public float clueTreshold;
     private string targetScene = "MainMenu";
     public float overallProgress;
 
@@ -147,6 +148,8 @@ public class GameplayManager : IInitializable, IDisposable
             {
                 artefactData = activeArtefactData.GetArtefactDatabase().GetItem(targetId);
                 finalRotation = artefactData.FinalRotation;
+                clueTreshold = artefactData.ClueTreshold;
+                // clueTreshold 
 
                 List<ArtefactFragmentData> artefactFragments = artefactData.ArtefactFragmentDatas;
                 for (int i = 0; i < artefactFragments.Count; i++)
