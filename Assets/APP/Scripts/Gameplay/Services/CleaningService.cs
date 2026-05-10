@@ -10,7 +10,7 @@ public class CleaningService : IInitializable, IDisposable
     private readonly HashSet<ICleanSurface> cleanSurfaces = new();
     private readonly HashSet<ICleanChunk> cleanChunks = new();
     private InputSystemService inputSystemService;
-    // private GameplayManager gameplayManager;
+    private GameplayManager gameplayManager;
 
     public bool isCleaning;
 
@@ -22,10 +22,10 @@ public class CleaningService : IInitializable, IDisposable
     public event Action<float> OnHardCleaningUpdate;
 
     [Inject]
-    public void Construct(InputSystemService input)
+    public void Construct(InputSystemService input, GameplayManager gameplayManager)
     {
         inputSystemService = input;
-        // this.gameplayManager = gameplayManager;
+        this.gameplayManager = gameplayManager;
     }
 
     public void Initialize()
@@ -88,7 +88,7 @@ public class CleaningService : IInitializable, IDisposable
     private void HandleKeycodeTabPerformed()
     {
         // AppLogger.Log("Tab kepencet di celaning service " + overallProgress + " < " + GameplayUIManager.clueEnableTreshold);
-        if (overallProgress < GameplayUIManager.clueEnableTreshold) return;
+        if (overallProgress < gameplayManager.clueTreshold) return;
         // AppLogger.Log("[HARUSNYA] Tab nyala cleaning");
         foreach (ICleanSurface surface in cleanSurfaces)
         {
@@ -98,7 +98,7 @@ public class CleaningService : IInitializable, IDisposable
 
     private void HandleKeycodeTabCanceled()
     {
-        if (overallProgress < GameplayUIManager.clueEnableTreshold) return;
+        if (overallProgress < gameplayManager.clueTreshold) return;
         foreach (ICleanSurface surface in cleanSurfaces)
         {
             surface.ShowClue(false);
@@ -108,6 +108,7 @@ public class CleaningService : IInitializable, IDisposable
     public void CleanSurface(ICleanSurface surface, Texture2D brush, Vector3 hitPoint, Vector3 hitNormal, Vector3 direction, float scale, float strength, Color color, float brushDepth)
     {
         if (!cleanSurfaces.Contains(surface)) return;
+        Debug.Log("[CLEANING] triggered");
         surface?.CleanSurface(hitPoint, brush, hitNormal, direction, scale, strength);
         OnSurfaceCleaningUpdate?.Invoke(CalculateSurfaceProgress());
     }

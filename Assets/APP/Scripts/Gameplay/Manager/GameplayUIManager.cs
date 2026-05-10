@@ -20,9 +20,8 @@ public class GameplayUIManager : MonoBehaviour
     [SerializeField] private PopUpConfirmationController quitConfirmationController;
 
     [Header("Settings")]
-    [SerializeField] public static float wrapUpThreshold = 95f;
-    [SerializeField] public static float clueEnableTreshold = 85f;
     [SerializeField] private float delayUntilAutoWrappedUp = 1.5f;
+    public float wrapUpThreshold = 95f;
 
     private CleaningService cleaningService;
     private FragmentService fragmentService;
@@ -82,7 +81,6 @@ public class GameplayUIManager : MonoBehaviour
         settingsController.OnSettingsClosed += OnSettingsClosed;
 
         mainUIController.SetActive(true);
-        wrapUpThreshold = gameplayManager.clueTreshold;
     }
 
     private IEnumerator Start()
@@ -192,7 +190,7 @@ public class GameplayUIManager : MonoBehaviour
         canWrapUp = overall >= wrapUpThreshold;
         bool isFullyCompleted = overall >= 99f;
 
-        if (surfaceProgress >= clueEnableTreshold)
+        if (surfaceProgress >= gameplayManager.clueTreshold)
         {
             if (gameplayManager.isTutorialAvailable)
             {
