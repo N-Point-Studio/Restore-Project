@@ -4,16 +4,20 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Users;
 using UnityEngine.UI;
+using UnityEngine.Localization;
 
 public class InputInstructionUI : MonoBehaviour
 {
     [Header("Data")]
     [SerializeField] protected InputActionReference inputAction;
     [SerializeField] protected bool isHolding;
-    [SerializeField] protected string info;
+    
+    [SerializeField] protected LocalizedString localizedInfo; 
+    
     [SerializeField] protected bool customText;
     [SerializeField] protected bool hideEverythingIfNotController;
     [SerializeField] protected bool hideEverythingIfController;
+    [SerializeField] protected bool hideEverythingIfMobile;
     [SerializeField] protected bool iconOnly;
 
     [Header("Component")]
@@ -30,6 +34,8 @@ public class InputInstructionUI : MonoBehaviour
     public bool UsingController => usingController;
 
     protected Action<bool> onUsingController;
+    
+    private string currentTranslatedInfo = "";
 
     protected virtual void Awake()
     {
@@ -48,9 +54,36 @@ public class InputInstructionUI : MonoBehaviour
         SetupUI();
     }
 
+    protected virtual void OnEnable()
+    {
+        if (localizedInfo != null)
+        {
+            localizedInfo.StringChanged += OnLocalizedStringChanged;
+        }
+
+        if (contentSizeFitter != null)
+        {
+            contentSizeFitter.RefreshContent();
+        }
+    }
+
+    protected virtual void OnDisable()
+    {
+        if (localizedInfo != null)
+        {
+            localizedInfo.StringChanged -= OnLocalizedStringChanged;
+        }
+    }
+
     protected virtual void OnDestroy()
     {
         InputUser.onChange -= HandleOnInputChanged;
+    }
+
+    protected virtual void OnLocalizedStringChanged(string value)
+    {
+        currentTranslatedInfo = value;
+        UpdateTextDisplay();
     }
 
     protected virtual void HandleOnInputChanged(InputUser user, InputUserChange change, InputDevice device)
@@ -79,14 +112,6 @@ public class InputInstructionUI : MonoBehaviour
         }
     }
 
-    protected virtual void OnEnable()
-    {
-        if (contentSizeFitter != null)
-        {
-            contentSizeFitter.RefreshContent();
-        }
-    }
-
     public virtual void RegisterCallback(Action<bool> onUsingController)
     {
         this.onUsingController = onUsingController;
@@ -98,10 +123,20 @@ public class InputInstructionUI : MonoBehaviour
         SetupUI();
     }
 
-    public virtual void ForceSetText(bool isHolding, string text)
+    public virtual void ForceSetLocalizedText(bool isHolding, LocalizedString newLocalizedInfo)
     {
         this.isHolding = isHolding;
-        info = text;
+        
+        if (localizedInfo != null) localizedInfo.StringChanged -= OnLocalizedStringChanged;
+        
+        localizedInfo = newLocalizedInfo;
+        
+        if (localizedInfo != null)
+        {
+            localizedInfo.StringChanged += OnLocalizedStringChanged;
+            localizedInfo.RefreshString(); 
+        }
+        
         SetupUI();
     }
 
@@ -114,6 +149,13 @@ public class InputInstructionUI : MonoBehaviour
     public virtual void SetHideEverythingIfController(bool isHidden)
     {
         hideEverythingIfController = isHidden;
+        SetupUI();
+    }
+
+    // NEW: Setter for Mobile
+    public virtual void SetHideEverythingIfMobile(bool isHidden)
+    {
+        hideEverythingIfMobile = isHidden;
         SetupUI();
     }
 
@@ -142,35 +184,21 @@ public class InputInstructionUI : MonoBehaviour
             onUsingController?.Invoke(usingController);
         }
 
-        string key;
-        string device;
-
         Image bgImage = null;
         if (TryGetComponent(out Image bg))
         {
             bgImage = bg;
         }
 
-        if (bgImage != null)
-        {
-            bgImage.enabled = true;
-        }
+        if (bgImage != null) bgImage.enabled = true;
+        if (textInfo != null) textInfo.gameObject.SetActive(true);
+        if (horizontalLayoutGroup != null) horizontalLayoutGroup.gameObject.SetActive(true);
 
-        textInfo.gameObject.SetActive(true);
-
-        if (horizontalLayoutGroup != null) // Text Input & Image Input Panel 
-        {
-            horizontalLayoutGroup.gameObject.SetActive(true);
-        }
-
-        if (!customText && textInfo != null)
-        {
-            textInfo.text = $"{(isHolding ? $"(Hold) {info}" : info)}";
-        }
+        UpdateTextDisplay();
 
         if (iconOnly)
         {
-            textInfo.gameObject.SetActive(false);
+            if (textInfo != null) textInfo.gameObject.SetActive(false);
         }
 
         if (bgImage != null)
@@ -178,15 +206,17 @@ public class InputInstructionUI : MonoBehaviour
             bgImage.enabled = !iconOnly;
         }
 
+        string key;
+        string device;
+
         if (usingController)
         {
             if (inputAction.action.bindings.Count > 1)
             {
-                int bindingIndex = 1; // Default binding index for non-Vector2 inputs
+                int bindingIndex = 1; 
 
                 if (inputAction.action.expectedControlType.Equals(nameof(Vector2)))
                 {
-                    // Find the first gamepad binding for Vector2 inputs
                     bindingIndex = -1;
                     for (int i = 0; i < inputAction.action.bindings.Count; i++)
                     {
@@ -198,14 +228,12 @@ public class InputInstructionUI : MonoBehaviour
                         }
                     }
 
-                    // Fallback to index 1 if no gamepad binding found
                     if (bindingIndex == -1)
                     {
                         bindingIndex = inputAction.action.bindings.Count > 1 ? 1 : 0;
                     }
                 }
 
-                // Ensure binding index is within bounds
                 if (bindingIndex >= inputAction.action.bindings.Count)
                 {
                     bindingIndex = inputAction.action.bindings.Count - 1;
@@ -213,116 +241,87 @@ public class InputInstructionUI : MonoBehaviour
 
                 inputAction.action.GetBindingDisplayString(bindingIndex, out device, out key);
 
-                if (key.Contains("/"))
+                if (key.Contains("/")) key = key.Split('/')[0];
+
+                Sprite icon = gamePadIconManager != null ? gamePadIconManager.GetIcon(key, device, null) : null;
+
+                if (horizontalLayoutGroup != null) horizontalLayoutGroup.gameObject.SetActive(icon != null);
+                if (imageInput != null)
                 {
-                    key = key.Split('/')[0];
+                    imageInput.gameObject.SetActive(icon != null);
+                    imageInput.sprite = icon;
                 }
-
-                Sprite icon = gamePadIconManager.GetIcon(key, device, null);
-
-                // Additional debug logging if icon is null
-                if (icon == null && inputAction.action.expectedControlType.Equals(nameof(Vector2)))
-                {
-                    Debug.LogWarning($"[InputInstructionUI] No icon found for Vector2 input - Key: '{key}', Device: '{device}'");
-                }
-
-                if (horizontalLayoutGroup != null)
-                {
-                    horizontalLayoutGroup.gameObject.SetActive(icon != null);
-                }
-
-                imageInput.gameObject.SetActive(icon != null);
-                imageInput.sprite = icon;
-
-                textInput.gameObject.SetActive(false);
+                if (textInput != null) textInput.gameObject.SetActive(false);
             }
             else
             {
-                // Handle case when there's only one binding
                 inputAction.action.GetBindingDisplayString(0, out device, out key);
 
-                if (key.Contains("/"))
+                if (key.Contains("/")) key = key.Split('/')[0];
+
+                Sprite icon = gamePadIconManager != null ? gamePadIconManager.GetIcon(key, device, null) : null;
+
+                if (horizontalLayoutGroup != null) horizontalLayoutGroup.gameObject.SetActive(icon != null);
+                if (imageInput != null)
                 {
-                    key = key.Split('/')[0];
+                    imageInput.gameObject.SetActive(icon != null);
+                    imageInput.sprite = icon;
                 }
-
-                Sprite icon = gamePadIconManager.GetIcon(key, device, null);
-
-                if (horizontalLayoutGroup != null)
-                {
-                    horizontalLayoutGroup.gameObject.SetActive(icon != null);
-                }
-
-                imageInput.gameObject.SetActive(icon != null);
-                imageInput.sprite = icon;
-
-                textInput.gameObject.SetActive(false);
+                if (textInput != null) textInput.gameObject.SetActive(false);
             }
 
             if (hideEverythingIfController)
             {
-                if (bgImage != null)
-                {
-                    bgImage.enabled = false;
-                }
-
-                if (horizontalLayoutGroup != null)
-                {
-                    horizontalLayoutGroup.gameObject.SetActive(false);
-                }
-
-                textInfo.gameObject.SetActive(false);
+                if (bgImage != null) bgImage.enabled = false;
+                if (horizontalLayoutGroup != null) horizontalLayoutGroup.gameObject.SetActive(false);
+                if (textInfo != null) textInfo.gameObject.SetActive(false);
             }
         }
-        else
+        else 
         {
-            if (textInput != null)
+            if (textInput != null && inputAction.action != null)
             {
                 inputAction.action.GetBindingDisplayString(0, out device, out key);
-                Sprite icon = gamePadIconManager.GetIcon(key, device, null);
+                Sprite icon = gamePadIconManager != null ? gamePadIconManager.GetIcon(key, device, null) : null;
 
-                imageInput.gameObject.SetActive(icon != null);
-                imageInput.sprite = icon;
+                if (imageInput != null)
+                {
+                    imageInput.gameObject.SetActive(icon != null);
+                    imageInput.sprite = icon;
+                }
 
                 textInput.gameObject.SetActive(icon == null);
                 if (icon == null)
                 {
                     textInput.text = inputAction.action.GetBindingDisplayString(0);
-
-                    // shorten the text
-                    if (textInput.text.Contains("LEFT"))
-                        textInput.text = textInput.text.Replace("LEFT", "L");
-                    if (textInput.text.Contains("RIGHT"))
-                        textInput.text = textInput.text.Replace("RIGHT", "R");
-                    if (textInput.text.Contains("Control"))
-                        textInput.text = textInput.text.Replace("Control", "Ctrl");
+                    if (textInput.text.Contains("LEFT")) textInput.text = textInput.text.Replace("LEFT", "L");
+                    if (textInput.text.Contains("RIGHT")) textInput.text = textInput.text.Replace("RIGHT", "R");
+                    if (textInput.text.Contains("Control")) textInput.text = textInput.text.Replace("Control", "Ctrl");
 
                     textInput.gameObject.SetActive(true);
                 }
 
                 if (horizontalLayoutGroup != null)
                 {
-                    horizontalLayoutGroup.GetComponent<Image>().enabled = icon == null;
-
-                    if (defaultPadding != null)
-                        horizontalLayoutGroup.padding = icon == null ? defaultPadding : new RectOffset(0, 0, 0, 0);
+                    if (horizontalLayoutGroup.TryGetComponent(out Image hgImage)) hgImage.enabled = icon == null;
+                    if (defaultPadding != null) horizontalLayoutGroup.padding = icon == null ? defaultPadding : new RectOffset(0, 0, 0, 0);
                 }
             }
 
             if (hideEverythingIfNotController)
             {
-                if (bgImage != null)
-                {
-                    bgImage.enabled = false;
-                }
-
-                if (horizontalLayoutGroup != null)
-                {
-                    horizontalLayoutGroup.gameObject.SetActive(false);
-                }
-
-                textInfo.gameObject.SetActive(false);
+                if (bgImage != null) bgImage.enabled = false;
+                if (horizontalLayoutGroup != null) horizontalLayoutGroup.gameObject.SetActive(false);
+                if (textInfo != null) textInfo.gameObject.SetActive(false);
             }
+        }
+
+        // NEW: Check if running on a mobile platform and hide visuals if toggled
+        if (hideEverythingIfMobile && Application.isMobilePlatform)
+        {
+            if (bgImage != null) bgImage.enabled = false;
+            if (horizontalLayoutGroup != null) horizontalLayoutGroup.gameObject.SetActive(false);
+            if (textInfo != null) textInfo.gameObject.SetActive(false);
         }
 
         UpdateDoubleIcons();
@@ -333,8 +332,20 @@ public class InputInstructionUI : MonoBehaviour
         }
     }
 
+    private void UpdateTextDisplay()
+    {
+        if (!customText && textInfo != null)
+        {
+            textInfo.text = $"{(isHolding ? $"(Hold) {currentTranslatedInfo}" : currentTranslatedInfo)}";
+        }
+        
+        if (contentSizeFitter != null && gameObject.activeInHierarchy)
+        {
+            contentSizeFitter.RefreshContent();
+        }
+    }
+
     public virtual void UpdateDoubleIcons()
     {
-
     }
 }

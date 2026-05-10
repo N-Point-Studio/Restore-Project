@@ -1,5 +1,6 @@
 using UnityEngine;
 using VContainer;
+using UnityEngine.Localization;
 
 public class MenuController : BaseMenuController
 {
@@ -8,6 +9,10 @@ public class MenuController : BaseMenuController
     [SerializeField] private ButtonItemUI buttonContinue;
     [SerializeField] private ButtonItemUI buttonSettings;
     [SerializeField] private ButtonItemUI buttonQuit;
+
+    [Header("Localization")]
+    [SerializeField] private LocalizedString newGameLabel;
+    [SerializeField] private LocalizedString startLabel;
 
     private PlayerProgressionData playerProgressionData;
 
@@ -47,7 +52,7 @@ public class MenuController : BaseMenuController
         {
             bool hasPlayed = playerProgressionData.HasPlayedBefore;
             buttonContinue.gameObject.SetActive(hasPlayed);
-            buttonNewGame.SetLabel(hasPlayed ? "New Game" : "Start");
+            buttonNewGame.SetLocalizedLabel(hasPlayed ? newGameLabel : startLabel);
         }
     }
 

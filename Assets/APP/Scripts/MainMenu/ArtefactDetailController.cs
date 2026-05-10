@@ -4,6 +4,7 @@ using MoreMountains.Feedbacks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Localization;
 
 public class ArtefactDetailController : MonoBehaviour
 {
@@ -24,6 +25,8 @@ public class ArtefactDetailController : MonoBehaviour
 
     [Header("Text Instructions")]
     [SerializeField] private TMP_Text instructionText; 
+    [SerializeField] private LocalizedString localizedInstructOpenBox;
+    [SerializeField] private LocalizedString localizedInstructPeelNote;
 
     [Header("Feedbacks")]
     [SerializeField] private MMF_Player wallTextRevealFeedback;
@@ -58,6 +61,12 @@ public class ArtefactDetailController : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        if (localizedInstructOpenBox != null) localizedInstructOpenBox.StringChanged += UpdateInstructionText;
+        if (localizedInstructPeelNote != null) localizedInstructPeelNote.StringChanged += UpdateInstructionText;
+    }
+
     private void OnDestroy()
     {
         buttonBack.OnClick -= OnBackClicked;
@@ -76,6 +85,11 @@ public class ArtefactDetailController : MonoBehaviour
             this.input.OnUIKeycodeRPerformed -= OnUIKeycodeRPerformed;
             this.input.OnUIKeycodeEnterPerformed -= OnUIKeycodeEnterPerformed;
         }
+
+        if (localizedInstructOpenBox != null) localizedInstructOpenBox.StringChanged -= UpdateInstructionText;
+        if (localizedInstructPeelNote != null) localizedInstructPeelNote.StringChanged -= UpdateInstructionText;
+
+        UnsubscribeArtefactData();
     }
 
     public void SetInputSystemService(InputSystemService input)
@@ -98,14 +112,32 @@ public class ArtefactDetailController : MonoBehaviour
         }
     }
 
+    private void UnsubscribeArtefactData()
+    {
+        if (currentArtefactData != null)
+        {
+            if (currentArtefactData.LocalizedItemName != null) currentArtefactData.LocalizedItemName.StringChanged -= UpdateWallTitleText;
+            if (currentArtefactData.LocalizedItemDescription != null) currentArtefactData.LocalizedItemDescription.StringChanged -= UpdateWallDescText;
+        }
+    }
+
+    private void UpdateWallTitleText(string value) { if (wallTitleText != null) wallTitleText.text = value; }
+    private void UpdateWallDescText(string value) { if (wallDescText != null) wallDescText.text = value; }
+    private void UpdateInstructionText(string value) { if (instructionText != null) instructionText.text = value; }
+
     public void OpenDetail(ArtefactData artefactData, ActiveArtefactData activeData, Artefact3DItem item3D, bool forceShowBook = false)
     {
+        UnsubscribeArtefactData();
+
         isClosing = false;
         currentArtefactData = artefactData;
         activeArtefactData = activeData;
         current3DItem = item3D;
         isCompleted = activeArtefactData.IsArtefactCompleted(currentArtefactData.BaseData.Id);
         bool isStoryRead = activeArtefactData.IsStoryRead(currentArtefactData.BaseData.Id);
+
+        if (currentArtefactData.LocalizedItemName != null) currentArtefactData.LocalizedItemName.StringChanged += UpdateWallTitleText;
+        if (currentArtefactData.LocalizedItemDescription != null) currentArtefactData.LocalizedItemDescription.StringChanged += UpdateWallDescText;
 
         bool hasNotesRemaining = !isCompleted && !isStoryRead;
         if (current3DItem != null) 
@@ -143,9 +175,11 @@ public class ArtefactDetailController : MonoBehaviour
                 journalController.SetupPostRestoration(currentArtefactData, OnJournalContinueClicked);
                 journalController.HideBookToPeek();
 
-                wallTitleText.text = currentArtefactData.BaseData.ItemName;
-                wallDescText.text = currentArtefactData.BaseData.ItemDescription;
                 wallTextGroup.gameObject.SetActive(true);
+
+                // Fetch Strings Asynchronously
+                if (currentArtefactData.LocalizedItemName != null) currentArtefactData.LocalizedItemName.RefreshString();
+                if (currentArtefactData.LocalizedItemDescription != null) currentArtefactData.LocalizedItemDescription.RefreshString();
 
                 if (wallTextRevealFeedback != null)
                 {
@@ -162,7 +196,7 @@ public class ArtefactDetailController : MonoBehaviour
             if (isStoryRead)
             {
                 instructionText.gameObject.SetActive(true);
-                instructionText.text = "Open the box and\nstart restore...";
+                if (localizedInstructOpenBox != null) localizedInstructOpenBox.RefreshString(); // Fetch
                 
                 buttonBack.SetAlternateStyle(false);
 
@@ -172,7 +206,7 @@ public class ArtefactDetailController : MonoBehaviour
             else
             {
                 instructionText.gameObject.SetActive(true);
-                instructionText.text = "Peel off the sticky note...";
+                if (localizedInstructPeelNote != null) localizedInstructPeelNote.RefreshString(); // Fetch
                 
                 buttonBack.SetAlternateStyle(false);
 
@@ -224,10 +258,10 @@ public class ArtefactDetailController : MonoBehaviour
     {
         journalController.HideBookToPeek();
         
-        wallTitleText.text = currentArtefactData.BaseData.ItemName;
-        wallDescText.text = currentArtefactData.BaseData.ItemDescription;
-        
         wallTextGroup.gameObject.SetActive(true);
+
+        if (currentArtefactData.LocalizedItemName != null) currentArtefactData.LocalizedItemName.RefreshString();
+        if (currentArtefactData.LocalizedItemDescription != null) currentArtefactData.LocalizedItemDescription.RefreshString();
 
         if (wallTextRevealFeedback != null)
         {
@@ -251,15 +285,17 @@ public class ArtefactDetailController : MonoBehaviour
 
             if (isCompleted)
             {
-                wallTitleText.text = currentArtefactData.BaseData.ItemName;
-                wallDescText.text = currentArtefactData.BaseData.ItemDescription;
                 wallTextGroup.gameObject.SetActive(true);
+                
+                if (currentArtefactData.LocalizedItemName != null) currentArtefactData.LocalizedItemName.RefreshString();
+                if (currentArtefactData.LocalizedItemDescription != null) currentArtefactData.LocalizedItemDescription.RefreshString();
+
                 wallTextGroup.DOFade(1, wallTextFadeDuration);
             }
             else
             {
                 instructionText.gameObject.SetActive(true);
-                instructionText.text = "Open the box and\nstart restore...";
+                if (localizedInstructOpenBox != null) localizedInstructOpenBox.RefreshString();
             }
         }
         else

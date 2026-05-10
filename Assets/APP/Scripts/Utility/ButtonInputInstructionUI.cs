@@ -12,12 +12,12 @@ public class ButtonInputInstructionUI : InputInstructionUI, IPointerEnterHandler
     public Action OnClick;
 
     [Header("Text Animation Settings")]
-    [SerializeField] private RectTransform animatedTextRect; // Description Text RectTransform
-    [SerializeField] private TextColorChanger textDescriptionColorChanger; // Description Text Color
-    [SerializeField] private TextFontChanger textDescriptionFontChanger; // Description Text Font
-    [SerializeField] private SpriteColorChanger spriteInstructionBgColorChanger; // Instruction Background
-    [SerializeField] private TextColorChanger textInstructionColorChanger; // Instruction Text Color
-    [SerializeField] private TextFontChanger textInstructionFontChanger; // Instruction Text Font
+    [SerializeField] private RectTransform animatedTextRect; 
+    [SerializeField] private TextColorChanger textDescriptionColorChanger; 
+    [SerializeField] private TextFontChanger textDescriptionFontChanger; 
+    [SerializeField] private SpriteColorChanger spriteInstructionBgColorChanger; 
+    [SerializeField] private TextColorChanger textInstructionColorChanger; 
+    [SerializeField] private TextFontChanger textInstructionFontChanger; 
 
     [Header("Scale Settings")]
     [SerializeField] private float hoverScale = 1.05f;
@@ -35,7 +35,11 @@ public class ButtonInputInstructionUI : InputInstructionUI, IPointerEnterHandler
     protected override void Awake()
     {
         base.Awake();
-        button.onClick.AddListener(HandleOnButtonClicked);
+        
+        if (button != null)
+        {
+            button.onClick.AddListener(HandleOnButtonClicked);
+        }
 
         if (animatedTextRect == null && textInfo != null)
         {
@@ -56,13 +60,15 @@ public class ButtonInputInstructionUI : InputInstructionUI, IPointerEnterHandler
     protected override void OnDestroy()
     {
         base.OnDestroy();
-        button.onClick.RemoveListener(HandleOnButtonClicked);
+        
+        if (button != null) button.onClick.RemoveListener(HandleOnButtonClicked);
         if (!gameObject.scene.isLoaded) return;
         if (animatedTextRect != null) animatedTextRect.DOKill();
     }
 
-    protected virtual void OnDisable()
+    protected override void OnDisable()
     {
+        base.OnDisable();
         CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
     }
 
@@ -83,14 +89,14 @@ public class ButtonInputInstructionUI : InputInstructionUI, IPointerEnterHandler
     {
         if (button == null || !button.interactable) return;
         ApplyVisualState(true, false);
-        CursorController.instance?.SetCursorState(CursorState.Hover); // Set Hover Cursor
+        CursorController.instance?.SetCursorState(CursorState.Hover); 
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         if (button == null || !button.interactable) return;
         ApplyVisualState(false, false);
-        CursorController.instance?.SetCursorState(CursorState.DefaultRounded); // Reset Cursor
+        CursorController.instance?.SetCursorState(CursorState.DefaultRounded); 
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -113,13 +119,6 @@ public class ButtonInputInstructionUI : InputInstructionUI, IPointerEnterHandler
     {
         if (animatedTextRect == null) return;
 
-        animatedTextRect.DOKill();
-        Vector3 targetScale = originalScale;
-        if (isHovered) targetScale = originalScale * hoverScale;
-        if (isPressed) targetScale *= pressScaleModifier;
-
-        animatedTextRect.DOScale(targetScale, tweenDuration).SetEase(isPressed ? Ease.OutBack : tweenEase);
-
         int stateIndex = useAlternateStyle ? 1 : 0; 
         
         if (textDescriptionColorChanger != null) textDescriptionColorChanger.ChangeColorSmooth(stateIndex, tweenDuration);
@@ -128,5 +127,12 @@ public class ButtonInputInstructionUI : InputInstructionUI, IPointerEnterHandler
         if (spriteInstructionBgColorChanger != null) spriteInstructionBgColorChanger.ChangeColorSmooth(stateIndex, tweenDuration);
         if (textInstructionColorChanger != null) textInstructionColorChanger.ChangeColorSmooth(stateIndex, tweenDuration);
         if (textInstructionFontChanger != null) textInstructionFontChanger.ChangeFont(stateIndex);
+
+        animatedTextRect.DOKill();
+        Vector3 targetScale = originalScale;
+        if (isHovered) targetScale = originalScale * hoverScale;
+        if (isPressed) targetScale *= pressScaleModifier;
+
+        animatedTextRect.DOScale(targetScale, tweenDuration).SetEase(isPressed ? Ease.OutBack : tweenEase);
     }
 }

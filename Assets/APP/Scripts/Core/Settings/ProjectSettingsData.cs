@@ -22,6 +22,9 @@ public class ProjectSettingsData : ScriptableObject, ISaveable
     [SerializeField] private bool crosshair = false;
     public bool Crosshair => crosshair;
 
+    [SerializeField] private string languageCode = "en";
+    public string LanguageCode => languageCode;
+
     public void Apply(ProjectSettingsGraphicMode graphicMode)
     {
         this.graphicMode = graphicMode;
@@ -48,6 +51,11 @@ public class ProjectSettingsData : ScriptableObject, ISaveable
         this.crosshair = enabled;
     }
 
+    public void Apply(string code)
+    {
+        this.languageCode = code;
+    }
+
     public JSONNode AsJSON()
     {
         JSONObject json = new JSONObject();
@@ -56,23 +64,48 @@ public class ProjectSettingsData : ScriptableObject, ISaveable
         json["master_volume"].AsFloat = masterVolume;
         json["sfx_volume"].AsFloat = sfxVolume;
         json["bgm_volume"].AsFloat = bgmVolume;
-        json["crosshair"].AsBool = crosshair;
+        json["crosshair"].AsBool = crosshair;        
+        json["language_code"] = languageCode;
 
         return json;
     }
 
     public void LoadFromJSON(JSONNode json)
     {
-        graphicMode = (ProjectSettingsGraphicMode)json["graphic_mode"].AsInt;
-        masterVolume = json["master_volume"].AsFloat;
-        sfxVolume = json["sfx_volume"].AsFloat;
-        bgmVolume = json["bgm_volume"].AsFloat;
-        crosshair = json["crosshair"].AsBool;
+        if (json == null || json.ToString() == "{}" || json.ToString() == "null") return;
+
+        if (json.HasKey("graphic_mode"))
+        {
+            graphicMode = (ProjectSettingsGraphicMode)json["graphic_mode"].AsInt;
+        }
+
+        if (json.HasKey("master_volume"))
+        {
+            masterVolume = json["master_volume"].AsFloat;
+        }
+
+        if (json.HasKey("sfx_volume"))
+        {
+            sfxVolume = json["sfx_volume"].AsFloat;
+        }
+
+        if (json.HasKey("bgm_volume"))
+        {
+            bgmVolume = json["bgm_volume"].AsFloat;
+        }
+
+        if (json.HasKey("crosshair"))
+        {
+            crosshair = json["crosshair"].AsBool;
+        }
+
+        if (json.HasKey("language_code"))
+        {
+            languageCode = json["language_code"].Value;
+        }
     }
 }
 
-public enum ProjectSettingsType { Graphic, Sound, Crosshair }
-
+public enum ProjectSettingsType { Graphic, Sound, Crosshair, Language }
 public enum ProjectSettingsGraphicMode { Performance, Balance, Quality }
-
 public enum ProjectSettingsAudioType { Master, SFX, BGM }

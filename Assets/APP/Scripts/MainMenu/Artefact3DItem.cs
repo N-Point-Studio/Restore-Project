@@ -1,6 +1,7 @@
 using DG.Tweening;
 using MoreMountains.Feedbacks;
 using UnityEngine;
+using UnityEngine.Localization;
 
 public class Artefact3DItem : MonoBehaviour
 {
@@ -98,13 +99,13 @@ public class Artefact3DItem : MonoBehaviour
                 {
                     if (hasUnpeeledNotes)
                     {
-                        string labelText = "";
-                        if (artefactData.StickyNoteTexts != null && i < artefactData.StickyNoteTexts.Length)
+                        LocalizedString locText = null;
+                        if (artefactData.LocalizedStickyNoteTexts != null && i < artefactData.LocalizedStickyNoteTexts.Length)
                         {
-                            labelText = artefactData.StickyNoteTexts[i];
+                            locText = artefactData.LocalizedStickyNoteTexts[i];
                         }
 
-                        note.Initialize(labelText, this);
+                        note.Initialize(locText, this);
                         note.ToggleCollider(false);
                     }
                     else
@@ -197,28 +198,22 @@ public class Artefact3DItem : MonoBehaviour
 
     public void PlayCompletionAnimation()
     {
-        // 1. Smoothly reveal the Artefact
         if (artefactTransform != null) 
         {
-            artefactTransform.localScale = Vector3.zero; // Start invisible
+            artefactTransform.localScale = Vector3.zero;
             artefactTransform.gameObject.SetActive(true);
-            
-            // Bounce up to full size with a tiny delay so the box has time to shrink
             artefactTransform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack).SetDelay(0.15f);
         }
         
-        // 2. Smoothly shrink the Box
         if (boxTransform != null) 
         {
-            // Shrink to zero, then deactivate it once the animation finishes
             boxTransform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack).OnComplete(() => 
             {
                 boxTransform.gameObject.SetActive(false);
-                boxTransform.localScale = Vector3.one; // Reset scale secretly for the next time it's used
+                boxTransform.localScale = Vector3.one; 
             });
         }
         
-        // 3. Play any particle effects or sounds you set up in Feel
         if (completionFeedback != null) completionFeedback.PlayFeedbacks();
     }
 
@@ -253,10 +248,7 @@ public class Artefact3DItem : MonoBehaviour
         Vector3 targetPos = show ? originalPosition : originalPosition + (Vector3.down * slideDownDistance);
         Vector3 targetScale = show ? originalScale : Vector3.zero; 
 
-        // Apply Position Lerp
         transform.DOLocalMove(targetPos, duration).SetEase(show ? Ease.OutBack : Ease.InBack);
-        
-        // Apply Scale Lerp
         transform.DOScale(targetScale, duration).SetEase(show ? Ease.OutBack : Ease.InBack)
             .OnComplete(() => 
             {

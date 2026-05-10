@@ -4,12 +4,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using DG.Tweening;
+using UnityEngine.Localization;
 
 [RequireComponent(typeof(Button))]
 public class ButtonItemUI : UIBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
 {
     [Header("Base Settings")]
-    [SerializeField] private string label;
+    [SerializeField] private LocalizedString localizedLabel;
     [SerializeField] private TMP_Text textLabel;
     [SerializeField] private Button button;
     [SerializeField] private RectTransform rectTransform;
@@ -53,16 +54,14 @@ public class ButtonItemUI : UIBehaviour, IPointerEnterHandler, IPointerExitHandl
         button.onClick.AddListener(HandleOnClick);
     }
 
-    #if UNITY_EDITOR
-    protected override void OnValidate()
+    protected override void OnEnable()
     {
-        base.OnValidate();
-        if (!string.IsNullOrEmpty(label) && textLabel != null)
+        base.OnEnable();
+        if (localizedLabel != null) 
         {
-            textLabel.text = label;
+            localizedLabel.StringChanged += UpdateLabelText;
         }
     }
-    #endif
 
     protected override void OnDestroy()
     {
@@ -74,7 +73,35 @@ public class ButtonItemUI : UIBehaviour, IPointerEnterHandler, IPointerExitHandl
     protected override void OnDisable()
     {
         base.OnDisable();
+        if (localizedLabel != null) 
+        {
+            localizedLabel.StringChanged -= UpdateLabelText;
+        }
         CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
+    }
+
+    private void UpdateLabelText(string value)
+    {
+        if (textLabel != null)
+        {
+            textLabel.text = value;
+        }
+    }
+
+    public void SetLocalizedLabel(LocalizedString newLabel)
+    {
+        if (localizedLabel != null)
+        {
+            localizedLabel.StringChanged -= UpdateLabelText;
+        }
+
+        localizedLabel = newLabel;
+
+        if (localizedLabel != null)
+        {
+            localizedLabel.StringChanged += UpdateLabelText;
+            localizedLabel.RefreshString(); 
+        }
     }
 
     #region Pointer Events (Hover & Press)
@@ -123,10 +150,10 @@ public class ButtonItemUI : UIBehaviour, IPointerEnterHandler, IPointerExitHandl
         ApplyVisualState(isSelected);
     }
 
-    public void SetLabel(string newLabel)
+    public void SetLabel(LocalizedString newLabel)
     {
-        label = newLabel;
-        if (textLabel != null) textLabel.text = label;
+        localizedLabel = newLabel;
+        if (textLabel != null) textLabel.text = localizedLabel.GetLocalizedString();
     }
 
     private void ApplyVisualState(bool showAsSelected)

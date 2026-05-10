@@ -22,6 +22,7 @@ public class ActiveSettingsData : ISaveable
         CurrentSettingsData.Apply(ProjectSettingsAudioType.BGM, source.BGMVolume);
         CurrentSettingsData.Apply(ProjectSettingsAudioType.SFX, source.SFXVolume);
         CurrentSettingsData.Apply(source.Crosshair);
+        CurrentSettingsData.Apply(source.LanguageCode);
     }
 
     public JSONNode AsJSON()

@@ -1,12 +1,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Modules.SoundSystems;
+using UnityEngine.Localization;
 
 [CreateAssetMenu(fileName = nameof(ArtefactData), menuName = "App/Data/Artefact Data")]
 public class ArtefactData : ScriptableObject
 {
     [SerializeField] private BaseData baseData;
     public BaseData BaseData => baseData;
+
+    [Header("Localization Data")]
+    [SerializeField] private LocalizedString localizedItemName;
+    public LocalizedString LocalizedItemName => localizedItemName;
+
+    [SerializeField] private LocalizedString localizedItemDescription;
+    public LocalizedString LocalizedItemDescription => localizedItemDescription;
+
+    [SerializeField] private LocalizedString[] localizedStickyNoteTexts;
+    public LocalizedString[] LocalizedStickyNoteTexts => localizedStickyNoteTexts;
 
     [Header("Story / Journal Data")]
     [TextArea(2, 4)]
