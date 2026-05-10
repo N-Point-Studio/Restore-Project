@@ -82,6 +82,7 @@ public class GameplayUIManager : MonoBehaviour
         settingsController.OnSettingsClosed += OnSettingsClosed;
 
         mainUIController.SetActive(true);
+        wrapUpThreshold = gameplayManager.clueTreshold;
     }
 
     private IEnumerator Start()
@@ -191,14 +192,22 @@ public class GameplayUIManager : MonoBehaviour
         canWrapUp = overall >= wrapUpThreshold;
         bool isFullyCompleted = overall >= 99f;
 
-        // Debug.Log("Progress surface: " + surfaceProgress);
-
         if (surfaceProgress >= clueEnableTreshold)
         {
-            // Debug.Log("harusnya clue muncul " + overall);
-            if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 0)
+            if (gameplayManager.isTutorialAvailable)
             {
-                tutorialService.StartTutorial(1, 0);
+                if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 0)
+                    tutorialService.StartTutorial(1, 0);
+            }
+            else
+            {
+                Debug.Log("Masuk ke treshold Non Tutorial");
+
+                // Jadikan CurrentStage sebagai pengunci otomatis
+                if (tutorialService.CurrentStage != 2)
+                {
+                    tutorialService.StartInstantTutorial(2, 0);
+                }
             }
         }
 

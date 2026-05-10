@@ -3,6 +3,8 @@ using UnityEngine.UI;
 using System.Collections;
 using DG.Tweening;
 using TMPro;
+using UnityEngine.Localization;
+using System;
 
 public enum RevealStyle 
 { 
@@ -29,7 +31,57 @@ public class JournalPageAnimator : MonoBehaviour
     [SerializeField] private PageElement[] sequenceElements;
     [SerializeField] private float delayBetweenElements = 0.5f;
     [SerializeField] private float fadeDuration = 0.4f;
+    
+    [Tooltip("Make sure to assign your TMP_Text components here in the Inspector!")]
     [SerializeField] private TMP_Text[] uiNoteTexts;
+
+    private LocalizedString[] currentLocalizedTexts;
+    private LocalizedString.ChangeHandler[] textUpdateActions;
+
+    private void OnDestroy()
+    {
+        if (currentLocalizedTexts != null && textUpdateActions != null)
+        {
+            for (int i = 0; i < currentLocalizedTexts.Length; i++)
+            {
+                if (i < textUpdateActions.Length && currentLocalizedTexts[i] != null && textUpdateActions[i] != null)
+                {
+                    currentLocalizedTexts[i].StringChanged -= textUpdateActions[i];
+                }
+            }
+        }
+    }
+
+    public void InjectTexts(LocalizedString[] textsFromSSoT)
+    {
+        if (uiNoteTexts == null || textsFromSSoT == null) return;
+        
+        currentLocalizedTexts = textsFromSSoT;
+        textUpdateActions = new LocalizedString.ChangeHandler[uiNoteTexts.Length];
+
+        for (int i = 0; i < uiNoteTexts.Length; i++)
+        {
+            if (i < textsFromSSoT.Length && uiNoteTexts[i] != null && textsFromSSoT[i] != null)
+            {
+                int index = i; 
+                textUpdateActions[index] = (val) => 
+                { 
+                    if (uiNoteTexts[index] != null) 
+                    {
+                        uiNoteTexts[index].text = val; 
+                        
+                        if (uiNoteTexts[index].maxVisibleCharacters > 0)
+                        {
+                            uiNoteTexts[index].maxVisibleCharacters = 99999;
+                        }
+                    }
+                };
+                
+                textsFromSSoT[index].StringChanged += textUpdateActions[index];
+                textsFromSSoT[index].RefreshString();
+            }
+        }
+    }
 
     public void PlayRevealAnimation(System.Action onComplete = null)
     {
@@ -78,10 +130,16 @@ public class JournalPageAnimator : MonoBehaviour
                     case RevealStyle.Typewriter:
                         if (element.textComponent != null)
                         {
-                            int totalChars = element.textComponent.text.Length;
-                            DOTween.To(() => element.textComponent.maxVisibleCharacters, 
-                                       x => element.textComponent.maxVisibleCharacters = x, 
-                                       totalChars, 
+                            float progress = 0f;
+                            DOTween.To(() => progress, 
+                                       x => {
+                                           progress = x;
+                                           if (element.textComponent != null)
+                                           {
+                                               element.textComponent.maxVisibleCharacters = Mathf.CeilToInt(element.textComponent.text.Length * progress);
+                                           }
+                                       }, 
+                                       1f, 
                                        fadeDuration * 2f)
                                    .SetEase(Ease.Linear);
                         }
@@ -124,19 +182,6 @@ public class JournalPageAnimator : MonoBehaviour
                         element.textComponent.maxVisibleCharacters = 99999; 
                     }
                 }
-            }
-        }
-    }
-
-    public void InjectTexts(string[] textsFromSSoT)
-    {
-        if (uiNoteTexts == null || textsFromSSoT == null) return;
-
-        for (int i = 0; i < uiNoteTexts.Length; i++)
-        {
-            if (i < textsFromSSoT.Length && uiNoteTexts[i] != null)
-            {
-                uiNoteTexts[i].text = textsFromSSoT[i];
             }
         }
     }

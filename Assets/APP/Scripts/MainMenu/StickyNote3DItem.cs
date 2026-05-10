@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine.EventSystems;
 using MoreMountains.Feedbacks;
 using DG.Tweening;
+using UnityEngine.Localization;
 
 [RequireComponent(typeof(Collider))]
 public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
@@ -26,12 +27,19 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
     private Vector3 originalScale;
     private Vector3 originalRotation;
     private Artefact3DItem brain;
+    private LocalizedString localizedNoteText;
     
     private Collider col;
     
     public static Action<StickyNote3DItem> OnNotePeeled;
 
     private bool isInitialized = false;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void Init()
+    {
+        OnNotePeeled = null;
+    }
 
     private void SetupOriginalValues()
     {
@@ -59,20 +67,35 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
     private void OnDisable()
     {
         CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
+        if (localizedNoteText != null) localizedNoteText.StringChanged -= UpdateText; // Prevent Memory Leak
     }
 
-    public void Initialize(string noteText, Artefact3DItem boss)
+    public void Initialize(LocalizedString noteText, Artefact3DItem boss)
     {
         SetupOriginalValues();
         
         brain = boss;
-        if (text3D != null) text3D.text = noteText;
+
+        // Cleanup old subscription and bind the new string
+        if (localizedNoteText != null) localizedNoteText.StringChanged -= UpdateText;
+        localizedNoteText = noteText;
+
+        if (localizedNoteText != null)
+        {
+            localizedNoteText.StringChanged += UpdateText;
+            localizedNoteText.RefreshString(); 
+        }
         
         spriteRenderer.color = originalColor;
         transform.DOKill(); 
         transform.localScale = originalScale; 
         transform.localEulerAngles = originalRotation;
         gameObject.SetActive(true);
+    }
+
+    private void UpdateText(string val)
+    {
+        if (text3D != null) text3D.text = val;
     }
 
     public void ToggleCollider(bool isOn)
@@ -92,7 +115,6 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
         transform.DOScale(originalScale * hoverScaleMultiplier, hoverAnimDuration).SetEase(Ease.OutBack);
         transform.DOLocalRotate(originalRotation + new Vector3(0, 0, hoverRotationZ), hoverAnimDuration).SetEase(Ease.OutBack);
 
-        // Change to Grab Open cursor since it's a sticky note
         CursorController.instance?.SetCursorState(CursorState.GrabOpen); 
     }
 
@@ -104,7 +126,7 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
         transform.DOScale(originalScale, hoverAnimDuration).SetEase(Ease.OutQuad);
         transform.DOLocalRotate(originalRotation, hoverAnimDuration).SetEase(Ease.OutQuad);
 
-        CursorController.instance?.SetCursorState(CursorState.DefaultRounded); // Reset
+        CursorController.instance?.SetCursorState(CursorState.DefaultRounded); 
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -114,8 +136,6 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
         spriteRenderer.color = originalColor;
 
         transform.DOKill();
-        
-        // Change cursor to grabbed on click!
         CursorController.instance?.SetCursorState(CursorState.GrabClose);
 
         if (peelFeedback != null)
@@ -138,7 +158,6 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
         gameObject.SetActive(false);
         OnNotePeeled?.Invoke(this);
         
-        // Reset after animation
         CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
     }
 }

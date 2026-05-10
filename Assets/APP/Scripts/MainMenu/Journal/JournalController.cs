@@ -2,6 +2,7 @@ using DG.Tweening;
 using System;
 using UnityEngine;
 using MoreMountains.Feedbacks;
+using UnityEngine.Localization;
 
 public enum JournalState { Hidden, Peeking, Opened }
 
@@ -31,6 +32,10 @@ public class JournalController : MonoBehaviour
     [Header("Buttons & Interactions")]
     [SerializeField] private ButtonInputInstructionUI buttonAction;
     [SerializeField] private BookPanelInteractable bookInteractable;
+
+    [Header("Localization")]
+    [SerializeField] private LocalizedString localizedRestoreText;
+    [SerializeField] private LocalizedString localizedContinueText;
 
     public JournalState CurrentState { get; private set; } = JournalState.Hidden;
     public bool IsAnimating { get; private set; } = false;
@@ -103,7 +108,7 @@ public class JournalController : MonoBehaviour
         currentActionCallback = onRestoreClicked;
         isPostRestoration = false;
         
-        buttonAction.ForceSetText(false, "Let's Restore");
+        buttonAction.ForceSetLocalizedText(false, localizedRestoreText);
     }
 
     public void SetupPostRestoration(ArtefactData data, Action onContinueClicked)
@@ -112,7 +117,7 @@ public class JournalController : MonoBehaviour
         currentActionCallback = onContinueClicked;
         isPostRestoration = true;
 
-        buttonAction.ForceSetText(false, "Continue");
+        buttonAction.ForceSetLocalizedText(false, localizedContinueText);
     }
 
     public void SetBookHiddenInstant()
@@ -130,7 +135,7 @@ public class JournalController : MonoBehaviour
         HideOverlay();
     }
 
-    private void SpawnAndInjectHalaman()
+    private void SpawnAndInjectPage()
     {
         StopAllCoroutines();
         foreach (Transform child in leftPageContainer) Destroy(child.gameObject);
@@ -139,20 +144,20 @@ public class JournalController : MonoBehaviour
         activeLeftPage = null;
         activeRightPage = null;
 
-        if (!isPostRestoration) // FLOW PRE-RESTORATION
+        if (!isPostRestoration) 
         {
             if (currentData.PreRestorationPagePrefab != null)
             {
                 activeLeftPage = Instantiate(currentData.PreRestorationPagePrefab, leftPageContainer);
-                activeLeftPage.InjectTexts(currentData.StickyNoteTexts);
+                activeLeftPage.InjectTexts(currentData.LocalizedStickyNoteTexts);
             }
         }
-        else // FLOW POST-RESTORATION
+        else 
         {
             if (currentData.PreRestorationPagePrefab != null)
             {
                 activeLeftPage = Instantiate(currentData.PreRestorationPagePrefab, leftPageContainer);
-                activeLeftPage.InjectTexts(currentData.StickyNoteTexts);
+                activeLeftPage.InjectTexts(currentData.LocalizedStickyNoteTexts);
             }
 
             if (currentData.PostRestorationPagePrefab != null)
@@ -175,7 +180,7 @@ public class JournalController : MonoBehaviour
 
         if (!isContentRevealed)
         {
-            SpawnAndInjectHalaman();
+            SpawnAndInjectPage();
         }
         else
         {

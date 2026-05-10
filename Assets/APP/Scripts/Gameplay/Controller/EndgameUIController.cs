@@ -1,6 +1,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Localization;
 using VContainer;
 
 public class EndgameUIController : BaseMenuController
@@ -11,6 +12,7 @@ public class EndgameUIController : BaseMenuController
     private InputSystemService input;    
     private PlayerProgressionData playerProgressionData;
     private ActiveArtefactData activeArtefactData;
+    private LocalizedString currentLocalizedName;
 
     public event Action OnFinishedGame;
 
@@ -38,6 +40,8 @@ public class EndgameUIController : BaseMenuController
         base.OnDestroy();
         buttonFinish.OnClick -= OnFinishClick;        
         input.OnUIKeycodeEnterPerformed -= OnUIKeycodeEnterPerformed;
+        
+        if (currentLocalizedName != null) currentLocalizedName.StringChanged -= UpdateArtefactNameText;
     }
 
     public override void SetActive(bool isActive)
@@ -61,17 +65,30 @@ public class EndgameUIController : BaseMenuController
                 ArtefactData data = activeArtefactData.GetArtefactDatabase().GetItem(targetId);
                 if (data != null)
                 {
-                    SetArtefactName(data.BaseData.ItemName);
+                    SetArtefactName(data.LocalizedItemName);
                 }
             }
         }
     }
 
-    public void SetArtefactName(string name)
+    public void SetArtefactName(LocalizedString localizedName)
+    {
+        if (currentLocalizedName != null) currentLocalizedName.StringChanged -= UpdateArtefactNameText;
+        
+        currentLocalizedName = localizedName;
+        
+        if (currentLocalizedName != null)
+        {
+            currentLocalizedName.StringChanged += UpdateArtefactNameText;
+            currentLocalizedName.RefreshString();
+        }
+    }
+
+    private void UpdateArtefactNameText(string value)
     {
         if (textArtefactName != null)
         {
-            textArtefactName.text = name;
+            textArtefactName.text = value;
         }
     }
 

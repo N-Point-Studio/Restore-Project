@@ -25,7 +25,37 @@ MonoBehaviour:
   inspectionZoomSpeed: 0.02
   inspectionSmoothTime: 0.1
   inspectionResetDuration: 1
-  maxPaintDistance: 7
-  toolReturnDuration: 0.5
   autoSaveCooldown: 1
   minLoadingScreenDuration: 2
+  bgmFadeDuration: 2
+  tutorialItemId: Artefact_Coin
+  displayArtefactString:
+    m_TableReference:
+      m_TableCollectionName: GUID:cb92ced7c936e1d488319505859ec2f0
+    m_TableEntryReference:
+      m_KeyId: 698510105513984
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  returnToMenuString:
+    m_TableReference:
+      m_TableCollectionName: GUID:cb92ced7c936e1d488319505859ec2f0
+    m_TableEntryReference:
+      m_KeyId: 698550941257728
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  unboxingArtefactString:
+    m_TableReference:
+      m_TableCollectionName: GUID:cb92ced7c936e1d488319505859ec2f0
+    m_TableEntryReference:
+      m_KeyId: 698589835038720
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  references:
+    version: 2
+    RefIds: []

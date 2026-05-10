@@ -24,6 +24,23 @@ public class TutorialService
         TutorialManager.Instance.StartCoroutine(StartTutorialRoutine(sIndex, mIndex, initialDelay));
     }
 
+    public void StartInstantTutorial(int sIndex, int mIndex)
+    {
+        if (isProcessing) return;
+
+        currentStage = sIndex;
+        currentModule = mIndex;
+        bool success = TutorialManager.Instance.ForceStageStarted(sIndex, mIndex);
+
+        Debug.Log("berhasil: " + success);
+
+        if (success)
+        {
+            isTutorialActive = true;
+            isProcessing = false;
+        }
+    }
+
     private IEnumerator StartTutorialRoutine(int sIndex, int mIndex, float delay)
     {
         isProcessing = true;

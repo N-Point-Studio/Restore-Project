@@ -26,15 +26,12 @@ public class ClipBoardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             animatedRect = GetComponent<RectTransform>();
 
         startPosition = animatedRect.anchoredPosition;
-    }
-
-    private void OnEnable()
-    {
         ProgressBarUI.OnProgressBarCompleted += ProgressCompleted;
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
+        moveTween?.Kill();
         ProgressBarUI.OnProgressBarCompleted -= ProgressCompleted;
         CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
     }

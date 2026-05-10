@@ -1,17 +1,27 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Localization;
 
 public class PopUpConfirmationController : BaseMenuController
 {
+    [Header("UI Texts")]
     [SerializeField] private TMP_Text textTitle;
     [SerializeField] private TMP_Text textSubtitle;
 
-    [SerializeField] private string titleLabel;
-    [SerializeField] private string subtitleLabel;
+    [Header("Localization Data")]
+    [SerializeField] private LocalizedString localizedTitle;
+    [SerializeField] private LocalizedString localizedSubtitle;
 
+    [Header("Buttons")]
     [SerializeField] private ButtonItemUI buttonConfirm;
     [SerializeField] private ButtonItemUI buttonCancel;
+
+    [Header("Button Overrides (Optional)")]
+    [Tooltip("Leave empty to use the default button localization inside the ButtonItemUI prefab")]
+    [SerializeField] private LocalizedString overrideConfirmLabel;
+    [Tooltip("Leave empty to use the default button localization inside the ButtonItemUI prefab")]
+    [SerializeField] private LocalizedString overrideCancelLabel;
 
     public event Action OnConfirm;
     public event Action OnCancel;
@@ -23,6 +33,28 @@ public class PopUpConfirmationController : BaseMenuController
         buttonCancel.OnClick += OnButtonCancelClick;
     }
 
+    protected virtual void OnEnable()
+    {
+        if (localizedTitle != null) localizedTitle.StringChanged += UpdateTitleText;
+        if (localizedSubtitle != null) localizedSubtitle.StringChanged += UpdateSubtitleText;
+
+        if (overrideConfirmLabel != null && !overrideConfirmLabel.IsEmpty)
+        {
+            buttonConfirm.SetLocalizedLabel(overrideConfirmLabel);
+        }
+
+        if (overrideCancelLabel != null && !overrideCancelLabel.IsEmpty)
+        {
+            buttonCancel.SetLocalizedLabel(overrideCancelLabel);
+        }
+    }
+
+    protected virtual void OnDisable()
+    {
+        if (localizedTitle != null) localizedTitle.StringChanged -= UpdateTitleText;
+        if (localizedSubtitle != null) localizedSubtitle.StringChanged -= UpdateSubtitleText;
+    }
+
     protected override void OnDestroy()
     {
         base.OnDestroy();
@@ -30,24 +62,41 @@ public class PopUpConfirmationController : BaseMenuController
         buttonCancel.OnClick -= OnButtonCancelClick;
     }
 
-    public void SetTitle(string title)
+    private void UpdateTitleText(string value)
     {
-        textTitle.text = title;
+        if (textTitle != null) textTitle.text = value;
     }
 
-    public void SetSubtitle(string subtitle)
+    private void UpdateSubtitleText(string value)
     {
-        textSubtitle.text = subtitle;
+        if (textSubtitle != null) textSubtitle.text = value;
     }
 
-    public void SetConfirmButtonText(string label)
+    // 6. Updated Setters to take LocalizedString instead of standard strings
+    public void SetTitle(LocalizedString newTitle)
     {
-        buttonConfirm.SetLabel(label);
+        if (localizedTitle != null) localizedTitle.StringChanged -= UpdateTitleText;
+        
+        localizedTitle = newTitle;
+        
+        if (localizedTitle != null)
+        {
+            localizedTitle.StringChanged += UpdateTitleText;
+            localizedTitle.RefreshString();
+        }
     }
 
-    public void SetCancelButtonText(string label)
+    public void SetSubtitle(LocalizedString newSubtitle)
     {
-        buttonCancel.SetLabel(label);
+        if (localizedSubtitle != null) localizedSubtitle.StringChanged -= UpdateSubtitleText;
+        
+        localizedSubtitle = newSubtitle;
+        
+        if (localizedSubtitle != null)
+        {
+            localizedSubtitle.StringChanged += UpdateSubtitleText;
+            localizedSubtitle.RefreshString();
+        }
     }
 
     private void OnButtonConfirmClick()
@@ -59,22 +108,4 @@ public class PopUpConfirmationController : BaseMenuController
     {
         OnCancel?.Invoke();
     }
-
-
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        if (!string.IsNullOrEmpty(titleLabel) && textTitle != null)
-        {
-            textTitle.text = titleLabel;
-        }
-
-        if (!string.IsNullOrEmpty(subtitleLabel) && textSubtitle != null)
-        {
-            textSubtitle.text = subtitleLabel;
-        }
-    }
-#endif
-
-
 }

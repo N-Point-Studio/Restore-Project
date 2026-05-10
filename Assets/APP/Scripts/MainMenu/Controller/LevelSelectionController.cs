@@ -161,7 +161,12 @@ public class LevelSelectionController : BaseMenuController
     private void OnRequestArtefactPlay(ArtefactData data)
     {
         playerProgressionData.SetCurrentActiveArtefact(data.BaseData.Id);
-        _ = sceneLoader.LoadSceneAsync(targetScene, config.minLoadingScreenDuration, "Unboxing Artefact...");
+        
+        _ = sceneLoader.LoadSceneAsync(
+            targetScene, 
+            config.minLoadingScreenDuration, 
+            config.unboxingArtefactString.GetLocalizedString()
+        );
     }
 
     private void OnRequestArtefactDetail(ArtefactData data)
