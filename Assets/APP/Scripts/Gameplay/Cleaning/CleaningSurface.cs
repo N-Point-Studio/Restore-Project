@@ -64,8 +64,8 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
         maskMaterial = new Material(maskShader);
         paintableMaterial = rend.material;
 
-        paintingMap = CreateRenderTexture(1024);
-        maskMap = CreateRenderTexture(1024);
+        paintingMap = CreateRenderTexture(2048);
+        maskMap = CreateRenderTexture(2048);
 
         if (!isFullShader)
         {
