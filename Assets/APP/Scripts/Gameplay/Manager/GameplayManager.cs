@@ -94,7 +94,10 @@ public class GameplayManager : IInitializable, IDisposable
 
     private void HandleGameFinished(bool isCompleted)
     {
-        string loadingText = isCompleted ? "Displaying Artefact..." : "Returning to Menu...";
+        string loadingText = isCompleted 
+            ? config.displayArtefactString.GetLocalizedString() 
+            : config.returnToMenuString.GetLocalizedString();
+            
         StartSceneTransition(loadingText);
     }
 

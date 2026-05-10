@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Localization;
 
 [CreateAssetMenu(fileName = nameof(GameConfigData), menuName = "App/Data/Game Config Data")]
 public class GameConfigData : ScriptableObject
@@ -29,4 +30,9 @@ public class GameConfigData : ScriptableObject
 
     [Header("Tutorial Settings")]
     public string tutorialItemId = "Artefact_Coin";
+
+    [Header("Localization")]
+    public LocalizedString displayArtefactString;
+    public LocalizedString returnToMenuString;
+    public LocalizedString unboxingArtefactString;
 }
