@@ -108,7 +108,7 @@ public class CleaningService : IInitializable, IDisposable
     public void CleanSurface(ICleanSurface surface, Texture2D brush, Vector3 hitPoint, Vector3 hitNormal, Vector3 direction, float scale, float strength, Color color, float brushDepth)
     {
         if (!cleanSurfaces.Contains(surface)) return;
-        Debug.Log("[CLEANING] triggered");
+        AppLogger.Log("[CLEANING] triggered");
         surface?.CleanSurface(hitPoint, brush, hitNormal, direction, scale, strength);
         OnSurfaceCleaningUpdate?.Invoke(CalculateSurfaceProgress());
     }

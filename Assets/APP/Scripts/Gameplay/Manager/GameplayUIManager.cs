@@ -199,7 +199,7 @@ public class GameplayUIManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("Masuk ke treshold Non Tutorial");
+                AppLogger.Log("Masuk ke treshold Non Tutorial");
 
                 // Jadikan CurrentStage sebagai pengunci otomatis
                 if (tutorialService.CurrentStage != 2)
