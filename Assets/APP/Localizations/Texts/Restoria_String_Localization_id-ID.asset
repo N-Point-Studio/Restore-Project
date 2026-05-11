@@ -59,7 +59,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 621278116843520
-    m_Localized: Ayo Pulihkan
+    m_Localized: Ayo Restorasi
     m_Metadata:
       m_Items: []
   - m_Id: 623313050537984
@@ -79,19 +79,19 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 624123373293568
-    m_Localized: Terima kasih telah Memulihkan Artefak.
+    m_Localized: Terima kasih telah merestorasi artefak.
     m_Metadata:
       m_Items: []
   - m_Id: 624517835001856
-    m_Localized: Kembalilah kapan saja untuk melanjutkan pemulihan artefak
+    m_Localized: Kembalilah kapan saja untuk melanjutkan restorasi artefak
     m_Metadata:
       m_Items: []
   - m_Id: 626313739505664
-    m_Localized: Apakah Anda yakin Memulai Permainan Baru?
+    m_Localized: Apakah yakin Memulai Permainan Baru?
     m_Metadata:
       m_Items: []
   - m_Id: 626544380088320
-    m_Localized: Kemajuan Anda akan diatur ulang dan tidak dapat dipulihkan.
+    m_Localized: Pekerjaan Anda akan diulang dan tidak dapat dikembalikan.
     m_Metadata:
       m_Items: []
   - m_Id: 626889151877120
@@ -112,9 +112,9 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 661675153166336
     m_Localized: "Karakter pada koin ini menunjukkan gaya kaligrafi khas Kaisar Huizong,
-      yang dikenal sebagai \u201Cemas ramping\u201D karena menyerupai filamen logam
-      mulia yang dipintal halus. Huizong berusaha menampilkan dirinya sebagai orang
-      yang memiliki selera yang tinggi melalui berbagai cara. Tulisan-tulisannya
+      yang dikenal sebagai \u201Cslender gold\" atau emas ramping karena menyerupai
+      filamen logam mulia yang dipintal halus. Huizong menampilkan dirinya sebagai
+      orang yang memiliki selera yang tinggi melalui berbagai cara. Tulisan-tulisannya
       sering diukir pada batu atau logam, seperti di sini, dan beredar luas di kalangan
       masyarakat."
     m_Metadata:
@@ -123,16 +123,18 @@ MonoBehaviour:
     m_Localized: 'Ini artefak pertamamu, Nova.
 
       Saya harap ini adalah awal
-      yang indah untuk perjalanan Anda di sini!
+      yang indah untuk perjalananmu di sini!
 
-      
 
-      -Ny. Maya :)'
+      - Bu Maya :)'
     m_Metadata:
       m_Items: []
   - m_Id: 661745072214016
-    m_Localized: P.S Luar biasa melihat proyek ini berada di tangan seseorang yang
-      sangat kompeten! Aku tahu aku bisa mempercayaimu.
+    m_Localized: 'P.S Senang sekali melihat proyek ini berada di tangan seseorang
+      yang sekompeten kamu! Saya tahu saya bisa percaya sama kamu.
+
+
+      - Bu Maya'
     m_Metadata:
       m_Items: []
   - m_Id: 661833643331584
@@ -140,84 +142,85 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 661993203044352
-    m_Localized: Terbuat dari bahan perak, kuda berdiri yang anggun ini mungkin berfungsi
-      sebagai pemberat kertas di meja sarjana. Gambar tersebut mencerminkan karya
-      logam halus dan estetika yang dibudidayakan yang dihargai oleh para intelektual
-      pada masa itu.
+    m_Localized: 'Terbuat dari bahan perak, kuda yang berdiri dengan anggun ini kemungkinan
+      berfungsi sebagai pemberat kertas di meja orang-orang terpelajar di masa itu.
+      Artefak tersebut merefleksikan apa yang dihargai oleh para intelektual pada
+      masa itu: pengerjaan logam yang halus dan selera estetika yang elegan.'
     m_Metadata:
       m_Items: []
   - m_Id: 662160123760640
-    m_Localized: 'Ini artefak Tiongkok lainnya! Cantik... Sesuatu yang secara pribadi
-      saya miliki di rumah saya, sejujurnya :)
+    m_Localized: 'Ini artefak Tiongkok lagi! Indah sekali... Sesuatu sejujurnya ingin
+      saya miliki di rumah saya sendiri :)
 
 
-      -Ny. Maya'
+      - Bu Maya'
     m_Metadata:
       m_Items: []
   - m_Id: 662186422046720
-    m_Localized: p.s Jadi ibumu adalah Tara Arkana? Saya pernah mendengarnya dari
-      sebuah proyek penggalian di awal tahun 2000an... Dedikasinya untuk mewakili
-      Indonesia di dunia internasional sangat menginspirasi saya sebagai sejarawan
-      muda saat itu!
+    m_Localized: 'p.s Jadi ibumu itu Tara Arkana? Saya pernah dengar tentang Bu Tara
+      dari proyek penggalian artefak di awal tahun 2000an... Dulu, sebagai sejarawan
+      muda, saya merasa dedikasinya untuk mewakili Indonesia di dunia internasional
+      sangat menginspirasi!
+
+
+      - Bu Maya'
     m_Metadata:
       m_Items: []
   - m_Id: 662376306577408
-    m_Localized: Toples Dengan Naga
+    m_Localized: Guci dengan Naga
     m_Metadata:
       m_Items: []
   - m_Id: 662389711572992
-    m_Localized: Porselen putih yang dilukis dengan warna biru kobalt, gaya yang
-      pertama kali berkembang di Tiongkok pada abad keempat belas, bisa dibilang
-      merupakan perkembangan terpenting dalam sejarah keramik. Ditugaskan oleh istana,
-      toples penyimpanan spektakuler ini, dibuat di tempat pembakaran di Jingdezhen,
-      bertanggal pada masa pemerintahan kaisar Xuande dengan tulisan di bahunya.
-      Dekorasi lukisannya menampilkan animasi naga yang bergelombang melintasi langit
-      yang jarang mendung.
+    m_Localized: Guci ini terbuat dari porselen putih yang dilukis dengan warna biru
+      kobalt. Gaya yang pertama kali berkembang di Tiongkok pada abad keempat belas
+      ini dapat disebut sebagai perkembangan terpenting dalam sejarah keramik. Dipesan
+      oleh istana, toples penyimpanan spektakuler ini dibuat di tempat pembakaran
+      di Jingdezhen, bertanggal pada masa pemerintahan kaisar Xuande dengan tulisan
+      di bahunya. Dekorasi lukisannya menampilkan animasi naga yang bergelombang
+      melintasi langit yang berawan.
     m_Metadata:
       m_Items: []
   - m_Id: 662411404513280
-    m_Localized: 'Kerja bagus pada yang terakhir!
+    m_Localized: 'Kerja bagus di artefak sebelum ini!
 
 
-      Kamu pikir kamu bisa menangani
-      artefak yang lebih besar ini? Anda dapat ini! :)
+      Menurutmu kamu bisa
+      menangani artefak yang lebih besar tidak? Kamu pasti bisa!
 
 
-      -Ny. Maya :)'
+      - Bu Maya'
     m_Metadata:
       m_Items: []
   - m_Id: 662432128569344
-    m_Localized: p.s Jadi itu benar! Jadi, apakah Anda lahir dan besar di Belanda?
-      Saya dengar mereka punya museum yang luar biasa di sana, termasuk museum tempat
-      artefak-artefak Indonesia dikembalikan!
+    m_Localized: p.s Ternyata benar, ya! Jadi kamu lahir dan besar di Belanda? Saya
+      dengar di sana banyak museum yang bagus sekali di sana, termasuk museum yang
+      menjadi asal artefak-artefak Indonesia yang dikembalikan ke sini!
     m_Metadata:
       m_Items: []
   - m_Id: 662559601856512
-    m_Localized: Kendi adalah wadah air tradisional, sering kali terbuat dari gerabah,
-      digunakan untuk menyimpan dan meminum air, serta digunakan untuk keperluan
-      ritual dan upacara. Merupakan benda kuno, dengan bukti arkeologi berupa kapal
-      serupa yang ada di wilayah tersebut sebelum zaman Majapahit dan bahkan muncul
-      pada relief di Candi Borobudur. Istilah ini berasal dari kata Sansekerta "kundika",
-      yang berarti wadah air.
+    m_Localized: Kendi adalah wadah air tradisional yang sering kali digunakan untuk
+      menyimpan dan meminum air. Kendi juga dapat digunakan untuk keperluan ritual
+      dan upacara. Istilah ini berasal dari kata Sansekerta "kundika", yang berarti
+      wadah air. Kendi ini terbuat dari emas, kendi ini berasal dari abad ke 8-9
+      periode Jawa Tengah di Indonesia.
     m_Metadata:
       m_Items: []
   - m_Id: 662600655704064
-    m_Localized: 'Ini artefakmu berikutnya. Satu lagi artefak Indonesia! Jaga baik-baik
-      yang ini, Nova :)
+    m_Localized: 'Ini artefak selanjutnya, ya. Artefak Indonesia lagi! Kerjakan yang
+      ini sepenuh hati ya, Nova :)
 
 
       Semoga berhasil!
 
 
-      -Ny. Maya'
+      - Bu Maya'
     m_Metadata:
       m_Items: []
   - m_Id: 662615998468096
-    m_Localized: 'p.s Aku ingin memastikan sesuatu: apakah ibumu benar-benar pindah
-      ke Belanda pada tahun 80-an untuk bekerja? Bagi saya, dia selalu terdengar
-      sangat keren... Seperti, dia adalah seorang arkeolog Indonesia di luar negeri
-      padahal di zamannya hanya sedikit orang Indonesia yang mampu mengenyam pendidikan
-      tinggi!'
+    m_Localized: 'p.s Saya mau memastikan dulu: ibumu betulan pindah ke Belanda untuk
+      bekerja di tahun 80-an? Buat saya sih, dia kedengaran keren sekali... Dia arkeolog
+      Indonesia yang bekerja di luar negeri di saat orang Indonesia yang mendapat
+      pendidikan tinggi saja masih jarang...'
     m_Metadata:
       m_Items: []
   - m_Id: 662704598945792
@@ -225,24 +228,28 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 662738652499968
-    m_Localized: Keris dengan bilahnya yang berliku-liku seperti ular merupakan senjata
-      khas Indonesia. Dianggap sejak awal memiliki kekuatan spiritual yang besar,
-      namun masih menjadi bagian integral dari budaya Indonesia.
+    m_Localized: Keris dengan bilahnya yang berliku-liku seperti ular ini merupakan
+      senjata khas Indonesia. Sejak masa lampau dipandang memiliki kekuatan spiritual
+      yang besar dan masih menjadi bagian integral dari budaya Indonesia.
     m_Metadata:
       m_Items: []
   - m_Id: 662756914499584
-    m_Localized: 'Artefak Indonesia pertamamu ada di sini, Nova!
+    m_Localized: 'Artefak Indonesia pertamamu di sini, Nova!
 
 
-      Berhati-hatilah
-      dengan yang satu ini
+      Kerjakan yang
+      satu ini sepenuh hati, ya.
 
-      -Ny. Maya'
+
+      - Bu Maya'
     m_Metadata:
       m_Items: []
   - m_Id: 662772081102848
-    m_Localized: P.S Jadi ibumu adalah seorang arkeolog? Kecintaannya pada sejarah
-      jelas terlihat pada Anda! Bagaimana kabarnya?
+    m_Localized: 'P.S Jadi ibumu itu arkeolog? Kecintaannya untuk sejarah kelihatan
+      jelas di kamu juga, sih :) Bagaimana kabarnya?
+
+
+      - Bu Maya'
     m_Metadata:
       m_Items: []
   - m_Id: 662827815014400
@@ -250,32 +257,32 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 662876884176896
-    m_Localized: 'Scarab bersayap ini terdiri dari tiga bagian: satu kumbang scarab
-      asli dan dua sayap yang dibuat terpisah. Sayapnya bukan sayap kumbang, melainkan
-      sayap burung, seperti terlihat dari bentuknya dan ciri-ciri bulunya. Setiap
-      bagian memiliki beberapa lubang kecil yang digunakan untuk mengikat scarab
-      bersayap ke pembungkus mumi. Scarab bersayap, yang dimaksudkan untuk menjamin
-      kelahiran kembali orang yang meninggal, adalah jimat penguburan yang sangat
-      populer.'
+    m_Localized: 'Kumbang scarab bersayap ini terdiri dari tiga bagian: satu kumbang
+      scarab asli dan dua sayap yang dibuat terpisah. Sayap pada jimat ini bukan
+      sayap kumbang, melainkan sayap burung, yang terlihat dari bentuk keseluruhannya
+      dan bentuk bulunya. Setiap bagian memiliki beberapa lubang kecil yang digunakan
+      untuk mengikat scarab bersayap ke pembungkus mumi. Scarab bersayap, yang dimaksudkan
+      untuk menjamin kelahiran kembali orang yang meninggal, adalah jimat penguburan
+      yang sangat populer.'
     m_Metadata:
       m_Items: []
   - m_Id: 662906575654912
-    m_Localized: 'Pokoknya, barang terbaru dari Mesir baru saja tiba...
+    m_Localized: 'Barang terbaru dari Mesir baru saja datang...
+
+      Semoga berhasil!
 
 
-      Semoga
-      berhasil!
-
-      -Ny. Maya'
+      -
+      Bu Maya'
     m_Metadata:
       m_Items: []
   - m_Id: 662950208999424
-    m_Localized: 'P.S. Aku turut berduka atas diagnosis ibumu kemarin... Senang mendengar
-      bibimu ada di sana untuk membantunya.
+    m_Localized: 'P.S. Saya turut sedih atas diagnosis ibumu kemarin... Tetapi ikut
+      lega juga mendengar bibimu ada di sana untuk menemaninya.
 
 
-      Adakah cara agar aku bisa mendukungmu
-      melalui hal ini?'
+      Tolong kabari
+      saya kalau ada yang bisa saya bantu ya, Nova.'
     m_Metadata:
       m_Items: []
   - m_Id: 670290119364608
@@ -287,87 +294,83 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 671280864301056
-    m_Localized: Lepaskan catatan tempel...
+    m_Localized: Lepaskan catatannya...
     m_Metadata:
       m_Items: []
   - m_Id: 671435663478784
-    m_Localized: Buka kotaknya dan\nmulai memulihkan...
+    m_Localized: Buka kotaknya dan mulai restorasi...
     m_Metadata:
       m_Items: []
   - m_Id: 681396854460416
     m_Localized: 'Akhirnya selesai juga artefak pertamaku di Indonesia! Awalnya agak
-      gugup, tapi Bu Maya sangat baik dan mendukung.
+      gugup sih, tapi Bu Maya baik hati sekali...
 
 
-      Tidak sabar untuk menceritakan
-      ini pada Mama! Kurasa dia pernah pergi ke Tiongkok untuk proyek penggalian...?'
+      Tidak sabar mau menceritakan
+      ini ke Mama! Kalau tidak salah, dia pernah pergi ke Tiongkok untuk proyek penggalian
+      artefak...?'
     m_Metadata:
       m_Items: []
   - m_Id: 681702430478336
-    m_Localized: 'Artefak kali ini adalah pemberat kertas berbentuk kuda. Saya setuju
-      dengan Bu Maya, ini adalah sesuatu yang ingin sekali saya miliki di rumah :D
+    m_Localized: 'Artefak kali ini adalah pemberat kertas berbentuk kuda. Aku setuju
+      dengan Bu Maya, ini sesuatu yang mau aku punya di rumah :D
 
-      
 
       Ngomong-ngomong,
-      saya sedikit mengobrol tentang Mama dengan Bu Maya dan mengetahui bahwa beliau
-      SANGAT terkenal di kancah sejarah Indonesia...? Saya semakin merasa bangga
-      padanya. Saya akan mengatakan itu padanya saat saya menelepon nanti malam :)
-      Semoga itu bisa membantunya merasa lebih baik.'
+      aku ngobrol sedikit tentang Mama dengan Bu Maya dan ternyata Mama dikenal di
+      kancah sejarah Indonesia...? Aku makin bangga. Aku akan ceritakan ke Mama saat
+      menelepon nanti malam :) Semoga itu bisa membantu Mama merasa lebih baik.'
     m_Metadata:
       m_Items: []
   - m_Id: 681728636489728
-    m_Localized: 'Artefak kali ini adalah sebuah guci dan kurasa aku selalu menyukai
-      desain seperti ini pada keramik! Aku sangat menikmati proses pembuatannya.
+    m_Localized: 'Artefak kali ini sebuah guci dan aku selalu suka sekali desain
+      seperti ini di keramik! Konservasi kali ini seru sekali.
 
-      
 
-      Selain
-      itu, sangat menarik bahwa aku dan Ibu Maya terus melakukan percakapan singkat
-      ini. Aku sangat menghargai usahanya untuk terhubung denganku meskipun beliau
-      selalu sangat sibuk. Aku senang bisa berbagi minat sejarah ini dengan seseorang
-      yang juga mengenal Mama...'
+      Selain itu,
+      sangat menarik bahwa aku dan Ibu Maya terus mengobrol singkat seperti ini.
+      Aku sangat menghargai usahanya untuk berbincang denganku meskipun beliau selalu
+      sangat sibuk. Aku senang bisa berbagi minat sejarah ini dengan seseorang yang
+      juga mengetahui Mama...'
     m_Metadata:
       m_Items: []
   - m_Id: 681751302508544
     m_Localized: 'Dapat artefak Indonesia lagi! Artefak ini sangat berkilau dengan
-      ukiran yang indah... Aku SANGAT suka betapa cantiknya artefak ini. Aku benar-benar
-      mengerti mengapa Mama jatuh cinta pada artefak ini dan sangat ingin membagikannya
-      kepada dunia.
+      ukiran yang indah... Aku SANGAT suka dengan betapa cantiknya artefak ini. Aku
+      benar-benar mengerti mengapa Mama jatuh cinta pada artefak Indonesia dan sangat
+      ingin membagikannya kepada dunia.
 
-      
 
-      Juga! Baru menyadari betapa kerennya Mama karena
-      menjadi seorang arkeolog Indonesia yang bekerja di luar negeri pada tahun 80-an.
-      Aku ingat betul pernah memohon pada Mama untuk ikut dengannya dalam perjalanan
-      penggalian, tetapi dia hanya mau mengajakku ke penggalian di Belanda...'
+      Aku juga baru benar-benar mengerti
+      betapa kerennya Mama karena menjadi seorang arkeolog Indonesia yang bekerja
+      di luar negeri pada tahun 80-an. Aku ingat betul pernah memohon pada Mama untuk
+      ikut dengannya dalam perjalanan penggalian artefak, tetapi dia hanya mau mengajakku
+      ke penggalian yang masih di dalam Belanda...'
     m_Metadata:
       m_Items: []
   - m_Id: 681772164976640
-    m_Localized: 'Hari ini, artefak Indonesia pertama yang saya bawa pulang dari
-      Delft. Hari yang besar bagi saya dan Mama :)
+    m_Localized: 'Hari ini aku mengonservasi artefak Indonesia pertama yang dibawa
+      dari Delft. Hari yang penting untuk aku dan Mama :)
 
-      Semoga ini bisa membangkitkan
-      semangatnya, melihat mimpinya terwujud melalui saya.
+      Semoga ini bisa
+      membangkitkan semangatnya, melihat mimpinya terwujud melalui aku.
 
-      
 
       Pokoknya,
-      saya harus menelepon Mama segera setelah sampai di rumah. Bibi saya belum menghubungi
-      saya sejak menemani Mama ke rumah sakit untuk pemeriksaan...'
+      aku harus langsung menelepon Mama setelah sampai di rumah. Tante belum menghubungi
+      aku lagi sejak menemani Mama ke rumah sakit untuk pemeriksaan...'
     m_Metadata:
       m_Items: []
   - m_Id: 681785788076032
-    m_Localized: 'Hari ini aku berhasil mendapatkan artefak Mesir! Ini mengingatkan
-      aku pada masa-masa ketika aku dulu terobsesi dengan seluruh peradaban Mesir
-      kuno...
+    m_Localized: 'Hari ini aku berhasil mengonservasi artefak Mesir! Ini mengingatkanku
+      pada masa-masa ketika aku dulu terobsesi dengan peradaban Mesir kuno...
 
-      
 
-      Aku masih tidak percaya dia didiagnosis penyakit itu
-      kemarin. Aku berharap bisa berada di sana bersamanya, tetapi dia terus bersikeras
-      bahwa mengerjakan proyek ini adalah cara terbaik yang bisa kulakukan untuk
-      membantunya... Untungnya Bibi ada di sana untuk menemaninya.'
+      Tetapi,
+      aku masih tidak percaya Mama didiagnosis penyakit itu kemarin. Aku berharap
+      bisa berada di sana bersamanya, tetapi dia terus bersikeras bahwa mengerjakan
+      proyek ini adalah cara terbaik yang bisa kulakukan untuk membantunya... Setidaknya
+      Tante ada di sana untuk menemaninya.'
     m_Metadata:
       m_Items: []
   - m_Id: 684852990316544
@@ -431,7 +434,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 694091263643648
-    m_Localized: Kemajuan Anda tidak akan tersimpan dan permainan akan dimulai dari
+    m_Localized: Pekerjaan Anda tidak akan tersimpan dan permainan akan dimulai dari
       awal lagi.
     m_Metadata:
       m_Items: []
@@ -478,8 +481,8 @@ MonoBehaviour:
   - m_Id: 722369328320512
     m_Localized: 'Kerja bagus. Artefak ini siap dipajang di museum.
 
-      Anda
-      dapat mengetuk Selesaikan di kanan bawah untuk menyelesaikan, atau terus memulihkan
+      Anda dapat
+      mengetuk Selesaikan di kanan bawah untuk menyelesaikan, atau terus merestorasi
       hingga sempurna.'
     m_Metadata:
       m_Items: []

@@ -2,6 +2,7 @@ using System.Collections;
 using VContainer;
 using NINESOFT.TUTORIAL_SYSTEM;
 using UnityEngine;
+using Modules;
 
 public class TutorialService
 {
@@ -32,7 +33,7 @@ public class TutorialService
         currentModule = mIndex;
         bool success = TutorialManager.Instance.ForceStageStarted(sIndex, mIndex);
 
-        Debug.Log("berhasil: " + success);
+        AppLogger.Log("berhasil: " + success);
 
         if (success)
         {

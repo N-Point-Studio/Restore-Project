@@ -74,7 +74,7 @@ public class GameplayManager : IInitializable, IDisposable
     private void HandleTabPerformed()
     {
         // AppLogger.Log("Tab nyala" + overallProgress + " < " + GameplayUIManager.clueEnableTreshold);
-        if (overallProgress >= GameplayUIManager.clueEnableTreshold)
+        if (overallProgress >= clueTreshold)
         {
             // AppLogger.Log("[HARUSNYA] Tab nyala");
 
@@ -88,16 +88,16 @@ public class GameplayManager : IInitializable, IDisposable
 
     private void HandleTabCanceled()
     {
-        if (overallProgress >= GameplayUIManager.clueEnableTreshold) directionalLight.enabled = true;
+        if (overallProgress >= clueTreshold) directionalLight.enabled = true;
     }
 
 
     private void HandleGameFinished(bool isCompleted)
     {
-        string loadingText = isCompleted 
-            ? config.displayArtefactString.GetLocalizedString() 
+        string loadingText = isCompleted
+            ? config.displayArtefactString.GetLocalizedString()
             : config.returnToMenuString.GetLocalizedString();
-            
+
         StartSceneTransition(loadingText);
     }
 
