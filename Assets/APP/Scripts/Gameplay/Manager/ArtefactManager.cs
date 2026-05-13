@@ -9,6 +9,7 @@ public class ArtefactManager : IInitializable, IDisposable
     private readonly AssemblyService assemblyService;
     private readonly HoldProgressUI holdProgressUI;
     private readonly GameConfigData config;
+    private readonly Inspection inspection;
     private bool isHoldingUI = false;
     private bool isGameFinished = false;
 
@@ -17,12 +18,13 @@ public class ArtefactManager : IInitializable, IDisposable
     private IArtefactPart currentHoldPart;
 
     [Inject]
-    public ArtefactManager(ToolService toolService, AssemblyService assemblyService, HoldProgressUI holdProgressUI, GameConfigData config)
+    public ArtefactManager(ToolService toolService, AssemblyService assemblyService, HoldProgressUI holdProgressUI, GameConfigData config, Inspection inspection)
     {
         this.assemblyService = assemblyService;
         this.toolService = toolService;
         this.holdProgressUI = holdProgressUI;
         this.config = config;
+        this.inspection = inspection;
     }
 
     public void Initialize()
@@ -80,10 +82,16 @@ public class ArtefactManager : IInitializable, IDisposable
     {
         if (interact is IDragObject drag) { drag.OnDragPerformed(worldPos); }
         if (currentDraggedPart != null) assemblyService.TryCheckSlot(currentDraggedPart, worldPos);
+
+        if (assemblyService.IsInspectEmpty())
+        {
+            inspection.SetSphereRenderer(true);
+        }
     }
 
     private void HandleDragEnded(IInteractObject interact, Vector3 worldPos)
     {
+        inspection.SetSphereRenderer(false);
         IArtefactPart artefactPart = currentDraggedPart;
         currentDraggedPart = null;
 

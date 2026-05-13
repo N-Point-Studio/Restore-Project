@@ -28,6 +28,7 @@ public class Inspection : MonoBehaviour
 
     private PlaneReference planeReference;
 
+    [SerializeField] private Renderer sphereRenderer;
 
     [Inject]
     public void Construct(TutorialService tutorialService, GameConfigData config, GameplayManager gameplayManager, PlaneReference plane)
@@ -162,6 +163,12 @@ public class Inspection : MonoBehaviour
 
         _targetPosition = InitialInspectPosition;
         _zoomVelocity = Vector3.zero;
+    }
+
+    public void SetSphereRenderer(bool isActive)
+    {
+        if (sphereRenderer == null) return;
+        sphereRenderer.enabled = isActive;
     }
 
     public void SetInspectionUsage(bool status) => isContain = status;
