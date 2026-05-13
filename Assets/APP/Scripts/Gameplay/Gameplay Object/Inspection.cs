@@ -26,13 +26,16 @@ public class Inspection : MonoBehaviour
     private GameConfigData config;
     private GameplayManager gameplayManager;
 
+    private PlaneReference planeReference;
+
 
     [Inject]
-    public void Construct(TutorialService tutorialService, GameConfigData config, GameplayManager gameplayManager)
+    public void Construct(TutorialService tutorialService, GameConfigData config, GameplayManager gameplayManager, PlaneReference plane)
     {
         this.tutorialService = tutorialService;
         this.config = config;
         this.gameplayManager = gameplayManager;
+        this.planeReference = plane;
     }
 
     void Start()
@@ -133,6 +136,7 @@ public class Inspection : MonoBehaviour
         targetDistance = Mathf.Clamp(targetDistance, config.inspectionMinDistance, _initialDistance);
         _targetPosition = _mainCamera.transform.position + direction * targetDistance;
 
+        planeReference.SetReferencePosition(_targetPosition);
         //zoom tutorial
         if (!tutorialService.IsProcessing && tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 1)
         {
@@ -144,6 +148,7 @@ public class Inspection : MonoBehaviour
     {
         transform.SetPositionAndRotation(InitialInspectPosition, InitialInspectRotation);
         _targetPosition = InitialInspectPosition;
+        planeReference.SetReferencePosition(_targetPosition);
         _zoomVelocity = Vector3.zero;
     }
 

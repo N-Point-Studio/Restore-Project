@@ -83,6 +83,22 @@ public class AssemblyService : IInitializable, IDisposable
         }
     }
 
+    public void DismissCheckSlot()
+    {
+        if (currentAssembleList.Count != 0)
+        {
+            foreach (var part in currentAssembleList)
+            {
+                foreach (var partSocket in part.GetSockets())
+                {
+                    var renderer = partSocket.transform.GetComponent<Renderer>();
+                    if (renderer == null) continue;
+                    renderer.enabled = false;
+                }
+            }
+        }
+    }
+
     private float GetFlattenedDistance(Camera cam, Vector3 posA, Vector3 posB)
     {
         if (cam == null) return Vector3.Distance(posA, posB);
@@ -151,13 +167,13 @@ public class AssemblyService : IInitializable, IDisposable
         if (!currentAssembleList.Contains(part))
             return;
 
-        if (currentAssembleList.Count == 0)
-        {
-            inspectPoint.ResetPosition();
-            fragmentService.ProgressUpdate();
-            inspectPoint.SetInspectionUsage(false);
-            return;
-        }
+        // if (currentAssembleList.Count == 0)
+        // {
+        //     inspectPoint.ResetPosition();
+        //     fragmentService.ProgressUpdate();
+        //     inspectPoint.SetInspectionUsage(false);
+        //     return;
+        // }
 
         if (currentAssembleList.Count == 2)
         {
@@ -195,6 +211,12 @@ public class AssemblyService : IInitializable, IDisposable
             item.GetTransform().SetParent(null);
             item.OnDetached();
             currentAssembleList.Remove(item);
+        }
+
+        if (currentAssembleList.Count == 0)
+        {
+            inspectPoint.ResetPosition();
+            inspectPoint.SetInspectionUsage(false);
         }
 
         fragmentService.ProgressUpdate();

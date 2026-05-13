@@ -10,14 +10,14 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
     private IInteractObject interactable;
     public Action<IInteractObject> OnInteractDetected;
 
-    private readonly Plane plane;
+    private PlaneReference plane;
     private bool isUsed = false;
     private Vector2 mousePos;
 
     private float cachedDragDepth;
 
     [Inject]
-    public ObjectDetectionService(InputSystemService inputSystemService, Camera cam, Plane plane)
+    public ObjectDetectionService(InputSystemService inputSystemService, Camera cam, PlaneReference plane)
     {
         this.cam = cam;
         this.plane = plane;
@@ -137,7 +137,8 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
         if (!IsValidPosition(screenPos)) return Vector3.zero;
 
         Ray ray = cam.ScreenPointToRay(screenPos);
-        if (plane.Raycast(ray, out float distance)) return ray.GetPoint(distance);
+        Plane dragPlane = new(plane.transform.up, plane.transform.position);
+        if (dragPlane.Raycast(ray, out float distance)) return ray.GetPoint(distance);
         return Vector3.zero;
     }
 

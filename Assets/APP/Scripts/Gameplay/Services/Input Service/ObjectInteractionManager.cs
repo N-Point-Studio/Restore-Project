@@ -86,7 +86,7 @@ public class ObjectInteractionManager : IInitializable, IDisposable
         detectionService.SetInteractObjectUsed(true);
 
         detectionService.CacheDragDepth(currentInteract);
-        Vector3 worldPos = detectionService.GetCachedDragWorldPos(vector);
+        Vector3 worldPos = detectionService.ScreenToWorld(vector);
 
         InteractionEvents.OnDragStarted?.Invoke(currentInteract, worldPos);
     }
