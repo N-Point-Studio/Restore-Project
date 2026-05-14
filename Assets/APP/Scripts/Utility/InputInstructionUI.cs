@@ -37,6 +37,7 @@ public class InputInstructionUI : MonoBehaviour
     
     private string currentTranslatedInfo = "";
 
+
     protected virtual void Awake()
     {
         if (defaultPadding != null && horizontalLayoutGroup != null)
@@ -316,12 +317,25 @@ public class InputInstructionUI : MonoBehaviour
             }
         }
 
-        // NEW: Check if running on a mobile platform and hide visuals if toggled
-        if (hideEverythingIfMobile && Application.isMobilePlatform)
+        imageInput.transform.parent.gameObject.SetActive(true);
+
+        bool isMobile = Application.isMobilePlatform;
+
+#if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+        isMobile = true;
+#endif
+
+        if (hideEverythingIfMobile && isMobile)
         {
-            if (bgImage != null) bgImage.enabled = false;
-            if (horizontalLayoutGroup != null) horizontalLayoutGroup.gameObject.SetActive(false);
-            if (textInfo != null) textInfo.gameObject.SetActive(false);
+            if (horizontalLayoutGroup != null) horizontalLayoutGroup.gameObject.SetActive(true);
+            if (textInfo != null) textInfo.gameObject.SetActive(true);
+
+            if (imageInput != null)
+            {
+                imageInput.gameObject.SetActive(false);
+                imageInput.transform.parent.gameObject.SetActive(false);
+            }    
+            if (textInput != null) textInput.gameObject.SetActive(false);
         }
 
         UpdateDoubleIcons();

@@ -163,6 +163,15 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""KeycodeSpace"",
+                    ""type"": ""Button"",
+                    ""id"": ""6dbdfbc6-a831-49ae-83c0-6b6a1f2acd8f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -262,6 +271,17 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Desktop"",
                     ""action"": ""KeycodeTab"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f75b25e7-2e40-40f5-a201-27903492cd26"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Desktop"",
+                    ""action"": ""KeycodeSpace"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -371,6 +391,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_Player_KeycodeEscape = m_Player.FindAction("KeycodeEscape", throwIfNotFound: true);
         m_Player_ScreenPos = m_Player.FindAction("ScreenPos", throwIfNotFound: true);
         m_Player_KeycodeTab = m_Player.FindAction("KeycodeTab", throwIfNotFound: true);
+        m_Player_KeycodeSpace = m_Player.FindAction("KeycodeSpace", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_KeycodeEscape = m_UI.FindAction("KeycodeEscape", throwIfNotFound: true);
@@ -465,6 +486,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_KeycodeEscape;
     private readonly InputAction m_Player_ScreenPos;
     private readonly InputAction m_Player_KeycodeTab;
+    private readonly InputAction m_Player_KeycodeSpace;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -508,6 +530,10 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/KeycodeTab".
         /// </summary>
         public InputAction @KeycodeTab => m_Wrapper.m_Player_KeycodeTab;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/KeycodeSpace".
+        /// </summary>
+        public InputAction @KeycodeSpace => m_Wrapper.m_Player_KeycodeSpace;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -558,6 +584,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @KeycodeTab.started += instance.OnKeycodeTab;
             @KeycodeTab.performed += instance.OnKeycodeTab;
             @KeycodeTab.canceled += instance.OnKeycodeTab;
+            @KeycodeSpace.started += instance.OnKeycodeSpace;
+            @KeycodeSpace.performed += instance.OnKeycodeSpace;
+            @KeycodeSpace.canceled += instance.OnKeycodeSpace;
         }
 
         /// <summary>
@@ -593,6 +622,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @KeycodeTab.started -= instance.OnKeycodeTab;
             @KeycodeTab.performed -= instance.OnKeycodeTab;
             @KeycodeTab.canceled -= instance.OnKeycodeTab;
+            @KeycodeSpace.started -= instance.OnKeycodeSpace;
+            @KeycodeSpace.performed -= instance.OnKeycodeSpace;
+            @KeycodeSpace.canceled -= instance.OnKeycodeSpace;
         }
 
         /// <summary>
@@ -833,6 +865,13 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnKeycodeTab(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "KeycodeSpace" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnKeycodeSpace(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

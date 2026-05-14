@@ -8,6 +8,8 @@ public class ToolService : IInitializable, IDisposable, ITickable
     private readonly ObjectDetectionService objectDetectionService;
     private readonly SurfaceDetectionService surfaceDetectionService;
     private readonly CleaningService cleaningService;
+    private readonly TutorialService tutorialService;
+    private readonly GameplayManager gameplayManager;
 
     public bool isCleaning { get; private set; }
     public bool isFinished { get; set; } = false;
@@ -16,16 +18,25 @@ public class ToolService : IInitializable, IDisposable, ITickable
     private IToolObject currentToolObject;
     private IInteractObject currentInteract;
     private Vector2 mousePos;
+    
     private bool isSfxPlaying = false;
+    private bool isVfxPlaying = false;
+
+    private float movementTimer = 0f;
+    private const float MOVEMENT_TIMEOUT = 0.15f;
 
     [Inject]
     public ToolService(ObjectDetectionService objectDetectionService,
         SurfaceDetectionService surfaceDetectionService,
-        CleaningService cleaningService)
+        CleaningService cleaningService,
+        TutorialService tutorialService,
+        GameplayManager gameplayManager)
     {
         this.objectDetectionService = objectDetectionService;
         this.surfaceDetectionService = surfaceDetectionService;
         this.cleaningService = cleaningService;
+        this.tutorialService = tutorialService;
+        this.gameplayManager = gameplayManager;
     }
 
     public void Initialize()
@@ -54,6 +65,19 @@ public class ToolService : IInitializable, IDisposable, ITickable
     {
         if (currentToolObject == null) return;
 
+        if (isCleaning)
+        {
+            if (movementTimer > 0f)
+            {
+                movementTimer -= Time.deltaTime;
+                if (movementTimer <= 0f)
+                {
+                    PlayToolSfx(false);
+                    PlayToolVfx(false);
+                }
+            }
+        }
+
         if (surfaceDetectionService.DetectSurface(mousePos))
         {
             StickToSurfaces();
@@ -62,6 +86,8 @@ public class ToolService : IInitializable, IDisposable, ITickable
         {
             var worldPos = objectDetectionService.ScreenToWorld(mousePos, currentToolObject as IInteractObject);
             currentToolObject.FollowMouse(worldPos);
+            
+            // Kursor keluar dari permukaan artefak -> Matikan suara
             PlayToolSfx(false);
             PlayToolVfx(false);
         }
@@ -84,6 +110,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
             case IClean clean when clean.IsCleanable():
                 isCleaning = true;
+                movementTimer = MOVEMENT_TIMEOUT;
                 ProcessCleaning();
                 break;
 
@@ -100,10 +127,12 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
     private void HandleMouseMove(Vector2 newMousePos)
     {
+        float delta = Vector2.Distance(mousePos, newMousePos);
         mousePos = newMousePos;
 
-        if (isCleaning)
+        if (isCleaning && delta > 1.0f) 
         {
+            movementTimer = MOVEMENT_TIMEOUT;
             ProcessCleaning();
         }
     }
@@ -126,6 +155,11 @@ public class ToolService : IInitializable, IDisposable, ITickable
         currentToolObject = tool;
         currentToolObject.Use();
 
+        if (gameplayManager.isTutorialAvailable)
+        {
+            tutorialService.TriggerHighlight(false, tool.ToolId);
+        }
+
         CursorController.instance?.LockCursorState(CursorState.Crosshair);
     }
 
@@ -138,6 +172,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
         isCleaning = false;
         PlayToolSfx(false);
+        PlayToolVfx(false);
 
         CursorController.instance?.UnlockCursorState();
         CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
@@ -212,7 +247,17 @@ public class ToolService : IInitializable, IDisposable, ITickable
     private void PlayToolVfx(bool play)
     {
         if (currentToolObject == null) return;
-        currentToolObject.PlayVfx(play);
+
+        if (play && !isVfxPlaying)
+        {
+            currentToolObject.PlayVfx(true);
+            isVfxPlaying = true;
+        }
+        else if (!play && isVfxPlaying)
+        {
+            currentToolObject.PlayVfx(false);
+            isVfxPlaying = false;
+        }
     }
 
     private void PlayToolSfx(bool play)

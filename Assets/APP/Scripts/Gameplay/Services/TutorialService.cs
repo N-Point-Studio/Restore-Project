@@ -3,6 +3,7 @@ using VContainer;
 using NINESOFT.TUTORIAL_SYSTEM;
 using UnityEngine;
 using Modules;
+using System;
 
 public class TutorialService
 {
@@ -14,6 +15,9 @@ public class TutorialService
     public bool IsProcessing => isProcessing;
     public int CurrentStage => currentStage;
     public int CurrentModule => currentModule;
+
+    public static Action<string> OnTutorialHighlightOn;
+    public static Action<string> OnTutorialHighlightOff;
 
     [Inject]
     public TutorialService() { }
@@ -92,5 +96,24 @@ public class TutorialService
         TutorialManager.Instance.StageCompleted(currentStage, currentModule);
         currentStage++;
         currentModule = 0;
+    }
+
+    public void LockTutorialState()
+    {
+        currentStage = 2;
+        isTutorialActive = false;
+        isProcessing = false;
+    }
+
+    public void TriggerHighlight(bool isOn, string objId)
+    {
+        if (isOn)
+        {
+            OnTutorialHighlightOn.Invoke(objId);
+        }
+        else
+        {
+            OnTutorialHighlightOff.Invoke(objId);
+        }
     }
 }

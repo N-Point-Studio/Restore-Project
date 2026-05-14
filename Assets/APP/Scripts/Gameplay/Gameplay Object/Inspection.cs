@@ -118,6 +118,7 @@ public class Inspection : MonoBehaviour
         if (!tutorialService.IsProcessing && tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 2)
         {
             tutorialService.CompleteAndAdvance(true);
+            tutorialService.TriggerHighlight(true, "Tool_Brush");
         }
     }
 

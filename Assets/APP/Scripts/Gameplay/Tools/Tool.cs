@@ -1,9 +1,14 @@
+using System;
 using DG.Tweening;
 using Modules.SoundSystems;
 using UnityEngine;
 
 public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPressObject
 {
+    [Header("Brush Information")]
+    [SerializeField] private string toolId = "Tool_";
+    [SerializeField] private Outline outline;
+
     [Header("Animation Settings")]
     [SerializeField] protected float returnAnimDuration = 0.5f;
     [SerializeField] protected float followMouseSpeed = 0.1f;
@@ -36,6 +41,30 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         col = GetComponent<Collider>();
         animator.enabled = false;
     }
+
+    private void OnEnable()
+    {
+        TutorialService.OnTutorialHighlightOn += HandleTutorialHighlightOn;
+        TutorialService.OnTutorialHighlightOff += HandleTutorialHighlightOff;
+
+    }
+
+    private void OnDisable()
+    {
+        TutorialService.OnTutorialHighlightOn += HandleTutorialHighlightOn;
+        TutorialService.OnTutorialHighlightOff += HandleTutorialHighlightOff;
+    }
+
+    private void HandleTutorialHighlightOn(string obj)
+    {
+        if (toolId == obj) outline.enabled = true;
+    }
+
+    private void HandleTutorialHighlightOff(string obj)
+    {
+        if (toolId == obj) outline.enabled = false;
+    }
+
     public void OnPressStarted() => PressStarted();
     public void OnPressEnded() => PressEnded();
 
@@ -45,6 +74,9 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
 
 
     public AudioKey ToolSFX => audioKey;
+
+    public string ToolId => toolId;
+
     public IInteractObject GetOrigin() => origin;
 
 

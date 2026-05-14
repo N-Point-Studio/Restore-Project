@@ -272,4 +272,9 @@ public class AssemblyService : IInitializable, IDisposable
     {
         return currentAssembleList.Count == 0;
     }
+
+    public int TotalCurrentParts()
+    {
+        return currentAssembleList.Count;
+    }
 }

@@ -77,6 +77,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "KeycodeSpace",
+                    "type": "Button",
+                    "id": "6dbdfbc6-a831-49ae-83c0-6b6a1f2acd8f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -176,6 +185,17 @@
                     "processors": "",
                     "groups": ";Desktop",
                     "action": "KeycodeTab",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f75b25e7-2e40-40f5-a201-27903492cd26",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Desktop",
+                    "action": "KeycodeSpace",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

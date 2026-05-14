@@ -201,10 +201,9 @@ public class GameplayUIManager : MonoBehaviour
             {
                 AppLogger.Log("Masuk ke treshold Non Tutorial");
 
-                // Jadikan CurrentStage sebagai pengunci otomatis
                 if (tutorialService.CurrentStage != 2)
                 {
-                    tutorialService.StartInstantTutorial(2, 0);
+                    tutorialService.LockTutorialState();
                 }
             }
         }
@@ -217,8 +216,6 @@ public class GameplayUIManager : MonoBehaviour
         if (canWrapUp)
         {
             isTutorialTriggered = true;
-            // Debug.Log("harusnya wrap muncul " + overall);
-
             if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 1)
             {
                 tutorialService.StartTutorial(1, 1);
@@ -263,6 +260,7 @@ public class GameplayUIManager : MonoBehaviour
         if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 3)
         {
             tutorialService.CompleteAndAdvance(true);
+            tutorialService.TriggerHighlight(true, "Tool_Chisel");
         }
     }
 
