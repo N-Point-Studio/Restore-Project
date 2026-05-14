@@ -200,8 +200,6 @@ public class GameplayUIManager : MonoBehaviour
             else
             {
                 AppLogger.Log("Masuk ke treshold Non Tutorial");
-
-                // Jadikan CurrentStage sebagai pengunci otomatis
                 if (tutorialService.CurrentStage != 2)
                 {
                     tutorialService.StartInstantTutorial(2, 0);
@@ -217,8 +215,6 @@ public class GameplayUIManager : MonoBehaviour
         if (canWrapUp)
         {
             isTutorialTriggered = true;
-            // Debug.Log("harusnya wrap muncul " + overall);
-
             if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 1)
             {
                 tutorialService.StartTutorial(1, 1);

@@ -161,7 +161,7 @@ public class GameplayManager : IInitializable, IDisposable
                     Spawn(artefact.Prefab, artefact.SpawnTransform.Position, artefact.SpawnTransform.Rotation);
                 }
 
-                isTutorialAvailable = artefactData.BaseData.Id == config.tutorialItemId;
+                isTutorialAvailable = CheckTutorialAvailability(1);
             }
         }
     }
@@ -171,5 +171,24 @@ public class GameplayManager : IInitializable, IDisposable
         if (prefab == null) return;
         Quaternion rot = Quaternion.Euler(rotation);
         GameObject obj = UnityEngine.Object.Instantiate(prefab, position, rot);
+    }
+
+    public bool CheckTutorialAvailability(int whichTutorial)
+    {
+        string targetId = playerProgressionData.CurrentActiveArtefactId;
+        artefactData = activeArtefactData.GetArtefactDatabase().GetItem(targetId);
+        bool tutorialAvailable = false;
+
+        switch (whichTutorial)
+        {
+            case 1:
+                tutorialAvailable = artefactData.BaseData.Id == config.tutorialItemId;
+                break;
+            case 2:
+                tutorialAvailable = artefactData.BaseData.Id == config.tutorialSecondItemId;
+                break;
+        }
+
+        return tutorialAvailable;
     }
 }

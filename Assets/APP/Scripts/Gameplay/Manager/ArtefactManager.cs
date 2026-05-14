@@ -12,18 +12,30 @@ public class ArtefactManager : IInitializable, IDisposable
     private readonly Inspection inspection;
     private bool isHoldingUI = false;
     private bool isGameFinished = false;
+    private bool isTutorialShown = false;
 
     private IArtefactPart currentDraggedPart;
     private IInteractObject currentHoldInteract;
     private IArtefactPart currentHoldPart;
 
+    private GameplayManager gameplayManager;
+    private TutorialService tutorialService;
+
     [Inject]
-    public ArtefactManager(ToolService toolService, AssemblyService assemblyService, HoldProgressUI holdProgressUI, GameConfigData config, Inspection inspection)
+    public ArtefactManager(ToolService toolService,
+    AssemblyService assemblyService,
+    HoldProgressUI holdProgressUI,
+    GameConfigData config,
+    GameplayManager gameplayManager,
+    TutorialService tutorialService,
+    Inspection inspection)
     {
         this.assemblyService = assemblyService;
         this.toolService = toolService;
         this.holdProgressUI = holdProgressUI;
         this.config = config;
+        this.gameplayManager = gameplayManager;
+        this.tutorialService = tutorialService;
         this.inspection = inspection;
     }
 
@@ -99,7 +111,30 @@ public class ArtefactManager : IInitializable, IDisposable
 
         bool isCloseEnough = assemblyService.CanSnap(artefactPart, worldPos);
 
-        if (isCloseEnough && assemblyService.TryAssemble(artefactPart)) return;
+        if (isCloseEnough && assemblyService.TryAssemble(artefactPart))
+        {
+            if (gameplayManager.CheckTutorialAvailability(2))
+            {
+                if (!isTutorialShown)
+                {
+                    if (assemblyService.TotalCurrentParts() == 1)
+                    {
+                        tutorialService.StartInstantTutorial(3, 0);
+                        isTutorialShown = true;
+                    }
+                }
+
+                else if (assemblyService.TotalCurrentParts() > 1)
+                {
+                    if (tutorialService.CurrentStage == 3 && tutorialService.CurrentModule == 0)
+                    {
+                        tutorialService.CompleteAndAdvance(true);
+                    }
+                }
+            }
+
+            return;
+        }
 
         if (interact is IDragObject drag) drag.OnDragEnded(worldPos);
 
@@ -143,6 +178,10 @@ public class ArtefactManager : IInitializable, IDisposable
         if (partToDetach != null)
         {
             assemblyService.Detach(partToDetach);
+            if (tutorialService.CurrentStage == 3 && tutorialService.CurrentModule == 1)
+            {
+                tutorialService.CompleteStage();
+            }
         }
     }
 

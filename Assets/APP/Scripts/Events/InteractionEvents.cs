@@ -8,6 +8,9 @@ public static class InteractionEvents
     public static Action OnTabPerformed;
     public static Action OnTabCanceled;
 
+    public static Action OnSpacePerformed;
+    public static Action OnSpaceCanceled;
+
     public static Action<IInteractObject> OnPressStarted;
     public static Action OnPressStart;
     public static Action<IInteractObject> OnPressEnded;

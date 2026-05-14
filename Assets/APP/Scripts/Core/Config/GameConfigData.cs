@@ -13,8 +13,8 @@ public class GameConfigData : ScriptableObject
     public float holdMoveTolerance = 5f;
 
     [Header("Artefact Assembly")]
-    public float socketSnapDistance = 0.5f;
-    public float assembleSnapDistance = 1.5f;
+    public float socketSnapDistance = 2f;
+    public float assembleSnapDistance = 2f;
     public float recenterAnimDuration = 0.5f;
 
     [Header("Inspection Camera")]
@@ -30,6 +30,7 @@ public class GameConfigData : ScriptableObject
 
     [Header("Tutorial Settings")]
     public string tutorialItemId = "Artefact_Coin";
+    public string tutorialSecondItemId = "Artefact_Keris";
 
     [Header("Localization")]
     public LocalizedString displayArtefactString;
