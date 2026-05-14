@@ -8,6 +8,8 @@ public class ToolService : IInitializable, IDisposable, ITickable
     private readonly ObjectDetectionService objectDetectionService;
     private readonly SurfaceDetectionService surfaceDetectionService;
     private readonly CleaningService cleaningService;
+    private readonly TutorialService tutorialService;
+    private readonly GameplayManager gameplayManager;
 
     public bool isCleaning { get; private set; }
     public bool isFinished { get; set; } = false;
@@ -21,11 +23,15 @@ public class ToolService : IInitializable, IDisposable, ITickable
     [Inject]
     public ToolService(ObjectDetectionService objectDetectionService,
         SurfaceDetectionService surfaceDetectionService,
-        CleaningService cleaningService)
+        CleaningService cleaningService,
+        TutorialService tutorialService,
+        GameplayManager gameplayManager)
     {
         this.objectDetectionService = objectDetectionService;
         this.surfaceDetectionService = surfaceDetectionService;
         this.cleaningService = cleaningService;
+        this.tutorialService = tutorialService;
+        this.gameplayManager = gameplayManager;
     }
 
     public void Initialize()
@@ -125,6 +131,11 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
         currentToolObject = tool;
         currentToolObject.Use();
+
+        if (gameplayManager.isTutorialAvailable)
+        {
+            tutorialService.TriggerHighlight(false, tool.ToolId);
+        }
 
         CursorController.instance?.LockCursorState(CursorState.Crosshair);
     }

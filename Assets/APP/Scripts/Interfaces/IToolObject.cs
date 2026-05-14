@@ -1,7 +1,9 @@
+using System;
 using UnityEngine;
 
 public interface IToolObject
 {
+    String ToolId { get; }
     void FollowMouse(Vector3 worldPos);
     void Use();
     void Return();

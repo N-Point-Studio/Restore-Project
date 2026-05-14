@@ -259,6 +259,7 @@ public class GameplayUIManager : MonoBehaviour
         if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 3)
         {
             tutorialService.CompleteAndAdvance(true);
+            tutorialService.TriggerHighlight(true, "Tool_Chisel");
         }
     }
 
