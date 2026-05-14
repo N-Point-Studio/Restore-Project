@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class ArtefactPieceIdleState : ArtefactPieceBaseState, IDragObject, IArtefactPart
@@ -17,12 +18,14 @@ public class ArtefactPieceIdleState : ArtefactPieceBaseState, IDragObject, IArte
     //=== IDragObject ===
     public void OnDragStarted(Vector3 worldPos)
     {
-        stateMachine.transform.position = worldPos;
+        stateMachine.transform.DOKill();
+        stateMachine.transform.DOMove(worldPos, stateMachine.moveDuration).SetEase(Ease.OutCubic);
     }
 
     public void OnDragPerformed(Vector3 worldPos)
     {
-        stateMachine.transform.position = worldPos;
+        stateMachine.transform.DOKill();
+        stateMachine.transform.DOMove(worldPos, stateMachine.moveDuration).SetEase(Ease.OutCubic);
     }
 
     public void OnDragEnded(Vector3 worldPos)

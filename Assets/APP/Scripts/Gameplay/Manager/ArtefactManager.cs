@@ -9,6 +9,7 @@ public class ArtefactManager : IInitializable, IDisposable
     private readonly AssemblyService assemblyService;
     private readonly HoldProgressUI holdProgressUI;
     private readonly GameConfigData config;
+    private readonly Inspection inspection;
     private bool isHoldingUI = false;
     private bool isGameFinished = false;
 
@@ -17,12 +18,13 @@ public class ArtefactManager : IInitializable, IDisposable
     private IArtefactPart currentHoldPart;
 
     [Inject]
-    public ArtefactManager(ToolService toolService, AssemblyService assemblyService, HoldProgressUI holdProgressUI, GameConfigData config)
+    public ArtefactManager(ToolService toolService, AssemblyService assemblyService, HoldProgressUI holdProgressUI, GameConfigData config, Inspection inspection)
     {
         this.assemblyService = assemblyService;
         this.toolService = toolService;
         this.holdProgressUI = holdProgressUI;
         this.config = config;
+        this.inspection = inspection;
     }
 
     public void Initialize()
@@ -59,13 +61,13 @@ public class ArtefactManager : IInitializable, IDisposable
     private IArtefactPart ResolveArtefactPart(IInteractObject interact)
     {
         if (interact == null) return null;
-        
+
         if (interact is MonoBehaviour mono)
         {
-            if (mono == null) return null; 
+            if (mono == null) return null;
             return mono.GetComponentInParent<IArtefactPart>();
         }
-        
+
         if (interact is IArtefactPart part) return part;
         return null;
     }
@@ -80,20 +82,28 @@ public class ArtefactManager : IInitializable, IDisposable
     {
         if (interact is IDragObject drag) { drag.OnDragPerformed(worldPos); }
         if (currentDraggedPart != null) assemblyService.TryCheckSlot(currentDraggedPart, worldPos);
+
+        if (assemblyService.IsInspectEmpty())
+        {
+            inspection.SetSphereRenderer(true);
+        }
     }
 
     private void HandleDragEnded(IInteractObject interact, Vector3 worldPos)
     {
+        inspection.SetSphereRenderer(false);
         IArtefactPart artefactPart = currentDraggedPart;
-        currentDraggedPart = null; 
+        currentDraggedPart = null;
 
         if (toolService.IsOnToolMode || artefactPart == null) return;
 
         bool isCloseEnough = assemblyService.CanSnap(artefactPart, worldPos);
 
         if (isCloseEnough && assemblyService.TryAssemble(artefactPart)) return;
-        
+
         if (interact is IDragObject drag) drag.OnDragEnded(worldPos);
+
+        assemblyService.DismissCheckSlot();
     }
 
     private void HandleHoldPerformed(IInteractObject interact, float holdTime, Vector2 position)
@@ -110,7 +120,7 @@ public class ArtefactManager : IInitializable, IDisposable
 
         if (!isHoldingUI)
         {
-            isHoldingUI = true; 
+            isHoldingUI = true;
             ShowHoldProgress(currentHoldPart, position);
         }
 
@@ -139,7 +149,7 @@ public class ArtefactManager : IInitializable, IDisposable
     private void HandleHoldCanceled(IInteractObject interact, Vector2 position)
     {
         if (toolService.IsOnToolMode || isGameFinished) return;
-        
+
         HideHoldProgress(currentHoldPart);
         isHoldingUI = false;
 

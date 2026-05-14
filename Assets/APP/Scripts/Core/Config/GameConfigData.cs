@@ -13,7 +13,7 @@ public class GameConfigData : ScriptableObject
     public float holdMoveTolerance = 5f;
 
     [Header("Artefact Assembly")]
-    public float socketSnapDistance = 1f;
+    public float socketSnapDistance = 0.5f;
     public float assembleSnapDistance = 1.5f;
     public float recenterAnimDuration = 0.5f;
 
