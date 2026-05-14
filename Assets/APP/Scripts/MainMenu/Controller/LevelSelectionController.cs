@@ -133,6 +133,49 @@ public class LevelSelectionController : BaseMenuController
         StartCoroutine(PlayPendingAnimationsSequence());
     }
 
+    public void OpenLevelSelectionAndShowDetail(string artefactId)
+    {
+        RefreshUI();
+        SetActive(true);
+        SetArtefactsInteractable(false);
+        
+        StartCoroutine(PlayReplayReturnSequence(artefactId));
+    }
+
+    private IEnumerator PlayReplayReturnSequence(string artefactId)
+    {
+        yield return waitInitialSequence;
+
+        ArtefactData aData = activeArtefactData.GetArtefactDatabase().GetItem(artefactId);
+        if (aData != null)
+        {
+            Artefact3DItem foundItem = Array.Find(artefact3DItems, x => x != null && x.ArtefactId == aData.BaseData.Id);
+
+            if (foundItem != null)
+            {
+                Transform targetTransform = foundItem.ArtefactTransform != null && foundItem.ArtefactTransform.gameObject.activeSelf 
+                    ? foundItem.ArtefactTransform 
+                    : foundItem.ArtefactCameraTransform;
+
+                isCameraMoving = true;
+                MainMenuEvents.TriggerCameraFocusToArtefact(targetTransform);
+
+                yield return new WaitUntil(() => !isCameraMoving);
+                
+                yield return new WaitForSeconds(0.25f);
+            }
+
+            MainMenuEvents.TriggerShowBackground(true);
+            OpenArtefactDetailAutomatically(aData, false);
+        }
+        else
+        {
+            MainMenuEvents.TriggerCameraToLevelSelection();
+            SetArtefactsInteractable(true);
+            if (backButtonItemUI != null) backButtonItemUI.gameObject.SetActive(true);
+        }
+    }
+
     private void SetArtefactsInteractable(bool active)
     {
         if (artefact3DItems == null) return;
@@ -171,28 +214,10 @@ public class LevelSelectionController : BaseMenuController
 
     private void OnRequestArtefactDetail(ArtefactData data)
     {
-        backButtonItemUI.gameObject.SetActive(false);
-        clickedItem = Array.Find(artefact3DItems, x => x != null && x.ArtefactId == data.BaseData.Id);
-
-        for (int i = 0; i < artefact3DItems.Length; i++)
-        {
-            if (artefact3DItems[i] != null && artefact3DItems[i] != clickedItem)
-                artefact3DItems[i].AnimateItem(false, hideAnimDuration);
-        }
-
-        if (emptyPedestals != null)
-        {
-            for (int i = 0; i < emptyPedestals.Length; i++)
-            {
-                PedestalAnimator empty = emptyPedestals[i];
-                if (empty != null) empty.AnimatePedestal(false, hideAnimDuration);
-            }
-        }
-
-        artefactDetailController.OpenDetail(data, activeArtefactData, clickedItem, false);
+        OpenArtefactDetailAutomatically(data, false); 
     }
 
-    private void OpenArtefactDetailAutomatically(ArtefactData data)
+    private void OpenArtefactDetailAutomatically(ArtefactData data, bool forceShowBook)
     {
         backButtonItemUI.gameObject.SetActive(false);
         clickedItem = Array.Find(artefact3DItems, x => x != null && x.ArtefactId == data.BaseData.Id);
@@ -212,14 +237,13 @@ public class LevelSelectionController : BaseMenuController
             }
         }
 
-        artefactDetailController.OpenDetail(data, activeArtefactData, clickedItem, true);
+        artefactDetailController.OpenDetail(data, activeArtefactData, clickedItem, forceShowBook);
     }
 
     private void OnCloseArtefactDetail()
     {
         artefactDetailController.CloseDetail();
 
-        // Animate all pedestals up (including the new one so the box has a place to land!)
         for (int i = 0; i < artefact3DItems.Length; i++)
         {
             if (artefact3DItems[i] != null && artefact3DItems[i] != clickedItem)
@@ -282,8 +306,6 @@ public class LevelSelectionController : BaseMenuController
                 MainMenuEvents.TriggerCameraFocusToArtefact(targetItem.ArtefactCameraTransform);
 
                 yield return new WaitUntil(() => !isCameraMoving);
-
-                // Let the camera settle for a split-second before playing the animation
                 yield return new WaitForSeconds(0.25f);
 
                 MainMenuEvents.TriggerShowBackground(true);
@@ -298,7 +320,8 @@ public class LevelSelectionController : BaseMenuController
                 isPlayingSequence = false;
 
                 ArtefactData aData = activeArtefactData.GetArtefactDatabase().GetItem(data.artefactId);
-                if (aData != null) OpenArtefactDetailAutomatically(aData);
+                // True = paksa buka Journal untuk menampilkan cerita pertamakalinya
+                if (aData != null) OpenArtefactDetailAutomatically(aData, true); 
             }
             else
             {
@@ -314,7 +337,7 @@ public class LevelSelectionController : BaseMenuController
         yield return StartCoroutine(PlayPendingUnlocksSequence());
     }
 
-    private IEnumerator PlayPendingUnlocksSequence()
+        private IEnumerator PlayPendingUnlocksSequence()
     {
         List<ArtefactProgressData> pendingUnlocks = activeArtefactData.GetPendingUnlockAnimations();
         
@@ -326,6 +349,8 @@ public class LevelSelectionController : BaseMenuController
 
             yield return waitUnlockSequence; 
             
+            ArtefactProgressData lastUnlockedData = null;
+
             for (int i = 0; i < pendingUnlocks.Count; i++)
             {
                 ArtefactProgressData data = pendingUnlocks[i];
@@ -339,26 +364,38 @@ public class LevelSelectionController : BaseMenuController
                         targetItem.BoxTransform.gameObject.SetActive(true); 
                     }
 
+                    // Fokus kamera ke box yang baru muncul
                     isCameraMoving = true;
                     MainMenuEvents.TriggerCameraFocusToArtefact(targetItem.BoxTransform != null ? targetItem.BoxTransform : targetItem.ArtefactCameraTransform);
                     
                     yield return new WaitUntil(() => !isCameraMoving);
                     
-                    // Let the camera settle for a split-second before dropping the box
                     yield return new WaitForSeconds(0.25f);
 
                     AppLogger.Log($"[Animation] Playing UNLOCK animation for {data.artefactId}");
                     targetItem.PlayUnlockAnimation();
                     
                     yield return waitUnlockDrop;
-                }
-                else
-                {
-                    // FIX 3: Warn you if the prefab is missing from the Inspector!
-                    AppLogger.LogError($"[LevelSelection] MISSING PREFAB! Cannot play unlock animation for {data.artefactId} because it is not assigned in the Artefact3DItems array in the Inspector!");
+                    lastUnlockedData = data;
                 }
                 
                 activeArtefactData.MarkUnlockAnimSeen(data.artefactId);
+            }
+            
+            if (lastUnlockedData != null)
+            {
+                ArtefactData aData = activeArtefactData.GetArtefactDatabase().GetItem(lastUnlockedData.artefactId);
+                if (aData != null)
+                {
+                    AppLogger.Log($"[Unlock Flow] Auto-opening detail for {lastUnlockedData.artefactId}");
+                    
+                    RefreshUI();
+                    isPlayingSequence = false;
+
+                    OpenArtefactDetailAutomatically(aData, false); 
+                    
+                    yield break; 
+                }
             }
             
             isCameraMoving = true;

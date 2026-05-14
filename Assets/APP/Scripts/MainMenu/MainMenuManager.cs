@@ -92,8 +92,17 @@ public class MainMenuManager : MonoBehaviour
         }
         else
         {
-            AppLogger.Log("[MainMenuManager] Entering normal Main Menu.");
-            menuController.SetActive(true);
+            string lastArtefactId = playerProgressionData.CurrentActiveArtefactId;
+            if (!string.IsNullOrEmpty(lastArtefactId))
+            {
+                AppLogger.Log("[MainMenuManager] Player returned from Replay. Opening Level Selection and Artefact Detail.");
+                levelSelectionController.OpenLevelSelectionAndShowDetail(lastArtefactId);
+            }
+            else
+            {
+                AppLogger.Log("[MainMenuManager] No active artefact found, entering normal Main Menu.");
+                menuController.SetActive(true);
+            }
         }
     }
 

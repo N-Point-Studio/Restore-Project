@@ -98,6 +98,13 @@ public class TutorialService
         currentModule = 0;
     }
 
+    public void LockTutorialState()
+    {
+        currentStage = 2;
+        isTutorialActive = false;
+        isProcessing = false;
+    }
+
     public void TriggerHighlight(bool isOn, string objId)
     {
         if (isOn)

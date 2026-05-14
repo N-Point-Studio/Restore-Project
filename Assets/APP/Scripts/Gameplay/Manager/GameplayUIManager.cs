@@ -200,9 +200,10 @@ public class GameplayUIManager : MonoBehaviour
             else
             {
                 AppLogger.Log("Masuk ke treshold Non Tutorial");
+
                 if (tutorialService.CurrentStage != 2)
                 {
-                    tutorialService.StartInstantTutorial(2, 0);
+                    tutorialService.LockTutorialState();
                 }
             }
         }
