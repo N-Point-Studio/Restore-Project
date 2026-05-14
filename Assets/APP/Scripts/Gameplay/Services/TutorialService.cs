@@ -93,4 +93,11 @@ public class TutorialService
         currentStage++;
         currentModule = 0;
     }
+
+    public void LockTutorialState()
+    {
+        currentStage = 2;
+        isTutorialActive = false;
+        isProcessing = false;
+    }
 }
