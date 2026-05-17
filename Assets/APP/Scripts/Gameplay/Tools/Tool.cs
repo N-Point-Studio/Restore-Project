@@ -87,7 +87,7 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
 
     public void Use()
     {
-        origin.SetCollider(true);
+        origin.SetColliderEnable(true);
         returnSequence?.Kill();
         col.enabled = false;
         isUsed = true;
@@ -107,7 +107,7 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         returnSequence.Join(transform.DOMove(initialPosition, returnAnimDuration).SetEase(Ease.OutBack));
         returnSequence.Join(transform.DORotateQuaternion(initialRotation, returnAnimDuration).SetEase(Ease.OutBack));
         returnSequence.OnComplete(() => isReturning = false);
-        origin.SetCollider(false);
+        origin.SetColliderEnable(false);
     }
 
     public void FollowMouse(Vector3 worldPos)

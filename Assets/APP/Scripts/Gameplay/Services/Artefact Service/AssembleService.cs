@@ -70,7 +70,6 @@ public class AssemblyService : IInitializable, IDisposable
 
                 isSlotAvailable = distance <= config.socketSnapDistance;
                 renderer.enabled = isSlotAvailable;
-                AppLogger.Log($"snap distance {distance} <= {config.socketSnapDistance}");
 
                 isArtefactSlotAvailable = isSlotAvailable;
                 return isSlotAvailable;
