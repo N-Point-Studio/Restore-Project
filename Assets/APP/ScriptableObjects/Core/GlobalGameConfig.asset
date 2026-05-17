@@ -18,8 +18,8 @@ MonoBehaviour:
   holdDelay: 0.2
   holdDuration: 0.5
   holdMoveTolerance: 5
-  socketSnapDistance: 1
-  assembleSnapDistance: 1.5
+  socketSnapDistance: 0.3
+  assembleSnapDistance: 0.3
   recenterAnimDuration: 0.5
   inspectionMinDistance: 2
   inspectionZoomSpeed: 0.02
@@ -29,6 +29,7 @@ MonoBehaviour:
   minLoadingScreenDuration: 2
   bgmFadeDuration: 2
   tutorialItemId: Artefact_Coin
+  tutorialSecondItemId: Artefact_Keris
   displayArtefactString:
     m_TableReference:
       m_TableCollectionName: GUID:cb92ced7c936e1d488319505859ec2f0

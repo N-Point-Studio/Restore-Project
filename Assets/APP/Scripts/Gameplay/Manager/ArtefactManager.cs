@@ -109,9 +109,7 @@ public class ArtefactManager : IInitializable, IDisposable
 
         if (toolService.IsOnToolMode || artefactPart == null) return;
 
-        bool isCloseEnough = assemblyService.CanSnap(artefactPart, worldPos);
-
-        if (isCloseEnough && assemblyService.TryAssemble(artefactPart))
+        if (assemblyService.isArtefactSlotAvailable && assemblyService.TryAssemble(artefactPart))
         {
             if (gameplayManager.CheckTutorialAvailability(2))
             {
