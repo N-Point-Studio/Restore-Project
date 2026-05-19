@@ -13,6 +13,7 @@ public class GameplayManager : IInitializable, IDisposable
     private readonly GameConfigData config;
     private readonly TutorialService tutorialService;
     private readonly Light directionalLight;
+    private readonly GameplayToolManager gameplayToolManager;
 
     private ArtefactData artefactData;
     public bool isTutorialAvailable;
@@ -30,7 +31,8 @@ public class GameplayManager : IInitializable, IDisposable
     string targetScene,
     TutorialService tutorialService,
     Light directionalLight,
-    GameConfigData config)
+    GameConfigData config,
+    GameplayToolManager gameplayToolManager)
     {
         this.playerProgressionData = playerProgressionData;
         this.activeArtefactData = activeArtefactData;
@@ -40,6 +42,7 @@ public class GameplayManager : IInitializable, IDisposable
         this.config = config;
         this.tutorialService = tutorialService;
         this.directionalLight = directionalLight;
+        this.gameplayToolManager = gameplayToolManager;
 
         InitializeSession();
     }
@@ -152,6 +155,7 @@ public class GameplayManager : IInitializable, IDisposable
                 artefactData = activeArtefactData.GetArtefactDatabase().GetItem(targetId);
                 finalRotation = artefactData.FinalRotation;
                 clueTreshold = artefactData.ClueTreshold;
+                var ToolType = artefactData.AllowedToolTypes;
                 // clueTreshold 
 
                 List<ArtefactFragmentData> artefactFragments = artefactData.ArtefactFragmentDatas;
@@ -160,6 +164,8 @@ public class GameplayManager : IInitializable, IDisposable
                     ArtefactFragmentData artefact = artefactFragments[i];
                     Spawn(artefact.Prefab, artefact.SpawnTransform.Position, artefact.SpawnTransform.Rotation);
                 }
+
+                gameplayToolManager.SetToolVisibility(ToolType, true);
 
                 isTutorialAvailable = CheckTutorialAvailability(1);
             }

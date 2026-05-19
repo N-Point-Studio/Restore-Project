@@ -28,14 +28,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 761813369995159848}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7057589, y: 0.043639235, z: -0.043639235, w: 0.7057589}
+  m_LocalRotation: {x: 0.70575875, y: 0.04364207, z: -0.04364207, w: 0.70575875}
   m_LocalPosition: {x: -3.668, y: 0.695, z: 0.28}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6302769332485156868}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: -7.077}
 --- !u!33 &1856406885316075264
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -105,6 +105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77224a80f3b0b42508e3fd4ef0c1f54e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ToolOrigin
+  toolObject: {fileID: 996608044457523410}
 --- !u!65 &6371992001580613987
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -153,7 +154,7 @@ Transform:
   m_GameObject: {fileID: 882940607798990332}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.0000040197547, z: -0, w: 1}
-  m_LocalPosition: {x: 0.009999756, y: 0.384, z: -0.02199948}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4989,7 +4990,7 @@ Transform:
   m_GameObject: {fileID: 1752158232530809263}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.009999942, y: 0, z: -0.0019997063}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9869,6 +9870,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ToolBrush
   toolId: Tool_Brush
+  toolType: 1
   outline: {fileID: 5697896912635630005}
   returnAnimDuration: 0.5
   followMouseSpeed: 0.2

@@ -16,8 +16,8 @@ public class TutorialService
     public int CurrentStage => currentStage;
     public int CurrentModule => currentModule;
 
-    public static Action<string> OnTutorialHighlightOn;
-    public static Action<string> OnTutorialHighlightOff;
+    public static Action<ToolType> OnTutorialHighlightOn;
+    public static Action<ToolType> OnTutorialHighlightOff;
 
     [Inject]
     public TutorialService() { }
@@ -105,15 +105,15 @@ public class TutorialService
         isProcessing = false;
     }
 
-    public void TriggerHighlight(bool isOn, string objId)
+    public void TriggerHighlight(bool isOn, ToolType toolType)
     {
         if (isOn)
         {
-            OnTutorialHighlightOn.Invoke(objId);
+            OnTutorialHighlightOn.Invoke(toolType);
         }
         else
         {
-            OnTutorialHighlightOff.Invoke(objId);
+            OnTutorialHighlightOff.Invoke(toolType);
         }
     }
 }

@@ -69,6 +69,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ToolChisel
   toolId: Tool_Chisel
+  toolType: 2
   outline: {fileID: 2064158174824890534}
   returnAnimDuration: 0.5
   followMouseSpeed: 0.2
@@ -112,7 +113,7 @@ GameObject:
   m_Layer: 0
   m_Name: Chisel_Origin
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -124,7 +125,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7795282616102921527}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.036252797, z: -0, w: 0.9993427}
+  m_LocalRotation: {x: 0, y: 0.03625126, z: 0, w: 0.9993428}
   m_LocalPosition: {x: -4.184, y: 0.702, z: 0.109}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
@@ -201,6 +202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77224a80f3b0b42508e3fd4ef0c1f54e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ToolOrigin
+  toolObject: {fileID: 3447163298484272563}
 --- !u!65 &6048051614043120524
 BoxCollider:
   m_ObjectHideFlags: 0

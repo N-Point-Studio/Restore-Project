@@ -6,7 +6,7 @@ using UnityEngine;
 public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPressObject
 {
     [Header("Brush Information")]
-    [SerializeField] private string toolId = "Tool_";
+    [SerializeField] private ToolType toolType;
     [SerializeField] private Outline outline;
 
     [Header("Animation Settings")]
@@ -39,7 +39,7 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         initialPosition = transform.position;
         initialRotation = transform.rotation;
         col = GetComponent<Collider>();
-        animator.enabled = false;
+        if (animator != null) animator.enabled = false;
     }
 
     private void OnEnable()
@@ -51,18 +51,18 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
 
     private void OnDisable()
     {
-        TutorialService.OnTutorialHighlightOn += HandleTutorialHighlightOn;
-        TutorialService.OnTutorialHighlightOff += HandleTutorialHighlightOff;
+        TutorialService.OnTutorialHighlightOn -= HandleTutorialHighlightOn;
+        TutorialService.OnTutorialHighlightOff -= HandleTutorialHighlightOff;
     }
 
-    private void HandleTutorialHighlightOn(string obj)
+    private void HandleTutorialHighlightOn(ToolType toolType)
     {
-        if (toolId == obj) outline.enabled = true;
+        if (this.toolType == toolType) outline.enabled = true;
     }
 
-    private void HandleTutorialHighlightOff(string obj)
+    private void HandleTutorialHighlightOff(ToolType toolType)
     {
-        if (toolId == obj) outline.enabled = false;
+        if (this.toolType == toolType) outline.enabled = false;
     }
 
     public void OnPressStarted() => PressStarted();
@@ -75,7 +75,7 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
 
     public AudioKey ToolSFX => audioKey;
 
-    public string ToolId => toolId;
+    public ToolType ToolId => toolType;
 
     public IInteractObject GetOrigin() => origin;
 
@@ -91,7 +91,7 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         returnSequence?.Kill();
         col.enabled = false;
         isUsed = true;
-        animator.enabled = true;
+        if (animator != null) animator.enabled = true;
     }
 
     public void Return()
@@ -99,7 +99,7 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         col.enabled = true;
         isReturning = true;
         isUsed = false;
-        animator.enabled = false;
+        if (animator != null) animator.enabled = false;
 
         returnSequence?.Kill();
         returnSequence = DOTween.Sequence();

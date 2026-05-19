@@ -46,6 +46,7 @@ public class GameplayLifetimeScope : LifetimeScope
         builder.RegisterEntryPoint<ToolService>(Lifetime.Scoped).AsSelf();
 
         builder.RegisterComponentInHierarchy<GameplayUIManager>().AsSelf();
+        builder.RegisterComponentInHierarchy<GameplayToolManager>().AsSelf();
 
         builder.RegisterEntryPoint<GameplayManager>().AsSelf().WithParameter(targetScene);
     }

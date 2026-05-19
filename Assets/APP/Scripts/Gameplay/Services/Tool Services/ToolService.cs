@@ -18,7 +18,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
     private IToolObject currentToolObject;
     private IInteractObject currentInteract;
     private Vector2 mousePos;
-    
+
     private bool isSfxPlaying = false;
     private bool isVfxPlaying = false;
 
@@ -86,7 +86,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
         {
             var worldPos = objectDetectionService.ScreenToWorld(mousePos, currentToolObject as IInteractObject);
             currentToolObject.FollowMouse(worldPos);
-            
+
             // Kursor keluar dari permukaan artefak -> Matikan suara
             PlayToolSfx(false);
             PlayToolVfx(false);
@@ -130,7 +130,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
         float delta = Vector2.Distance(mousePos, newMousePos);
         mousePos = newMousePos;
 
-        if (isCleaning && delta > 1.0f) 
+        if (isCleaning && delta > 1.0f)
         {
             movementTimer = MOVEMENT_TIMEOUT;
             ProcessCleaning();
