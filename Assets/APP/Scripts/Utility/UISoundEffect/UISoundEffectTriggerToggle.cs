@@ -34,17 +34,15 @@ public class UISoundEffectTriggerToggle : UISoundEffectTrigger
 
     protected void OnToggleValueChanged(bool isOn)
     {
-        // if (lastToggleValue && isOn)
-        // {
-        //     return;
-        // }
+        if (lastToggleValue && isOn)
+        {
+            return;
+        }
 
-        // lastToggleValue = isOn;
+        lastToggleValue = isOn;
         if (isOn)
         {
             PlaySound();
         }
     }
-
-
 }

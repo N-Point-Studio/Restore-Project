@@ -351,6 +351,7 @@ public class InputInstructionUI : MonoBehaviour
         if (!customText && textInfo != null)
         {
             textInfo.text = $"{(isHolding ? $"(Hold) {currentTranslatedInfo}" : currentTranslatedInfo)}";
+            textInfo.ForceMeshUpdate();
         }
         
         if (contentSizeFitter != null && gameObject.activeInHierarchy)

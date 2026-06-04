@@ -190,7 +190,9 @@ public class GameplayUIManager : MonoBehaviour
         canWrapUp = overall >= wrapUpThreshold;
         bool isFullyCompleted = overall >= 99f;
 
-        if (surfaceProgress >= gameplayManager.clueTreshold)
+        bool shouldShowHintToggle = surfaceProgress >= gameplayManager.clueTreshold;
+
+        if (shouldShowHintToggle)
         {
             if (gameplayManager.isTutorialAvailable)
             {
@@ -207,6 +209,8 @@ public class GameplayUIManager : MonoBehaviour
                 }
             }
         }
+
+        mainUIController.ShowHintToggle(shouldShowHintToggle);
 
         bool showButton = canWrapUp && !isFullyCompleted && !isAutoWrapUpTriggered;
         mainUIController.EnableWrapUp(showButton);
