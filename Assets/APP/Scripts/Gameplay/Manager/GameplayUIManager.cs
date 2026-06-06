@@ -69,6 +69,7 @@ public class GameplayUIManager : MonoBehaviour
     private void Awake()
     {
         mainUIController.OnWrapUp += OnWrapUp;
+        mainUIController.OnPauseRequest += PauseGame; 
         endgameController.OnFinishedGame += OnFinishedGame;
 
         pauseController.OnResume += OnResume;
@@ -106,6 +107,7 @@ public class GameplayUIManager : MonoBehaviour
         input.OnUIKeycodeEscapePerformed -= OnUIKeycodeEscapePerformed;
 
         mainUIController.OnWrapUp -= OnWrapUp;
+        mainUIController.OnPauseRequest -= PauseGame; 
         endgameController.OnFinishedGame -= OnFinishedGame;
 
         pauseController.OnResume -= OnResume;
@@ -242,6 +244,21 @@ public class GameplayUIManager : MonoBehaviour
         }
     }
 
+    private void PauseGame()
+    {
+        if (!isGamePaused)
+        {
+            isGamePaused = true;
+            Time.timeScale = 0f;
+            pauseController.SetActive(true);
+
+            if (input != null)
+            {
+                input.ChangeInputState(InputStateType.UI);
+            }
+        }
+    }
+
     private void HandleProgressUpdate(float progress)
     {
         // AppLogger.Log("Assemble should be");
@@ -270,17 +287,7 @@ public class GameplayUIManager : MonoBehaviour
 
     private void OnPlayerKeycodeEscapePerformed()
     {
-        if (!isGamePaused)
-        {
-            isGamePaused = true;
-            Time.timeScale = 0f;
-            pauseController.SetActive(true);
-
-            if (input != null)
-            {
-                input.ChangeInputState(InputStateType.UI);
-            }
-        }
+        PauseGame();
     }
 
     private void OnUIKeycodeEscapePerformed()
