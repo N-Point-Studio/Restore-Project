@@ -1,8 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
-using NINESOFT.TUTORIAL_SYSTEM;
 using VContainer;
-using System;
 
 public class Inspection : MonoBehaviour
 {
@@ -67,6 +65,17 @@ public class Inspection : MonoBehaviour
         GameplayUIManager.OnGameWrapped += HandleGameWrapped;
     }
 
+    void OnDestroy()
+    {
+        InteractionEvents.OnRotatePerformed -= OnRotatePerformed;
+        InteractionEvents.OnZoomPerformed -= OnZoomPerformed;
+
+        AssembleEvents.OnAssemblePerformed -= HandleAssemblePerformed;
+        AssembleEvents.OnAssembleFinished -= HandleAssembleFinished;
+
+        GameplayUIManager.OnGameWrapped -= HandleGameWrapped;
+    }
+
     void OnDisable()
     {
         InteractionEvents.OnRotatePerformed -= OnRotatePerformed;
@@ -118,7 +127,7 @@ public class Inspection : MonoBehaviour
         if (!tutorialService.IsProcessing && tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 2)
         {
             tutorialService.CompleteAndAdvance(true);
-            tutorialService.TriggerHighlight(true, ToolType.Brush);
+            tutorialService.TriggerHighlight(true, ToolType.Chisel);
         }
     }
 

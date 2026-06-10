@@ -281,19 +281,19 @@ public class GameplayUIManager : MonoBehaviour
     {
         UpdateProgress(ProgressType.Mud, progress);
 
-        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 4)
+        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 3)
         {
-            tutorialService.CompleteStage();
+            tutorialService.CompleteAndAdvance(true);
+            tutorialService.TriggerHighlight(true, ToolType.Brush);
         }
     }
 
     private void HandleSurfaceCleaningUpdate(float progress)
     {
         UpdateProgress(ProgressType.Dust, progress);
-        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 3)
+        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 4)
         {
-            tutorialService.CompleteAndAdvance(true);
-            tutorialService.TriggerHighlight(true, ToolType.Chisel);
+            tutorialService.CompleteStage();
         }
     }
 
