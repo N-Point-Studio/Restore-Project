@@ -2,20 +2,21 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
-using UnityEngine.Localization;
 
 public class MainUIController : BaseMenuController
 {
+    [Header("Desktop")]
     [SerializeField] private ButtonInputInstructionUI buttonWrapUp;
 
-    [Header("Hint / Clue System")]
+    [Header("Mobile")]
+    [SerializeField] private ButtonInputInstructionUI buttonMobileWrapUp;
     [SerializeField] private Toggle hintToggle;
-
-    [Header("Pause System")]
     [SerializeField] private Button buttonPause;
 
     private InputSystemService input;
     private bool canWrapUp;
+    
+    private ButtonInputInstructionUI activeWrapUpButton; 
     
     public event Action OnWrapUp;
     public event Action OnPauseRequest;
@@ -34,8 +35,26 @@ public class MainUIController : BaseMenuController
     {
         base.Awake();
         
-        if (buttonWrapUp != null) 
-            buttonWrapUp.OnClick += OnWrapUpClick;
+        bool isMobile = Application.isMobilePlatform;
+#if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+        isMobile = true;
+#endif
+
+        if (isMobile)
+        {
+            activeWrapUpButton = buttonMobileWrapUp;
+            if (buttonWrapUp != null && buttonWrapUp.transform.parent != null)
+                buttonWrapUp.transform.parent.gameObject.SetActive(false);
+        }
+        else
+        {
+            activeWrapUpButton = buttonWrapUp;
+            if (buttonMobileWrapUp != null)
+                buttonMobileWrapUp.gameObject.SetActive(false);
+        }
+
+        if (activeWrapUpButton != null) 
+            activeWrapUpButton.OnClick += OnWrapUpClick;
 
         if (hintToggle != null) 
         {
@@ -46,11 +65,6 @@ public class MainUIController : BaseMenuController
         if (buttonPause != null)
         {
             buttonPause.onClick.AddListener(OnPauseClicked);
-            
-            bool isMobile = Application.isMobilePlatform;
-#if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
-            isMobile = true;
-#endif
             buttonPause.gameObject.SetActive(isMobile);
         }
     }
@@ -59,8 +73,9 @@ public class MainUIController : BaseMenuController
     {
         base.OnDestroy();
         
-        if (buttonWrapUp != null) 
-            buttonWrapUp.OnClick -= OnWrapUpClick;
+        // Unsubscribe from the active button
+        if (activeWrapUpButton != null) 
+            activeWrapUpButton.OnClick -= OnWrapUpClick;
             
         if (hintToggle != null) 
             hintToggle.onValueChanged.RemoveListener(OnHintToggleValueChanged);
@@ -100,9 +115,14 @@ public class MainUIController : BaseMenuController
 
     public void ShowButtonWrap(bool isShowing)
     {
-        bool wasShowing = buttonWrapUp.transform.parent.gameObject.activeSelf;
+        if (activeWrapUpButton == null) return;
 
-        buttonWrapUp.transform.parent.gameObject.SetActive(isShowing);
+        GameObject targetObj = activeWrapUpButton == buttonWrapUp 
+            ? activeWrapUpButton.transform.parent.gameObject 
+            : activeWrapUpButton.gameObject;
+
+        bool wasShowing = targetObj.activeSelf;
+        targetObj.SetActive(isShowing);
         
         if (isShowing && !wasShowing)
         {
@@ -114,7 +134,7 @@ public class MainUIController : BaseMenuController
     {
         if (canWrapUp)
         {
-            buttonWrapUp.OnClick?.Invoke();
+            activeWrapUpButton?.OnClick?.Invoke();
         }
     }
 

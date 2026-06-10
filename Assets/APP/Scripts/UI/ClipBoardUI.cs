@@ -8,6 +8,7 @@ public class ClipBoardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     [Header("References")]
     [SerializeField] private RectTransform animatedRect; 
     [SerializeField] private GameObject desktopControlsInfo;
+    [SerializeField] private GameObject mobileControlsInfo;
 
     [Header("Animation Settings")]
     [SerializeField] private Vector2 hoverPosition;
@@ -19,6 +20,8 @@ public class ClipBoardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     private Tween moveTween;
     private bool isHovering = false;
     private bool isClickedOpen = false; 
+    
+    private GameObject activeInfoPanel;
 
     private void Awake()
     {
@@ -27,6 +30,22 @@ public class ClipBoardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
         startPosition = animatedRect.anchoredPosition;
         ProgressBarUI.OnProgressBarCompleted += ProgressCompleted;
+
+        bool isMobile = Application.isMobilePlatform;
+#if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+        isMobile = true;
+#endif
+
+        if (isMobile)
+        {
+            activeInfoPanel = mobileControlsInfo;
+            if (desktopControlsInfo != null) desktopControlsInfo.SetActive(false); // Hide Desktop forever
+        }
+        else
+        {
+            activeInfoPanel = desktopControlsInfo;
+            if (mobileControlsInfo != null) mobileControlsInfo.SetActive(false); // Hide Mobile forever
+        }
     }
 
     private void OnDestroy()
@@ -65,13 +84,12 @@ public class ClipBoardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             isClickedOpen = true;
             MoveTo(hoverPosition);
             
-            if (desktopControlsInfo != null) desktopControlsInfo.SetActive(true);
+            if (activeInfoPanel != null) activeInfoPanel.SetActive(true);
         }
     }
 
     private void Update()
     {
-        // Check for taps outside the clipboard to close it
         if (isClickedOpen && Pointer.current != null && Pointer.current.press.wasPressedThisFrame)
         {
             Vector2 screenPos = Pointer.current.position.ReadValue();
@@ -83,15 +101,11 @@ public class ClipBoardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
                 cam = canvas.worldCamera;
             }
 
-            // If the tap was OUTSIDE the clipboard's RectTransform, close it
             if (!RectTransformUtility.RectangleContainsScreenPoint(animatedRect, screenPos, cam))
             {
                 isClickedOpen = false;
-                
-                // Only move down if the mouse isn't currently hovering (for Editor testing)
                 if (!isHovering) MoveTo(startPosition);
-                
-                if (desktopControlsInfo != null) desktopControlsInfo.SetActive(false);
+                if (activeInfoPanel != null) activeInfoPanel.SetActive(false);
             }
         }
     }
@@ -109,7 +123,7 @@ public class ClipBoardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         if (!isClickedOpen) 
         {
             MoveTo(hoverPosition);
-            if (desktopControlsInfo != null) desktopControlsInfo.SetActive(true);
+            if (activeInfoPanel != null) activeInfoPanel.SetActive(true);
         }
         
         CursorController.instance?.SetCursorState(CursorState.Hover);
@@ -122,7 +136,7 @@ public class ClipBoardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         if (!isClickedOpen) 
         {
             MoveTo(startPosition);
-            if (desktopControlsInfo != null) desktopControlsInfo.SetActive(false);
+            if (activeInfoPanel != null) activeInfoPanel.SetActive(false);
         }
         
         CursorController.instance?.SetCursorState(CursorState.DefaultRounded);

@@ -317,7 +317,7 @@ public class InputInstructionUI : MonoBehaviour
             }
         }
 
-        imageInput.transform.parent.gameObject.SetActive(true);
+        if (imageInput != null) imageInput.transform.parent.gameObject.SetActive(true);
 
         bool isMobile = Application.isMobilePlatform;
 

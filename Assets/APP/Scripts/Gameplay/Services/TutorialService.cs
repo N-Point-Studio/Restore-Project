@@ -19,8 +19,30 @@ public class TutorialService
     public static Action<ToolType> OnTutorialHighlightOn;
     public static Action<ToolType> OnTutorialHighlightOff;
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        OnTutorialHighlightOn = null;
+        OnTutorialHighlightOff = null;
+    }
+
     [Inject]
     public TutorialService() { }
+
+    private bool IsMobilePlatform()
+    {
+        bool isMobile = Application.isMobilePlatform;
+#if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+        isMobile = true;
+#endif
+        return isMobile;
+    }
+
+    private int GetActualStageIndex(int baseStageIndex)
+    {
+        // If mobile, offset by 4 (Stage 0 becomes 4, Stage 1 becomes 5, etc.)
+        return IsMobilePlatform() ? baseStageIndex + 4 : baseStageIndex;
+    }
 
     public void StartTutorial(int sIndex, int mIndex, float initialDelay = 0.5f)
     {
@@ -35,9 +57,11 @@ public class TutorialService
 
         currentStage = sIndex;
         currentModule = mIndex;
-        bool success = TutorialManager.Instance.ForceStageStarted(sIndex, mIndex);
+        
+        int actualStage = GetActualStageIndex(sIndex);
+        bool success = TutorialManager.Instance.ForceStageStarted(actualStage, mIndex);
 
-        AppLogger.Log("berhasil: " + success);
+        AppLogger.Log($"[Tutorial] Force starting stage: {actualStage}, module: {mIndex} | Success: {success}");
 
         if (success)
         {
@@ -54,7 +78,8 @@ public class TutorialService
         currentStage = sIndex;
         currentModule = mIndex;
 
-        bool success = TutorialManager.Instance.StageStarted(sIndex, mIndex);
+        int actualStage = GetActualStageIndex(sIndex);
+        bool success = TutorialManager.Instance.StageStarted(actualStage, mIndex);
 
         if (success)
         {
@@ -80,7 +105,9 @@ public class TutorialService
     {
         isProcessing = true;
         isTutorialActive = false;
-        TutorialManager.Instance.StageCompleted(currentStage, currentModule);
+        
+        int actualStage = GetActualStageIndex(currentStage);
+        TutorialManager.Instance.StageCompleted(actualStage, currentModule);
 
         yield return new WaitForSeconds(delay);
 
@@ -93,7 +120,8 @@ public class TutorialService
 
     public void CompleteStage()
     {
-        TutorialManager.Instance.StageCompleted(currentStage, currentModule);
+        int actualStage = GetActualStageIndex(currentStage);
+        TutorialManager.Instance.StageCompleted(actualStage, currentModule);
         currentStage++;
         currentModule = 0;
     }
@@ -109,11 +137,11 @@ public class TutorialService
     {
         if (isOn)
         {
-            OnTutorialHighlightOn.Invoke(toolType);
+            OnTutorialHighlightOn?.Invoke(toolType);
         }
         else
         {
-            OnTutorialHighlightOff.Invoke(toolType);
+            OnTutorialHighlightOff?.Invoke(toolType);
         }
     }
 }

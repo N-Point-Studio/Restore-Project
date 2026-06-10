@@ -19,9 +19,13 @@ public class GameplayUIManager : MonoBehaviour
     [SerializeField] private SettingsController settingsController;
     [SerializeField] private PopUpConfirmationController quitConfirmationController;
 
+    [Header("Tutorial Canvas Configuration")]
+    [SerializeField] private GameObject tutorialDesktopRoot;
+    [SerializeField] private GameObject tutorialMobileRoot;
+
     [Header("Settings")]
     [SerializeField] private float delayUntilAutoWrappedUp = 1.5f;
-    public float wrapUpThreshold = 95f;
+    [SerializeField] private float wrapUpThreshold = 95f;
 
     private CleaningService cleaningService;
     private FragmentService fragmentService;
@@ -87,6 +91,14 @@ public class GameplayUIManager : MonoBehaviour
     private IEnumerator Start()
     {
         mainUIController.ShowButtonWrap(false);
+
+        bool isMobile = Application.isMobilePlatform;
+#if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+        isMobile = true;
+#endif
+
+        if (tutorialDesktopRoot != null) tutorialDesktopRoot.SetActive(!isMobile);
+        if (tutorialMobileRoot != null) tutorialMobileRoot.SetActive(isMobile);
 
         yield return null;
 
