@@ -36,9 +36,9 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
     public void Initialize()
     {
         EnhancedTouchSupport.Enable();
-        
+
 #if UNITY_EDITOR
-        UnityEngine.InputSystem.EnhancedTouch.TouchSimulation.Enable(); 
+        UnityEngine.InputSystem.EnhancedTouch.TouchSimulation.Enable();
 #endif
 
         Input.Player.Press.started += HandleLeftPressStarted;
@@ -60,7 +60,7 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
     public void Dispose()
     {
         EnhancedTouchSupport.Disable();
-        
+
 #if UNITY_EDITOR
         UnityEngine.InputSystem.EnhancedTouch.TouchSimulation.Disable();
 #endif
@@ -124,7 +124,12 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
 
     public Vector2 GetMousePosition()
     {
-        if (Touch.activeTouches.Count > 0) return Touch.activeTouches[0].screenPosition;
-        return Input.Player.ScreenPos.ReadValue<Vector2>();
+        if (Pointer.current != null)
+        {
+            Vector2 startPosition = Pointer.current.position.ReadValue();
+            return startPosition;
+        }
+
+        return Vector2.zero;
     }
 }

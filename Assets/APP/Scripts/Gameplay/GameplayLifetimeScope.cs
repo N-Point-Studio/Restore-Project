@@ -41,6 +41,8 @@ public class GameplayLifetimeScope : LifetimeScope
         builder.RegisterEntryPoint<ObjectHoldService>(Lifetime.Scoped).AsSelf();
         builder.RegisterEntryPoint<ObjectZoomService>(Lifetime.Scoped).AsSelf();
 
+        // builder.RegisterEntryPoint<MobileInputSystemService>(Lifetime.Scoped).AsSelf();
+
         builder.RegisterEntryPoint<ObjectInteractionManager>(Lifetime.Scoped).AsSelf();
 
         builder.RegisterEntryPoint<ToolService>(Lifetime.Scoped).AsSelf();
