@@ -6,3 +6,20 @@ public interface IDraggableTool
     void PlaySfx(bool isPlaying);
     void PlayVfx(bool isPlaying);
 }
+
+public interface IDraggableBrushTool
+{
+    Texture2D GetBrush();
+    float GetBrushScale();
+    float GetBrushStrength();
+    Color GetBrushColor();
+    Transform GetBrushTransform();
+    float GetBrushDepth();
+    float GetRaycastLength();
+}
+
+public interface IDraggableChiselTool
+{
+    void PlayGouge();
+
+}

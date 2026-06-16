@@ -84,7 +84,7 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
             hit.collider.TryGetComponent(out newTarget);
         }
 
-        Debug.Log("Press Started " + screenPos + " Hit: " + hit.collider?.name + " NewTarget: " + newTarget);
+        // Debug.Log("Press Started " + screenPos + " Hit: " + hit.collider?.name + " NewTarget: " + newTarget);
 
         if (newTarget != interactable)
         {

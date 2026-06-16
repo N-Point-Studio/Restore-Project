@@ -1,11 +1,12 @@
 using DG.Tweening;
+using Modules.SoundSystems;
 using UnityEngine;
 
-public class DraggableTool : MonoBehaviour, IInteractObject, IDragObject, IDraggableTool
+public abstract class DraggableTool : MonoBehaviour, IInteractObject, IDragObject, IDraggableTool
 {
     [Header("Drag Settings")]
-    [SerializeField] private float raycastRange = 5f;
-    [SerializeField] private Transform grabPosition;
+    [SerializeField] protected float raycastRange = 5f;
+    [SerializeField] protected Transform grabPosition;
 
     [Header("Animation Settings")]
     [SerializeField] protected float returnAnimDuration = 0.5f;
@@ -13,22 +14,30 @@ public class DraggableTool : MonoBehaviour, IInteractObject, IDragObject, IDragg
     [SerializeField] protected float surfaceMoveSpeed = 0.1f;
     [SerializeField] protected float surfaceRotateSpeed = 0.1f;
 
-    public bool isDragging { get; private set; }
-    public bool isReturning { get; private set; }
+    [Header("Audio settings")]
+    [SerializeField] protected AudioKey audioKey;
+    [SerializeField] protected SoundType soundType;
 
-    private Collider col;
-    private float grabOffset;
-    private Vector3 initialPosition;
+    [Header("Animation Settings")]
+    [SerializeField] protected Animator animator;
+
+    protected bool isDragging { get; private set; }
+    protected bool isReturning { get; private set; }
+
+    protected Collider col;
+    protected float grabOffset;
+    protected Vector3 initialPosition;
     protected Quaternion initialRotation;
-    private Vector3 targetPosition;
+    protected Vector3 targetPosition;
     protected Sequence returnSequence;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         initialPosition = transform.position;
         initialRotation = transform.rotation;
 
         col = GetComponent<Collider>();
+        if (animator != null) animator.enabled = false;
 
         if (grabPosition != null)
         {
@@ -51,7 +60,8 @@ public class DraggableTool : MonoBehaviour, IInteractObject, IDragObject, IDragg
         returnSequence?.Kill();
 
         targetPosition = CalculateTargetPosition(worldPos);
-        Debug.Log($"Drag {name} Started at {worldPos}");
+        // Debug.Log($"Drag {name} Started at {worldPos}");
+        if (animator != null) animator.enabled = true;
     }
 
     public void OnDragPerformed(Vector3 worldPos)
@@ -68,9 +78,10 @@ public class DraggableTool : MonoBehaviour, IInteractObject, IDragObject, IDragg
     {
         isDragging = false;
         isReturning = true;
+        if (animator != null) animator.enabled = false;
 
         SetColliderEnable(true);
-        Debug.Log($"Drag {name} Ended at {worldPos}");
+        // Debug.Log($"Drag {name} Ended at {worldPos}");
 
         returnSequence?.Kill();
         returnSequence = DOTween.Sequence();

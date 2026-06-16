@@ -39,6 +39,10 @@ public class CleaningChunk : MonoBehaviour, IInteractObject, ICleanChunk, IDragO
             myMaterial = rend.material;
             myMaterial.SetFloat(crackThresholdID, 1f);
         }
+
+#if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
+        maxHit = 1;
+#endif
     }
 
     private void Start()

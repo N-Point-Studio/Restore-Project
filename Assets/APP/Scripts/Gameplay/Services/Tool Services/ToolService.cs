@@ -222,7 +222,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
     void PerformRaycastTouch(Vector2 screenPos)
     {
         if (draggableTool == null) return;
-        var tipPoint = new Vector2(screenPos.x, screenPos.y + 150);
+        var tipPoint = new Vector2(screenPos.x, screenPos.y + 350);
 
         if (surfaceDetectionService.DetectSurface(tipPoint))
         {
@@ -239,6 +239,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
         currentToolObject.StickToSurface(targetPos, targetRotation);
 #elif UNITY_IOS || UNITY_ANDROID || UNITY_EDITOR
         draggableTool?.StickToSurface(targetPos, targetRotation);
+        ProcessCleaning();
 #endif
     }
 
@@ -271,9 +272,39 @@ public class ToolService : IInitializable, IDisposable, ITickable
         }
     }
 
+    private void CleanSurface(IDraggableBrushTool brushTool)
+    {
+        var surface = surfaceDetectionService.CleanableSurface;
+
+        if (surface == null) return;
+
+        PlayToolSfx(true);
+        cleaningService.CleanSurface(
+            surface,
+            brushTool.GetBrush(),
+            surfaceDetectionService.RaycastPos,
+            surfaceDetectionService.RaycastNormal,
+            brushTool.GetBrushTransform().up,
+            brushTool.GetBrushScale(),
+            brushTool.GetBrushStrength(),
+            brushTool.GetBrushColor(),
+            brushTool.GetBrushDepth()
+        );
+
+        // if (cleaningService.IsDustRemoved(surface))
+        // {
+        //     PlayToolVfx(true);
+        // }
+        // else
+        // {
+        //     PlayToolVfx(false);
+        // }
+    }
+
     private void CleanChunk()
     {
         if (isFinished || currentInteract == null) return;
+        Debug.Log("Attempting to clean chunk...");
 
         var chunk = surfaceDetectionService.CleanableChunk;
         if (chunk == null) return;
@@ -281,7 +312,10 @@ public class ToolService : IInitializable, IDisposable, ITickable
         isCleaning = false;
         PlayToolSfx(true);
         PlayToolVfx(true);
-        if (currentToolObject is IChiselTool tool) tool.PlayGouge();
+
+        if (currentToolObject is IChiselTool tool) tool?.PlayGouge();
+        if (draggableTool is IDraggableChiselTool draggableChisel) draggableChisel?.PlayGouge();
+
         cleaningService.CleanChunk(chunk);
     }
 
@@ -292,6 +326,10 @@ public class ToolService : IInitializable, IDisposable, ITickable
         if (currentToolObject is IBrushTool brush)
         {
             CleanSurface(brush);
+        }
+        else if (draggableTool is IDraggableBrushTool draggableBrush)
+        {
+            CleanSurface(draggableBrush);
         }
         else
         {
@@ -305,12 +343,14 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
         if (play && !isVfxPlaying)
         {
-            currentToolObject.PlayVfx(true);
+            currentToolObject?.PlayVfx(true);
+            draggableTool?.PlayVfx(true);
             isVfxPlaying = true;
         }
         else if (!play && isVfxPlaying)
         {
-            currentToolObject.PlayVfx(false);
+            currentToolObject?.PlayVfx(false);
+            draggableTool?.PlayVfx(false);
             isVfxPlaying = false;
         }
     }
@@ -322,11 +362,13 @@ public class ToolService : IInitializable, IDisposable, ITickable
         if (play && !isSfxPlaying)
         {
             currentToolObject.PlaySfx(true);
+            draggableTool?.PlaySfx(true);
             isSfxPlaying = true;
         }
         else if (!play && isSfxPlaying)
         {
-            currentToolObject.PlaySfx(false);
+            currentToolObject?.PlaySfx(false);
+            draggableTool?.PlaySfx(false);
             isSfxPlaying = false;
         }
     }
