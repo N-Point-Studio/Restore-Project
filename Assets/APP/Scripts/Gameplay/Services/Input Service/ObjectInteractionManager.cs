@@ -86,17 +86,34 @@ public class ObjectInteractionManager : IInitializable, IDisposable
         detectionService.SetInteractObjectUsed(true);
 
         detectionService.CacheDragDepth(currentInteract);
-        Vector3 worldPos = detectionService.ScreenToWorld(vector);
 
-        InteractionEvents.OnDragStarted?.Invoke(currentInteract, worldPos);
+        if (currentInteract is not IDraggableTool)
+        {
+            Vector3 worldPos = detectionService.ScreenToWorld(vector);
+            InteractionEvents.OnDragStarted?.Invoke(currentInteract, worldPos);
+        }
+        else
+        {
+            Vector3 worldPos = detectionService.ScreenToWorld(vector, currentInteract);
+            InteractionEvents.OnDragStarted?.Invoke(currentInteract, worldPos);
+        }
+
     }
 
     private void HandleDragPerformed(Vector2 vector)
     {
         if (!IsInteractValid()) return;
 
-        Vector3 worldPos = detectionService.ScreenToWorld(vector);
-        InteractionEvents.OnDragPerformed?.Invoke(currentInteract, worldPos);
+        if (currentInteract is not IDraggableTool)
+        {
+            Vector3 worldPos = detectionService.ScreenToWorld(vector);
+            InteractionEvents.OnDragPerformed?.Invoke(currentInteract, worldPos);
+        }
+        else
+        {
+            Vector3 worldPos = detectionService.ScreenToWorld(vector, currentInteract);
+            InteractionEvents.OnDragPerformed?.Invoke(currentInteract, worldPos);
+        }
     }
 
     private void HandleDragEnded(Vector2 vector)

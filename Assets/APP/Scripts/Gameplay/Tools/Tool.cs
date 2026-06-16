@@ -23,8 +23,6 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
     protected Sequence returnSequence;
     protected bool isReturning;
     protected bool isUsed;
-    protected bool isStickingToSurface;
-    protected bool isSfxOn = false;
     private int currentAudioId = -1;
 
     [Header("Audio settings")]
@@ -122,11 +120,6 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         transform.DOKill();
         transform.DOMove(position, SurfaceMoveSpeed).SetEase(Ease.OutQuad);
         transform.DORotateQuaternion(rotation, SurfaceRotateSpeed).SetEase(Ease.OutQuad);
-    }
-
-    public void SetStickToSurface(bool isSticking)
-    {
-        isStickingToSurface = isSticking;
     }
 
     protected abstract void InteractDetected();

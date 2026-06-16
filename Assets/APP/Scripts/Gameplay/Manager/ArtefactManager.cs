@@ -95,7 +95,7 @@ public class ArtefactManager : IInitializable, IDisposable
         if (interact is IDragObject drag) { drag.OnDragPerformed(worldPos); }
         if (currentDraggedPart != null) assemblyService.TryCheckSlot(currentDraggedPart, worldPos);
 
-        if (assemblyService.IsInspectEmpty())
+        if (assemblyService.IsInspectEmpty() && currentDraggedPart != null)
         {
             inspection.SetSphereRenderer(true);
         }

@@ -10,12 +10,14 @@ public class ToolService : IInitializable, IDisposable, ITickable
     private readonly CleaningService cleaningService;
     private readonly TutorialService tutorialService;
     private readonly GameplayManager gameplayManager;
+    private readonly InputSystemService inputSystemService;
 
     public bool isCleaning { get; private set; }
     public bool isFinished { get; set; } = false;
     public bool IsOnToolMode => currentToolObject != null;
 
     private IToolObject currentToolObject;
+    private IDraggableTool draggableTool;
     private IInteractObject currentInteract;
     private Vector2 mousePos;
 
@@ -30,13 +32,15 @@ public class ToolService : IInitializable, IDisposable, ITickable
         SurfaceDetectionService surfaceDetectionService,
         CleaningService cleaningService,
         TutorialService tutorialService,
-        GameplayManager gameplayManager)
+        GameplayManager gameplayManager,
+        InputSystemService inputSystemService)
     {
         this.objectDetectionService = objectDetectionService;
         this.surfaceDetectionService = surfaceDetectionService;
         this.cleaningService = cleaningService;
         this.tutorialService = tutorialService;
         this.gameplayManager = gameplayManager;
+        this.inputSystemService = inputSystemService;
     }
 
     public void Initialize()
@@ -46,6 +50,10 @@ public class ToolService : IInitializable, IDisposable, ITickable
         InteractionEvents.OnPressStart += HandlePressStart;
         InteractionEvents.OnPressEnd += HandlePressEnd;
         InteractionEvents.OnMouseMoved += HandleMouseMove;
+
+        InteractionEvents.OnDragStarted += HandleDragStarted;
+        InteractionEvents.OnDragPerformed += HandleDragPerformed;
+        InteractionEvents.OnDragEnded += HandleDragEnded;
 
         GameplayUIManager.OnGameWrapped += HandleGameWrapped;
     }
@@ -57,6 +65,10 @@ public class ToolService : IInitializable, IDisposable, ITickable
         InteractionEvents.OnPressStart -= HandlePressStart;
         InteractionEvents.OnPressEnd -= HandlePressEnd;
         InteractionEvents.OnMouseMoved -= HandleMouseMove;
+
+        InteractionEvents.OnDragStarted -= HandleDragStarted;
+        InteractionEvents.OnDragPerformed -= HandleDragPerformed;
+        InteractionEvents.OnDragEnded -= HandleDragEnded;
 
         GameplayUIManager.OnGameWrapped -= HandleGameWrapped;
     }
@@ -100,6 +112,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
     private void HandlePressStart()
     {
+#if UNITY_STANDALONE
         if (isFinished && currentInteract == null) return;
 
         switch (currentInteract)
@@ -107,26 +120,25 @@ public class ToolService : IInitializable, IDisposable, ITickable
             case IToolObject tool:
                 EquipTool(tool);
                 break;
-
             case IClean clean when clean.IsCleanable():
                 isCleaning = true;
                 movementTimer = MOVEMENT_TIMEOUT;
                 ProcessCleaning();
                 break;
-
             case IClean clean when !clean.IsCleanable():
                 isCleaning = false;
                 ReturnCurrentTool();
                 break;
-
             case var _ when IsOnToolMode && currentInteract == currentToolObject.GetOrigin():
                 ReturnCurrentTool();
                 break;
         }
+#endif
     }
 
     private void HandleMouseMove(Vector2 newMousePos)
     {
+#if UNITY_STANDALONE
         float delta = Vector2.Distance(mousePos, newMousePos);
         mousePos = newMousePos;
 
@@ -135,15 +147,44 @@ public class ToolService : IInitializable, IDisposable, ITickable
             movementTimer = MOVEMENT_TIMEOUT;
             ProcessCleaning();
         }
+#endif
     }
 
     private void HandlePressEnd()
     {
+#if UNITY_STANDALONE
         if (isFinished) return;
-
         isCleaning = false;
         PlayToolSfx(false);
         PlayToolVfx(false);
+#endif
+    }
+
+    private void HandleDragStarted(IInteractObject interact, Vector3 vector)
+    {
+#if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
+        if (interact is IDraggableTool tool) draggableTool = tool;
+        if (draggableTool != null && draggableTool is IDragObject drag) drag.OnDragStarted(vector);
+#endif
+    }
+
+    private void HandleDragPerformed(IInteractObject interact, Vector3 vector)
+    {
+#if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
+        if (interact is not IDraggableTool) { return; }
+        if (draggableTool != null && draggableTool is IDragObject tool) tool.OnDragPerformed(vector);
+        PerformRaycastTouch(inputSystemService.GetMousePosition());
+#endif
+
+    }
+
+    private void HandleDragEnded(IInteractObject interact, Vector3 vector)
+    {
+#if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
+        if (interact is not IDraggableTool) { return; }
+        if (draggableTool != null && draggableTool is IDragObject tool) tool.OnDragEnded(vector);
+        draggableTool = null;
+#endif
     }
 
     private void EquipTool(IToolObject tool)
@@ -178,17 +219,14 @@ public class ToolService : IInitializable, IDisposable, ITickable
         CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
     }
 
-    private void ProcessCleaning()
+    void PerformRaycastTouch(Vector2 screenPos)
     {
-        if (!surfaceDetectionService.HasHit) return;
+        if (draggableTool == null) return;
+        var tipPoint = new Vector2(screenPos.x, screenPos.y + 150);
 
-        if (currentToolObject is IBrushTool brush)
+        if (surfaceDetectionService.DetectSurface(tipPoint))
         {
-            CleanSurface(brush);
-        }
-        else
-        {
-            CleanChunk();
+            StickToSurfaces();
         }
     }
 
@@ -197,8 +235,11 @@ public class ToolService : IInitializable, IDisposable, ITickable
         Vector3 targetPos = surfaceDetectionService.RaycastPos;
         Vector3 targetNormal = surfaceDetectionService.RaycastNormal;
         Quaternion targetRotation = Quaternion.LookRotation(-targetNormal, Vector3.up);
-
+#if UNITY_STANDALONE
         currentToolObject.StickToSurface(targetPos, targetRotation);
+#elif UNITY_IOS || UNITY_ANDROID || UNITY_EDITOR
+        draggableTool?.StickToSurface(targetPos, targetRotation);
+#endif
     }
 
     private void CleanSurface(IBrushTool brushTool)
@@ -242,6 +283,20 @@ public class ToolService : IInitializable, IDisposable, ITickable
         PlayToolVfx(true);
         if (currentToolObject is IChiselTool tool) tool.PlayGouge();
         cleaningService.CleanChunk(chunk);
+    }
+
+    private void ProcessCleaning()
+    {
+        if (!surfaceDetectionService.HasHit) return;
+
+        if (currentToolObject is IBrushTool brush)
+        {
+            CleanSurface(brush);
+        }
+        else
+        {
+            CleanChunk();
+        }
     }
 
     private void PlayToolVfx(bool play)
