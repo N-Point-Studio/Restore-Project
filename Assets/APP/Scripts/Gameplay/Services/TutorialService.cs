@@ -40,6 +40,15 @@ public class TutorialService
 
     private int GetActualStageIndex(int baseStageIndex)
     {
+        // if (IsMobilePlatform())
+        // {
+        //     AppLogger.Log($"[TutorialService] Mobile platform detected. Offsetting stage index by 4. Base: {baseStageIndex}, Actual: {baseStageIndex + 4}");
+        // }
+        // else
+        // {
+        //     AppLogger.Log($"[TutorialService] Non-mobile platform detected. Using base stage index: {baseStageIndex}");
+        // }
+
         // If mobile, offset by 4 (Stage 0 becomes 4, Stage 1 becomes 5, etc.)
         return IsMobilePlatform() ? baseStageIndex + 4 : baseStageIndex;
     }
@@ -47,7 +56,7 @@ public class TutorialService
     public void StartTutorial(int sIndex, int mIndex, float initialDelay = 0.5f)
     {
         if (isProcessing) return;
-
+        // Debug.Log($"[TutorialService] Starting tutorial for Stage: {sIndex}, Module: {mIndex} with initial delay: {initialDelay}s");
         TutorialManager.Instance.StartCoroutine(StartTutorialRoutine(sIndex, mIndex, initialDelay));
     }
 
@@ -57,11 +66,11 @@ public class TutorialService
 
         currentStage = sIndex;
         currentModule = mIndex;
-        
+
         int actualStage = GetActualStageIndex(sIndex);
         bool success = TutorialManager.Instance.ForceStageStarted(actualStage, mIndex);
 
-        AppLogger.Log($"[Tutorial] Force starting stage: {actualStage}, module: {mIndex} | Success: {success}");
+        // AppLogger.Log($"[Tutorial] Force starting stage: {actualStage}, module: {mIndex} | Success: {success}");
 
         if (success)
         {
@@ -79,7 +88,9 @@ public class TutorialService
         currentModule = mIndex;
 
         int actualStage = GetActualStageIndex(sIndex);
-        bool success = TutorialManager.Instance.StageStarted(actualStage, mIndex);
+        bool success = TutorialManager.Instance.ForceStageStarted(actualStage, mIndex);
+        // Debug.Log($"[TutorialService] Instantly starting tutorial for Stage: {actualStage}, Module: {mIndex}, Success: {success}");
+
 
         if (success)
         {
@@ -105,7 +116,7 @@ public class TutorialService
     {
         isProcessing = true;
         isTutorialActive = false;
-        
+
         int actualStage = GetActualStageIndex(currentStage);
         TutorialManager.Instance.StageCompleted(actualStage, currentModule);
 

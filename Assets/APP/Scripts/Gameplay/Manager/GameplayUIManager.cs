@@ -73,7 +73,7 @@ public class GameplayUIManager : MonoBehaviour
     private void Awake()
     {
         mainUIController.OnWrapUp += OnWrapUp;
-        mainUIController.OnPauseRequest += PauseGame; 
+        mainUIController.OnPauseRequest += PauseGame;
         endgameController.OnFinishedGame += OnFinishedGame;
 
         pauseController.OnResume += OnResume;
@@ -119,7 +119,7 @@ public class GameplayUIManager : MonoBehaviour
         input.OnUIKeycodeEscapePerformed -= OnUIKeycodeEscapePerformed;
 
         mainUIController.OnWrapUp -= OnWrapUp;
-        mainUIController.OnPauseRequest -= PauseGame; 
+        mainUIController.OnPauseRequest -= PauseGame;
         endgameController.OnFinishedGame -= OnFinishedGame;
 
         pauseController.OnResume -= OnResume;
@@ -284,6 +284,9 @@ public class GameplayUIManager : MonoBehaviour
         if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 3)
         {
             tutorialService.CompleteAndAdvance(true);
+#if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
+            tutorialService.TriggerHighlight(false, ToolType.Chisel);
+#endif
             tutorialService.TriggerHighlight(true, ToolType.Brush);
         }
     }
@@ -293,6 +296,9 @@ public class GameplayUIManager : MonoBehaviour
         UpdateProgress(ProgressType.Dust, progress);
         if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 4)
         {
+#if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
+            tutorialService.TriggerHighlight(false, ToolType.Brush);
+#endif
             tutorialService.CompleteStage();
         }
     }

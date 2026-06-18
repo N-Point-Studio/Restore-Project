@@ -7,6 +7,9 @@ public abstract class DraggableTool : MonoBehaviour, IInteractObject, IDragObjec
     [Header("Drag Settings")]
     [SerializeField] protected float raycastRange = 5f;
     [SerializeField] protected Transform grabPosition;
+    [SerializeField] private Outline outline;
+    [SerializeField] private ToolType toolType;
+
 
     [Header("Animation Settings")]
     [SerializeField] protected float returnAnimDuration = 0.5f;
@@ -43,6 +46,31 @@ public abstract class DraggableTool : MonoBehaviour, IInteractObject, IDragObjec
         {
             grabOffset = Vector3.Distance(transform.position, grabPosition.position);
         }
+    }
+
+    private void OnEnable()
+    {
+        TutorialService.OnTutorialHighlightOn += HandleTutorialHighlightOn;
+        TutorialService.OnTutorialHighlightOff += HandleTutorialHighlightOff;
+
+    }
+
+    private void OnDisable()
+    {
+        TutorialService.OnTutorialHighlightOn -= HandleTutorialHighlightOn;
+        TutorialService.OnTutorialHighlightOff -= HandleTutorialHighlightOff;
+    }
+
+    private void HandleTutorialHighlightOn(ToolType toolType)
+    {
+        Debug.Log("Tutorial ON highlight: " + toolType);
+        if (this.toolType == toolType) outline.enabled = true;
+    }
+
+    private void HandleTutorialHighlightOff(ToolType toolType)
+    {
+        Debug.Log("Tutorial OFF highlight: " + toolType);
+        if (this.toolType == toolType) outline.enabled = false;
     }
 
     private void OnDrawGizmos()

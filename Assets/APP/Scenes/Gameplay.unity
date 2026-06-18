@@ -1305,6 +1305,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DraggableToolChisel
   raycastRange: 5
   grabPosition: {fileID: 712377421}
+  outline: {fileID: 989452955}
+  toolType: 2
   returnAnimDuration: 0.5
   followMouseSpeed: 0.1
   surfaceMoveSpeed: 0.1
@@ -16713,7 +16715,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 989452954}
-  - component: {fileID: 989452956}
   - component: {fileID: 989452955}
   m_Layer: 7
   m_Name: Tool Chisel
@@ -16756,28 +16757,6 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
---- !u!114 &989452956
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 989452953}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3d0a0c6e6da1140ae8440828b44f130d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ToolChisel
-  toolType: 2
-  outline: {fileID: 989452955}
-  returnAnimDuration: 0.5
-  followMouseSpeed: 0.2
-  SurfaceMoveSpeed: 0.2
-  SurfaceRotateSpeed: 0.8
-  origin: {fileID: 0}
-  audioKey: 9
-  soundType: 1
-  animator: {fileID: 930288995}
 --- !u!1 &1011012376
 GameObject:
   m_ObjectHideFlags: 0
@@ -34908,36 +34887,6 @@ MonoBehaviour:
   references:
     version: 2
     RefIds: []
---- !u!114 &3148895778015349251
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8474059191251763003}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 861a2aeae8a55466bb8494e2c1a35efe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ToolBrush
-  toolType: 1
-  outline: {fileID: 7599110475028882276}
-  returnAnimDuration: 0.5
-  followMouseSpeed: 0.2
-  SurfaceMoveSpeed: 0.2
-  SurfaceRotateSpeed: 0.8
-  origin: {fileID: 0}
-  audioKey: 8
-  soundType: 0
-  animator: {fileID: 4104087559057409822}
-  brushTexture: {fileID: 2800000, guid: 115f6ace71e744a3fad92c438b210dfa, type: 3}
-  brushScale: 0.4
-  brushStrength: 0.03
-  paintingColor: {r: 1, g: 1, b: 1, a: 1}
-  brushDepth: 0.03
-  animationSmoothSpeed: 10
-  smokeVFX: {fileID: 6755868474063746243}
-  dustVFX: {fileID: 6115496304856214758}
 --- !u!1 &3239504869904522233
 GameObject:
   m_ObjectHideFlags: 0
@@ -35297,6 +35246,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DraggableToolBrush
   raycastRange: 0.2
   grabPosition: {fileID: 813050467}
+  outline: {fileID: 7599110475028882276}
+  toolType: 1
   returnAnimDuration: 0.5
   followMouseSpeed: 0.1
   surfaceMoveSpeed: 0.1
@@ -47198,7 +47149,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8147124884367606485}
-  - component: {fileID: 3148895778015349251}
   - component: {fileID: 7599110475028882276}
   m_Layer: 7
   m_Name: Tool Brush
