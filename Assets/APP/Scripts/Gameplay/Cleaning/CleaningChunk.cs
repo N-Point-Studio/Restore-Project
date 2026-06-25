@@ -40,9 +40,15 @@ public class CleaningChunk : MonoBehaviour, IInteractObject, ICleanChunk, IDragO
             myMaterial.SetFloat(crackThresholdID, 1f);
         }
 
-#if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
-        maxHit = 1;
+        bool isMobile = Application.isMobilePlatform;
+#if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+        isMobile = true;
 #endif
+
+        if (isMobile)
+        {
+            maxHit = 1;
+        }
     }
 
     private void Start()

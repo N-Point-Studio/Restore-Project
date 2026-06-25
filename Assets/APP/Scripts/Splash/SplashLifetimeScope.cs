@@ -19,5 +19,15 @@ public class SplashLifetimeScope : LifetimeScope
             .WithParameter(targetScene).WithParameter(canvasGroup)
             .WithParameter(splashSprites).WithParameter(splashImage)
             .WithParameter(splashSettings);
+
+         bool isMobile = Application.isMobilePlatform;
+#if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+        isMobile = true;
+#endif
+
+        if (isMobile)
+        {
+            Application.targetFrameRate = 60;
+        }
     }
 }
