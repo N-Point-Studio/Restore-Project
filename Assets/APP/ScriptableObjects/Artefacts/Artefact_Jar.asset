@@ -76,7 +76,7 @@ MonoBehaviour:
   unlockedByDefault: 0
   unlockRequirements:
   - {fileID: 11400000, guid: e1fd02f44ca454e028dbb6f9a0ed00fe, type: 2}
-  allowedToolTypes: 11
+  allowedToolTypes: 3
   artefactFragmentDatas:
   - prefab: {fileID: 7039195393670596243, guid: 6781f9a25090242b68110397376fdf36, type: 3}
     spawnTransform:
@@ -91,7 +91,7 @@ MonoBehaviour:
       rotation: {x: 36.293, y: 120.495, z: 65.398}
       position: {x: -2.45, y: 1.12, z: 3.19}
   finalRotation: {x: 50, y: 0, z: 0}
-  clueTreshold: 80
+  clueTreshold: 75
   references:
     version: 2
     RefIds: []
