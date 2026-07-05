@@ -48,7 +48,7 @@ public class AssemblyService : IInitializable, IDisposable
         if (IsInspectEmpty())
         {
             float distance = GetFlattenedDistance(cam, worldPos, inspectPoint.transform.position);
-            isSlotAvailable = distance < config.socketSnapDistance;
+            isSlotAvailable = distance < config.emptySlotDistance;
 
             isArtefactSlotAvailable = isSlotAvailable;
             return isSlotAvailable;

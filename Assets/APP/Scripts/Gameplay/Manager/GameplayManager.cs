@@ -155,7 +155,12 @@ public class GameplayManager : IInitializable, IDisposable
             {
                 artefactData = activeArtefactData.GetArtefactDatabase().GetItem(targetId);
                 finalRotation = artefactData.FinalRotation;
+
+#if UNITY_STANDALONE
                 clueTreshold = artefactData.ClueTreshold;
+#elif UNITY_IOS || UNITY_ANDROID || UNITY_EDITOR
+                clueTreshold = 50f;
+#endif
                 zoomValue = artefactData.ZoomValue;
                 var ToolType = artefactData.AllowedToolTypes;
                 // clueTreshold 
