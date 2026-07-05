@@ -185,6 +185,8 @@ public class ToolService : IInitializable, IDisposable, ITickable
 #if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
         if (interact is not IDraggableTool) { return; }
         if (draggableTool != null && draggableTool is IDragObject tool) tool.OnDragEnded(vector);
+        PlayToolSfx(false);
+        PlayToolVfx(false);
         draggableTool = null;
 #endif
     }
@@ -229,6 +231,11 @@ public class ToolService : IInitializable, IDisposable, ITickable
         if (surfaceDetectionService.DetectSurface(tipPoint))
         {
             StickToSurfaces();
+        }
+        else
+        {
+            PlayToolSfx(false);
+            PlayToolVfx(false);
         }
     }
 
@@ -315,12 +322,13 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
         isCleaning = false;
         PlayToolSfx(true);
-        PlayToolVfx(true);
+        // PlayToolVfx(true);
 
         if (currentToolObject is IChiselTool tool) tool?.PlayGouge();
         if (draggableTool is IDraggableChiselTool draggableChisel) draggableChisel?.PlayGouge();
 
         cleaningService.CleanChunk(chunk);
+        PlayToolSfx(false);
     }
 
     private void ProcessCleaning()

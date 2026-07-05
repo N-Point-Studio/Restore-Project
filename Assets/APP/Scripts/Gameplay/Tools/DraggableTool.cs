@@ -106,8 +106,8 @@ public abstract class DraggableTool : MonoBehaviour, IInteractObject, IDragObjec
 
     public void OnDragEnded(Vector3 worldPos)
     {
-        ToolVFX(false);
-        PlaySfx(false);
+        // ToolVFX(false);
+        // PlaySfx(false);
         isDragging = false;
         isReturning = true;
         if (animator != null) animator.enabled = false;
