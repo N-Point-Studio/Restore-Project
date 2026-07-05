@@ -143,9 +143,17 @@ public class Inspection : MonoBehaviour
             _targetPosition
         );
 
-        float targetDistance = currentDistance + (zoomDelta * config.inspectionZoomSpeed);
-        targetDistance = Mathf.Clamp(targetDistance, config.inspectionMinDistance, _initialDistance);
+        float targetDistance = currentDistance + (zoomDelta * gameplayManager.zoomValue);
+        targetDistance = Mathf.Clamp(targetDistance, gameplayManager.zoomValue, _initialDistance);
         _targetPosition = _mainCamera.transform.position + direction * targetDistance;
+
+        // print("target distance: " + targetDistance);
+
+        //koin 1
+        //keris 1.28
+        //scarab 1.4
+        //kendi 1.5
+        //jar 2
 
         planeReference.SetReferencePosition(_targetPosition);
         //zoom tutorial

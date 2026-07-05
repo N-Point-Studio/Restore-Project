@@ -19,6 +19,7 @@ public class GameplayManager : IInitializable, IDisposable
     public bool isTutorialAvailable;
     public Vector3 finalRotation;
     public float clueTreshold;
+    public float zoomValue;
     private string targetScene = "MainMenu";
     public float overallProgress;
 
@@ -155,6 +156,7 @@ public class GameplayManager : IInitializable, IDisposable
                 artefactData = activeArtefactData.GetArtefactDatabase().GetItem(targetId);
                 finalRotation = artefactData.FinalRotation;
                 clueTreshold = artefactData.ClueTreshold;
+                zoomValue = artefactData.ZoomValue;
                 var ToolType = artefactData.AllowedToolTypes;
                 // clueTreshold 
 

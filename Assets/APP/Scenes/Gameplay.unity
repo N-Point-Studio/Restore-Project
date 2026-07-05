@@ -1308,9 +1308,9 @@ MonoBehaviour:
   outline: {fileID: 989452955}
   toolType: 2
   returnAnimDuration: 0.5
-  followMouseSpeed: 0.1
-  surfaceMoveSpeed: 0.1
-  surfaceRotateSpeed: 0.1
+  followMouseSpeed: 0.2
+  surfaceMoveSpeed: 0.2
+  surfaceRotateSpeed: 0.8
   audioKey: 9
   soundType: 1
   animator: {fileID: 930288995}
@@ -35281,15 +35281,15 @@ MonoBehaviour:
   outline: {fileID: 7599110475028882276}
   toolType: 1
   returnAnimDuration: 0.5
-  followMouseSpeed: 0.1
-  surfaceMoveSpeed: 0.1
-  surfaceRotateSpeed: 0.1
+  followMouseSpeed: 0.2
+  surfaceMoveSpeed: 0.2
+  surfaceRotateSpeed: 0.8
   audioKey: 8
   soundType: 0
   animator: {fileID: 4104087559057409822}
   brushTexture: {fileID: 2800000, guid: 115f6ace71e744a3fad92c438b210dfa, type: 3}
   brushScale: 0.4
-  brushStrength: 0.03
+  brushStrength: 1
   paintingColor: {r: 1, g: 1, b: 1, a: 1}
   brushDepth: 0.03
   animationSmoothSpeed: 10

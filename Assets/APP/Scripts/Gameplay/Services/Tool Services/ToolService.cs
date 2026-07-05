@@ -27,6 +27,8 @@ public class ToolService : IInitializable, IDisposable, ITickable
     private float movementTimer = 0f;
     private const float MOVEMENT_TIMEOUT = 0.15f;
 
+    private float tipOffset = 135;
+
     [Inject]
     public ToolService(ObjectDetectionService objectDetectionService,
         SurfaceDetectionService surfaceDetectionService,
@@ -222,7 +224,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
     void PerformRaycastTouch(Vector2 screenPos)
     {
         if (draggableTool == null) return;
-        var tipPoint = new Vector2(screenPos.x, screenPos.y + 350);
+        var tipPoint = new Vector2(screenPos.x, screenPos.y + tipOffset);
 
         if (surfaceDetectionService.DetectSurface(tipPoint))
         {
@@ -274,6 +276,8 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
     private void CleanSurface(IDraggableBrushTool brushTool)
     {
+        // Debug.Log("Cleaning surface with draggable brush tool...");
+
         var surface = surfaceDetectionService.CleanableSurface;
 
         if (surface == null) return;
@@ -291,14 +295,14 @@ public class ToolService : IInitializable, IDisposable, ITickable
             brushTool.GetBrushDepth()
         );
 
-        // if (cleaningService.IsDustRemoved(surface))
-        // {
-        //     PlayToolVfx(true);
-        // }
-        // else
-        // {
-        //     PlayToolVfx(false);
-        // }
+        if (cleaningService.IsDustRemoved(surface))
+        {
+            PlayToolVfx(true);
+        }
+        else
+        {
+            PlayToolVfx(false);
+        }
     }
 
     private void CleanChunk()
@@ -323,11 +327,11 @@ public class ToolService : IInitializable, IDisposable, ITickable
     {
         if (!surfaceDetectionService.HasHit) return;
 
-        if (currentToolObject is IBrushTool brush)
+        if (currentToolObject != null && currentToolObject is IBrushTool brush)
         {
             CleanSurface(brush);
         }
-        else if (draggableTool is IDraggableBrushTool draggableBrush)
+        else if (draggableTool != null && draggableTool is IDraggableBrushTool draggableBrush)
         {
             CleanSurface(draggableBrush);
         }
@@ -339,37 +343,63 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
     private void PlayToolVfx(bool play)
     {
-        if (currentToolObject == null) return;
-
-        if (play && !isVfxPlaying)
+        if (currentToolObject != null)
         {
-            currentToolObject?.PlayVfx(true);
-            draggableTool?.PlayVfx(true);
-            isVfxPlaying = true;
+            if (play && !isVfxPlaying)
+            {
+                currentToolObject.PlayVfx(true);
+                isVfxPlaying = true;
+            }
+            else if (!play && isVfxPlaying)
+            {
+                currentToolObject.PlayVfx(false);
+                isVfxPlaying = false;
+            }
         }
-        else if (!play && isVfxPlaying)
+        else if (draggableTool != null)
         {
-            currentToolObject?.PlayVfx(false);
-            draggableTool?.PlayVfx(false);
-            isVfxPlaying = false;
+            Debug.Log("Playing tool VFX for draggable tool: " + draggableTool.GetType().Name);
+            if (play && !isVfxPlaying)
+            {
+                draggableTool.PlayVfx(true);
+                isVfxPlaying = true;
+            }
+            else if (!play && isVfxPlaying)
+            {
+                draggableTool.PlayVfx(false);
+                isVfxPlaying = false;
+            }
         }
     }
 
     private void PlayToolSfx(bool play)
     {
-        if (currentToolObject == null) return;
-
-        if (play && !isSfxPlaying)
+        Debug.Log("PlayToolSfx called with play = " + play);
+        if (currentToolObject != null)
         {
-            currentToolObject.PlaySfx(true);
-            draggableTool?.PlaySfx(true);
-            isSfxPlaying = true;
+            if (play && !isSfxPlaying)
+            {
+                currentToolObject.PlaySfx(true);
+                isSfxPlaying = true;
+            }
+            else if (!play && isSfxPlaying)
+            {
+                currentToolObject.PlaySfx(false);
+                isSfxPlaying = false;
+            }
         }
-        else if (!play && isSfxPlaying)
+        if (draggableTool != null)
         {
-            currentToolObject?.PlaySfx(false);
-            draggableTool?.PlaySfx(false);
-            isSfxPlaying = false;
+            if (play && !isSfxPlaying)
+            {
+                draggableTool.PlaySfx(true);
+                isSfxPlaying = true;
+            }
+            else if (!play && isSfxPlaying)
+            {
+                draggableTool.PlaySfx(false);
+                isSfxPlaying = false;
+            }
         }
     }
 

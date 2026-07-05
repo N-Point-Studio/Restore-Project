@@ -34,6 +34,8 @@ public abstract class DraggableTool : MonoBehaviour, IInteractObject, IDragObjec
     protected Vector3 targetPosition;
     protected Sequence returnSequence;
 
+    private int currentAudioId = -1;
+
     protected virtual void Awake()
     {
         initialPosition = transform.position;
@@ -104,17 +106,19 @@ public abstract class DraggableTool : MonoBehaviour, IInteractObject, IDragObjec
 
     public void OnDragEnded(Vector3 worldPos)
     {
+        ToolVFX(false);
+        PlaySfx(false);
         isDragging = false;
         isReturning = true;
         if (animator != null) animator.enabled = false;
 
         SetColliderEnable(true);
-        // Debug.Log($"Drag {name} Ended at {worldPos}");
-
+        transform.DOKill();
         returnSequence?.Kill();
+
         returnSequence = DOTween.Sequence();
         returnSequence.Join(transform.DOMove(initialPosition, returnAnimDuration).SetEase(Ease.OutBack));
-        returnSequence.Join(transform.DORotateQuaternion(initialRotation, returnAnimDuration).SetEase(Ease.OutBack));
+        returnSequence.Join(transform.DORotate(initialRotation.eulerAngles, returnAnimDuration).SetEase(Ease.OutBack));
         returnSequence.OnComplete(() => isReturning = false);
     }
 
@@ -127,7 +131,7 @@ public abstract class DraggableTool : MonoBehaviour, IInteractObject, IDragObjec
     {
         transform.DOKill();
         transform.DOMove(position, surfaceMoveSpeed).SetEase(Ease.OutQuad);
-        transform.DORotateQuaternion(rotation, surfaceRotateSpeed).SetEase(Ease.OutQuad);
+        transform.DORotate(rotation.eulerAngles, surfaceRotateSpeed).SetEase(Ease.OutQuad);
     }
 
     public void OnInteractDetected()
@@ -148,11 +152,43 @@ public abstract class DraggableTool : MonoBehaviour, IInteractObject, IDragObjec
 
     public void PlaySfx(bool isPlaying)
     {
+        if (soundType == SoundType.Once)
+        {
+            if (isPlaying)
+            {
+                SoundSystem.Instance.PlayAudio(audioKey, 1f, false, true, false);
+            }
+        }
+        else
+        {
+            if (isPlaying)
+            {
+                bool isAlreadyPlaying = false;
+                if (currentAudioId != -1)
+                {
+                    Audio activeAudio = SoundSystem.Instance.GetAudio(currentAudioId);
+                    if (activeAudio != null && activeAudio.IsPlaying)
+                    {
+                        isAlreadyPlaying = true;
+                    }
+                }
 
+                if (!isAlreadyPlaying)
+                {
+                    currentAudioId = SoundSystem.Instance.PlayAudio(audioKey, 1f, true, true, false);
+                }
+            }
+            else
+            {
+                if (currentAudioId != -1)
+                {
+                    SoundSystem.Instance.StopAudio(currentAudioId);
+                    currentAudioId = -1;
+                }
+            }
+        }
     }
 
-    public void PlayVfx(bool isPlaying)
-    {
-
-    }
+    public void PlayVfx(bool isPlaying) { ToolVFX(isPlaying); }
+    protected abstract void ToolVFX(bool isPlaying);
 }

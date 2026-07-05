@@ -52,6 +52,9 @@ public class ArtefactData : ScriptableObject
     [SerializeField] private float clueTreshold;
     public float ClueTreshold => clueTreshold;
 
+    [SerializeField] private float zoomValue;
+    public float ZoomValue => zoomValue;
+
     private string artefactGroupId;
     public string ArtefactGroupId => artefactGroupId;
 

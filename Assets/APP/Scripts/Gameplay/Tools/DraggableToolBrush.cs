@@ -83,4 +83,17 @@ public class DraggableToolBrush : DraggableTool, IDraggableBrushTool
     public Transform GetBrushTransform() => transform;
     public float GetBrushDepth() => brushDepth;
     public float GetRaycastLength() => raycastRange;
+
+    protected override void ToolVFX(bool isPlaying)
+    {
+        Debug.Log($"ToolVFX called with isPlaying: {isPlaying}");
+        if (isPlaying)
+        {
+            SetVfxEmission(2f, 8f);
+        }
+        else
+        {
+            SetVfxEmission(0f, 0f);
+        }
+    }
 }

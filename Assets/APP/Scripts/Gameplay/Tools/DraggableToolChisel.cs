@@ -17,4 +17,6 @@ public class DraggableToolChisel : DraggableTool, IDraggableChiselTool
             animator.CrossFadeInFixedTime(GougeHash, CrossFadeDuration);
         }
     }
+
+    protected override void ToolVFX(bool isPlaying) { }
 }
