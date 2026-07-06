@@ -87,6 +87,13 @@ public class ArtefactManager : IInitializable, IDisposable
     private void HandleDragStarted(IInteractObject interact, Vector3 worldPos)
     {
         currentDraggedPart = ResolveArtefactPart(interact);
+
+        // Prevent an already assembled piece from being flagged as a dragged piece for assembly
+        if (currentDraggedPart != null && currentDraggedPart.CurrentState == ArtefactPieceState.Assembled)
+        {
+            currentDraggedPart = null;
+        }
+
         if (interact is IDragObject drag) { drag.OnDragStarted(worldPos); }
     }
 

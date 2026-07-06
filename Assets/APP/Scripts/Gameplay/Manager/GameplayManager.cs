@@ -18,6 +18,7 @@ public class GameplayManager : IInitializable, IDisposable
     private ArtefactData artefactData;
     public bool isTutorialAvailable;
     public Vector3 finalRotation;
+    public float finalScaleMultiplier;
     public float clueTreshold;
     public float zoomValue;
     private string targetScene = "MainMenu";
@@ -155,6 +156,9 @@ public class GameplayManager : IInitializable, IDisposable
             {
                 artefactData = activeArtefactData.GetArtefactDatabase().GetItem(targetId);
                 finalRotation = artefactData.FinalRotation;
+
+                finalScaleMultiplier = artefactData.FinalScaleMultiplier;
+                if (finalScaleMultiplier <= 0f) finalScaleMultiplier = 1f;
 
 #if UNITY_STANDALONE
                 clueTreshold = artefactData.ClueTreshold;

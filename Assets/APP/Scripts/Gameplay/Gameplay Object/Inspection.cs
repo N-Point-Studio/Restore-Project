@@ -14,6 +14,7 @@ public class Inspection : MonoBehaviour
 
     private Vector3 InitialInspectPosition;
     private Quaternion InitialInspectRotation;
+    private Vector3 InitialInspectScale;
 
     public Transform assemblyRoot;
     private bool isContain = false;
@@ -43,6 +44,7 @@ public class Inspection : MonoBehaviour
         _targetPosition = transform.position;
         InitialInspectPosition = transform.position;
         InitialInspectRotation = transform.rotation;
+        InitialInspectScale = transform.localScale;
     }
 
     void OnEnable()
@@ -166,9 +168,21 @@ public class Inspection : MonoBehaviour
     public void ResetPosition()
     {
         transform.SetPositionAndRotation(InitialInspectPosition, InitialInspectRotation);
+        transform.localScale = InitialInspectScale;
         _targetPosition = InitialInspectPosition;
         planeReference.SetReferencePosition(_targetPosition);
         _zoomVelocity = Vector3.zero;
+    }
+
+    public void RotateHorizontally(float deltaX)
+    {
+        if (isGameFinished)
+        {
+            if (_mainCamera == null) _mainCamera = Camera.main;
+            Vector3 cameraUp = _mainCamera != null ? _mainCamera.transform.up : Vector3.up;
+            float rotateY = -deltaX * rotateSpeed * 0.2f;
+            transform.Rotate(cameraUp, rotateY, Space.World);
+        }
     }
 
     public void FinishPosition()
@@ -178,6 +192,7 @@ public class Inspection : MonoBehaviour
         transform.DOKill();
         transform.DOMove(InitialInspectPosition, config.inspectionResetDuration).SetEase(Ease.OutBack);
         transform.DORotateQuaternion(Quaternion.Euler(gameplayManager.finalRotation), config.inspectionResetDuration).SetEase(Ease.OutBack);
+        transform.DOScale(InitialInspectScale * gameplayManager.finalScaleMultiplier, config.inspectionResetDuration).SetEase(Ease.OutBack);
 
         _targetPosition = InitialInspectPosition;
         _zoomVelocity = Vector3.zero;

@@ -3,29 +3,33 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
 using VContainer;
+using UnityEngine.EventSystems;
 
-public class EndgameUIController : BaseMenuController
+public class EndgameUIController : BaseMenuController, IDragHandler
 {
     [SerializeField] private TMP_Text textArtefactName;
     [SerializeField] private ButtonInputInstructionUI buttonFinish;
 
-    private InputSystemService input;    
+    private InputSystemService input;
     private PlayerProgressionData playerProgressionData;
     private ActiveArtefactData activeArtefactData;
     private LocalizedString currentLocalizedName;
+    private Inspection inspection;
 
     public event Action OnFinishedGame;
 
     [Inject]
     public void Construct(
-        InputSystemService input, 
-        PlayerProgressionData playerProgressionData, 
-        ActiveArtefactData activeArtefactData)
+        InputSystemService input,
+        PlayerProgressionData playerProgressionData,
+        ActiveArtefactData activeArtefactData,
+        Inspection inspection)
     {
         this.input = input;
         this.playerProgressionData = playerProgressionData;
         this.activeArtefactData = activeArtefactData;
-        
+        this.inspection = inspection;
+
         this.input.OnUIKeycodeEnterPerformed += OnUIKeycodeEnterPerformed;
     }
 
@@ -38,16 +42,24 @@ public class EndgameUIController : BaseMenuController
     protected override void OnDestroy()
     {
         base.OnDestroy();
-        buttonFinish.OnClick -= OnFinishClick;        
+        buttonFinish.OnClick -= OnFinishClick;
         input.OnUIKeycodeEnterPerformed -= OnUIKeycodeEnterPerformed;
-        
+
         if (currentLocalizedName != null) currentLocalizedName.StringChanged -= UpdateArtefactNameText;
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (inspection != null)
+        {
+            inspection.RotateHorizontally(eventData.delta.x);
+        }
     }
 
     public override void SetActive(bool isActive)
     {
         base.SetActive(isActive);
-        
+
         if (isActive)
         {
             RefreshArtefactName();
@@ -59,7 +71,7 @@ public class EndgameUIController : BaseMenuController
         if (playerProgressionData != null && activeArtefactData != null)
         {
             string targetId = playerProgressionData.CurrentActiveArtefactId;
-            
+
             if (!string.IsNullOrEmpty(targetId))
             {
                 ArtefactData data = activeArtefactData.GetArtefactDatabase().GetItem(targetId);
@@ -74,9 +86,9 @@ public class EndgameUIController : BaseMenuController
     public void SetArtefactName(LocalizedString localizedName)
     {
         if (currentLocalizedName != null) currentLocalizedName.StringChanged -= UpdateArtefactNameText;
-        
+
         currentLocalizedName = localizedName;
-        
+
         if (currentLocalizedName != null)
         {
             currentLocalizedName.StringChanged += UpdateArtefactNameText;
