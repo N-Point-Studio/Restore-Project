@@ -1,20 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-3336331407169508521
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d69a19d29ef66464ea0afc7cd84fd6c2, type: 3}
-  m_Name: VolumetricFogRendererFeature
-  m_EditorClassIdentifier: com.cqf.urpvolumetricfog.runtime::VolumetricFogRendererFeature
-  m_Active: 1
-  downsampleDepthShader: {fileID: 4800000, guid: cffeaeec0396a2c4dad475266cc8dfeb, type: 3}
-  volumetricFogShader: {fileID: 4800000, guid: 08f816187f9af0244a95556ee0cab83f, type: 3}
 --- !u!114 &-138173521220213161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27,18 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f62c9c65cf3354c93be831c8bc075510, type: 3}
   m_Name: ScreenSpaceAmbientOcclusion
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.ScreenSpaceAmbientOcclusion
-  m_Active: 1
+  m_Active: 0
   m_Settings:
     AOMethod: 1
-    Downsample: 0
-    AfterOpaque: 0
-    Source: 1
+    Downsample: 1
+    AfterOpaque: 1
+    Source: 0
     NormalSamples: 2
     Intensity: 5
     DirectLightingStrength: 0
     Radius: 10
-    Samples: 0
-    BlurQuality: 0
+    Samples: 2
+    BlurQuality: 2
     Falloff: 60
     SampleCount: -1
 --- !u!114 &11400000
@@ -67,8 +52,7 @@ MonoBehaviour:
     probeVolumeBlendStatesCS: {fileID: 0}
   m_RendererFeatures:
   - {fileID: -138173521220213161}
-  - {fileID: -3336331407169508521}
-  m_RendererFeatureMap: 57e64d1eea1b15fe57abae0643f8b2d1
+  m_RendererFeatureMap: 57e64d1eea1b15fe
   m_UseNativeRenderPass: 1
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -89,8 +73,8 @@ MonoBehaviour:
     passOperation: 2
     failOperation: 0
     zFailOperation: 0
-  m_ShadowTransparentReceive: 1
-  m_RenderingMode: 2
+  m_ShadowTransparentReceive: 0
+  m_RenderingMode: 0
   m_DepthPrimingMode: 0
   m_CopyDepthMode: 0
   m_DepthAttachmentFormat: 0
