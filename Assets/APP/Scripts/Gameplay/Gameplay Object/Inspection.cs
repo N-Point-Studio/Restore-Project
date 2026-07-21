@@ -36,6 +36,9 @@ public class Inspection : MonoBehaviour
         this.config = config;
         this.gameplayManager = gameplayManager;
         this.planeReference = plane;
+        this._zoomVelocity = config.inspectionZoomSpeed * Vector3.one;
+
+        Debug.Log("zoomvelocity: " + _zoomVelocity);
     }
 
     void Start()
@@ -91,11 +94,18 @@ public class Inspection : MonoBehaviour
 
     void Update()
     {
+        // transform.position = Vector3.SmoothDamp(
+        //     transform.position,
+        //     _targetPosition,
+        //     ref _zoomVelocity,
+        //     config.inspectionSmoothTime
+        // );
         transform.position = Vector3.SmoothDamp(
             transform.position,
             _targetPosition,
             ref _zoomVelocity,
-            config.inspectionSmoothTime
+            config.inspectionSmoothTime,
+            config.inspectionZoomSpeed // Parameter batas kecepatan masuk di sini
         );
     }
 
@@ -145,19 +155,19 @@ public class Inspection : MonoBehaviour
             _targetPosition
         );
 
-        float targetDistance = currentDistance + (zoomDelta * gameplayManager.zoomValue);
+        // 1. Tambahkan variabel ini untuk meredam respons input scroll (Coba angka 0.05f atau 0.1f)
+        float zoomStepSpeed = 0.05f;
+
+        // 2. Kalikan zoomDelta dengan zoomStepSpeed, BUKAN zoomValue
+        float targetDistance = currentDistance + (zoomDelta * zoomStepSpeed);
+
+        // 3. zoomValue tetap murni dipakai untuk batas kedekatan (agar tidak tembus pandang)
         targetDistance = Mathf.Clamp(targetDistance, gameplayManager.zoomValue, _initialDistance);
+
         _targetPosition = _mainCamera.transform.position + direction * targetDistance;
 
-        // print("target distance: " + targetDistance);
-
-        //koin 1
-        //keris 1.28
-        //scarab 1.4
-        //kendi 1.5
-        //jar 2
-
         planeReference.SetReferencePosition(_targetPosition);
+
         //zoom tutorial
         if (!tutorialService.IsProcessing && tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 1)
         {
