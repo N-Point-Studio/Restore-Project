@@ -13,7 +13,7 @@ public class JournalController : MonoBehaviour
     [SerializeField] protected float fadeDuration = 0.25f;
 
     [Header("Feel Feedbacks (Gerakan Utama)")]
-    [SerializeField] private MMF_Player feedbackOpen; 
+    [SerializeField] private MMF_Player feedbackOpen;
     [SerializeField] private MMF_Player feedbackOpenFromHidden;
     [SerializeField] private MMF_Player feedbackPeek;
     [SerializeField] private MMF_Player feedbackHide;
@@ -26,6 +26,7 @@ public class JournalController : MonoBehaviour
     [SerializeField] private float hoverAnimDuration = 0.15f;
 
     [Header("Page Containers")]
+    [SerializeField] private CanvasGroup pagesCanvasGroup;
     [SerializeField] private Transform leftPageContainer;
     [SerializeField] private Transform rightPageContainer;
 
@@ -42,7 +43,7 @@ public class JournalController : MonoBehaviour
     private ArtefactData currentData;
     private Action currentActionCallback;
     private bool isPostRestoration;
-    private bool isContentRevealed = false; 
+    private bool isContentRevealed = false;
 
     private JournalPageAnimator activeLeftPage;
     private JournalPageAnimator activeRightPage;
@@ -107,7 +108,7 @@ public class JournalController : MonoBehaviour
         currentData = data;
         currentActionCallback = onRestoreClicked;
         isPostRestoration = false;
-        
+
         buttonAction.ForceSetLocalizedText(false, localizedRestoreText);
     }
 
@@ -129,7 +130,7 @@ public class JournalController : MonoBehaviour
         if (feedbackOpen != null) feedbackOpen.StopFeedbacks();
         if (feedbackPeek != null) feedbackPeek.StopFeedbacks();
         if (feedbackHide != null) feedbackHide.StopFeedbacks();
-        bookRect.DOKill(); 
+        bookRect.DOKill();
 
         if (bookRect != null) bookRect.anchoredPosition = posHidden;
         HideOverlay();
@@ -144,7 +145,7 @@ public class JournalController : MonoBehaviour
         activeLeftPage = null;
         activeRightPage = null;
 
-        if (!isPostRestoration) 
+        if (!isPostRestoration)
         {
             if (currentData.PreRestorationPagePrefab != null)
             {
@@ -152,7 +153,7 @@ public class JournalController : MonoBehaviour
                 activeLeftPage.InjectTexts(currentData.LocalizedStickyNoteTexts);
             }
         }
-        else 
+        else
         {
             if (currentData.PreRestorationPagePrefab != null)
             {
@@ -167,10 +168,23 @@ public class JournalController : MonoBehaviour
         }
     }
 
+    private void ShowContent(bool isShowing)
+    {
+        if (pagesCanvasGroup != null)
+        {
+            pagesCanvasGroup.alpha = isShowing ? 1f : 0f;
+            pagesCanvasGroup.blocksRaycasts = isShowing;
+            pagesCanvasGroup.interactable = isShowing;
+        }
+
+        // Keep the GameObjects active so Coroutines never crash
+        if (leftPageContainer != null) leftPageContainer.gameObject.SetActive(true);
+        if (rightPageContainer != null) rightPageContainer.gameObject.SetActive(true);
+    }
+
     public void OpenBookFull()
     {
         JournalState prevState = CurrentState;
-
         CurrentState = JournalState.Opened;
         buttonAction.gameObject.SetActive(false);
         IsAnimating = true;
@@ -178,30 +192,46 @@ public class JournalController : MonoBehaviour
 
         OnBookOpened?.Invoke();
 
+        // 1. Hide visuals using the CanvasGroup, but ensure GameObjects are active
+        ShowContent(false);
+
         if (!isContentRevealed)
         {
             SpawnAndInjectPage();
         }
+
+        // 2. Play the Feel Feedback and listen for when it finishes
+        MMF_Player targetFeedback = (prevState == JournalState.Hidden && feedbackOpenFromHidden != null)
+            ? feedbackOpenFromHidden
+            : feedbackOpen;
+
+        if (targetFeedback != null)
+        {
+            targetFeedback.Events.OnComplete.RemoveListener(OnBookOpenAnimationComplete);
+            targetFeedback.Events.OnComplete.AddListener(OnBookOpenAnimationComplete);
+            targetFeedback.PlayFeedbacks();
+        }
         else
         {
-            if (activeLeftPage != null) activeLeftPage.ShowInstant();
-            if (activeRightPage != null) activeRightPage.ShowInstant();
+            OnBookOpenAnimationComplete();
         }
+    }
 
-        if (prevState == JournalState.Hidden && feedbackOpenFromHidden != null)
-        {
-            feedbackOpenFromHidden.PlayFeedbacks();
-        }
-        else if (feedbackOpen != null)
-        {
-            feedbackOpen.PlayFeedbacks();
-        }
+    private void OnBookOpenAnimationComplete()
+    {
+        // Clean up listeners
+        if (feedbackOpen != null) feedbackOpen.Events.OnComplete.RemoveListener(OnBookOpenAnimationComplete);
+        if (feedbackOpenFromHidden != null) feedbackOpenFromHidden.Events.OnComplete.RemoveListener(OnBookOpenAnimationComplete);
 
+        // 3. Now that the book is physically open, make the container visible
+        ShowContent(true);
+
+        // 4. Trigger the text reveal Coroutines
         if (!isContentRevealed)
         {
             if (!isPostRestoration && activeLeftPage != null)
             {
-                activeLeftPage.PlayRevealAnimation(() => 
+                activeLeftPage.PlayRevealAnimation(() =>
                 {
                     buttonAction.gameObject.SetActive(true);
                     IsAnimating = false;
@@ -209,7 +239,7 @@ public class JournalController : MonoBehaviour
             }
             else if (isPostRestoration && activeRightPage != null)
             {
-                activeRightPage.PlayRevealAnimation(() => 
+                activeRightPage.PlayRevealAnimation(() =>
                 {
                     buttonAction.gameObject.SetActive(true);
                     IsAnimating = false;
@@ -220,11 +250,13 @@ public class JournalController : MonoBehaviour
                 buttonAction.gameObject.SetActive(true);
                 IsAnimating = false;
             }
-            
             isContentRevealed = true;
         }
         else
         {
+            if (activeLeftPage != null) activeLeftPage.ShowInstant();
+            if (activeRightPage != null) activeRightPage.ShowInstant();
+
             buttonAction.gameObject.SetActive(true);
             IsAnimating = false;
         }
@@ -235,8 +267,9 @@ public class JournalController : MonoBehaviour
         CurrentState = JournalState.Peeking;
         IsAnimating = false;
         HideOverlay();
+        ShowContent(false);
         buttonAction.gameObject.SetActive(false);
-        
+
         if (feedbackPeek != null) feedbackPeek.PlayFeedbacks();
     }
 
@@ -245,7 +278,8 @@ public class JournalController : MonoBehaviour
         CurrentState = JournalState.Hidden;
         IsAnimating = false;
         HideOverlay();
-        
+        ShowContent(false);
+
         if (feedbackHide != null) feedbackHide.PlayFeedbacks();
     }
 
@@ -257,7 +291,7 @@ public class JournalController : MonoBehaviour
 
     private void OpenBookFromPeek()
     {
-        OpenBookFull(); 
+        OpenBookFull();
     }
 
     private void ShowOverlay()
@@ -300,7 +334,7 @@ public class JournalController : MonoBehaviour
 
     private void OnUIKeycodeEnterPerformed()
     {
-        if (CurrentState == JournalState.Opened && buttonAction != null && 
+        if (CurrentState == JournalState.Opened && buttonAction != null &&
             buttonAction.gameObject.activeInHierarchy && buttonAction.Button.interactable)
         {
             OnButtonActionClicked();
