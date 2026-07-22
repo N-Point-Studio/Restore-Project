@@ -32,6 +32,8 @@ public class JournalController : MonoBehaviour
     [SerializeField] private CanvasGroup pagesCanvasGroup;
     [SerializeField] private Transform leftPageContainer;
     [SerializeField] private Transform rightPageContainer;
+    [SerializeField] private float pageFadeDuration = 0.3f; // Smooth fade duration
+    [SerializeField] private float pageHideFadeDuration = 0.1f;
 
     [Header("Buttons & Interactions")]
     [SerializeField] private ButtonInputInstructionUI buttonAction;
@@ -41,7 +43,7 @@ public class JournalController : MonoBehaviour
     [SerializeField] private Button buttonNextPage;
     [SerializeField] private Button buttonPrevPage;
     [SerializeField] private GameObject paginationSeparator;
-    [SerializeField] private TMP_Text textPageIndicator; // Optional: To show "1 / 2"
+    [SerializeField] private TMP_Text textPageIndicator;
 
     [Header("Localization")]
     [SerializeField] private LocalizedString localizedRestoreText;
@@ -54,10 +56,9 @@ public class JournalController : MonoBehaviour
     private bool isPostRestoration;
     private bool isContentRevealed = false;
 
-    // Pagination State
     private int currentPageIndex = 0;
-    private JournalPageAnimator activeLeftPage; // Pre-restoration
-    private List<JournalPageAnimator> postPagesList = new List<JournalPageAnimator>(); // Post-restoration
+    private JournalPageAnimator activeLeftPage;
+    private List<JournalPageAnimator> postPagesList = new List<JournalPageAnimator>();
 
     public Action OnBookOpened;
 
@@ -149,6 +150,7 @@ public class JournalController : MonoBehaviour
 
         if (bookRect != null) bookRect.anchoredPosition = posHidden;
         HideOverlay();
+        ShowContentInstant(false);
     }
 
     private void SpawnAndInjectPage()
@@ -171,30 +173,29 @@ public class JournalController : MonoBehaviour
         }
         else
         {
-            // Spawn Left Page (Sticky Notes)
             if (currentData.PreRestorationPagePrefab != null)
             {
                 activeLeftPage = Instantiate(currentData.PreRestorationPagePrefab, leftPageContainer);
                 activeLeftPage.InjectTexts(currentData.LocalizedStickyNoteTexts);
             }
 
-            // Spawn ALL Post Restoration Pages into the right container
             if (currentData.PostRestorationPagePrefabs != null && currentData.PostRestorationPagePrefabs.Length > 0)
             {
                 for (int i = 0; i < currentData.PostRestorationPagePrefabs.Length; i++)
                 {
                     JournalPageAnimator page = Instantiate(currentData.PostRestorationPagePrefabs[i], rightPageContainer);
-                    page.gameObject.SetActive(i == 0); // Only show the first page initially
+                    page.gameObject.SetActive(i == 0);
                     postPagesList.Add(page);
                 }
             }
         }
     }
 
-    private void ShowContent(bool isShowing)
+    private void ShowContentInstant(bool isShowing)
     {
         if (pagesCanvasGroup != null)
         {
+            pagesCanvasGroup.DOKill();
             pagesCanvasGroup.alpha = isShowing ? 1f : 0f;
             pagesCanvasGroup.blocksRaycasts = isShowing;
             pagesCanvasGroup.interactable = isShowing;
@@ -202,6 +203,34 @@ public class JournalController : MonoBehaviour
 
         if (leftPageContainer != null) leftPageContainer.gameObject.SetActive(true);
         if (rightPageContainer != null) rightPageContainer.gameObject.SetActive(true);
+    }
+
+    private void FadePagesContent(bool isShowing, float duration, Action onComplete = null)
+    {
+        if (leftPageContainer != null) leftPageContainer.gameObject.SetActive(true);
+        if (rightPageContainer != null) rightPageContainer.gameObject.SetActive(true);
+
+        if (pagesCanvasGroup != null)
+        {
+            pagesCanvasGroup.DOKill();
+            pagesCanvasGroup.blocksRaycasts = isShowing;
+            pagesCanvasGroup.interactable = isShowing;
+            float targetAlpha = isShowing ? 1f : 0f;
+
+            if (duration > 0f)
+            {
+                pagesCanvasGroup.DOFade(targetAlpha, duration).OnComplete(() => onComplete?.Invoke());
+            }
+            else
+            {
+                pagesCanvasGroup.alpha = targetAlpha;
+                onComplete?.Invoke();
+            }
+        }
+        else
+        {
+            onComplete?.Invoke();
+        }
     }
 
     public void OpenBookFull()
@@ -214,7 +243,7 @@ public class JournalController : MonoBehaviour
 
         OnBookOpened?.Invoke();
 
-        ShowContent(false);
+        ShowContentInstant(false);
 
         if (!isContentRevealed)
         {
@@ -242,42 +271,56 @@ public class JournalController : MonoBehaviour
         if (feedbackOpen != null) feedbackOpen.Events.OnComplete.RemoveListener(OnBookOpenAnimationComplete);
         if (feedbackOpenFromHidden != null) feedbackOpenFromHidden.Events.OnComplete.RemoveListener(OnBookOpenAnimationComplete);
 
-        ShowContent(true);
-
+        // 1. Instantly prepare pages so they don't flash at 100% opacity
         if (!isContentRevealed)
         {
-            if (!isPostRestoration && activeLeftPage != null)
+            if (activeLeftPage != null) activeLeftPage.PrepareForReveal();
+            foreach (var page in postPagesList) page.PrepareForReveal();
+        }
+
+        // 2. Turn on the Page Numbers and Arrows immediately
+        UpdatePaginationUI();
+        
+        // 3. Hide the Action Button ("Restore" / "Completed") while the typing animation plays
+        if (!isContentRevealed) buttonAction.gameObject.SetActive(false);
+
+        // 4. Fade in the master CanvasGroup
+        FadePagesContent(true, pageFadeDuration, () =>
+        {
+            if (!isContentRevealed)
             {
-                activeLeftPage.PlayRevealAnimation(() =>
+                // What to do when the typing animation finishes
+                Action onRevealDone = () =>
                 {
-                    UpdatePaginationUI();
+                    UpdatePaginationUI(); // Restores the button Action if it's the last page
                     IsAnimating = false;
-                });
-            }
-            else if (isPostRestoration && postPagesList.Count > 0)
-            {
-                postPagesList[0].PlayRevealAnimation(() =>
+                };
+
+                // Trigger the typing/fade animations
+                if (!isPostRestoration && activeLeftPage != null)
                 {
-                    UpdatePaginationUI();
-                    IsAnimating = false;
-                });
+                    activeLeftPage.PlayRevealAnimation(onRevealDone);
+                }
+                else if (isPostRestoration && postPagesList.Count > 0)
+                {
+                    postPagesList[0].PlayRevealAnimation(onRevealDone);
+                }
+                else
+                {
+                    onRevealDone();
+                }
+
+                isContentRevealed = true;
             }
             else
             {
+                if (activeLeftPage != null) activeLeftPage.ShowInstant();
+                if (postPagesList.Count > 0) postPagesList[currentPageIndex].ShowInstant();
+
                 UpdatePaginationUI();
                 IsAnimating = false;
             }
-
-            isContentRevealed = true;
-        }
-        else
-        {
-            if (activeLeftPage != null) activeLeftPage.ShowInstant();
-            if (postPagesList.Count > 0) postPagesList[currentPageIndex].ShowInstant();
-
-            UpdatePaginationUI();
-            IsAnimating = false;
-        }
+        });
     }
 
     #region Pagination Logic
@@ -302,10 +345,8 @@ public class JournalController : MonoBehaviour
     {
         if (postPagesList.Count == 0) return;
 
-        // Hide old page
         postPagesList[currentPageIndex].gameObject.SetActive(false);
 
-        // Show new page
         currentPageIndex = newIndex;
         postPagesList[currentPageIndex].gameObject.SetActive(true);
         postPagesList[currentPageIndex].ShowInstant(); 
@@ -317,28 +358,23 @@ public class JournalController : MonoBehaviour
     {
         if (!isPostRestoration || postPagesList.Count <= 1)
         {
-            // Single page (e.g., "Before" state)
             if (buttonNextPage != null) buttonNextPage.gameObject.SetActive(false);
             if (buttonPrevPage != null) buttonPrevPage.gameObject.SetActive(false);
-            if (paginationSeparator != null) paginationSeparator.SetActive(false); // Hide pipe
+            if (paginationSeparator != null) paginationSeparator.SetActive(false);
             if (textPageIndicator != null) textPageIndicator.gameObject.SetActive(false);
 
-            buttonAction.gameObject.SetActive(true); // Shows "Let's Restore"
+            buttonAction.gameObject.SetActive(true);
             return;
         }
 
-        // Multi-page logic
         bool showPrev = currentPageIndex > 0;
         bool showNext = currentPageIndex < postPagesList.Count - 1;
         bool showAction = currentPageIndex == postPagesList.Count - 1;
 
         if (buttonPrevPage != null) buttonPrevPage.gameObject.SetActive(showPrev);
         if (buttonNextPage != null) buttonNextPage.gameObject.SetActive(showNext);
-        
-        // The separator "|" should only show if "Previous" is visible
         if (paginationSeparator != null) paginationSeparator.SetActive(showPrev); 
 
-        // This will swap seamlessly from "Next" to "Completed"
         buttonAction.gameObject.SetActive(showAction);
 
         if (textPageIndicator != null)
@@ -355,7 +391,7 @@ public class JournalController : MonoBehaviour
         CurrentState = JournalState.Peeking;
         IsAnimating = false;
         HideOverlay();
-        ShowContent(false);
+        FadePagesContent(false, pageHideFadeDuration);
         buttonAction.gameObject.SetActive(false);
 
         if (feedbackPeek != null) feedbackPeek.PlayFeedbacks();
@@ -366,7 +402,7 @@ public class JournalController : MonoBehaviour
         CurrentState = JournalState.Hidden;
         IsAnimating = false;
         HideOverlay();
-        ShowContent(false);
+        FadePagesContent(false, pageHideFadeDuration);
 
         if (feedbackHide != null) feedbackHide.PlayFeedbacks();
     }

@@ -65,7 +65,8 @@ MonoBehaviour:
     I can trust you.
   customGameplayBGM: 3
   preRestorationPagePrefab: {fileID: 8636906436748886089, guid: 0ced2ee71da87fd4ba9f027556a9e73f, type: 3}
-  postRestorationPagePrefab: {fileID: 8866635996392126511, guid: b4b30d70204886846819ce23ac025ee4, type: 3}
+  postRestorationPagePrefabs:
+  - {fileID: 8866635996392126511, guid: b4b30d70204886846819ce23ac025ee4, type: 3}
   unlockedByDefault: 1
   unlockRequirements: []
   allowedToolTypes: 3

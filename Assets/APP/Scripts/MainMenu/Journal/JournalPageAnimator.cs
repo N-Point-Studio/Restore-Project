@@ -52,6 +52,24 @@ public class JournalPageAnimator : MonoBehaviour
         }
     }
 
+    public void PrepareForReveal()
+    {
+        if (sequenceElements != null)
+        {
+            foreach (var element in sequenceElements)
+            {
+                if (element == null || element.canvasGroup == null) continue;
+                element.canvasGroup.alpha = 0f;
+                
+                if (element.revealStyle == RevealStyle.FadeAndPop)
+                    element.canvasGroup.transform.localScale = Vector3.one * 0.9f;
+                else if (element.revealStyle == RevealStyle.Typewriter && element.textComponent != null)
+                    element.textComponent.maxVisibleCharacters = 0;
+                else if (element.revealStyle == RevealStyle.Scribble && element.imageComponent != null)
+                    element.imageComponent.fillAmount = 0f;
+            }
+        }
+    }
     public void InjectTexts(LocalizedString[] textsFromSSoT)
     {
         if (uiNoteTexts == null || textsFromSSoT == null) return;
