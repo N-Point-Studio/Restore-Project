@@ -31,8 +31,8 @@ public class ArtefactData : ScriptableObject
     [Header("Journal Content (Prefabs)")]
     [SerializeField] private JournalPageAnimator preRestorationPagePrefab;
     public JournalPageAnimator PreRestorationPagePrefab => preRestorationPagePrefab;
-    [SerializeField] private JournalPageAnimator postRestorationPagePrefab;
-    public JournalPageAnimator PostRestorationPagePrefab => postRestorationPagePrefab;
+    [SerializeField] private JournalPageAnimator[] postRestorationPagePrefabs;
+    public JournalPageAnimator[] PostRestorationPagePrefabs => postRestorationPagePrefabs;
 
     [SerializeField] private bool unlockedByDefault;
     public bool UnlockedByDefault => unlockedByDefault;

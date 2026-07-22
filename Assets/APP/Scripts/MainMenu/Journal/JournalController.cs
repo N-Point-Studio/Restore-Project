@@ -1,8 +1,11 @@
 using DG.Tweening;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using MoreMountains.Feedbacks;
 using UnityEngine.Localization;
+using TMPro;
 
 public enum JournalState { Hidden, Peeking, Opened }
 
@@ -33,6 +36,12 @@ public class JournalController : MonoBehaviour
     [Header("Buttons & Interactions")]
     [SerializeField] private ButtonInputInstructionUI buttonAction;
     [SerializeField] private BookPanelInteractable bookInteractable;
+    
+    [Header("Pagination Controls")]
+    [SerializeField] private Button buttonNextPage;
+    [SerializeField] private Button buttonPrevPage;
+    [SerializeField] private GameObject paginationSeparator;
+    [SerializeField] private TMP_Text textPageIndicator; // Optional: To show "1 / 2"
 
     [Header("Localization")]
     [SerializeField] private LocalizedString localizedRestoreText;
@@ -45,8 +54,10 @@ public class JournalController : MonoBehaviour
     private bool isPostRestoration;
     private bool isContentRevealed = false;
 
-    private JournalPageAnimator activeLeftPage;
-    private JournalPageAnimator activeRightPage;
+    // Pagination State
+    private int currentPageIndex = 0;
+    private JournalPageAnimator activeLeftPage; // Pre-restoration
+    private List<JournalPageAnimator> postPagesList = new List<JournalPageAnimator>(); // Post-restoration
 
     public Action OnBookOpened;
 
@@ -55,6 +66,9 @@ public class JournalController : MonoBehaviour
     private void Awake()
     {
         buttonAction.OnClick += OnButtonActionClicked;
+
+        if (buttonNextPage != null) buttonNextPage.onClick.AddListener(NextPage);
+        if (buttonPrevPage != null) buttonPrevPage.onClick.AddListener(PrevPage);
 
         if (canvasGroup != null)
         {
@@ -74,6 +88,9 @@ public class JournalController : MonoBehaviour
     private void OnDestroy()
     {
         buttonAction.OnClick -= OnButtonActionClicked;
+        
+        if (buttonNextPage != null) buttonNextPage.onClick.RemoveListener(NextPage);
+        if (buttonPrevPage != null) buttonPrevPage.onClick.RemoveListener(PrevPage);
 
         if (bookInteractable != null)
         {
@@ -108,7 +125,6 @@ public class JournalController : MonoBehaviour
         currentData = data;
         currentActionCallback = onRestoreClicked;
         isPostRestoration = false;
-
         buttonAction.ForceSetLocalizedText(false, localizedRestoreText);
     }
 
@@ -117,7 +133,6 @@ public class JournalController : MonoBehaviour
         currentData = data;
         currentActionCallback = onContinueClicked;
         isPostRestoration = true;
-
         buttonAction.ForceSetLocalizedText(false, localizedContinueText);
     }
 
@@ -143,7 +158,8 @@ public class JournalController : MonoBehaviour
         foreach (Transform child in rightPageContainer) Destroy(child.gameObject);
 
         activeLeftPage = null;
-        activeRightPage = null;
+        postPagesList.Clear();
+        currentPageIndex = 0;
 
         if (!isPostRestoration)
         {
@@ -155,15 +171,22 @@ public class JournalController : MonoBehaviour
         }
         else
         {
+            // Spawn Left Page (Sticky Notes)
             if (currentData.PreRestorationPagePrefab != null)
             {
                 activeLeftPage = Instantiate(currentData.PreRestorationPagePrefab, leftPageContainer);
                 activeLeftPage.InjectTexts(currentData.LocalizedStickyNoteTexts);
             }
 
-            if (currentData.PostRestorationPagePrefab != null)
+            // Spawn ALL Post Restoration Pages into the right container
+            if (currentData.PostRestorationPagePrefabs != null && currentData.PostRestorationPagePrefabs.Length > 0)
             {
-                activeRightPage = Instantiate(currentData.PostRestorationPagePrefab, rightPageContainer);
+                for (int i = 0; i < currentData.PostRestorationPagePrefabs.Length; i++)
+                {
+                    JournalPageAnimator page = Instantiate(currentData.PostRestorationPagePrefabs[i], rightPageContainer);
+                    page.gameObject.SetActive(i == 0); // Only show the first page initially
+                    postPagesList.Add(page);
+                }
             }
         }
     }
@@ -177,7 +200,6 @@ public class JournalController : MonoBehaviour
             pagesCanvasGroup.interactable = isShowing;
         }
 
-        // Keep the GameObjects active so Coroutines never crash
         if (leftPageContainer != null) leftPageContainer.gameObject.SetActive(true);
         if (rightPageContainer != null) rightPageContainer.gameObject.SetActive(true);
     }
@@ -192,7 +214,6 @@ public class JournalController : MonoBehaviour
 
         OnBookOpened?.Invoke();
 
-        // 1. Hide visuals using the CanvasGroup, but ensure GameObjects are active
         ShowContent(false);
 
         if (!isContentRevealed)
@@ -200,7 +221,6 @@ public class JournalController : MonoBehaviour
             SpawnAndInjectPage();
         }
 
-        // 2. Play the Feel Feedback and listen for when it finishes
         MMF_Player targetFeedback = (prevState == JournalState.Hidden && feedbackOpenFromHidden != null)
             ? feedbackOpenFromHidden
             : feedbackOpen;
@@ -219,48 +239,116 @@ public class JournalController : MonoBehaviour
 
     private void OnBookOpenAnimationComplete()
     {
-        // Clean up listeners
         if (feedbackOpen != null) feedbackOpen.Events.OnComplete.RemoveListener(OnBookOpenAnimationComplete);
         if (feedbackOpenFromHidden != null) feedbackOpenFromHidden.Events.OnComplete.RemoveListener(OnBookOpenAnimationComplete);
 
-        // 3. Now that the book is physically open, make the container visible
         ShowContent(true);
 
-        // 4. Trigger the text reveal Coroutines
         if (!isContentRevealed)
         {
             if (!isPostRestoration && activeLeftPage != null)
             {
                 activeLeftPage.PlayRevealAnimation(() =>
                 {
-                    buttonAction.gameObject.SetActive(true);
+                    UpdatePaginationUI();
                     IsAnimating = false;
                 });
             }
-            else if (isPostRestoration && activeRightPage != null)
+            else if (isPostRestoration && postPagesList.Count > 0)
             {
-                activeRightPage.PlayRevealAnimation(() =>
+                postPagesList[0].PlayRevealAnimation(() =>
                 {
-                    buttonAction.gameObject.SetActive(true);
+                    UpdatePaginationUI();
                     IsAnimating = false;
                 });
             }
             else
             {
-                buttonAction.gameObject.SetActive(true);
+                UpdatePaginationUI();
                 IsAnimating = false;
             }
+
             isContentRevealed = true;
         }
         else
         {
             if (activeLeftPage != null) activeLeftPage.ShowInstant();
-            if (activeRightPage != null) activeRightPage.ShowInstant();
+            if (postPagesList.Count > 0) postPagesList[currentPageIndex].ShowInstant();
 
-            buttonAction.gameObject.SetActive(true);
+            UpdatePaginationUI();
             IsAnimating = false;
         }
     }
+
+    #region Pagination Logic
+
+    public void NextPage()
+    {
+        if (currentPageIndex < postPagesList.Count - 1)
+        {
+            ChangePage(currentPageIndex + 1);
+        }
+    }
+
+    public void PrevPage()
+    {
+        if (currentPageIndex > 0)
+        {
+            ChangePage(currentPageIndex - 1);
+        }
+    }
+
+    private void ChangePage(int newIndex)
+    {
+        if (postPagesList.Count == 0) return;
+
+        // Hide old page
+        postPagesList[currentPageIndex].gameObject.SetActive(false);
+
+        // Show new page
+        currentPageIndex = newIndex;
+        postPagesList[currentPageIndex].gameObject.SetActive(true);
+        postPagesList[currentPageIndex].ShowInstant(); 
+
+        UpdatePaginationUI();
+    }
+
+    private void UpdatePaginationUI()
+    {
+        if (!isPostRestoration || postPagesList.Count <= 1)
+        {
+            // Single page (e.g., "Before" state)
+            if (buttonNextPage != null) buttonNextPage.gameObject.SetActive(false);
+            if (buttonPrevPage != null) buttonPrevPage.gameObject.SetActive(false);
+            if (paginationSeparator != null) paginationSeparator.SetActive(false); // Hide pipe
+            if (textPageIndicator != null) textPageIndicator.gameObject.SetActive(false);
+
+            buttonAction.gameObject.SetActive(true); // Shows "Let's Restore"
+            return;
+        }
+
+        // Multi-page logic
+        bool showPrev = currentPageIndex > 0;
+        bool showNext = currentPageIndex < postPagesList.Count - 1;
+        bool showAction = currentPageIndex == postPagesList.Count - 1;
+
+        if (buttonPrevPage != null) buttonPrevPage.gameObject.SetActive(showPrev);
+        if (buttonNextPage != null) buttonNextPage.gameObject.SetActive(showNext);
+        
+        // The separator "|" should only show if "Previous" is visible
+        if (paginationSeparator != null) paginationSeparator.SetActive(showPrev); 
+
+        // This will swap seamlessly from "Next" to "Completed"
+        buttonAction.gameObject.SetActive(showAction);
+
+        if (textPageIndicator != null)
+        {
+            textPageIndicator.gameObject.SetActive(true);
+            textPageIndicator.text = $"{currentPageIndex + 1} / {postPagesList.Count}";
+        }
+    }
+
+    #endregion
 
     public void HideBookToPeek()
     {
