@@ -24,6 +24,8 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
     public event Action OnUIKeycodeEnterPerformed;
     public event Action OnUIKeycodeEscapePerformed;
     public event Action OnUIKeycodeRPerformed;
+    public event Action OnUIKeycodeArrowRightPerformed;
+    public event Action OnUIKeycodeArrowLeftPerformed;
 
     private float previousPinchDistance;
 
@@ -55,6 +57,8 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
         Input.UI.KeycodeEnter.performed += HandleUIKeycodeEnterPerformed;
         Input.UI.KeycodeEscape.performed += HandleUIKeycodeEscapePerformed;
         Input.UI.KeycodeR.performed += HandleUIKeycodeRPerformed;
+        Input.UI.KeycodeArrowRight.performed += HandleUIKeycodeArrowRightPerformed;
+        Input.UI.KeycodeArrowLeft.performed += HandleUIKeycodeArrowLeftPerformed;
     }
 
     public void Dispose()
@@ -79,6 +83,8 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
         Input.UI.KeycodeEnter.performed -= HandleUIKeycodeEnterPerformed;
         Input.UI.KeycodeEscape.performed -= HandleUIKeycodeEscapePerformed;
         Input.UI.KeycodeR.performed -= HandleUIKeycodeRPerformed;
+        Input.UI.KeycodeArrowRight.performed -= HandleUIKeycodeArrowRightPerformed;
+        Input.UI.KeycodeArrowLeft.performed -= HandleUIKeycodeArrowLeftPerformed;
     }
 
     public void Tick()
@@ -121,6 +127,8 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
     private void HandleUIKeycodeEnterPerformed(InputAction.CallbackContext context) => OnUIKeycodeEnterPerformed?.Invoke();
     private void HandleUIKeycodeEscapePerformed(InputAction.CallbackContext context) => OnUIKeycodeEscapePerformed?.Invoke();
     private void HandleUIKeycodeRPerformed(InputAction.CallbackContext context) => OnUIKeycodeRPerformed?.Invoke();
+    private void HandleUIKeycodeArrowRightPerformed(InputAction.CallbackContext context) => OnUIKeycodeArrowRightPerformed?.Invoke();
+    private void HandleUIKeycodeArrowLeftPerformed(InputAction.CallbackContext context) => OnUIKeycodeArrowLeftPerformed?.Invoke();
 
     public Vector2 GetMousePosition()
     {

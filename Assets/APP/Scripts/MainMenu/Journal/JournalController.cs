@@ -11,6 +11,31 @@ public enum JournalState { Hidden, Peeking, Opened }
 
 public class JournalController : MonoBehaviour
 {
+    private class JournalSpread
+    {
+        public JournalPageAnimator leftPage;
+        public JournalPageAnimator rightPage;
+        public bool hasBeenRevealed = false;
+
+        public void SetActive(bool active)
+        {
+            if (leftPage != null) leftPage.gameObject.SetActive(active);
+            if (rightPage != null) rightPage.gameObject.SetActive(active);
+        }
+
+        public void PrepareForReveal()
+        {
+            if (leftPage != null) leftPage.PrepareForReveal();
+            if (rightPage != null) rightPage.PrepareForReveal();
+        }
+
+        public void ShowInstant()
+        {
+            if (leftPage != null) leftPage.ShowInstant();
+            if (rightPage != null) rightPage.ShowInstant();
+        }
+    }
+
     [Header("Overlay Animations")]
     [SerializeField] protected CanvasGroup canvasGroup;
     [SerializeField] protected float fadeDuration = 0.25f;
@@ -32,8 +57,8 @@ public class JournalController : MonoBehaviour
     [SerializeField] private CanvasGroup pagesCanvasGroup;
     [SerializeField] private Transform leftPageContainer;
     [SerializeField] private Transform rightPageContainer;
-    [SerializeField] private float pageFadeDuration = 0.3f; // Smooth fade duration
-    [SerializeField] private float pageHideFadeDuration = 0.1f;
+    [SerializeField] private float pageFadeDuration = 0.3f; 
+    [SerializeField] private float pageHideFadeDuration = 0.1f; 
 
     [Header("Buttons & Interactions")]
     [SerializeField] private ButtonInputInstructionUI buttonAction;
@@ -55,13 +80,13 @@ public class JournalController : MonoBehaviour
     private Action currentActionCallback;
     private bool isPostRestoration;
     private bool isContentRevealed = false;
+    
+    private bool forceInstantReveal = false; 
 
     private int currentPageIndex = 0;
-    private JournalPageAnimator activeLeftPage;
-    private List<JournalPageAnimator> postPagesList = new List<JournalPageAnimator>();
+    private List<JournalSpread> spreads = new List<JournalSpread>();
 
     public Action OnBookOpened;
-
     private InputSystemService input;
 
     private void Awake()
@@ -100,40 +125,48 @@ public class JournalController : MonoBehaviour
             bookInteractable.OnBookClicked -= HandleBookClicked;
         }
 
-        if (this.input != null)
+        if (input != null)
         {
-            this.input.OnUIKeycodeEnterPerformed -= OnUIKeycodeEnterPerformed;
+            input.OnUIKeycodeEnterPerformed -= OnUIKeycodeEnterPerformed;
+            input.OnUIKeycodeArrowRightPerformed -= OnUIKeycodeArrowRightPerformed;
+            input.OnUIKeycodeArrowLeftPerformed -= OnUIKeycodeArrowleftPerformed;
         }
     }
 
     public void SetInputSystemService(InputSystemService input)
     {
-        if (this.input != null)
+        if (this.input != null) 
         {
             this.input.OnUIKeycodeEnterPerformed -= OnUIKeycodeEnterPerformed;
+            this.input.OnUIKeycodeArrowRightPerformed -= OnUIKeycodeArrowRightPerformed;
+            this.input.OnUIKeycodeArrowLeftPerformed -= OnUIKeycodeArrowleftPerformed;
         }
 
         this.input = input;
-
+        
         if (this.input != null)
         {
             this.input.OnUIKeycodeEnterPerformed += OnUIKeycodeEnterPerformed;
+            input.OnUIKeycodeArrowRightPerformed += OnUIKeycodeArrowRightPerformed;
+            input.OnUIKeycodeArrowLeftPerformed += OnUIKeycodeArrowleftPerformed;
         }
     }
 
-    public void SetupPreRestoration(ArtefactData data, Action onRestoreClicked)
+    public void SetupPreRestoration(ArtefactData data, Action onRestoreClicked, bool instantReveal = false)
     {
         currentData = data;
         currentActionCallback = onRestoreClicked;
         isPostRestoration = false;
+        forceInstantReveal = instantReveal;
         buttonAction.ForceSetLocalizedText(false, localizedRestoreText);
     }
 
-    public void SetupPostRestoration(ArtefactData data, Action onContinueClicked)
+    public void SetupPostRestoration(ArtefactData data, Action onContinueClicked, bool instantReveal = false)
     {
         currentData = data;
         currentActionCallback = onContinueClicked;
         isPostRestoration = true;
+        forceInstantReveal = instantReveal;
         buttonAction.ForceSetLocalizedText(false, localizedContinueText);
     }
 
@@ -159,36 +192,72 @@ public class JournalController : MonoBehaviour
         foreach (Transform child in leftPageContainer) Destroy(child.gameObject);
         foreach (Transform child in rightPageContainer) Destroy(child.gameObject);
 
-        activeLeftPage = null;
-        postPagesList.Clear();
+        spreads.Clear();
         currentPageIndex = 0;
 
         if (!isPostRestoration)
         {
             if (currentData.PreRestorationPagePrefab != null)
             {
-                activeLeftPage = Instantiate(currentData.PreRestorationPagePrefab, leftPageContainer);
-                activeLeftPage.InjectTexts(currentData.LocalizedStickyNoteTexts);
+                JournalPageAnimator prePage = Instantiate(currentData.PreRestorationPagePrefab, leftPageContainer);
+                prePage.InjectTexts(currentData.LocalizedStickyNoteTexts);
+                spreads.Add(new JournalSpread { leftPage = prePage });
             }
         }
         else
         {
+            JournalSpread spread0 = new JournalSpread();
+            
             if (currentData.PreRestorationPagePrefab != null)
             {
-                activeLeftPage = Instantiate(currentData.PreRestorationPagePrefab, leftPageContainer);
-                activeLeftPage.InjectTexts(currentData.LocalizedStickyNoteTexts);
+                JournalPageAnimator prePage = Instantiate(currentData.PreRestorationPagePrefab, leftPageContainer);
+                prePage.InjectTexts(currentData.LocalizedStickyNoteTexts);
+                spread0.leftPage = prePage;
             }
+
+            spreads.Add(spread0);
 
             if (currentData.PostRestorationPagePrefabs != null && currentData.PostRestorationPagePrefabs.Length > 0)
             {
                 for (int i = 0; i < currentData.PostRestorationPagePrefabs.Length; i++)
                 {
-                    JournalPageAnimator page = Instantiate(currentData.PostRestorationPagePrefabs[i], rightPageContainer);
-                    page.gameObject.SetActive(i == 0);
-                    postPagesList.Add(page);
+                    JournalPageAnimator prefab = currentData.PostRestorationPagePrefabs[i];
+                    
+                    if (i == 0) 
+                    {
+                        JournalPageAnimator page = Instantiate(prefab, rightPageContainer);
+                        spread0.rightPage = page;
+                    }
+                    else
+                    {
+                        int spreadIndex = (i + 1) / 2; 
+
+                        if (spreads.Count <= spreadIndex) spreads.Add(new JournalSpread());
+
+                        if (i % 2 != 0) 
+                        {
+                            JournalPageAnimator page = Instantiate(prefab, leftPageContainer);
+                            spreads[spreadIndex].leftPage = page;
+                        }
+                        else 
+                        {
+                            JournalPageAnimator page = Instantiate(prefab, rightPageContainer);
+                            spreads[spreadIndex].rightPage = page;
+                        }
+                    }
                 }
             }
         }
+
+        if (forceInstantReveal)
+        {
+            foreach (var spread in spreads)
+            {
+                spread.hasBeenRevealed = true;
+            }
+        }
+
+        foreach (var spread in spreads) spread.SetActive(false);
     }
 
     private void ShowContentInstant(bool isShowing)
@@ -217,20 +286,14 @@ public class JournalController : MonoBehaviour
             pagesCanvasGroup.interactable = isShowing;
             float targetAlpha = isShowing ? 1f : 0f;
 
-            if (duration > 0f)
-            {
-                pagesCanvasGroup.DOFade(targetAlpha, duration).OnComplete(() => onComplete?.Invoke());
-            }
+            if (duration > 0f) pagesCanvasGroup.DOFade(targetAlpha, duration).OnComplete(() => onComplete?.Invoke());
             else
             {
                 pagesCanvasGroup.alpha = targetAlpha;
                 onComplete?.Invoke();
             }
         }
-        else
-        {
-            onComplete?.Invoke();
-        }
+        else onComplete?.Invoke();
     }
 
     public void OpenBookFull()
@@ -242,17 +305,12 @@ public class JournalController : MonoBehaviour
         ShowOverlay();
 
         OnBookOpened?.Invoke();
-
         ShowContentInstant(false);
 
-        if (!isContentRevealed)
-        {
-            SpawnAndInjectPage();
-        }
+        if (!isContentRevealed) SpawnAndInjectPage();
 
         MMF_Player targetFeedback = (prevState == JournalState.Hidden && feedbackOpenFromHidden != null)
-            ? feedbackOpenFromHidden
-            : feedbackOpen;
+            ? feedbackOpenFromHidden : feedbackOpen;
 
         if (targetFeedback != null)
         {
@@ -260,10 +318,7 @@ public class JournalController : MonoBehaviour
             targetFeedback.Events.OnComplete.AddListener(OnBookOpenAnimationComplete);
             targetFeedback.PlayFeedbacks();
         }
-        else
-        {
-            OnBookOpenAnimationComplete();
-        }
+        else OnBookOpenAnimationComplete();
     }
 
     private void OnBookOpenAnimationComplete()
@@ -271,92 +326,123 @@ public class JournalController : MonoBehaviour
         if (feedbackOpen != null) feedbackOpen.Events.OnComplete.RemoveListener(OnBookOpenAnimationComplete);
         if (feedbackOpenFromHidden != null) feedbackOpenFromHidden.Events.OnComplete.RemoveListener(OnBookOpenAnimationComplete);
 
-        // 1. Instantly prepare pages so they don't flash at 100% opacity
         if (!isContentRevealed)
         {
-            if (activeLeftPage != null) activeLeftPage.PrepareForReveal();
-            foreach (var page in postPagesList) page.PrepareForReveal();
+            foreach (var spread in spreads) 
+            {
+                // Only hide elements if we actually want to animate them
+                if (!spread.hasBeenRevealed) spread.PrepareForReveal();
+            }
         }
 
-        // 2. Turn on the Page Numbers and Arrows immediately
         UpdatePaginationUI();
-        
-        // 3. Hide the Action Button ("Restore" / "Completed") while the typing animation plays
         if (!isContentRevealed) buttonAction.gameObject.SetActive(false);
 
-        // 4. Fade in the master CanvasGroup
         FadePagesContent(true, pageFadeDuration, () =>
         {
-            if (!isContentRevealed)
+            RevealCurrentSpread(() => 
             {
-                // What to do when the typing animation finishes
-                Action onRevealDone = () =>
-                {
-                    UpdatePaginationUI(); // Restores the button Action if it's the last page
-                    IsAnimating = false;
-                };
-
-                // Trigger the typing/fade animations
-                if (!isPostRestoration && activeLeftPage != null)
-                {
-                    activeLeftPage.PlayRevealAnimation(onRevealDone);
-                }
-                else if (isPostRestoration && postPagesList.Count > 0)
-                {
-                    postPagesList[0].PlayRevealAnimation(onRevealDone);
-                }
-                else
-                {
-                    onRevealDone();
-                }
-
                 isContentRevealed = true;
+                UpdatePaginationUI();
+                IsAnimating = false;
+            });
+        });
+    }
+
+    private void RevealCurrentSpread(Action onComplete)
+    {
+        if (spreads.Count == 0)
+        {
+            onComplete?.Invoke();
+            return;
+        }
+
+        JournalSpread currentSpread = spreads[currentPageIndex];
+        currentSpread.SetActive(true);
+
+        // This checks the flag! If it's true, it instantly shows!
+        if (!currentSpread.hasBeenRevealed)
+        {
+            currentSpread.PrepareForReveal();
+            
+            int animationsToWait = 0;
+            Action checkComplete = () => 
+            {
+                animationsToWait--;
+                if (animationsToWait <= 0)
+                {
+                    currentSpread.hasBeenRevealed = true;
+                    onComplete?.Invoke();
+                }
+            };
+
+            if (isPostRestoration && currentPageIndex == 0)
+            {
+                if (currentSpread.leftPage != null) currentSpread.leftPage.ShowInstant();
+                if (currentSpread.rightPage != null)
+                {
+                    animationsToWait++;
+                    currentSpread.rightPage.PlayRevealAnimation(checkComplete);
+                }
             }
             else
             {
-                if (activeLeftPage != null) activeLeftPage.ShowInstant();
-                if (postPagesList.Count > 0) postPagesList[currentPageIndex].ShowInstant();
+                if (currentSpread.leftPage != null) animationsToWait++;
+                if (currentSpread.rightPage != null) animationsToWait++;
 
-                UpdatePaginationUI();
-                IsAnimating = false;
+                if (currentSpread.leftPage != null) currentSpread.leftPage.PlayRevealAnimation(checkComplete);
+                if (currentSpread.rightPage != null) currentSpread.rightPage.PlayRevealAnimation(checkComplete);
             }
-        });
+
+            if (animationsToWait == 0)
+            {
+                currentSpread.hasBeenRevealed = true;
+                onComplete?.Invoke();
+            }
+        }
+        else
+        {
+            currentSpread.ShowInstant();
+            onComplete?.Invoke();
+        }
     }
 
     #region Pagination Logic
 
     public void NextPage()
     {
-        if (currentPageIndex < postPagesList.Count - 1)
-        {
-            ChangePage(currentPageIndex + 1);
-        }
+        if (currentPageIndex < spreads.Count - 1) ChangePage(currentPageIndex + 1);
     }
 
     public void PrevPage()
     {
-        if (currentPageIndex > 0)
-        {
-            ChangePage(currentPageIndex - 1);
-        }
+        if (currentPageIndex > 0) ChangePage(currentPageIndex - 1);
     }
 
     private void ChangePage(int newIndex)
     {
-        if (postPagesList.Count == 0) return;
+        if (spreads.Count == 0) return;
 
-        postPagesList[currentPageIndex].gameObject.SetActive(false);
-
+        spreads[currentPageIndex].SetActive(false);
         currentPageIndex = newIndex;
-        postPagesList[currentPageIndex].gameObject.SetActive(true);
-        postPagesList[currentPageIndex].ShowInstant(); 
 
-        UpdatePaginationUI();
+        buttonAction.gameObject.SetActive(false);
+        if (buttonNextPage != null) buttonNextPage.interactable = false;
+        if (buttonPrevPage != null) buttonPrevPage.interactable = false;
+        IsAnimating = true;
+
+        RevealCurrentSpread(() => 
+        {
+            UpdatePaginationUI();
+            IsAnimating = false;
+            if (buttonNextPage != null) buttonNextPage.interactable = true;
+            if (buttonPrevPage != null) buttonPrevPage.interactable = true;
+        });
     }
 
     private void UpdatePaginationUI()
     {
-        if (!isPostRestoration || postPagesList.Count <= 1)
+        if (spreads.Count <= 1)
         {
             if (buttonNextPage != null) buttonNextPage.gameObject.SetActive(false);
             if (buttonPrevPage != null) buttonPrevPage.gameObject.SetActive(false);
@@ -368,8 +454,8 @@ public class JournalController : MonoBehaviour
         }
 
         bool showPrev = currentPageIndex > 0;
-        bool showNext = currentPageIndex < postPagesList.Count - 1;
-        bool showAction = currentPageIndex == postPagesList.Count - 1;
+        bool showNext = currentPageIndex < spreads.Count - 1;
+        bool showAction = currentPageIndex == spreads.Count - 1;
 
         if (buttonPrevPage != null) buttonPrevPage.gameObject.SetActive(showPrev);
         if (buttonNextPage != null) buttonNextPage.gameObject.SetActive(showNext);
@@ -380,7 +466,7 @@ public class JournalController : MonoBehaviour
         if (textPageIndicator != null)
         {
             textPageIndicator.gameObject.SetActive(true);
-            textPageIndicator.text = $"{currentPageIndex + 1} / {postPagesList.Count}";
+            textPageIndicator.text = $"{currentPageIndex + 1}/{spreads.Count}";
         }
     }
 
@@ -462,6 +548,24 @@ public class JournalController : MonoBehaviour
             buttonAction.gameObject.activeInHierarchy && buttonAction.Button.interactable)
         {
             OnButtonActionClicked();
+        }
+    }
+
+    private void OnUIKeycodeArrowRightPerformed()
+    {
+        if (CurrentState == JournalState.Opened && buttonNextPage != null &&
+            buttonNextPage.gameObject.activeInHierarchy && buttonNextPage.interactable)
+        {
+            NextPage();
+        }
+    }
+
+    private void OnUIKeycodeArrowleftPerformed()
+    {
+        if (CurrentState == JournalState.Opened && buttonPrevPage != null &&
+            buttonPrevPage.gameObject.activeInHierarchy && buttonPrevPage.interactable)
+        {
+            PrevPage();
         }
     }
 }

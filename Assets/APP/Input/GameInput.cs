@@ -317,6 +317,24 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""KeycodeArrowRight"",
+                    ""type"": ""Button"",
+                    ""id"": ""f2e490e1-7089-481d-a397-6d18bb66e180"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""KeycodeArrowLeft"",
+                    ""type"": ""Button"",
+                    ""id"": ""f84d3497-7af3-475e-85d7-e29cbae54aa2"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -350,6 +368,28 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Desktop"",
                     ""action"": ""KeycodeEnter"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""39b78449-5637-44f5-bb13-0a7bf457a595"",
+                    ""path"": ""<Keyboard>/rightArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Desktop"",
+                    ""action"": ""KeycodeArrowRight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1a579151-c678-4b5c-bb31-a1292d21c44d"",
+                    ""path"": ""<Keyboard>/leftArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Desktop"",
+                    ""action"": ""KeycodeArrowLeft"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -397,6 +437,8 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_UI_KeycodeEscape = m_UI.FindAction("KeycodeEscape", throwIfNotFound: true);
         m_UI_KeycodeR = m_UI.FindAction("KeycodeR", throwIfNotFound: true);
         m_UI_KeycodeEnter = m_UI.FindAction("KeycodeEnter", throwIfNotFound: true);
+        m_UI_KeycodeArrowRight = m_UI.FindAction("KeycodeArrowRight", throwIfNotFound: true);
+        m_UI_KeycodeArrowLeft = m_UI.FindAction("KeycodeArrowLeft", throwIfNotFound: true);
     }
 
     ~@GameInput()
@@ -665,6 +707,8 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_KeycodeEscape;
     private readonly InputAction m_UI_KeycodeR;
     private readonly InputAction m_UI_KeycodeEnter;
+    private readonly InputAction m_UI_KeycodeArrowRight;
+    private readonly InputAction m_UI_KeycodeArrowLeft;
     /// <summary>
     /// Provides access to input actions defined in input action map "UI".
     /// </summary>
@@ -688,6 +732,14 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "UI/KeycodeEnter".
         /// </summary>
         public InputAction @KeycodeEnter => m_Wrapper.m_UI_KeycodeEnter;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/KeycodeArrowRight".
+        /// </summary>
+        public InputAction @KeycodeArrowRight => m_Wrapper.m_UI_KeycodeArrowRight;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/KeycodeArrowLeft".
+        /// </summary>
+        public InputAction @KeycodeArrowLeft => m_Wrapper.m_UI_KeycodeArrowLeft;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -723,6 +775,12 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @KeycodeEnter.started += instance.OnKeycodeEnter;
             @KeycodeEnter.performed += instance.OnKeycodeEnter;
             @KeycodeEnter.canceled += instance.OnKeycodeEnter;
+            @KeycodeArrowRight.started += instance.OnKeycodeArrowRight;
+            @KeycodeArrowRight.performed += instance.OnKeycodeArrowRight;
+            @KeycodeArrowRight.canceled += instance.OnKeycodeArrowRight;
+            @KeycodeArrowLeft.started += instance.OnKeycodeArrowLeft;
+            @KeycodeArrowLeft.performed += instance.OnKeycodeArrowLeft;
+            @KeycodeArrowLeft.canceled += instance.OnKeycodeArrowLeft;
         }
 
         /// <summary>
@@ -743,6 +801,12 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @KeycodeEnter.started -= instance.OnKeycodeEnter;
             @KeycodeEnter.performed -= instance.OnKeycodeEnter;
             @KeycodeEnter.canceled -= instance.OnKeycodeEnter;
+            @KeycodeArrowRight.started -= instance.OnKeycodeArrowRight;
+            @KeycodeArrowRight.performed -= instance.OnKeycodeArrowRight;
+            @KeycodeArrowRight.canceled -= instance.OnKeycodeArrowRight;
+            @KeycodeArrowLeft.started -= instance.OnKeycodeArrowLeft;
+            @KeycodeArrowLeft.performed -= instance.OnKeycodeArrowLeft;
+            @KeycodeArrowLeft.canceled -= instance.OnKeycodeArrowLeft;
         }
 
         /// <summary>
@@ -901,5 +965,19 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnKeycodeEnter(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "KeycodeArrowRight" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnKeycodeArrowRight(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "KeycodeArrowLeft" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnKeycodeArrowLeft(InputAction.CallbackContext context);
     }
 }

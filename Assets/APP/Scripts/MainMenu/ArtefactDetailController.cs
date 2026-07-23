@@ -1,4 +1,3 @@
-using System;
 using DG.Tweening;
 using MoreMountains.Feedbacks;
 using TMPro;
@@ -11,20 +10,20 @@ public class ArtefactDetailController : MonoBehaviour
     [Header("Main References")]
     [SerializeField] private GameObject root;
     [SerializeField] private CanvasGroup canvasGroupRoot;
-    [SerializeField] private ButtonInputInstructionUI buttonBack; 
+    [SerializeField] private ButtonInputInstructionUI buttonBack;
     
     [Header("Sub-Controllers")]
-    [SerializeField] private JournalController journalController; 
+    [SerializeField] private JournalController journalController;
     
     [Header("Text Wall (Post-Restoration)")]
-    [SerializeField] private CanvasGroup wallTextGroup; 
+    [SerializeField] private CanvasGroup wallTextGroup;
     [SerializeField] private TMP_Text wallTitleText;
     [SerializeField] private TMP_Text wallDescText;
     [SerializeField] private Button buttonReplay;
     [SerializeField] private Button buttonContinueStory;
 
     [Header("Text Instructions")]
-    [SerializeField] private TMP_Text instructionText; 
+    [SerializeField] private TMP_Text instructionText;
     [SerializeField] private LocalizedString localizedInstructOpenBox;
     [SerializeField] private LocalizedString localizedInstructPeelNote;
 
@@ -37,22 +36,22 @@ public class ArtefactDetailController : MonoBehaviour
     [SerializeField] private float closeMenuDuration = 0.3f;
 
     private ArtefactData currentArtefactData;
-    private Artefact3DItem current3DItem; 
+    private Artefact3DItem current3DItem;
     private ActiveArtefactData activeArtefactData;
+
     private bool isCompleted;
     private bool isClosing = false;
-
     private InputSystemService input;
 
     public bool IsOpen => root != null && root.activeSelf;
-    
+
     private void Awake()
     {
         buttonBack.OnClick += OnBackClicked;
         buttonReplay.onClick.AddListener(OnReplayClicked);
         buttonContinueStory.onClick.AddListener(OnContinueStoryClicked);
+
         root.SetActive(false);
-        
         StickyNote3DItem.OnNotePeeled += HandleNotePeeled;
 
         if (journalController != null)
@@ -88,7 +87,6 @@ public class ArtefactDetailController : MonoBehaviour
 
         if (localizedInstructOpenBox != null) localizedInstructOpenBox.StringChanged -= UpdateInstructionText;
         if (localizedInstructPeelNote != null) localizedInstructPeelNote.StringChanged -= UpdateInstructionText;
-
         UnsubscribeArtefactData();
     }
 
@@ -100,10 +98,8 @@ public class ArtefactDetailController : MonoBehaviour
             this.input.OnUIKeycodeRPerformed -= OnUIKeycodeRPerformed;
             this.input.OnUIKeycodeEnterPerformed -= OnUIKeycodeEnterPerformed;
         }
-
         this.input = input;
         journalController.SetInputSystemService(this.input);
-
         if (this.input != null)
         {
             this.input.OnUIKeycodeEscapePerformed += OnUIKeycodeEscapePerformed;
@@ -128,11 +124,11 @@ public class ArtefactDetailController : MonoBehaviour
     public void OpenDetail(ArtefactData artefactData, ActiveArtefactData activeData, Artefact3DItem item3D, bool forceShowBook = false)
     {
         UnsubscribeArtefactData();
-
         isClosing = false;
         currentArtefactData = artefactData;
         activeArtefactData = activeData;
         current3DItem = item3D;
+
         isCompleted = activeArtefactData.IsArtefactCompleted(currentArtefactData.BaseData.Id);
         bool isStoryRead = activeArtefactData.IsStoryRead(currentArtefactData.BaseData.Id);
 
@@ -140,14 +136,10 @@ public class ArtefactDetailController : MonoBehaviour
         if (currentArtefactData.LocalizedItemDescription != null) currentArtefactData.LocalizedItemDescription.StringChanged += UpdateWallDescText;
 
         bool hasNotesRemaining = !isCompleted && !isStoryRead;
-        if (current3DItem != null) 
-        {
-            current3DItem.SetDetailMode(true, hasNotesRemaining); 
-        }
-        
+        if (current3DItem != null) current3DItem.SetDetailMode(true, hasNotesRemaining);
+
         wallTextGroup.alpha = 0;
         wallTextGroup.gameObject.SetActive(false);
-
         root.SetActive(true);
         canvasGroupRoot.alpha = 1;
 
@@ -156,61 +148,58 @@ public class ArtefactDetailController : MonoBehaviour
         if (isCompleted)
         {
             instructionText.gameObject.SetActive(false);
-            
-            if (forceShowBook)
+
+            if (forceShowBook) // Just finished gameplay!
             {
-                if (buttonBack != null) buttonBack.Button.interactable = false; 
+                if (buttonBack != null) buttonBack.Button.interactable = false;
                 DOVirtual.DelayedCall(backButtonUnlockDelay, () => { if (buttonBack != null) buttonBack.Button.interactable = true; });
-
+                
                 buttonBack.SetAlternateStyle(true);
-
-                journalController.SetupPostRestoration(currentArtefactData, OnJournalContinueClicked);
+                
+                // Animate = false
+                journalController.SetupPostRestoration(currentArtefactData, OnJournalContinueClicked, false);
                 journalController.OpenBookFull();
             }
-            else
+            else // Reopened from the Main Menu
             {
                 if (buttonBack != null) buttonBack.Button.interactable = true;
-                buttonBack.SetAlternateStyle(false); 
-
-                journalController.SetupPostRestoration(currentArtefactData, OnJournalContinueClicked);
+                
+                buttonBack.SetAlternateStyle(false);
+                
+                // Animate = true (Skip typing!)
+                journalController.SetupPostRestoration(currentArtefactData, OnJournalContinueClicked, true);
                 journalController.HideBookToPeek();
-
+                
                 wallTextGroup.gameObject.SetActive(true);
-
-                // Fetch Strings Asynchronously
                 if (currentArtefactData.LocalizedItemName != null) currentArtefactData.LocalizedItemName.RefreshString();
                 if (currentArtefactData.LocalizedItemDescription != null) currentArtefactData.LocalizedItemDescription.RefreshString();
-
-                if (wallTextRevealFeedback != null)
-                {
-                    wallTextRevealFeedback.PlayFeedbacks();
-                }
-                else
-                {
-                    wallTextGroup.DOFade(1, wallTextFadeDuration);
-                }
+                
+                if (wallTextRevealFeedback != null) wallTextRevealFeedback.PlayFeedbacks();
+                else wallTextGroup.DOFade(1, wallTextFadeDuration);
             }
         }
         else
         {
-            if (isStoryRead)
+            if (isStoryRead) // Reopened from menu, pre-restoration
             {
                 instructionText.gameObject.SetActive(true);
-                if (localizedInstructOpenBox != null) localizedInstructOpenBox.RefreshString(); // Fetch
+                if (localizedInstructOpenBox != null) localizedInstructOpenBox.RefreshString();
                 
                 buttonBack.SetAlternateStyle(false);
-
-                journalController.SetupPreRestoration(currentArtefactData, OnJournalRestoreClicked);
+                
+                // Skip typing
+                journalController.SetupPreRestoration(currentArtefactData, OnJournalRestoreClicked, true);
                 journalController.HideBookToPeek();
             }
-            else
+            else // First time
             {
                 instructionText.gameObject.SetActive(true);
-                if (localizedInstructPeelNote != null) localizedInstructPeelNote.RefreshString(); // Fetch
+                if (localizedInstructPeelNote != null) localizedInstructPeelNote.RefreshString();
                 
                 buttonBack.SetAlternateStyle(false);
-
-                journalController.SetupPreRestoration(currentArtefactData, OnJournalRestoreClicked);
+                
+                // Animate
+                journalController.SetupPreRestoration(currentArtefactData, OnJournalRestoreClicked, false);
             }
         }
     }
@@ -220,7 +209,6 @@ public class ArtefactDetailController : MonoBehaviour
         if (current3DItem == null) return;
 
         bool hasNotesLeft = current3DItem.CheckUnpeeledNotes();
-
         if (hasNotesLeft)
         {
             current3DItem.SetDetailMode(true, true);
@@ -230,23 +218,20 @@ public class ArtefactDetailController : MonoBehaviour
             current3DItem.SetDetailMode(true, false);
             activeArtefactData.MarkStoryRead(currentArtefactData.BaseData.Id);
             instructionText.gameObject.SetActive(false);
-                        
-            buttonBack.Button.interactable = false; 
-            DOVirtual.DelayedCall(backButtonUnlockDelay, () => { if (buttonBack != null) buttonBack.Button.interactable = true; });
 
+            buttonBack.Button.interactable = false;
+            DOVirtual.DelayedCall(backButtonUnlockDelay, () => { if (buttonBack != null) buttonBack.Button.interactable = true; });
             buttonBack.SetAlternateStyle(true);
 
-            journalController.SetupPreRestoration(currentArtefactData, OnJournalRestoreClicked);
+            // Just unlocked: Animate
+            journalController.SetupPreRestoration(currentArtefactData, OnJournalRestoreClicked, false);
             journalController.OpenBookFull();
         }
-    } 
+    }
 
     private void HandleJournalOpenedFromClick()
     {
-        if (buttonBack != null)
-        {
-            buttonBack.SetAlternateStyle(true);
-        }
+        if (buttonBack != null) buttonBack.SetAlternateStyle(true);
     }
 
     private void OnJournalRestoreClicked()
@@ -257,20 +242,13 @@ public class ArtefactDetailController : MonoBehaviour
     private void OnJournalContinueClicked()
     {
         journalController.HideBookToPeek();
-        
-        wallTextGroup.gameObject.SetActive(true);
 
+        wallTextGroup.gameObject.SetActive(true);
         if (currentArtefactData.LocalizedItemName != null) currentArtefactData.LocalizedItemName.RefreshString();
         if (currentArtefactData.LocalizedItemDescription != null) currentArtefactData.LocalizedItemDescription.RefreshString();
-
-        if (wallTextRevealFeedback != null)
-        {
-            wallTextRevealFeedback.PlayFeedbacks();
-        }
-        else
-        {
-            wallTextGroup.DOFade(1, wallTextFadeDuration);
-        }
+        
+        if (wallTextRevealFeedback != null) wallTextRevealFeedback.PlayFeedbacks();
+        else wallTextGroup.DOFade(1, wallTextFadeDuration);
     }
 
     private void OnBackClicked()
@@ -280,16 +258,13 @@ public class ArtefactDetailController : MonoBehaviour
         if (journalController.CurrentState == JournalState.Opened)
         {
             journalController.HideBookToPeek();
-            
             buttonBack.SetAlternateStyle(false);
 
             if (isCompleted)
             {
                 wallTextGroup.gameObject.SetActive(true);
-                
                 if (currentArtefactData.LocalizedItemName != null) currentArtefactData.LocalizedItemName.RefreshString();
                 if (currentArtefactData.LocalizedItemDescription != null) currentArtefactData.LocalizedItemDescription.RefreshString();
-
                 wallTextGroup.DOFade(1, wallTextFadeDuration);
             }
             else
@@ -303,11 +278,12 @@ public class ArtefactDetailController : MonoBehaviour
             if (isClosing) return;
             isClosing = true;
 
-            if (current3DItem != null) 
+            if (current3DItem != null)
             {
                 current3DItem.SetDetailMode(false, false);
-                current3DItem.Initialize(activeArtefactData); 
+                current3DItem.Initialize(activeArtefactData);
             }
+
             CloseDetail();
             MainMenuEvents.TriggerCloseArtefactDetail();
             journalController.HideBookCompletely();
@@ -323,11 +299,13 @@ public class ArtefactDetailController : MonoBehaviour
     {
         if (isClosing) return;
         isClosing = true;
-        if (current3DItem != null) 
+
+        if (current3DItem != null)
         {
             current3DItem.SetDetailMode(false, false);
-            current3DItem.Initialize(activeArtefactData); 
+            current3DItem.Initialize(activeArtefactData);
         }
+
         CloseDetail();
         MainMenuEvents.TriggerCloseArtefactDetail();
         journalController.HideBookCompletely();
@@ -341,9 +319,8 @@ public class ArtefactDetailController : MonoBehaviour
     private void OnUIKeycodeEscapePerformed()
     {
         if (!IsOpen) return;
-
         if (journalController != null && journalController.IsAnimating) return;
-        
+
         if (buttonBack != null && buttonBack.Button.interactable && buttonBack.gameObject.activeInHierarchy)
         {
             OnBackClicked();
@@ -353,10 +330,9 @@ public class ArtefactDetailController : MonoBehaviour
     private void OnUIKeycodeRPerformed()
     {
         if (!IsOpen) return;
-        if (journalController != null && journalController.CurrentState == JournalState.Opened)
-            return;
+        if (journalController != null && journalController.CurrentState == JournalState.Opened) return;
 
-        if (wallTextGroup != null && wallTextGroup.gameObject.activeInHierarchy && 
+        if (wallTextGroup != null && wallTextGroup.gameObject.activeInHierarchy &&
             buttonReplay != null && buttonReplay.interactable)
         {
             OnReplayClicked();
@@ -366,11 +342,9 @@ public class ArtefactDetailController : MonoBehaviour
     private void OnUIKeycodeEnterPerformed()
     {
         if (!IsOpen) return;
-        
-        if (journalController != null && journalController.CurrentState == JournalState.Opened)
-            return;
+        if (journalController != null && journalController.CurrentState == JournalState.Opened) return;
 
-        if (wallTextGroup != null && wallTextGroup.gameObject.activeInHierarchy && 
+        if (wallTextGroup != null && wallTextGroup.gameObject.activeInHierarchy &&
             buttonContinueStory != null && buttonContinueStory.interactable)
         {
             OnContinueStoryClicked();

@@ -65,7 +65,10 @@ MonoBehaviour:
     this?"
   customGameplayBGM: 5
   preRestorationPagePrefab: {fileID: 8636906436748886089, guid: baf0f97423e7a6943b9110caf23df1b4, type: 3}
-  postRestorationPagePrefab: {fileID: 8866635996392126511, guid: dc0a3121fb20bf6448a8f50eafe3ac94, type: 3}
+  postRestorationPagePrefabs:
+  - {fileID: 8866635996392126511, guid: dc0a3121fb20bf6448a8f50eafe3ac94, type: 3}
+  - {fileID: 683276941396468826, guid: 1e3b5924764e35f4e8af318e205f75a1, type: 3}
+  - {fileID: 5872695661965174262, guid: 5ed9220d561394e47b805a7a04fe6965, type: 3}
   unlockedByDefault: 0
   unlockRequirements:
   - {fileID: 11400000, guid: 438a20ec48c10f140a4418156d10a0cd, type: 2}

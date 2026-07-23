@@ -231,6 +231,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "KeycodeArrowRight",
+                    "type": "Button",
+                    "id": "f2e490e1-7089-481d-a397-6d18bb66e180",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "KeycodeArrowLeft",
+                    "type": "Button",
+                    "id": "f84d3497-7af3-475e-85d7-e29cbae54aa2",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -264,6 +282,28 @@
                     "processors": "",
                     "groups": "Desktop",
                     "action": "KeycodeEnter",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "39b78449-5637-44f5-bb13-0a7bf457a595",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Desktop",
+                    "action": "KeycodeArrowRight",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1a579151-c678-4b5c-bb31-a1292d21c44d",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Desktop",
+                    "action": "KeycodeArrowLeft",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

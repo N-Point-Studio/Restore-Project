@@ -71,8 +71,13 @@ MonoBehaviour:
     have amazing museums there, including the museum we got these returned Indonesian
     artifacts from!
   customGameplayBGM: 3
-  preRestorationPagePrefab: {fileID: 8636906436748886089, guid: ee1c9555de2d2e742be6e1eb8ce62c5f, type: 3}
-  postRestorationPagePrefab: {fileID: 8866635996392126511, guid: 2fcecb73a18c29e4687f0a801efa0119, type: 3}
+  preRestorationPagePrefab: {fileID: 8636906436748886089, guid: dae117185661d894b99eb5e4524ba49b, type: 3}
+  postRestorationPagePrefabs:
+  - {fileID: 9082852065344812496, guid: 3aa84896d2cef6f4895b5e339bf4784b, type: 3}
+  - {fileID: 6966637530497812873, guid: 2fb662479feeb0f4083e29997c6f4107, type: 3}
+  - {fileID: 7983809961152370281, guid: 5a239316650ecf54289e8f08b2db95de, type: 3}
+  - {fileID: 6803005672757313535, guid: d7e16f1c251da194c95dec7186c9389d, type: 3}
+  - {fileID: 3136208152901961810, guid: 55a7574c50718594dbd226ff2bb5f639, type: 3}
   unlockedByDefault: 0
   unlockRequirements:
   - {fileID: 11400000, guid: e1fd02f44ca454e028dbb6f9a0ed00fe, type: 2}
