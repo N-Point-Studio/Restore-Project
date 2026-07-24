@@ -9,6 +9,7 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 public class InputSystemService : IInitializable, IDisposable, ITickable
 {
     private readonly PlayerInputSystem inputSystem;
+    private readonly GameConfigData config;
     private GameInput Input => inputSystem.Input;
 
     public event Action<Vector2> OnLeftPressStarted;
@@ -30,9 +31,10 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
     private float previousPinchDistance;
 
     [Inject]
-    public InputSystemService(PlayerInputSystem inputSystem)
+    public InputSystemService(PlayerInputSystem inputSystem, GameConfigData config)
     {
         this.inputSystem = inputSystem;
+        this.config = config;
     }
 
     public void Initialize()
@@ -104,8 +106,10 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
             else if (touch0.phase == UnityEngine.InputSystem.TouchPhase.Moved || touch1.phase == UnityEngine.InputSystem.TouchPhase.Moved)
             {
                 float pinchDelta = currentPinchDistance - previousPinchDistance;
+                float dpi = Screen.dpi > 0 ? Screen.dpi : 160f;
+                float normalizedPinchDelta = pinchDelta / dpi;
 
-                OnScrollPerformed?.Invoke(-pinchDelta * 0.1f);
+                OnScrollPerformed?.Invoke(-normalizedPinchDelta * config.inspectionPinchSensitivity);
 
                 previousPinchDistance = currentPinchDistance;
             }

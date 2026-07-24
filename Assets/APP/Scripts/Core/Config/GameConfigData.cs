@@ -23,6 +23,7 @@ public class GameConfigData : ScriptableObject
     public float inspectionZoomSpeed = 0.02f;
     public float inspectionSmoothTime = 0.1f;
     public float inspectionResetDuration = 1f;
+    public float inspectionPinchSensitivity = 0.05f;
 
     [Header("System Settings")]
     public float autoSaveCooldown = 1.0f;

@@ -38,7 +38,7 @@ public class Inspection : MonoBehaviour
         this.planeReference = plane;
         this._zoomVelocity = config.inspectionZoomSpeed * Vector3.one;
 
-        Debug.Log("zoomvelocity: " + _zoomVelocity);
+        // Debug.Log("zoomvelocity: " + _zoomVelocity);
     }
 
     void Start()
