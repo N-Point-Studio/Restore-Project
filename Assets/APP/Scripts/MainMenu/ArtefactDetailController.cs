@@ -154,7 +154,7 @@ public class ArtefactDetailController : MonoBehaviour
                 if (buttonBack != null) buttonBack.Button.interactable = false;
                 DOVirtual.DelayedCall(backButtonUnlockDelay, () => { if (buttonBack != null) buttonBack.Button.interactable = true; });
                 
-                buttonBack.SetAlternateStyle(true);
+                buttonBack.SetAlternateStyle(false);
                 
                 // Animate = false
                 journalController.SetupPostRestoration(currentArtefactData, OnJournalContinueClicked, false);
@@ -164,7 +164,7 @@ public class ArtefactDetailController : MonoBehaviour
             {
                 if (buttonBack != null) buttonBack.Button.interactable = true;
                 
-                buttonBack.SetAlternateStyle(false);
+                buttonBack.SetAlternateStyle(true);
                 
                 // Animate = true (Skip typing!)
                 journalController.SetupPostRestoration(currentArtefactData, OnJournalContinueClicked, true);
@@ -185,7 +185,7 @@ public class ArtefactDetailController : MonoBehaviour
                 instructionText.gameObject.SetActive(true);
                 if (localizedInstructOpenBox != null) localizedInstructOpenBox.RefreshString();
                 
-                buttonBack.SetAlternateStyle(false);
+                buttonBack.SetAlternateStyle(true);
                 
                 // Skip typing
                 journalController.SetupPreRestoration(currentArtefactData, OnJournalRestoreClicked, true);
@@ -196,7 +196,7 @@ public class ArtefactDetailController : MonoBehaviour
                 instructionText.gameObject.SetActive(true);
                 if (localizedInstructPeelNote != null) localizedInstructPeelNote.RefreshString();
                 
-                buttonBack.SetAlternateStyle(false);
+                buttonBack.SetAlternateStyle(true);
                 
                 // Animate
                 journalController.SetupPreRestoration(currentArtefactData, OnJournalRestoreClicked, false);
@@ -221,7 +221,7 @@ public class ArtefactDetailController : MonoBehaviour
 
             buttonBack.Button.interactable = false;
             DOVirtual.DelayedCall(backButtonUnlockDelay, () => { if (buttonBack != null) buttonBack.Button.interactable = true; });
-            buttonBack.SetAlternateStyle(true);
+            buttonBack.SetAlternateStyle(false);
 
             // Just unlocked: Animate
             journalController.SetupPreRestoration(currentArtefactData, OnJournalRestoreClicked, false);
@@ -231,7 +231,7 @@ public class ArtefactDetailController : MonoBehaviour
 
     private void HandleJournalOpenedFromClick()
     {
-        if (buttonBack != null) buttonBack.SetAlternateStyle(true);
+        if (buttonBack != null) buttonBack.SetAlternateStyle(false);
     }
 
     private void OnJournalRestoreClicked()
@@ -258,7 +258,7 @@ public class ArtefactDetailController : MonoBehaviour
         if (journalController.CurrentState == JournalState.Opened)
         {
             journalController.HideBookToPeek();
-            buttonBack.SetAlternateStyle(false);
+            buttonBack.SetAlternateStyle(true);
 
             if (isCompleted)
             {
