@@ -1,6 +1,7 @@
 using UnityEngine;
 using DG.Tweening;
 using VContainer;
+using System;
 
 public class Inspection : MonoBehaviour
 {
@@ -20,6 +21,7 @@ public class Inspection : MonoBehaviour
     private bool isContain = false;
     private bool isGameFinished = false;
     private bool isAssembling = false;
+    private bool isDragging = false;
 
     private TutorialService tutorialService;
     private GameConfigData config;
@@ -55,6 +57,10 @@ public class Inspection : MonoBehaviour
         InteractionEvents.OnRotatePerformed += OnRotatePerformed;
         InteractionEvents.OnZoomPerformed += OnZoomPerformed;
 
+        InteractionEvents.OnDragStarted += HandleDragStarted;
+        InteractionEvents.OnDragPerformed += HandleDragPerformed;
+        InteractionEvents.OnDragEnded += HandleDragEnded;
+
         AssembleEvents.OnAssemblePerformed += HandleAssemblePerformed;
         AssembleEvents.OnAssembleFinished += HandleAssembleFinished;
 
@@ -75,10 +81,29 @@ public class Inspection : MonoBehaviour
         InteractionEvents.OnRotatePerformed -= OnRotatePerformed;
         InteractionEvents.OnZoomPerformed -= OnZoomPerformed;
 
+        InteractionEvents.OnDragStarted -= HandleDragStarted;
+        InteractionEvents.OnDragPerformed -= HandleDragPerformed;
+        InteractionEvents.OnDragEnded -= HandleDragEnded;
+
         AssembleEvents.OnAssemblePerformed -= HandleAssemblePerformed;
         AssembleEvents.OnAssembleFinished -= HandleAssembleFinished;
 
         GameplayUIManager.OnGameWrapped -= HandleGameWrapped;
+    }
+
+    private void HandleDragStarted(IInteractObject @object, Vector3 vector)
+    {
+        isDragging = true;
+    }
+
+    private void HandleDragPerformed(IInteractObject @object, Vector3 vector)
+    {
+
+    }
+
+    private void HandleDragEnded(IInteractObject @object, Vector3 vector)
+    {
+        isDragging = false;
     }
 
     void OnDisable()
@@ -94,6 +119,7 @@ public class Inspection : MonoBehaviour
 
     void Update()
     {
+        // if (isDragging) return;
         // transform.position = Vector3.SmoothDamp(
         //     transform.position,
         //     _targetPosition,
@@ -119,6 +145,8 @@ public class Inspection : MonoBehaviour
 
     public void OnRotatePerformed(Vector2 delta)
     {
+        // if (isDragging) return;
+
         if (!isContain || isAssembling) return;
         if (_mainCamera == null) return;
 
@@ -145,6 +173,8 @@ public class Inspection : MonoBehaviour
 
     public void OnZoomPerformed(float zoomDelta)
     {
+        // if (isDragging) return;
+
         if (!isContain || isGameFinished || isAssembling) return;
         if (_mainCamera == null) _mainCamera = Camera.main;
 
