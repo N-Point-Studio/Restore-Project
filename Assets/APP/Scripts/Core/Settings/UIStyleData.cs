@@ -6,7 +6,8 @@ public enum TypographyStyle
     PrimaryButton, 
     SecondaryButton, 
     BodyText, 
-    Header 
+    Header,
+    None
 }
 
 [Serializable]

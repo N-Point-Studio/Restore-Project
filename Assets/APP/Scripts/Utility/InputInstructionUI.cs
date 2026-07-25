@@ -141,6 +141,9 @@ public class InputInstructionUI : MonoBehaviour
         isMobile = true;
 #endif
 
+        if (textStyle == TypographyStyle.None)
+            return;
+            
         TypographyProfile profile = UIStyleData.Instance.GetProfile(textStyle);
         float targetSize = isMobile ? profile.mobileSize : profile.desktopSize;
 
