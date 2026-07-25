@@ -95,7 +95,7 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     private void UpdateText(string val)
     {
-        if (text3D != null) text3D.text = val;
+        // if (text3D != null) text3D.text = val;
     }
 
     public void ToggleCollider(bool isOn)
