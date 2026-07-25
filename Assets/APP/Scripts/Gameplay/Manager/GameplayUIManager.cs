@@ -10,7 +10,9 @@ using UnityEngine.InputSystem;
 public class GameplayUIManager : MonoBehaviour
 {
     [SerializeField] private List<ProgressBarUI> progressBars;
-    [SerializeField] private Camera toolCamera;
+
+    [Header("Cameras")]
+    [SerializeField] private Camera endCamera;
 
     [Header("Controllers")]
     [SerializeField] private MainUIController mainUIController;
@@ -91,6 +93,7 @@ public class GameplayUIManager : MonoBehaviour
     private IEnumerator Start()
     {
         mainUIController.ShowButtonWrap(false);
+        endCamera.enabled = false;
 
         bool isMobile = Application.isMobilePlatform;
 #if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
@@ -319,6 +322,7 @@ public class GameplayUIManager : MonoBehaviour
     private void OnWrapUp()
     {
         if (endgameController.IsActive) return;
+        endCamera.enabled = true;
 
         AppLogger.Log("Wrap up!");
         if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 1)
@@ -331,7 +335,6 @@ public class GameplayUIManager : MonoBehaviour
             cleaningService.ForceCleanAll();
         }
 
-        toolCamera.gameObject.SetActive(false);
         mainUIController.SetActive(false);
         endgameController.SetActive(true);
 
