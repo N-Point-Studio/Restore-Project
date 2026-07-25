@@ -12,8 +12,7 @@ public class GameplayManager : IInitializable, IDisposable
     private readonly InputSystemService inputSystemService;
     private readonly GameConfigData config;
     private readonly TutorialService tutorialService;
-    private readonly Light firstDirectionalLight;
-    private readonly Light secondDirectionalLight;
+    private readonly List<Light> firstDirectionalLight;
 
     private readonly GameplayToolManager gameplayToolManager;
 
@@ -34,7 +33,7 @@ public class GameplayManager : IInitializable, IDisposable
     InputSystemService inputSystemService,
     string targetScene,
     TutorialService tutorialService,
-    Light firstDirectionalLight,
+     List<Light> firstDirectionalLight,
     GameConfigData config,
     GameplayToolManager gameplayToolManager)
     {
@@ -84,8 +83,10 @@ public class GameplayManager : IInitializable, IDisposable
         if (overallProgress >= clueTreshold)
         {
             // AppLogger.Log("[HARUSNYA] Tab nyala");
-
-            firstDirectionalLight.enabled = false;
+            foreach (var light in firstDirectionalLight)
+            {
+                light.enabled = false;
+            }
             if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 0)
             {
                 tutorialService.CompleteAndAdvance(false);
@@ -95,7 +96,13 @@ public class GameplayManager : IInitializable, IDisposable
 
     private void HandleTabCanceled()
     {
-        if (overallProgress >= clueTreshold) firstDirectionalLight.enabled = true;
+        if (overallProgress >= clueTreshold)
+        {
+            foreach (var light in firstDirectionalLight)
+            {
+                light.enabled = true;
+            }
+        }
     }
 
 
@@ -110,6 +117,12 @@ public class GameplayManager : IInitializable, IDisposable
 
     private void HandleGameWrapped()
     {
+        foreach (var light in firstDirectionalLight)
+        {
+            if (light.enabled) continue;
+            light.enabled = true;
+        }
+
         SaveObjectCompletion();
     }
 

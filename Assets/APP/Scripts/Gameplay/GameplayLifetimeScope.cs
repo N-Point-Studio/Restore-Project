@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -10,7 +11,7 @@ public class GameplayLifetimeScope : LifetimeScope
     [SerializeField] private PlaneReference planeReference;
     [SerializeField] private HoldProgressUI holdProgressUI;
     [SerializeField] private string targetScene;
-    [SerializeField] private Light mainLight;
+    [SerializeField] private List<Light> mainLight;
 
     protected override void Configure(IContainerBuilder builder)
     {
