@@ -7,16 +7,27 @@ public class UISoundEffectTriggerToggle : UISoundEffectTrigger
 {
     private bool lastToggleValue;
     private Toggle toggle;
+    
+    private bool isInitialized = false;
 
     private void Awake()
     {
         toggle = GetComponent<Toggle>();
+        lastToggleValue = toggle.isOn; // Cache immediately
         toggle.onValueChanged.AddListener(OnToggleValueChanged);
+    }
+
+    private void Start()
+    {
+        isInitialized = true;
     }
 
     private void OnDestroy()
     {
-        toggle.onValueChanged.RemoveListener(OnToggleValueChanged);
+        if (toggle != null)
+        {
+            toggle.onValueChanged.RemoveListener(OnToggleValueChanged);
+        }
     }
 
     protected override void PlaySound()
@@ -34,14 +45,15 @@ public class UISoundEffectTriggerToggle : UISoundEffectTrigger
 
     protected void OnToggleValueChanged(bool isOn)
     {
-        if (lastToggleValue && isOn)
+        if (!isInitialized)
         {
+            lastToggleValue = isOn;
             return;
         }
 
-        lastToggleValue = isOn;
-        if (isOn)
+        if (lastToggleValue != isOn)
         {
+            lastToggleValue = isOn;
             PlaySound();
         }
     }

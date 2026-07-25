@@ -2952,6 +2952,8 @@ GameObject:
   - component: {fileID: 4032555845570932956}
   - component: {fileID: 3031479622338207755}
   - component: {fileID: 3646171751854416828}
+  - component: {fileID: 3119951336883906026}
+  - component: {fileID: 4046757291815030161}
   m_Layer: 5
   m_Name: ButtonPrevious
   m_TagString: Untagged
@@ -3031,6 +3033,33 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &3119951336883906026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6209500963208853670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96479da36537ec74e89bf0f6bfaa2223, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISoundEffectTriggerButton
+  customKey: 0
+  isConfirm: 1
+--- !u!114 &4046757291815030161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6209500963208853670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60ae9437bdb1d0e4f86291fa20102a79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISoundEffectTriggerHover
+  customKey: 0
 --- !u!1 &6243691047080766955
 GameObject:
   m_ObjectHideFlags: 0
@@ -3368,6 +3397,8 @@ GameObject:
   - component: {fileID: 2527610683108204425}
   - component: {fileID: 4225745190126991546}
   - component: {fileID: 3818611540543305271}
+  - component: {fileID: 4541780838986858659}
+  - component: {fileID: 7811863972070702909}
   m_Layer: 5
   m_Name: ButtonNext
   m_TagString: Untagged
@@ -3447,6 +3478,33 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4541780838986858659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6806260377392197778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96479da36537ec74e89bf0f6bfaa2223, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISoundEffectTriggerButton
+  customKey: 0
+  isConfirm: 1
+--- !u!114 &7811863972070702909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6806260377392197778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60ae9437bdb1d0e4f86291fa20102a79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISoundEffectTriggerHover
+  customKey: 0
 --- !u!1 &7099546839264218782
 GameObject:
   m_ObjectHideFlags: 0

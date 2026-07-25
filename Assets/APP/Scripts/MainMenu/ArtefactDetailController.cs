@@ -242,6 +242,7 @@ public class ArtefactDetailController : MonoBehaviour
     private void OnJournalContinueClicked()
     {
         journalController.HideBookToPeek();
+        if (buttonBack != null) buttonBack.SetAlternateStyle(true);
 
         wallTextGroup.gameObject.SetActive(true);
         if (currentArtefactData.LocalizedItemName != null) currentArtefactData.LocalizedItemName.RefreshString();

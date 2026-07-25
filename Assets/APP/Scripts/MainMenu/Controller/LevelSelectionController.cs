@@ -392,6 +392,8 @@ public class LevelSelectionController : BaseMenuController
                     RefreshUI();
                     isPlayingSequence = false;
 
+                    MainMenuEvents.TriggerShowBackground(true);
+
                     OpenArtefactDetailAutomatically(aData, false); 
                     
                     yield break; 

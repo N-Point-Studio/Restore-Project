@@ -433,33 +433,44 @@ public class JournalController : MonoBehaviour
 
         RevealCurrentSpread(() => 
         {
-            UpdatePaginationUI();
             IsAnimating = false;
-            if (buttonNextPage != null) buttonNextPage.interactable = true;
-            if (buttonPrevPage != null) buttonPrevPage.interactable = true;
+            
+            UpdatePaginationUI(); 
         });
     }
 
     private void UpdatePaginationUI()
     {
+        // 1. Single Page Edge Case (Pre-Restoration)
         if (spreads.Count <= 1)
         {
             if (buttonNextPage != null) buttonNextPage.gameObject.SetActive(false);
-            if (buttonPrevPage != null) buttonPrevPage.gameObject.SetActive(false);
-            if (paginationSeparator != null) paginationSeparator.SetActive(false);
+            if (buttonPrevPage != null) buttonPrevPage.gameObject.SetActive(false); // Completely hidden!
+            if (paginationSeparator != null) paginationSeparator.SetActive(false);  // Completely hidden!
             if (textPageIndicator != null) textPageIndicator.gameObject.SetActive(false);
 
             buttonAction.gameObject.SetActive(true);
             return;
         }
 
-        bool showPrev = currentPageIndex > 0;
-        bool showNext = currentPageIndex < spreads.Count - 1;
+        // 2. Multi-Page Journal Logic (Post-Restoration)
+        bool hasPrev = currentPageIndex > 0;
+        bool hasNext = currentPageIndex < spreads.Count - 1;
         bool showAction = currentPageIndex == spreads.Count - 1;
 
-        if (buttonPrevPage != null) buttonPrevPage.gameObject.SetActive(showPrev);
-        if (buttonNextPage != null) buttonNextPage.gameObject.SetActive(showNext);
-        if (paginationSeparator != null) paginationSeparator.SetActive(showPrev); 
+        if (buttonPrevPage != null) 
+        {
+            buttonPrevPage.gameObject.SetActive(true); // Always visible in multi-page mode
+            buttonPrevPage.interactable = hasPrev;     // Greyed out on page 1, active on others
+        }
+        
+        if (buttonNextPage != null) 
+        {
+            buttonNextPage.gameObject.SetActive(hasNext); // Replaced by the Action button on the last page
+            buttonNextPage.interactable = true;
+        }
+
+        if (paginationSeparator != null) paginationSeparator.SetActive(true); // Always visible in multi-page mode
 
         buttonAction.gameObject.SetActive(showAction);
 

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Button))]
 public class UISoundEffectTriggerButton : UISoundEffectTrigger
 {
-    [SerializeField] private bool isConfirm;
+    [SerializeField] private bool isConfirm = true;
     private Button button;
 
     private void Awake()
@@ -16,7 +16,10 @@ public class UISoundEffectTriggerButton : UISoundEffectTrigger
 
     private void OnDestroy()
     {
-        button.onClick.RemoveListener(PlaySound);
+        if (button != null)
+        {
+            button.onClick.RemoveListener(PlaySound);
+        }
     }
 
     public void SetConfirm(bool isConfirm)

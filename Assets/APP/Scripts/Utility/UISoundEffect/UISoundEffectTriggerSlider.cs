@@ -7,16 +7,27 @@ public class UISoundEffectTriggerSlider : UISoundEffectTrigger
 {
     private float lastSliderValue;
     private Slider slider;
+    
+    private bool isInitialized = false; 
 
     private void Awake()
     {
         slider = GetComponent<Slider>();
+        lastSliderValue = slider.value;
         slider.onValueChanged.AddListener(OnSliderValueChanged);
+    }
+
+    private void Start()
+    {
+        isInitialized = true;
     }
 
     private void OnDestroy()
     {
-        slider.onValueChanged.RemoveListener(OnSliderValueChanged);
+        if (slider != null)
+        {
+            slider.onValueChanged.RemoveListener(OnSliderValueChanged);
+        }
     }
 
     protected override void PlaySound()
@@ -34,8 +45,15 @@ public class UISoundEffectTriggerSlider : UISoundEffectTrigger
 
     private void OnSliderValueChanged(float value)
     {
-        if (lastSliderValue != value)
+        if (!isInitialized) 
         {
+            lastSliderValue = value;
+            return;
+        }
+
+        if (!Mathf.Approximately(lastSliderValue, value))
+        {
+            lastSliderValue = value;
             PlaySound();
         }
     }

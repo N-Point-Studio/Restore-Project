@@ -1,4 +1,5 @@
 using Modules.SoundSystems;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class UISoundEffectTriggerHover : UISoundEffectTrigger, ISelectHandler, IPointerEnterHandler
@@ -18,11 +19,19 @@ public class UISoundEffectTriggerHover : UISoundEffectTrigger, ISelectHandler, I
 
     void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
     {
+        bool isMobile = Application.isMobilePlatform;
+#if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+        isMobile = true;
+#endif
+        if (isMobile) return;
+
         PlaySound();
     }
 
     void ISelectHandler.OnSelect(BaseEventData eventData)
     {
+        if (eventData is PointerEventData) return;
+
         PlaySound();
     }
 }
