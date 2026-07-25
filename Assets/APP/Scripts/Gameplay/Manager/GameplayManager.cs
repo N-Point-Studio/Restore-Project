@@ -12,7 +12,9 @@ public class GameplayManager : IInitializable, IDisposable
     private readonly InputSystemService inputSystemService;
     private readonly GameConfigData config;
     private readonly TutorialService tutorialService;
-    private readonly Light directionalLight;
+    private readonly Light firstDirectionalLight;
+    private readonly Light secondDirectionalLight;
+
     private readonly GameplayToolManager gameplayToolManager;
 
     private ArtefactData artefactData;
@@ -32,7 +34,7 @@ public class GameplayManager : IInitializable, IDisposable
     InputSystemService inputSystemService,
     string targetScene,
     TutorialService tutorialService,
-    Light directionalLight,
+    Light firstDirectionalLight,
     GameConfigData config,
     GameplayToolManager gameplayToolManager)
     {
@@ -43,7 +45,7 @@ public class GameplayManager : IInitializable, IDisposable
         this.targetScene = targetScene;
         this.config = config;
         this.tutorialService = tutorialService;
-        this.directionalLight = directionalLight;
+        this.firstDirectionalLight = firstDirectionalLight;
         this.gameplayToolManager = gameplayToolManager;
 
         InitializeSession();
@@ -83,7 +85,7 @@ public class GameplayManager : IInitializable, IDisposable
         {
             // AppLogger.Log("[HARUSNYA] Tab nyala");
 
-            directionalLight.enabled = false;
+            firstDirectionalLight.enabled = false;
             if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 0)
             {
                 tutorialService.CompleteAndAdvance(false);
@@ -93,7 +95,7 @@ public class GameplayManager : IInitializable, IDisposable
 
     private void HandleTabCanceled()
     {
-        if (overallProgress >= clueTreshold) directionalLight.enabled = true;
+        if (overallProgress >= clueTreshold) firstDirectionalLight.enabled = true;
     }
 
 
