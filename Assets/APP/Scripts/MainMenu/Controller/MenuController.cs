@@ -1,6 +1,7 @@
 using UnityEngine;
 using VContainer;
 using UnityEngine.Localization;
+using UnityEngine.UI;
 
 public class MenuController : BaseMenuController
 {
@@ -10,6 +11,11 @@ public class MenuController : BaseMenuController
     [SerializeField] private ButtonItemUI buttonSettings;
     [SerializeField] private ButtonItemUI buttonQuit;
 
+    [Header("Layout Settings")]
+    [SerializeField] private float mobileSpacing = 36f;
+    [SerializeField] private float desktopSpacing = 12f;
+    [SerializeField] private VerticalLayoutGroup verticalLayoutGroup;
+ 
     [Header("Localization")]
     [SerializeField] private LocalizedString newGameLabel;
     [SerializeField] private LocalizedString startLabel;
@@ -29,6 +35,13 @@ public class MenuController : BaseMenuController
         buttonContinue.OnClick += OnButtonContinueClick;
         buttonSettings.OnClick += OnButtonSettingsClick;
         buttonQuit.OnClick += OnButtonQuitClick;
+
+        bool isMobile = Application.isMobilePlatform;
+#if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+        isMobile = true;
+#endif
+
+        verticalLayoutGroup.spacing = isMobile ? mobileSpacing : desktopSpacing;
     }
 
     protected override void Start()

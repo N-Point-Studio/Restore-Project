@@ -871,7 +871,7 @@ MonoBehaviour:
   m_Spacing: 40
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
+  m_ChildControlWidth: 1
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
@@ -955,7 +955,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
-  m_HorizontalFit: 0
+  m_HorizontalFit: 2
   m_VerticalFit: 2
 --- !u!114 &2939726351363731232
 MonoBehaviour:
@@ -988,6 +988,7 @@ GameObject:
   - component: {fileID: 8544774436637437410}
   - component: {fileID: 5929836791605272435}
   - component: {fileID: 3242230740747795502}
+  - component: {fileID: 3095039310256822054}
   m_Layer: 5
   m_Name: Bar
   m_TagString: Untagged
@@ -1052,6 +1053,26 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3095039310256822054
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4229909695567278174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
+  m_IgnoreLayout: 0
+  m_MinWidth: 2
+  m_MinHeight: -1
+  m_PreferredWidth: -1
+  m_PreferredHeight: -1
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &5399338671454551028
 GameObject:
   m_ObjectHideFlags: 0
@@ -1897,8 +1918,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c97afc556caea1c44969477eb7ddec74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Crystal.SafeArea
-  ConformX: 1
-  ConformY: 1
+  ConformLeft: 1
+  ConformRight: 1
+  ConformTop: 1
+  ConformBottom: 1
   Logging: 0
 --- !u!1001 &469121060592693360
 PrefabInstance:
@@ -2008,6 +2031,14 @@ PrefabInstance:
       propertyPath: changeSizeWhenSelected
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5445000821573752765, guid: 6a49c5ef214e9fe4ab4ee7a6f012476a, type: 3}
+      propertyPath: localizedLabel.m_TableEntryReference.m_KeyId
+      value: 626889151877120
+      objectReference: {fileID: 0}
+    - target: {fileID: 5445000821573752765, guid: 6a49c5ef214e9fe4ab4ee7a6f012476a, type: 3}
+      propertyPath: localizedLabel.m_TableReference.m_TableCollectionName
+      value: GUID:cb92ced7c936e1d488319505859ec2f0
+      objectReference: {fileID: 0}
     - target: {fileID: 6165702988879560498, guid: 6a49c5ef214e9fe4ab4ee7a6f012476a, type: 3}
       propertyPath: m_SizeDelta.x
       value: 0
@@ -2082,7 +2113,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7419079706413985183, guid: 6a49c5ef214e9fe4ab4ee7a6f012476a, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 451.93
+      value: 488.455
       objectReference: {fileID: 0}
     - target: {fileID: 7419079706413985183, guid: 6a49c5ef214e9fe4ab4ee7a6f012476a, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -2248,6 +2279,14 @@ PrefabInstance:
       propertyPath: changeSizeWhenSelected
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5445000821573752765, guid: 6a49c5ef214e9fe4ab4ee7a6f012476a, type: 3}
+      propertyPath: localizedLabel.m_TableEntryReference.m_KeyId
+      value: 623313050537984
+      objectReference: {fileID: 0}
+    - target: {fileID: 5445000821573752765, guid: 6a49c5ef214e9fe4ab4ee7a6f012476a, type: 3}
+      propertyPath: localizedLabel.m_TableReference.m_TableCollectionName
+      value: GUID:cb92ced7c936e1d488319505859ec2f0
+      objectReference: {fileID: 0}
     - target: {fileID: 6165702988879560498, guid: 6a49c5ef214e9fe4ab4ee7a6f012476a, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -2338,7 +2377,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7419079706413985183, guid: 6a49c5ef214e9fe4ab4ee7a6f012476a, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 369.93
+      value: 406.455
       objectReference: {fileID: 0}
     - target: {fileID: 7419079706413985183, guid: 6a49c5ef214e9fe4ab4ee7a6f012476a, type: 3}
       propertyPath: m_AnchoredPosition.y
