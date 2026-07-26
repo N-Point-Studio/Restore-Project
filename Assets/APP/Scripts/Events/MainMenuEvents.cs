@@ -11,6 +11,8 @@ public static class MainMenuEvents
     public static event Action OnContinueGame;
     public static event Action OnOpenSettings;
     public static event Action OnRequestQuit;
+    public static event Action OnOpenCredits;
+    public static event Action OnCloseCredits;
 
     // Camera
     public static event Action OnCameraToMainMenu;
@@ -32,7 +34,9 @@ public static class MainMenuEvents
     public static void TriggerCameraFocusToArtefact(Transform targetTransform) => OnCameraFocusToArtefact?.Invoke(targetTransform);
     public static void TriggerCameraMoveFinished() => OnCameraMoveFinished?.Invoke();
     public static void TriggerShowBackground(bool show) => OnShowBackground?.Invoke(show);
-    
+    public static void TriggerOpenCredits() => OnOpenCredits?.Invoke();
+    public static void TriggerCloseCredits() => OnCloseCredits?.Invoke();
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
@@ -49,5 +53,7 @@ public static class MainMenuEvents
         OnCameraToLevelSelection = null;
         OnCameraFocusToArtefact = null;
         OnShowBackground = null;
+        OnOpenCredits = null;
+        OnCloseCredits = null;
     }
 }

@@ -249,6 +249,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "KeycodeSpace",
+                    "type": "Button",
+                    "id": "d3b1d6cf-18ec-4945-8cf4-fe46d9b5367a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -304,6 +313,17 @@
                     "processors": "",
                     "groups": ";Desktop",
                     "action": "KeycodeArrowLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "02b946ef-2055-4c34-9ab6-a5f372e6dac0",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Desktop",
+                    "action": "KeycodeSpace",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

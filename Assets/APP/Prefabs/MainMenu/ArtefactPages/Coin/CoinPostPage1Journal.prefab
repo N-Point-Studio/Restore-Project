@@ -28,7 +28,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2140565966222655866}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.000040778}
+  m_LocalPosition: {x: 0, y: 0, z: -0.000017621}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -36,8 +36,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.54499, y: 304}
-  m_SizeDelta: {x: 798.91, y: 159}
+  m_AnchoredPosition: {x: -9.3117, y: 309.3}
+  m_SizeDelta: {x: 816.44, y: 159.104}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1477905407710442776
 CanvasRenderer:
@@ -96,8 +96,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 33.2
-  m_fontSizeBase: 24
+  m_fontSize: 33.8
+  m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 11
@@ -228,7 +228,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 7.83}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -13, y: 31}
+  m_AnchoredPosition: {x: -13.8, y: 37}
   m_SizeDelta: {x: 372.69, y: 372.69}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1753006237653431838
@@ -377,7 +377,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8864463155582719050}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.000048403}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -385,8 +385,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.000040792, y: -261.35}
-  m_SizeDelta: {x: 800, y: 212}
+  m_AnchoredPosition: {x: -9.311, y: -281.582}
+  m_SizeDelta: {x: 816.44, y: 217.164}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3233632764318061455
 CanvasRenderer:
@@ -445,7 +445,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 33.2
+  m_fontSize: 34.05
   m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 1

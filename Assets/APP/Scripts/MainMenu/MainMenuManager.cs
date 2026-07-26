@@ -11,6 +11,7 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private QuitController quitController;
     [SerializeField] private BackgroundController backgroundController;
     [SerializeField] private PopUpConfirmationController popUpConfirmationController;
+    [SerializeField] private CreditsController creditsController;
 
     [Header("Scene Configuration")]
     [SerializeField] private string splashSceneName = "Splash";
@@ -42,6 +43,7 @@ public class MainMenuManager : MonoBehaviour
         container.Inject(levelSelectionController);
         container.Inject(settingsController);
         container.Inject(quitController);
+        container.Inject(creditsController);
 
         input.ChangeInputState(InputStateType.UI);
     }
@@ -62,6 +64,8 @@ public class MainMenuManager : MonoBehaviour
         MainMenuEvents.OnOpenSettings += OnRequestOpenSettings;
         MainMenuEvents.OnRequestQuit += OnRequestQuit;
         MainMenuEvents.OnShowBackground += OnRequestShowBackground;
+        MainMenuEvents.OnOpenCredits += OnRequestOpenCredits;
+        MainMenuEvents.OnCloseCredits += OnRequestCloseCredits;
 
         popUpConfirmationController.OnConfirm += OnConfirmNewGame;
         popUpConfirmationController.OnCancel += OnCancelNewGame;
@@ -116,6 +120,8 @@ public class MainMenuManager : MonoBehaviour
         MainMenuEvents.OnOpenSettings -= OnRequestOpenSettings;
         MainMenuEvents.OnRequestQuit -= OnRequestQuit;
         MainMenuEvents.OnShowBackground -= OnRequestShowBackground;
+        MainMenuEvents.OnOpenCredits -= OnRequestOpenCredits;
+        MainMenuEvents.OnCloseCredits -= OnRequestCloseCredits;
 
         popUpConfirmationController.OnConfirm -= OnConfirmNewGame;
         popUpConfirmationController.OnCancel -= OnCancelNewGame;
@@ -198,6 +204,23 @@ public class MainMenuManager : MonoBehaviour
     private void OnRequestShowBackground(bool show)
     {
         backgroundController.SetActive(show);
+    }
+
+    private void OnRequestOpenCredits()
+    {
+        // Hide other menus and show credits
+        menuController.SetActive(false);
+        levelSelectionController.CloseLevelSelection(); // Ensure 3D items hide if needed
+        backgroundController.SetActive(true);
+        creditsController.SetActive(true);
+    }
+
+    private void OnRequestCloseCredits()
+    {
+        backgroundController.SetActive(false);
+        
+        // Return to the main menu when credits end
+        menuController.SetActive(true);
     }
 
     private void OnConfirmNewGame()

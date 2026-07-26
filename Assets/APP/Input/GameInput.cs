@@ -335,6 +335,15 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""KeycodeSpace"",
+                    ""type"": ""Button"",
+                    ""id"": ""d3b1d6cf-18ec-4945-8cf4-fe46d9b5367a"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -392,6 +401,17 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""action"": ""KeycodeArrowLeft"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""02b946ef-2055-4c34-9ab6-a5f372e6dac0"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Desktop"",
+                    ""action"": ""KeycodeSpace"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -439,6 +459,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_UI_KeycodeEnter = m_UI.FindAction("KeycodeEnter", throwIfNotFound: true);
         m_UI_KeycodeArrowRight = m_UI.FindAction("KeycodeArrowRight", throwIfNotFound: true);
         m_UI_KeycodeArrowLeft = m_UI.FindAction("KeycodeArrowLeft", throwIfNotFound: true);
+        m_UI_KeycodeSpace = m_UI.FindAction("KeycodeSpace", throwIfNotFound: true);
     }
 
     ~@GameInput()
@@ -709,6 +730,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_KeycodeEnter;
     private readonly InputAction m_UI_KeycodeArrowRight;
     private readonly InputAction m_UI_KeycodeArrowLeft;
+    private readonly InputAction m_UI_KeycodeSpace;
     /// <summary>
     /// Provides access to input actions defined in input action map "UI".
     /// </summary>
@@ -740,6 +762,10 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "UI/KeycodeArrowLeft".
         /// </summary>
         public InputAction @KeycodeArrowLeft => m_Wrapper.m_UI_KeycodeArrowLeft;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/KeycodeSpace".
+        /// </summary>
+        public InputAction @KeycodeSpace => m_Wrapper.m_UI_KeycodeSpace;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -781,6 +807,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @KeycodeArrowLeft.started += instance.OnKeycodeArrowLeft;
             @KeycodeArrowLeft.performed += instance.OnKeycodeArrowLeft;
             @KeycodeArrowLeft.canceled += instance.OnKeycodeArrowLeft;
+            @KeycodeSpace.started += instance.OnKeycodeSpace;
+            @KeycodeSpace.performed += instance.OnKeycodeSpace;
+            @KeycodeSpace.canceled += instance.OnKeycodeSpace;
         }
 
         /// <summary>
@@ -807,6 +836,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @KeycodeArrowLeft.started -= instance.OnKeycodeArrowLeft;
             @KeycodeArrowLeft.performed -= instance.OnKeycodeArrowLeft;
             @KeycodeArrowLeft.canceled -= instance.OnKeycodeArrowLeft;
+            @KeycodeSpace.started -= instance.OnKeycodeSpace;
+            @KeycodeSpace.performed -= instance.OnKeycodeSpace;
+            @KeycodeSpace.canceled -= instance.OnKeycodeSpace;
         }
 
         /// <summary>
@@ -979,5 +1011,12 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnKeycodeArrowLeft(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "KeycodeSpace" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnKeycodeSpace(InputAction.CallbackContext context);
     }
 }

@@ -27,6 +27,8 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
     public event Action OnUIKeycodeRPerformed;
     public event Action OnUIKeycodeArrowRightPerformed;
     public event Action OnUIKeycodeArrowLeftPerformed;
+    public event Action OnUIKeycodeSpaceStarted;
+    public event Action OnUIKeycodeSpaceCanceled;
 
     private float previousPinchDistance;
 
@@ -61,6 +63,8 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
         Input.UI.KeycodeR.performed += HandleUIKeycodeRPerformed;
         Input.UI.KeycodeArrowRight.performed += HandleUIKeycodeArrowRightPerformed;
         Input.UI.KeycodeArrowLeft.performed += HandleUIKeycodeArrowLeftPerformed;
+        Input.UI.KeycodeSpace.started += HandleUIKeycodeSpaceStarted;
+        Input.UI.KeycodeSpace.canceled += HandleUIKeycodeSpaceCanceled;
     }
 
     public void Dispose()
@@ -87,6 +91,8 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
         Input.UI.KeycodeR.performed -= HandleUIKeycodeRPerformed;
         Input.UI.KeycodeArrowRight.performed -= HandleUIKeycodeArrowRightPerformed;
         Input.UI.KeycodeArrowLeft.performed -= HandleUIKeycodeArrowLeftPerformed;
+        Input.UI.KeycodeSpace.started -= HandleUIKeycodeSpaceStarted;
+        Input.UI.KeycodeSpace.canceled -= HandleUIKeycodeSpaceCanceled;
     }
 
     public void Tick()
@@ -133,6 +139,8 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
     private void HandleUIKeycodeRPerformed(InputAction.CallbackContext context) => OnUIKeycodeRPerformed?.Invoke();
     private void HandleUIKeycodeArrowRightPerformed(InputAction.CallbackContext context) => OnUIKeycodeArrowRightPerformed?.Invoke();
     private void HandleUIKeycodeArrowLeftPerformed(InputAction.CallbackContext context) => OnUIKeycodeArrowLeftPerformed?.Invoke();
+    private void HandleUIKeycodeSpaceStarted(InputAction.CallbackContext context) => OnUIKeycodeSpaceStarted?.Invoke();
+    private void HandleUIKeycodeSpaceCanceled(InputAction.CallbackContext context) => OnUIKeycodeSpaceCanceled?.Invoke();
 
     public Vector2 GetMousePosition()
     {

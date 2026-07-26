@@ -1,93 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &538584620445516048
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5780406709399624090}
-  - component: {fileID: 8594907232231640366}
-  - component: {fileID: 1673490414178858398}
-  - component: {fileID: 458181387329738579}
-  m_Layer: 5
-  m_Name: Icon (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &5780406709399624090
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 538584620445516048}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8888354279336158064}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -33.1, y: 197.8}
-  m_SizeDelta: {x: 3, y: 318}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &8594907232231640366
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 538584620445516048}
-  m_CullTransparentMesh: 1
---- !u!114 &1673490414178858398
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 538584620445516048}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.13725491, g: 0.09411765, b: 0.019607844, a: 1}
-  m_RaycastTarget: 0
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 3
-  m_PreserveAspect: 1
-  m_FillCenter: 1
-  m_FillMethod: 1
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 1
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!225 &458181387329738579
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 538584620445516048}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1 &1039328245827887582
 GameObject:
   m_ObjectHideFlags: 0
@@ -116,7 +28,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1039328245827887582}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.000028031}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -124,8 +36,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 193.96, y: 197.8}
-  m_SizeDelta: {x: 409.91, y: 318}
+  m_AnchoredPosition: {x: 235.851, y: 214.1}
+  m_SizeDelta: {x: 424.583, y: 326.908}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8565575746334396886
 CanvasRenderer:
@@ -184,7 +96,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 34.45
+  m_fontSize: 35.7
   m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -309,7 +221,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2635677135821958823}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0.0000064824}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -317,8 +229,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -203, y: -173}
-  m_SizeDelta: {x: 357.1, y: 265}
+  m_AnchoredPosition: {x: -185.27, y: -192.631}
+  m_SizeDelta: {x: 370.55, y: 222.261}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7101212939109328171
 CanvasRenderer:
@@ -377,7 +289,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 40
+  m_fontSize: 34.85
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -504,7 +416,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1421250504516381400}
-  - {fileID: 5780406709399624090}
   - {fileID: 3014713512760059153}
   - {fileID: 3364114517122788900}
   - {fileID: 6157320358815801324}
@@ -530,13 +441,9 @@ MonoBehaviour:
   initialDelay: 0.5
   sequenceElements:
   - canvasGroup: {fileID: 2906503821271424438}
-    revealStyle: 0
-    textComponent: {fileID: 0}
-    imageComponent: {fileID: 0}
-  - canvasGroup: {fileID: 458181387329738579}
     revealStyle: 2
     textComponent: {fileID: 0}
-    imageComponent: {fileID: 1673490414178858398}
+    imageComponent: {fileID: 4834390757937843095}
   - canvasGroup: {fileID: 6226911247228354035}
     revealStyle: 1
     textComponent: {fileID: 5977913802517507340}
@@ -548,7 +455,7 @@ MonoBehaviour:
   - canvasGroup: {fileID: 5300225139680445374}
     revealStyle: 0
     textComponent: {fileID: 0}
-    imageComponent: {fileID: 0}
+    imageComponent: {fileID: 7240408673679370831}
   delayBetweenElements: 1
   fadeDuration: 0.5
   uiNoteTexts: []
@@ -565,7 +472,7 @@ GameObject:
   - component: {fileID: 4834390757937843095}
   - component: {fileID: 2906503821271424438}
   m_Layer: 5
-  m_Name: StickyNote2D
+  m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -579,7 +486,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6932399916976457643}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -587,7 +494,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -236.6, y: 191.5}
+  m_AnchoredPosition: {x: -202, y: 199.8}
   m_SizeDelta: {x: 305, y: 370}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &350864412957602684
@@ -618,14 +525,14 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: 20cdd7f68a4621e418422238f6b39eb2, type: 3}
+  m_Type: 3
   m_PreserveAspect: 1
   m_FillCenter: 1
-  m_FillMethod: 4
+  m_FillMethod: 1
   m_FillAmount: 1
   m_FillClockwise: 1
-  m_FillOrigin: 0
+  m_FillOrigin: 1
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
 --- !u!225 &2906503821271424438
@@ -653,7 +560,7 @@ GameObject:
   - component: {fileID: 7240408673679370831}
   - component: {fileID: 5300225139680445374}
   m_Layer: 5
-  m_Name: StickyNote2D (1)
+  m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -675,8 +582,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 203.5, y: -189.8}
-  m_SizeDelta: {x: 305, y: 307}
+  m_AnchoredPosition: {x: 182.00002, y: -193.05286}
+  m_SizeDelta: {x: 311.066, y: 313.106}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2446850488488246453
 CanvasRenderer:
@@ -706,14 +613,14 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: 1712c420948a9c643a445c3d14aaaadf, type: 3}
+  m_Type: 3
   m_PreserveAspect: 1
   m_FillCenter: 1
-  m_FillMethod: 4
+  m_FillMethod: 1
   m_FillAmount: 1
   m_FillClockwise: 1
-  m_FillOrigin: 0
+  m_FillOrigin: 1
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
 --- !u!225 &5300225139680445374

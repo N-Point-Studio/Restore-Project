@@ -38,4 +38,9 @@ public class GameConfigData : ScriptableObject
     public LocalizedString displayArtefactString;
     public LocalizedString returnToMenuString;
     public LocalizedString unboxingArtefactString;
+
+    [Header("Social Links")]
+    public string steamURL;
+    public string discordURL = "https://discord.gg/YOUR_INVITE_CODE";
+    public string instagramURL = "https://www.instagram.com/YOUR_ACCOUNT_NAME";
 }

@@ -241,6 +241,37 @@ public class ArtefactDetailController : MonoBehaviour
 
     private void OnJournalContinueClicked()
     {
+        bool isAllArtefactsCompleted = true;
+        
+        var allArtefacts = activeArtefactData.GetArtefactDatabase().GetAllItems();
+        
+        foreach (var item in allArtefacts)
+        {
+            if (!activeArtefactData.IsArtefactCompleted(item.BaseData.Id))
+            {
+                isAllArtefactsCompleted = false;
+                break;
+            }
+        }
+
+        if (isAllArtefactsCompleted)
+        {
+            if (isClosing) return;
+            isClosing = true;
+
+            if (current3DItem != null)
+            {
+                current3DItem.SetDetailMode(false, false);
+                current3DItem.Initialize(activeArtefactData);
+            }
+            CloseDetail();
+            MainMenuEvents.TriggerCloseArtefactDetail();
+            journalController.HideBookCompletely();
+            
+            MainMenuEvents.TriggerOpenCredits();
+            return;
+        }
+
         journalController.HideBookToPeek();
         if (buttonBack != null) buttonBack.SetAlternateStyle(true);
 
