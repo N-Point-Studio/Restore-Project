@@ -12,12 +12,13 @@ public class MainUIController : BaseMenuController
     [SerializeField] private ButtonInputInstructionUI buttonMobileWrapUp;
     [SerializeField] private Toggle hintToggle;
     [SerializeField] private Button buttonPause;
+    [SerializeField] private Image tipPoint;
 
     private InputSystemService input;
     private bool canWrapUp;
-    
-    private ButtonInputInstructionUI activeWrapUpButton; 
-    
+
+    private ButtonInputInstructionUI activeWrapUpButton;
+
     public event Action OnWrapUp;
     public event Action OnPauseRequest;
 
@@ -34,11 +35,13 @@ public class MainUIController : BaseMenuController
     protected override void Awake()
     {
         base.Awake();
-        
+
         bool isMobile = Application.isMobilePlatform;
 #if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
         isMobile = true;
 #endif
+
+        tipPoint.gameObject.SetActive(false);
 
         if (isMobile)
         {
@@ -53,13 +56,13 @@ public class MainUIController : BaseMenuController
                 buttonMobileWrapUp.gameObject.SetActive(false);
         }
 
-        if (activeWrapUpButton != null) 
+        if (activeWrapUpButton != null)
             activeWrapUpButton.OnClick += OnWrapUpClick;
 
-        if (hintToggle != null) 
+        if (hintToggle != null)
         {
             hintToggle.onValueChanged.AddListener(OnHintToggleValueChanged);
-            hintToggle.gameObject.SetActive(false); 
+            hintToggle.gameObject.SetActive(false);
         }
 
         if (buttonPause != null)
@@ -72,18 +75,18 @@ public class MainUIController : BaseMenuController
     protected override void OnDestroy()
     {
         base.OnDestroy();
-        
+
         // Unsubscribe from the active button
-        if (activeWrapUpButton != null) 
+        if (activeWrapUpButton != null)
             activeWrapUpButton.OnClick -= OnWrapUpClick;
-            
-        if (hintToggle != null) 
+
+        if (hintToggle != null)
             hintToggle.onValueChanged.RemoveListener(OnHintToggleValueChanged);
 
         if (buttonPause != null)
             buttonPause.onClick.RemoveListener(OnPauseClicked);
 
-        if (input != null) 
+        if (input != null)
             input.OnPlayerKeycodeEnterPerformed -= OnPlayerKeycodeEnterPerformed;
 
         InteractionEvents.OnTabPerformed -= SyncHintToggleOn;
@@ -93,7 +96,7 @@ public class MainUIController : BaseMenuController
     // ==========================================
     // PAUSE LOGIC
     // ==========================================
-    
+
     private void OnPauseClicked()
     {
         OnPauseRequest?.Invoke();
@@ -117,13 +120,13 @@ public class MainUIController : BaseMenuController
     {
         if (activeWrapUpButton == null) return;
 
-        GameObject targetObj = activeWrapUpButton == buttonWrapUp 
-            ? activeWrapUpButton.transform.parent.gameObject 
+        GameObject targetObj = activeWrapUpButton == buttonWrapUp
+            ? activeWrapUpButton.transform.parent.gameObject
             : activeWrapUpButton.gameObject;
 
         bool wasShowing = targetObj.activeSelf;
         targetObj.SetActive(isShowing);
-        
+
         if (isShowing && !wasShowing)
         {
             AudioEvents.TriggerPlayCustomSFX(Modules.SoundSystems.AudioKey.SFX_Finish);
@@ -150,7 +153,7 @@ public class MainUIController : BaseMenuController
 
     private void SyncHintToggleOn()
     {
-        if (hintToggle != null && !hintToggle.isOn) hintToggle.SetIsOnWithoutNotify(true); 
+        if (hintToggle != null && !hintToggle.isOn) hintToggle.SetIsOnWithoutNotify(true);
     }
 
     private void SyncHintToggleOff()
@@ -167,6 +170,22 @@ public class MainUIController : BaseMenuController
             isMobile = true;
 #endif
             hintToggle.gameObject.SetActive(isShowing && isMobile);
+        }
+    }
+
+    public void ShowTipPoint(bool isShowing)
+    {
+        if (tipPoint != null)
+        {
+            tipPoint.gameObject.SetActive(isShowing);
+        }
+    }
+
+    public void SetTipPosition(Vector2 screenPosition)
+    {
+        if (tipPoint != null)
+        {
+            tipPoint.rectTransform.position = screenPosition;
         }
     }
 }

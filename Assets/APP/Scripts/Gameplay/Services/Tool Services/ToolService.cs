@@ -11,6 +11,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
     private readonly TutorialService tutorialService;
     private readonly GameplayManager gameplayManager;
     private readonly InputSystemService inputSystemService;
+    private readonly GameplayUIManager gameplayUIManager;
 
     public bool isCleaning { get; private set; }
     public bool isFinished { get; set; } = false;
@@ -35,7 +36,8 @@ public class ToolService : IInitializable, IDisposable, ITickable
         CleaningService cleaningService,
         TutorialService tutorialService,
         GameplayManager gameplayManager,
-        InputSystemService inputSystemService)
+        InputSystemService inputSystemService,
+        GameplayUIManager gameplayUIManager)
     {
         this.objectDetectionService = objectDetectionService;
         this.surfaceDetectionService = surfaceDetectionService;
@@ -43,6 +45,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
         this.tutorialService = tutorialService;
         this.gameplayManager = gameplayManager;
         this.inputSystemService = inputSystemService;
+        this.gameplayUIManager = gameplayUIManager;
     }
 
     public void Initialize()
@@ -100,8 +103,6 @@ public class ToolService : IInitializable, IDisposable, ITickable
         {
             var worldPos = objectDetectionService.ScreenToWorld(mousePos, currentToolObject as IInteractObject);
             currentToolObject.FollowMouse(worldPos);
-
-            // Kursor keluar dari permukaan artefak -> Matikan suara
             PlayToolSfx(false);
             PlayToolVfx(false);
         }
@@ -166,7 +167,11 @@ public class ToolService : IInitializable, IDisposable, ITickable
     {
 #if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
         if (interact is IDraggableTool tool) draggableTool = tool;
-        if (draggableTool != null && draggableTool is IDragObject drag) drag.OnDragStarted(vector);
+        if (draggableTool != null && draggableTool is IDragObject drag)
+        {
+            gameplayUIManager.ShowTipPoint(true);
+            drag.OnDragStarted(vector);
+        }
 #endif
     }
 
@@ -174,8 +179,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
     {
 #if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
         if (interact is not IDraggableTool) { return; }
-        if (draggableTool != null && draggableTool is IDragObject tool) tool.OnDragPerformed(vector);
-        PerformRaycastTouch(inputSystemService.GetMousePosition());
+        PerformRaycastTouch(inputSystemService.GetMousePosition(), vector);
 #endif
 
     }
@@ -185,6 +189,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
 #if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
         if (interact is not IDraggableTool) { return; }
         if (draggableTool != null && draggableTool is IDragObject tool) tool.OnDragEnded(vector);
+        gameplayUIManager.ShowTipPoint(false);
         PlayToolSfx(false);
         PlayToolVfx(false);
         draggableTool = null;
@@ -223,19 +228,28 @@ public class ToolService : IInitializable, IDisposable, ITickable
         CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
     }
 
-    void PerformRaycastTouch(Vector2 screenPos)
+    void PerformRaycastTouch(Vector2 screenPos, Vector3 worldPos)
     {
         if (draggableTool == null) return;
         var tipPoint = new Vector2(screenPos.x, screenPos.y + tipOffset);
+        gameplayUIManager.SetTipPointPosition(tipPoint);
 
         if (surfaceDetectionService.DetectSurface(tipPoint))
         {
+            if (draggableTool is IDragObject tool) tool.OnDragPerformed(worldPos);
             StickToSurfaces();
         }
         else
         {
             PlayToolSfx(false);
             PlayToolVfx(false);
+            float distanceFromCamera = Camera.main.WorldToScreenPoint(draggableTool.GetTransform().position).z;
+            Vector3 screenPosWithDepth = new Vector3(tipPoint.x, tipPoint.y, distanceFromCamera);
+            Vector3 worldPosRelativeToCamera = Camera.main.ScreenToWorldPoint(screenPosWithDepth);
+            if (draggableTool is IDragObject tool)
+            {
+                tool.OnDragPerformed(worldPosRelativeToCamera);
+            }
         }
     }
 
@@ -283,8 +297,6 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
     private void CleanSurface(IDraggableBrushTool brushTool)
     {
-        // Debug.Log("Cleaning surface with draggable brush tool...");
-
         var surface = surfaceDetectionService.CleanableSurface;
 
         if (surface == null) return;
@@ -322,7 +334,6 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
         isCleaning = false;
         PlayToolSfx(true);
-        // PlayToolVfx(true);
 
         if (currentToolObject is IChiselTool tool) tool?.PlayGouge();
         if (draggableTool is IDraggableChiselTool draggableChisel) draggableChisel?.PlayGouge();

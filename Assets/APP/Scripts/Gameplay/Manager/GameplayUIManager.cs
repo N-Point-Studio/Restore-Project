@@ -419,4 +419,17 @@ public class GameplayUIManager : MonoBehaviour
             pauseController.SetActive(true);
         }
     }
+
+    public void ShowTipPoint(bool isShowing)
+    {
+        mainUIController.ShowTipPoint(isShowing);
+    }
+
+    public void SetTipPointPosition(Vector2 screenPosition)
+    {
+        if (mainUIController != null)
+        {
+            mainUIController.SetTipPosition(screenPosition);
+        }
+    }
 }

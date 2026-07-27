@@ -89,25 +89,18 @@ public abstract class DraggableTool : MonoBehaviour, IInteractObject, IDragObjec
         SetColliderEnable(false);
         returnSequence?.Kill();
 
-        targetPosition = CalculateTargetPosition(worldPos);
-        // Debug.Log($"Drag {name} Started at {worldPos}");
         if (animator != null) animator.enabled = true;
     }
 
     public void OnDragPerformed(Vector3 worldPos)
     {
         if (!isDragging) return;
-
-        targetPosition = CalculateTargetPosition(worldPos);
-
         transform.DOKill();
-        transform.DOMove(targetPosition, followMouseSpeed).SetEase(Ease.OutQuad);
+        transform.DOMove(worldPos, followMouseSpeed).SetEase(Ease.OutQuad);
     }
 
     public void OnDragEnded(Vector3 worldPos)
     {
-        // ToolVFX(false);
-        // PlaySfx(false);
         isDragging = false;
         isReturning = true;
         if (animator != null) animator.enabled = false;
@@ -122,11 +115,6 @@ public abstract class DraggableTool : MonoBehaviour, IInteractObject, IDragObjec
         returnSequence.OnComplete(() => isReturning = false);
     }
 
-    private Vector3 CalculateTargetPosition(Vector3 worldPos)
-    {
-        return new Vector3(worldPos.x, initialPosition.y, worldPos.z + grabOffset);
-    }
-
     public void StickToSurface(Vector3 position, Quaternion rotation)
     {
         transform.DOKill();
@@ -134,13 +122,9 @@ public abstract class DraggableTool : MonoBehaviour, IInteractObject, IDragObjec
         transform.DORotate(rotation.eulerAngles, surfaceRotateSpeed).SetEase(Ease.OutQuad);
     }
 
-    public void OnInteractDetected()
-    {
-    }
+    public void OnInteractDetected() { }
 
-    public void OnInteractEnded()
-    {
-    }
+    public void OnInteractEnded() { }
 
     public void SetColliderEnable(bool isActive)
     {
@@ -191,4 +175,9 @@ public abstract class DraggableTool : MonoBehaviour, IInteractObject, IDragObjec
 
     public void PlayVfx(bool isPlaying) { ToolVFX(isPlaying); }
     protected abstract void ToolVFX(bool isPlaying);
+
+    public Transform GetTransform()
+    {
+        return transform;
+    }
 }
