@@ -4,6 +4,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Localization;
+using VContainer;
+using Modules.SavingSystems;
 
 public class ArtefactDetailController : MonoBehaviour
 {
@@ -42,6 +44,8 @@ public class ArtefactDetailController : MonoBehaviour
     private bool isCompleted;
     private bool isClosing = false;
     private InputSystemService input;
+    private PlayerProgressionData playerProgressionData;
+    private ProjectSavingSystem projectSavingSystem;
 
     public bool IsOpen => root != null && root.activeSelf;
 
@@ -90,7 +94,7 @@ public class ArtefactDetailController : MonoBehaviour
         UnsubscribeArtefactData();
     }
 
-    public void SetInputSystemService(InputSystemService input)
+    public void SetServices(InputSystemService input, PlayerProgressionData playerProgressionData, ProjectSavingSystem projectSavingSystem)
     {
         if (this.input != null)
         {
@@ -99,6 +103,8 @@ public class ArtefactDetailController : MonoBehaviour
             this.input.OnUIKeycodeEnterPerformed -= OnUIKeycodeEnterPerformed;
         }
         this.input = input;
+        this.playerProgressionData = playerProgressionData;
+        this.projectSavingSystem = projectSavingSystem;
         journalController.SetInputSystemService(this.input);
         if (this.input != null)
         {
@@ -241,23 +247,16 @@ public class ArtefactDetailController : MonoBehaviour
 
     private void OnJournalContinueClicked()
     {
-        bool isAllArtefactsCompleted = true;
-        
-        var allArtefacts = activeArtefactData.GetArtefactDatabase().GetAllItems();
-        
-        foreach (var item in allArtefacts)
-        {
-            if (!activeArtefactData.IsArtefactCompleted(item.BaseData.Id))
-            {
-                isAllArtefactsCompleted = false;
-                break;
-            }
-        }
-
-        if (isAllArtefactsCompleted)
+        // --- 1. CHECK FOR FIRST-TIME GAME COMPLETION ---
+        // If all artefacts are done AND we haven't rolled the credits yet...
+        if (activeArtefactData.AreAllArtefactsCompleted() && !playerProgressionData.HasFinishedGame)
         {
             if (isClosing) return;
             isClosing = true;
+
+            playerProgressionData.MarkGameFinished();
+
+            projectSavingSystem.SaveAll();
 
             if (current3DItem != null)
             {
@@ -268,10 +267,13 @@ public class ArtefactDetailController : MonoBehaviour
             MainMenuEvents.TriggerCloseArtefactDetail();
             journalController.HideBookCompletely();
             
+            // Roll the credits!
             MainMenuEvents.TriggerOpenCredits();
             return;
         }
+        // -----------------------------------------------
 
+        // --- 2. NORMAL BEHAVIOR (Or Replaying the Last Level) ---
         journalController.HideBookToPeek();
         if (buttonBack != null) buttonBack.SetAlternateStyle(true);
 

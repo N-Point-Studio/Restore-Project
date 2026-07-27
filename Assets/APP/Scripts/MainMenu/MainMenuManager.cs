@@ -218,9 +218,8 @@ public class MainMenuManager : MonoBehaviour
     private void OnRequestCloseCredits()
     {
         backgroundController.SetActive(false);
-        
-        // Return to the main menu when credits end
         menuController.SetActive(true);
+        menuController.RefreshButtonVisibility();
     }
 
     private void OnConfirmNewGame()

@@ -8,9 +8,11 @@ public class PlayerProgressionData : ISaveable
 {
     private bool hasPlayedBefore;
     public bool HasPlayedBefore => hasPlayedBefore;
+    private bool hasFinishedGame;
+    public bool HasFinishedGame => hasFinishedGame;
 
     private HashSet<int> shownTutorials = new HashSet<int>();
-    
+
     private string currentActiveArtefactId;
     public string CurrentActiveArtefactId => currentActiveArtefactId;
 
@@ -55,9 +57,19 @@ public class PlayerProgressionData : ISaveable
         }
     }
 
+    public void MarkGameFinished()
+    {
+        if (!hasFinishedGame)
+        {
+            hasFinishedGame = true;
+            OnUpdated?.Invoke();
+        }
+    }
+
     public void ClearData()
     {
         hasPlayedBefore = false;
+        hasFinishedGame = false;
         shownTutorials.Clear();
         currentActiveArtefactId = string.Empty;
         OnUpdated?.Invoke();
@@ -67,6 +79,7 @@ public class PlayerProgressionData : ISaveable
     {
         JSONObject json = new JSONObject();
         json[nameof(hasPlayedBefore)] = hasPlayedBefore;
+        json[nameof(hasFinishedGame)] = hasFinishedGame;
         json[nameof(currentActiveArtefactId)] = currentActiveArtefactId;
 
         JSONArray tutorialsArray = new JSONArray();
@@ -83,6 +96,9 @@ public class PlayerProgressionData : ISaveable
     {
         if (json.HasKey(nameof(hasPlayedBefore)))
             hasPlayedBefore = json[nameof(hasPlayedBefore)].AsBool;
+
+        if (json.HasKey(nameof(hasFinishedGame)))
+            hasFinishedGame = json[nameof(hasFinishedGame)].AsBool;
 
         if (json.HasKey(nameof(currentActiveArtefactId)))
             currentActiveArtefactId = json[nameof(currentActiveArtefactId)];

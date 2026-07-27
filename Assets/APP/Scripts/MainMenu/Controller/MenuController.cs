@@ -68,6 +68,7 @@ public class MenuController : BaseMenuController
             bool hasPlayed = playerProgressionData.HasPlayedBefore;
             if (buttonContinue != null) buttonContinue.gameObject.SetActive(hasPlayed);
             if (buttonNewGame != null) buttonNewGame.SetLocalizedLabel(hasPlayed ? newGameLabel : startLabel);
+            if (buttonCredits != null) buttonCredits.gameObject.SetActive(playerProgressionData.HasFinishedGame);
         }
     }
 
