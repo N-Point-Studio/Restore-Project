@@ -12,6 +12,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
     private readonly GameplayManager gameplayManager;
     private readonly InputSystemService inputSystemService;
     private readonly GameplayUIManager gameplayUIManager;
+    private readonly GameConfigData gameConfigData;
 
     public bool isCleaning { get; private set; }
     public bool isFinished { get; set; } = false;
@@ -28,7 +29,6 @@ public class ToolService : IInitializable, IDisposable, ITickable
     private float movementTimer = 0f;
     private const float MOVEMENT_TIMEOUT = 0.15f;
 
-    private float tipOffset = 135;
 
     [Inject]
     public ToolService(ObjectDetectionService objectDetectionService,
@@ -37,7 +37,8 @@ public class ToolService : IInitializable, IDisposable, ITickable
         TutorialService tutorialService,
         GameplayManager gameplayManager,
         InputSystemService inputSystemService,
-        GameplayUIManager gameplayUIManager)
+        GameplayUIManager gameplayUIManager,
+        GameConfigData gameConfigData)
     {
         this.objectDetectionService = objectDetectionService;
         this.surfaceDetectionService = surfaceDetectionService;
@@ -46,6 +47,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
         this.gameplayManager = gameplayManager;
         this.inputSystemService = inputSystemService;
         this.gameplayUIManager = gameplayUIManager;
+        this.gameConfigData = gameConfigData;
     }
 
     public void Initialize()
@@ -231,7 +233,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
     void PerformRaycastTouch(Vector2 screenPos, Vector3 worldPos)
     {
         if (draggableTool == null) return;
-        var tipPoint = new Vector2(screenPos.x, screenPos.y + tipOffset);
+        var tipPoint = new Vector2(screenPos.x, screenPos.y + gameConfigData.toolTipOffset);
         gameplayUIManager.SetTipPointPosition(tipPoint);
 
         if (surfaceDetectionService.DetectSurface(tipPoint))

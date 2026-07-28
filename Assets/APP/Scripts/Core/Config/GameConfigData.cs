@@ -25,6 +25,9 @@ public class GameConfigData : ScriptableObject
     public float inspectionResetDuration = 1f;
     public float inspectionPinchSensitivity = 0.05f;
 
+    [Header("Tool Settings")]
+    public float toolTipOffset = 135f;
+
     [Header("System Settings")]
     public float autoSaveCooldown = 1.0f;
     public float minLoadingScreenDuration = 2.0f;
