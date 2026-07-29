@@ -66,12 +66,17 @@ MonoBehaviour:
   - P.S So your mom was an archeologist? Her love for history definitely shows in
     you! How is she doing?
   customGameplayBGM: 4
-  preRestorationPagePrefab: {fileID: 8636906436748886089, guid: 293edd6c68f3d8f4798da19eb07562f0, type: 3}
-  postRestorationPagePrefab: {fileID: 8866635996392126511, guid: 588a4135716dd79419f9c908add737aa, type: 3}
+  preRestorationPagePrefab: {fileID: 8636906436748886089, guid: 59d4cec8c38bc594ea457d5bb96c16c0, type: 3}
+  postRestorationPagePrefabs:
+  - {fileID: 8866635996392126511, guid: 0afd9824e5cbe134297ab0337b6d9c9b, type: 3}
+  - {fileID: 1276153152542897931, guid: d2efc443c93336d44b66fe79f0d29271, type: 3}
+  - {fileID: 7203347928531482933, guid: 67d4abb6cfb00b7449275cfe23dc52f7, type: 3}
+  - {fileID: 497317661898031955, guid: 17cdfab885eec074aaf2c521375bee62, type: 3}
+  - {fileID: 8860704531968068566, guid: 522db946c27dec94baa07d8c3f3b9184, type: 3}
   unlockedByDefault: 0
   unlockRequirements:
   - {fileID: 11400000, guid: be5bcc866d7c24e92a67ef37e57beff7, type: 2}
-  allowedToolTypes: -1
+  allowedToolTypes: 3
   artefactFragmentDatas:
   - prefab: {fileID: 9222601886007199220, guid: 383b32101bd7a4180937c944993fb254, type: 3}
     spawnTransform:
@@ -82,7 +87,9 @@ MonoBehaviour:
       rotation: {x: 0, y: 72.334, z: 0}
       position: {x: -0.91, y: 0.8399999, z: 2.74}
   finalRotation: {x: 345, y: 56, z: 150}
+  finalScaleMultiplier: 0
   clueTreshold: 80
+  zoomValue: 1.28
   references:
     version: 2
     RefIds: []

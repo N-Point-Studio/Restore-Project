@@ -14,7 +14,8 @@ public class GameConfigData : ScriptableObject
 
     [Header("Artefact Assembly")]
     public float socketSnapDistance = 2f;
-    public float assembleSnapDistance = 2f;
+    public float emptySlotDistance = 7f;
+    // public float assembleSnapDistance = 2f;
     public float recenterAnimDuration = 0.5f;
 
     [Header("Inspection Camera")]
@@ -22,6 +23,10 @@ public class GameConfigData : ScriptableObject
     public float inspectionZoomSpeed = 0.02f;
     public float inspectionSmoothTime = 0.1f;
     public float inspectionResetDuration = 1f;
+    public float inspectionPinchSensitivity = 0.05f;
+
+    [Header("Tool Settings")]
+    public float toolTipOffset = 135f;
 
     [Header("System Settings")]
     public float autoSaveCooldown = 1.0f;
@@ -36,4 +41,9 @@ public class GameConfigData : ScriptableObject
     public LocalizedString displayArtefactString;
     public LocalizedString returnToMenuString;
     public LocalizedString unboxingArtefactString;
+
+    [Header("Social Links")]
+    public string steamURL;
+    public string discordURL = "https://discord.gg/YOUR_INVITE_CODE";
+    public string instagramURL = "https://www.instagram.com/YOUR_ACCOUNT_NAME";
 }

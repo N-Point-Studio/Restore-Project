@@ -33,6 +33,8 @@ public static class InteractionEvents
         OnMouseMoved = null;
         OnTabPerformed = null;
         OnTabCanceled = null;
+        OnSpacePerformed = null;
+        OnSpaceCanceled = null;
         OnPressStarted = null;
         OnPressStart = null;
         OnPressEnded = null;

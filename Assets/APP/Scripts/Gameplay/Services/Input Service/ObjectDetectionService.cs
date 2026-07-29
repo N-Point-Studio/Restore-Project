@@ -9,6 +9,7 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
     private readonly Camera cam;
     private IInteractObject interactable;
     public Action<IInteractObject> OnInteractDetected;
+    private readonly InputSystemService inputSystemService;
 
     private PlaneReference plane;
     private bool isUsed = false;
@@ -21,10 +22,22 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
     {
         this.cam = cam;
         this.plane = plane;
+        this.inputSystemService = inputSystemService;
     }
 
-    public void Initialize() { InteractionEvents.OnMouseMoved += HandleMouseMove; }
-    public void Dispose() { InteractionEvents.OnMouseMoved -= HandleMouseMove; }
+    public void Initialize()
+    {
+        InteractionEvents.OnMouseMoved += HandleMouseMove;
+        inputSystemService.OnLeftPressStarted += HandlePressStarted;
+        inputSystemService.OnLeftPressEnded += HandlePressEnded;
+    }
+
+    public void Dispose()
+    {
+        InteractionEvents.OnMouseMoved -= HandleMouseMove;
+        inputSystemService.OnLeftPressStarted -= HandlePressStarted;
+        inputSystemService.OnLeftPressEnded -= HandlePressEnded;
+    }
 
     private bool IsValidPosition(Vector2 pos)
     {
@@ -54,12 +67,53 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
         }
         else CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
 
+        // [BUG FIX]: Simpan dulu nilainya sebelum di-null-kan agar tidak mereturn null
+        IInteractObject current = interactable;
         interactable = null;
-        return interactable;
+        return current;
+    }
+
+    private void HandlePressStarted(Vector2 screenPos)
+    {
+        if (!IsValidPosition(screenPos) || isUsed) return;
+
+        // Berlaku untuk PC (Klik) maupun Mobile (Tap/Touch)
+        IInteractObject newTarget = null;
+        if (TryRaycast(screenPos, out var hit))
+        {
+            hit.collider.TryGetComponent(out newTarget);
+        }
+
+        // Debug.Log("Press Started " + screenPos + " Hit: " + hit.collider?.name + " NewTarget: " + newTarget);
+
+        if (newTarget != interactable)
+        {
+            interactable?.OnInteractEnded();
+            interactable = newTarget;
+            interactable?.OnInteractDetected();
+            OnInteractDetected?.Invoke(interactable);
+        }
+    }
+
+    private void HandlePressEnded(Vector2 screenPos)
+    {
+        if (!IsValidPosition(screenPos)) return;
+
+#if UNITY_IOS || UNITY_ANDROID
+        // Khusus Mobile: Saat jari diangkat, otomatis interaksi berakhir
+        // karena tidak ada konsep "hover" di touch screen.
+        if (interactable != null && !isUsed)
+        {
+            interactable.OnInteractEnded();
+            interactable = null;
+            OnInteractDetected?.Invoke(null);
+        }
+#endif
     }
 
     private void HandleMouseMove(Vector2 screenPos)
     {
+#if UNITY_EDITOR || UNITY_STANDALONE
         if (!IsValidPosition(screenPos)) return;
 
         if (isUsed)
@@ -89,6 +143,27 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
             else CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
         }
         mousePos = screenPos;
+#endif
+    }
+
+    public void Tick()
+    {
+#if UNITY_EDITOR || UNITY_STANDALONE
+        // Tick hanya mendeteksi hover secara terus-menerus di PC/Editor.
+        // Di Mobile ini dimatikan agar hemat performa (karena tidak ada mouse hover).
+        if (isUsed || !IsValidPosition(mousePos)) return;
+
+        IInteractObject newTarget = null;
+        if (TryRaycast(mousePos, out var hit)) hit.collider.TryGetComponent(out newTarget);
+
+        if (newTarget != interactable)
+        {
+            interactable?.OnInteractEnded();
+            interactable = newTarget;
+            newTarget?.OnInteractDetected();
+            OnInteractDetected?.Invoke(newTarget);
+        }
+#endif
     }
 
     public bool TryRaycast(Vector2 screenPos, out RaycastHit hit)
@@ -140,21 +215,5 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
         Plane dragPlane = new(plane.transform.up, plane.transform.position);
         if (dragPlane.Raycast(ray, out float distance)) return ray.GetPoint(distance);
         return Vector3.zero;
-    }
-
-    public void Tick()
-    {
-        if (isUsed || !IsValidPosition(mousePos)) return;
-
-        IInteractObject newTarget = null;
-        if (TryRaycast(mousePos, out var hit)) hit.collider.TryGetComponent(out newTarget);
-
-        if (newTarget != interactable)
-        {
-            interactable?.OnInteractEnded();
-            interactable = newTarget;
-            newTarget?.OnInteractDetected();
-            OnInteractDetected?.Invoke(newTarget);
-        }
     }
 }

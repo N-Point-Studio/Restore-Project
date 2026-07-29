@@ -31,8 +31,8 @@ public class ArtefactData : ScriptableObject
     [Header("Journal Content (Prefabs)")]
     [SerializeField] private JournalPageAnimator preRestorationPagePrefab;
     public JournalPageAnimator PreRestorationPagePrefab => preRestorationPagePrefab;
-    [SerializeField] private JournalPageAnimator postRestorationPagePrefab;
-    public JournalPageAnimator PostRestorationPagePrefab => postRestorationPagePrefab;
+    [SerializeField] private JournalPageAnimator[] postRestorationPagePrefabs;
+    public JournalPageAnimator[] PostRestorationPagePrefabs => postRestorationPagePrefabs;
 
     [SerializeField] private bool unlockedByDefault;
     public bool UnlockedByDefault => unlockedByDefault;
@@ -49,8 +49,14 @@ public class ArtefactData : ScriptableObject
     [SerializeField] private Vector3 finalRotation;
     public Vector3 FinalRotation => finalRotation;
 
+    [SerializeField] private float finalScaleMultiplier;
+    public float FinalScaleMultiplier => finalScaleMultiplier;
+
     [SerializeField] private float clueTreshold;
     public float ClueTreshold => clueTreshold;
+
+    [SerializeField] private float zoomValue;
+    public float ZoomValue => zoomValue;
 
     private string artefactGroupId;
     public string ArtefactGroupId => artefactGroupId;

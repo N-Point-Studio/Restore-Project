@@ -1,34 +1,110 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 using VContainer;
 
 public class MainUIController : BaseMenuController
 {
+    [Header("Desktop")]
     [SerializeField] private ButtonInputInstructionUI buttonWrapUp;
+
+    [Header("Mobile")]
+    [SerializeField] private ButtonInputInstructionUI buttonMobileWrapUp;
+    [SerializeField] private Toggle hintToggle;
+    [SerializeField] private Button buttonPause;
+    [SerializeField] private Image tipPoint;
 
     private InputSystemService input;
     private bool canWrapUp;
+
+    private ButtonInputInstructionUI activeWrapUpButton;
+
     public event Action OnWrapUp;
+    public event Action OnPauseRequest;
 
     [Inject]
     public void Construct(InputSystemService input)
     {
         this.input = input;
         this.input.OnPlayerKeycodeEnterPerformed += OnPlayerKeycodeEnterPerformed;
+
+        InteractionEvents.OnTabPerformed += SyncHintToggleOn;
+        InteractionEvents.OnTabCanceled += SyncHintToggleOff;
     }
 
     protected override void Awake()
     {
         base.Awake();
-        buttonWrapUp.OnClick += OnWrapUpClick;
+
+        bool isMobile = Application.isMobilePlatform;
+#if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+        isMobile = true;
+#endif
+
+        tipPoint.gameObject.SetActive(false);
+
+        if (isMobile)
+        {
+            activeWrapUpButton = buttonMobileWrapUp;
+            if (buttonWrapUp != null && buttonWrapUp.transform.parent != null)
+                buttonWrapUp.transform.parent.gameObject.SetActive(false);
+        }
+        else
+        {
+            activeWrapUpButton = buttonWrapUp;
+            if (buttonMobileWrapUp != null)
+                buttonMobileWrapUp.gameObject.SetActive(false);
+        }
+
+        if (activeWrapUpButton != null)
+            activeWrapUpButton.OnClick += OnWrapUpClick;
+
+        if (hintToggle != null)
+        {
+            hintToggle.onValueChanged.AddListener(OnHintToggleValueChanged);
+            hintToggle.gameObject.SetActive(false);
+        }
+
+        if (buttonPause != null)
+        {
+            buttonPause.onClick.AddListener(OnPauseClicked);
+            buttonPause.gameObject.SetActive(isMobile);
+        }
     }
 
     protected override void OnDestroy()
     {
         base.OnDestroy();
-        buttonWrapUp.OnClick -= OnWrapUpClick;
-        input.OnPlayerKeycodeEnterPerformed -= OnPlayerKeycodeEnterPerformed;
+
+        // Unsubscribe from the active button
+        if (activeWrapUpButton != null)
+            activeWrapUpButton.OnClick -= OnWrapUpClick;
+
+        if (hintToggle != null)
+            hintToggle.onValueChanged.RemoveListener(OnHintToggleValueChanged);
+
+        if (buttonPause != null)
+            buttonPause.onClick.RemoveListener(OnPauseClicked);
+
+        if (input != null)
+            input.OnPlayerKeycodeEnterPerformed -= OnPlayerKeycodeEnterPerformed;
+
+        InteractionEvents.OnTabPerformed -= SyncHintToggleOn;
+        InteractionEvents.OnTabCanceled -= SyncHintToggleOff;
     }
+
+    // ==========================================
+    // PAUSE LOGIC
+    // ==========================================
+
+    private void OnPauseClicked()
+    {
+        OnPauseRequest?.Invoke();
+    }
+
+    // ==========================================
+    // WRAP UP LOGIC
+    // ==========================================
 
     private void OnWrapUpClick()
     {
@@ -42,10 +118,15 @@ public class MainUIController : BaseMenuController
 
     public void ShowButtonWrap(bool isShowing)
     {
-        bool wasShowing = buttonWrapUp.transform.parent.gameObject.activeSelf;
+        if (activeWrapUpButton == null) return;
 
-        buttonWrapUp.transform.parent.gameObject.SetActive(isShowing);
-        
+        GameObject targetObj = activeWrapUpButton == buttonWrapUp
+            ? activeWrapUpButton.transform.parent.gameObject
+            : activeWrapUpButton.gameObject;
+
+        bool wasShowing = targetObj.activeSelf;
+        targetObj.SetActive(isShowing);
+
         if (isShowing && !wasShowing)
         {
             AudioEvents.TriggerPlayCustomSFX(Modules.SoundSystems.AudioKey.SFX_Finish);
@@ -56,7 +137,55 @@ public class MainUIController : BaseMenuController
     {
         if (canWrapUp)
         {
-            buttonWrapUp.OnClick?.Invoke();
+            activeWrapUpButton?.OnClick?.Invoke();
+        }
+    }
+
+    // ==========================================
+    // HINT / CLUE TOGGLE LOGIC
+    // ==========================================
+
+    private void OnHintToggleValueChanged(bool isOn)
+    {
+        if (isOn) InteractionEvents.OnTabPerformed?.Invoke();
+        else InteractionEvents.OnTabCanceled?.Invoke();
+    }
+
+    private void SyncHintToggleOn()
+    {
+        if (hintToggle != null && !hintToggle.isOn) hintToggle.SetIsOnWithoutNotify(true);
+    }
+
+    private void SyncHintToggleOff()
+    {
+        if (hintToggle != null && hintToggle.isOn) hintToggle.SetIsOnWithoutNotify(false);
+    }
+
+    public void ShowHintToggle(bool isShowing)
+    {
+        if (hintToggle != null)
+        {
+            bool isMobile = Application.isMobilePlatform;
+#if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+            isMobile = true;
+#endif
+            hintToggle.gameObject.SetActive(isShowing && isMobile);
+        }
+    }
+
+    public void ShowTipPoint(bool isShowing)
+    {
+        if (tipPoint != null)
+        {
+            tipPoint.gameObject.SetActive(isShowing);
+        }
+    }
+
+    public void SetTipPosition(Vector2 screenPosition)
+    {
+        if (tipPoint != null)
+        {
+            tipPoint.rectTransform.position = screenPosition;
         }
     }
 }

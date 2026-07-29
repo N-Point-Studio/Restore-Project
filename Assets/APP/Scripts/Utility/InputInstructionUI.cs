@@ -11,13 +11,21 @@ public class InputInstructionUI : MonoBehaviour
     [Header("Data")]
     [SerializeField] protected InputActionReference inputAction;
     [SerializeField] protected bool isHolding;
-    
     [SerializeField] protected LocalizedString localizedInfo; 
     
+    [Header("Platform Typography")]
+    [SerializeField] private TypographyStyle textStyle = TypographyStyle.PrimaryButton;
+    
+    [Header("Display Rules")]
+    [Tooltip("Check this to manually type the text in the Inspector. The script will stop trying to auto-update it with Localized Strings.")]
     [SerializeField] protected bool customText;
+    [Tooltip("Hides this entire UI prompt if the player is using a Keyboard & Mouse.")]
     [SerializeField] protected bool hideEverythingIfNotController;
+    [Tooltip("Hides this entire UI prompt if the player is using a Gamepad/Controller.")]
     [SerializeField] protected bool hideEverythingIfController;
-    [SerializeField] protected bool hideEverythingIfMobile;
+    [Tooltip("Hides the button graphic/icon on Mobile devices, leaving ONLY the text description visible.")]
+    [SerializeField] protected bool hideInputIconOnMobile;
+    [Tooltip("Hides the background panel and text description, displaying ONLY the raw button icon.")]
     [SerializeField] protected bool iconOnly;
 
     [Header("Component")]
@@ -51,6 +59,8 @@ public class InputInstructionUI : MonoBehaviour
         }
 
         InputUser.onChange += HandleOnInputChanged;
+
+        ApplyTypographyStyle();
 
         SetupUI();
     }
@@ -124,6 +134,22 @@ public class InputInstructionUI : MonoBehaviour
         SetupUI();
     }
 
+    private void ApplyTypographyStyle()
+    {
+        bool isMobile = Application.isMobilePlatform;
+#if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+        isMobile = true;
+#endif
+
+        if (textStyle == TypographyStyle.None)
+            return;
+            
+        TypographyProfile profile = UIStyleData.Instance.GetProfile(textStyle);
+        float targetSize = isMobile ? profile.mobileSize : profile.desktopSize;
+
+        if (textInfo != null) textInfo.fontSize = targetSize;
+    }
+
     public virtual void ForceSetLocalizedText(bool isHolding, LocalizedString newLocalizedInfo)
     {
         this.isHolding = isHolding;
@@ -153,10 +179,9 @@ public class InputInstructionUI : MonoBehaviour
         SetupUI();
     }
 
-    // NEW: Setter for Mobile
-    public virtual void SetHideEverythingIfMobile(bool isHidden)
+    public virtual void SetHideInputIconOnMobile(bool isHidden)
     {
-        hideEverythingIfMobile = isHidden;
+        hideInputIconOnMobile = isHidden;
         SetupUI();
     }
 
@@ -317,7 +342,7 @@ public class InputInstructionUI : MonoBehaviour
             }
         }
 
-        imageInput.transform.parent.gameObject.SetActive(true);
+        if (imageInput != null) imageInput.transform.parent.gameObject.SetActive(true);
 
         bool isMobile = Application.isMobilePlatform;
 
@@ -325,7 +350,7 @@ public class InputInstructionUI : MonoBehaviour
         isMobile = true;
 #endif
 
-        if (hideEverythingIfMobile && isMobile)
+        if (hideInputIconOnMobile && isMobile)
         {
             if (horizontalLayoutGroup != null) horizontalLayoutGroup.gameObject.SetActive(true);
             if (textInfo != null) textInfo.gameObject.SetActive(true);
@@ -350,7 +375,12 @@ public class InputInstructionUI : MonoBehaviour
     {
         if (!customText && textInfo != null)
         {
-            textInfo.text = $"{(isHolding ? $"(Hold) {currentTranslatedInfo}" : currentTranslatedInfo)}";
+            if (Application.isPlaying)
+            {
+                textInfo.text = $"{(isHolding ? $"(Hold) {currentTranslatedInfo}" : currentTranslatedInfo)}";
+            }
+            
+            textInfo.ForceMeshUpdate();
         }
         
         if (contentSizeFitter != null && gameObject.activeInHierarchy)

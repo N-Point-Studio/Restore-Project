@@ -39,14 +39,14 @@ public class Artefact3DItem : MonoBehaviour
     private bool hasUnpeeledNotes = false;
     private bool isSelectionModeActive = false;
     private bool isCompleted = false;
-    
+
     private Vector3 originalPosition;
-    private Vector3 originalScale; 
+    private Vector3 originalScale;
     private bool isPosInitialized = false;
 
     public string ArtefactId => artefactId;
     public bool IsInDetailMode => isInDetailMode;
-    
+
     public bool CheckUnpeeledNotes()
     {
         if (stickyNoteObjects == null) return false;
@@ -124,7 +124,7 @@ public class Artefact3DItem : MonoBehaviour
         if (!isPosInitialized)
         {
             originalPosition = transform.localPosition;
-            originalScale = transform.localScale; 
+            originalScale = transform.localScale;
             isPosInitialized = true;
         }
     }
@@ -144,13 +144,13 @@ public class Artefact3DItem : MonoBehaviour
         }
     }
 
-     public bool CanInteract(bool isSensorBox)
+    public bool CanInteract(bool isSensorBox)
     {
         if (!isSelectionModeActive) return false;
         if (!isInteractable || artefactData == null) return false;
         if (isInDetailMode && isCompleted) return false;
         if (isSensorBox && isInDetailMode && hasUnpeeledNotes) return false;
-        
+
         return true;
     }
 
@@ -168,7 +168,18 @@ public class Artefact3DItem : MonoBehaviour
         else
         {
             MainMenuEvents.TriggerOpenArtefactDetail(artefactData);
-            Transform targetTransform = isSensorBox ? boxTransform : artefactTransform;
+            Transform targetTransform;
+
+            // If completed, always use the nicely framed camera transform
+            if (isCompleted)
+            {
+                targetTransform = artefactCameraTransform;
+            }
+            else
+            {
+                targetTransform = isSensorBox ? boxTransform : artefactTransform;
+            }
+
             MainMenuEvents.TriggerCameraFocusToArtefact(targetTransform);
         }
     }
@@ -189,10 +200,10 @@ public class Artefact3DItem : MonoBehaviour
 
     public void PlayUnlockAnimation()
     {
-        if (boxTransform != null) 
+        if (boxTransform != null)
         {
             boxTransform.localScale = Vector3.one;
-            boxTransform.gameObject.SetActive(true); 
+            boxTransform.gameObject.SetActive(true);
         }
 
         if (unlockFeedback != null) unlockFeedback.PlayFeedbacks();
@@ -200,22 +211,22 @@ public class Artefact3DItem : MonoBehaviour
 
     public void PlayCompletionAnimation()
     {
-        if (artefactTransform != null) 
+        if (artefactTransform != null)
         {
             artefactTransform.localScale = Vector3.zero;
             artefactTransform.gameObject.SetActive(true);
             artefactTransform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack).SetDelay(0.15f);
         }
-        
-        if (boxTransform != null) 
+
+        if (boxTransform != null)
         {
-            boxTransform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack).OnComplete(() => 
+            boxTransform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack).OnComplete(() =>
             {
                 boxTransform.gameObject.SetActive(false);
-                boxTransform.localScale = Vector3.one; 
+                boxTransform.localScale = Vector3.one;
             });
         }
-        
+
         if (completionFeedback != null) completionFeedback.PlayFeedbacks();
     }
 
@@ -228,7 +239,7 @@ public class Artefact3DItem : MonoBehaviour
         if (assignedPedestal != null)
         {
             PedestalAnimator animator = assignedPedestal.GetComponent<PedestalAnimator>();
-            if (animator != null) 
+            if (animator != null)
             {
                 animator.AnimatePedestal(show, duration);
             }
@@ -239,20 +250,20 @@ public class Artefact3DItem : MonoBehaviour
         foreach (Renderer r in renderers)
         {
             if (r.material == null) continue;
-            
+
             r.material.DOKill();
             if (r.material.HasProperty("_BaseColor")) r.material.DOFade(targetAlpha, "_BaseColor", duration);
             else if (r.material.HasProperty("_Color")) r.material.DOFade(targetAlpha, "_Color", duration);
         }
 
         transform.DOKill();
-        
+
         Vector3 targetPos = show ? originalPosition : originalPosition + (Vector3.down * slideDownDistance);
-        Vector3 targetScale = show ? originalScale : Vector3.zero; 
+        Vector3 targetScale = show ? originalScale : Vector3.zero;
 
         transform.DOLocalMove(targetPos, duration).SetEase(show ? Ease.OutBack : Ease.InBack);
         transform.DOScale(targetScale, duration).SetEase(show ? Ease.OutBack : Ease.InBack)
-            .OnComplete(() => 
+            .OnComplete(() =>
             {
                 if (!show) gameObject.SetActive(false);
             });

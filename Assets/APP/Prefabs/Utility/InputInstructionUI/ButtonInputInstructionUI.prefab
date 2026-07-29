@@ -351,10 +351,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputAction: {fileID: 0}
   isHolding: 0
-  info: Back
+  localizedInfo:
+    m_TableReference:
+      m_TableCollectionName: 
+    m_TableEntryReference:
+      m_KeyId: 0
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  textStyle: 0
   customText: 0
   hideEverythingIfNotController: 0
   hideEverythingIfController: 0
+  hideInputIconOnMobile: 0
   iconOnly: 0
   textInput: {fileID: 6829846748616176537}
   imageInput: {fileID: 7440108644551661735}
@@ -379,6 +389,10 @@ MonoBehaviour:
   tweenDuration: 0.2
   tweenEase: 6
   useAlternateStyle: 0
+  applyAlternateStyleOnStart: 1
+  references:
+    version: 2
+    RefIds: []
 --- !u!114 &7336051414703635489
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -717,7 +731,7 @@ RectTransform:
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 72.21, y: -9.115}
   m_SizeDelta: {x: 59.79, y: 41.77}
-  m_Pivot: {x: 0, y: 1}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4346657747324093493
 CanvasRenderer:
   m_ObjectHideFlags: 0

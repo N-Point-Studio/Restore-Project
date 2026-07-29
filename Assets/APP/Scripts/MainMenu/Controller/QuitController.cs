@@ -18,19 +18,16 @@ public class QuitController : BaseMenuController
     [SerializeField] private ButtonItemUI buttonCancel;
     [SerializeField] private ButtonItemUI buttonConfirm;
 
-    [Header("Settings")]
-    [SerializeField] private string wishlistLink;
-    [SerializeField] private string discordLink;
-    [SerializeField] private string instagramLink;
-
     private Tween quitTween;
     private ProjectSavingSystem projectSavingSystem;
+    private GameConfigData configData;
     public event Action OnQuitCancelled;
 
     [Inject]
-    public void Construct(ProjectSavingSystem projectSavingSystem)
+    public void Construct(ProjectSavingSystem projectSavingSystem, GameConfigData configData)
     {
         this.projectSavingSystem = projectSavingSystem;
+        this.configData = configData;
     }
 
     protected override void Awake()
@@ -60,17 +57,26 @@ public class QuitController : BaseMenuController
 
     private void OnButtonWishlistClick()
     {
-        if (!string.IsNullOrEmpty(wishlistLink)) Application.OpenURL(wishlistLink);
+        if (configData == null)
+            return;
+
+        if (!string.IsNullOrEmpty(configData.steamURL)) Application.OpenURL(configData.steamURL);
     }
 
     private void OnButtonDiscordClick()
     {
-        if (!string.IsNullOrEmpty(discordLink)) Application.OpenURL(discordLink);
+        if (configData == null)
+            return;
+
+        if (!string.IsNullOrEmpty(configData.discordURL)) Application.OpenURL(configData.discordURL);
     }
 
     private void OnButtonInstagramClick()
     {
-        if (!string.IsNullOrEmpty(instagramLink)) Application.OpenURL(instagramLink);
+        if (configData == null)
+            return;
+
+        if (!string.IsNullOrEmpty(configData.instagramURL)) Application.OpenURL(configData.instagramURL);
     }
 
     private void OnButtonCancelClick()

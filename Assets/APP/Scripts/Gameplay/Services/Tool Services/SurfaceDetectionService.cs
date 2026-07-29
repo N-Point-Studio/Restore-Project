@@ -29,6 +29,8 @@ public class SurfaceDetectionService
 
         Ray ray = cam.ScreenPointToRay(screenPos);
 
+        Debug.DrawRay(ray.origin, ray.direction * 10f, Color.red, 1f);
+
         if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, pieceLayerMask))
             return false;
 

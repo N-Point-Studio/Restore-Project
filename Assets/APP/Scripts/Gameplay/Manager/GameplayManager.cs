@@ -12,12 +12,16 @@ public class GameplayManager : IInitializable, IDisposable
     private readonly InputSystemService inputSystemService;
     private readonly GameConfigData config;
     private readonly TutorialService tutorialService;
-    private readonly Light directionalLight;
+    private readonly List<Light> firstDirectionalLight;
+
+    private readonly GameplayToolManager gameplayToolManager;
 
     private ArtefactData artefactData;
     public bool isTutorialAvailable;
     public Vector3 finalRotation;
+    public float finalScaleMultiplier;
     public float clueTreshold;
+    public float zoomValue;
     private string targetScene = "MainMenu";
     public float overallProgress;
 
@@ -29,8 +33,9 @@ public class GameplayManager : IInitializable, IDisposable
     InputSystemService inputSystemService,
     string targetScene,
     TutorialService tutorialService,
-    Light directionalLight,
-    GameConfigData config)
+     List<Light> firstDirectionalLight,
+    GameConfigData config,
+    GameplayToolManager gameplayToolManager)
     {
         this.playerProgressionData = playerProgressionData;
         this.activeArtefactData = activeArtefactData;
@@ -39,7 +44,8 @@ public class GameplayManager : IInitializable, IDisposable
         this.targetScene = targetScene;
         this.config = config;
         this.tutorialService = tutorialService;
-        this.directionalLight = directionalLight;
+        this.firstDirectionalLight = firstDirectionalLight;
+        this.gameplayToolManager = gameplayToolManager;
 
         InitializeSession();
     }
@@ -77,8 +83,10 @@ public class GameplayManager : IInitializable, IDisposable
         if (overallProgress >= clueTreshold)
         {
             // AppLogger.Log("[HARUSNYA] Tab nyala");
-
-            directionalLight.enabled = false;
+            foreach (var light in firstDirectionalLight)
+            {
+                light.enabled = false;
+            }
             if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 0)
             {
                 tutorialService.CompleteAndAdvance(false);
@@ -88,7 +96,13 @@ public class GameplayManager : IInitializable, IDisposable
 
     private void HandleTabCanceled()
     {
-        if (overallProgress >= clueTreshold) directionalLight.enabled = true;
+        if (overallProgress >= clueTreshold)
+        {
+            foreach (var light in firstDirectionalLight)
+            {
+                light.enabled = true;
+            }
+        }
     }
 
 
@@ -103,6 +117,12 @@ public class GameplayManager : IInitializable, IDisposable
 
     private void HandleGameWrapped()
     {
+        foreach (var light in firstDirectionalLight)
+        {
+            if (light.enabled) continue;
+            light.enabled = true;
+        }
+
         SaveObjectCompletion();
     }
 
@@ -151,7 +171,17 @@ public class GameplayManager : IInitializable, IDisposable
             {
                 artefactData = activeArtefactData.GetArtefactDatabase().GetItem(targetId);
                 finalRotation = artefactData.FinalRotation;
+
+                finalScaleMultiplier = artefactData.FinalScaleMultiplier;
+                if (finalScaleMultiplier <= 0f) finalScaleMultiplier = 1f;
+
+#if UNITY_STANDALONE
                 clueTreshold = artefactData.ClueTreshold;
+#elif UNITY_IOS || UNITY_ANDROID || UNITY_EDITOR
+                clueTreshold = 50f;
+#endif
+                zoomValue = artefactData.ZoomValue;
+                var ToolType = artefactData.AllowedToolTypes;
                 // clueTreshold 
 
                 List<ArtefactFragmentData> artefactFragments = artefactData.ArtefactFragmentDatas;
@@ -160,6 +190,8 @@ public class GameplayManager : IInitializable, IDisposable
                     ArtefactFragmentData artefact = artefactFragments[i];
                     Spawn(artefact.Prefab, artefact.SpawnTransform.Position, artefact.SpawnTransform.Rotation);
                 }
+
+                gameplayToolManager.SetToolVisibility(ToolType, true);
 
                 isTutorialAvailable = CheckTutorialAvailability(1);
             }

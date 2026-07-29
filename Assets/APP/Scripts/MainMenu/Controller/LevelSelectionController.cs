@@ -48,7 +48,8 @@ public class LevelSelectionController : BaseMenuController
         PlayerProgressionData playerProgressionData,
         SceneLoader sceneLoader,
         InputSystemService input,
-        GameConfigData config
+        GameConfigData config,
+        ProjectSavingSystem projectSavingSystem
         )
     {
         this.activeArtefactData = activeArtefactData;
@@ -56,7 +57,7 @@ public class LevelSelectionController : BaseMenuController
         this.sceneLoader = sceneLoader;
         this.input = input;
         this.config = config;
-        artefactDetailController.SetInputSystemService(this.input);
+        artefactDetailController.SetServices(this.input, this.playerProgressionData, projectSavingSystem);
     }
 
     protected override void Awake()
@@ -391,6 +392,8 @@ public class LevelSelectionController : BaseMenuController
                     
                     RefreshUI();
                     isPlayingSequence = false;
+
+                    MainMenuEvents.TriggerShowBackground(true);
 
                     OpenArtefactDetailAutomatically(aData, false); 
                     

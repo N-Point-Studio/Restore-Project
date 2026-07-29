@@ -9,6 +9,7 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 public class InputSystemService : IInitializable, IDisposable, ITickable
 {
     private readonly PlayerInputSystem inputSystem;
+    private readonly GameConfigData config;
     private GameInput Input => inputSystem.Input;
 
     public event Action<Vector2> OnLeftPressStarted;
@@ -24,21 +25,26 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
     public event Action OnUIKeycodeEnterPerformed;
     public event Action OnUIKeycodeEscapePerformed;
     public event Action OnUIKeycodeRPerformed;
+    public event Action OnUIKeycodeArrowRightPerformed;
+    public event Action OnUIKeycodeArrowLeftPerformed;
+    public event Action OnUIKeycodeSpaceStarted;
+    public event Action OnUIKeycodeSpaceCanceled;
 
     private float previousPinchDistance;
 
     [Inject]
-    public InputSystemService(PlayerInputSystem inputSystem)
+    public InputSystemService(PlayerInputSystem inputSystem, GameConfigData config)
     {
         this.inputSystem = inputSystem;
+        this.config = config;
     }
 
     public void Initialize()
     {
         EnhancedTouchSupport.Enable();
-        
+
 #if UNITY_EDITOR
-        UnityEngine.InputSystem.EnhancedTouch.TouchSimulation.Enable(); 
+        UnityEngine.InputSystem.EnhancedTouch.TouchSimulation.Enable();
 #endif
 
         Input.Player.Press.started += HandleLeftPressStarted;
@@ -55,12 +61,16 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
         Input.UI.KeycodeEnter.performed += HandleUIKeycodeEnterPerformed;
         Input.UI.KeycodeEscape.performed += HandleUIKeycodeEscapePerformed;
         Input.UI.KeycodeR.performed += HandleUIKeycodeRPerformed;
+        Input.UI.KeycodeArrowRight.performed += HandleUIKeycodeArrowRightPerformed;
+        Input.UI.KeycodeArrowLeft.performed += HandleUIKeycodeArrowLeftPerformed;
+        Input.UI.KeycodeSpace.started += HandleUIKeycodeSpaceStarted;
+        Input.UI.KeycodeSpace.canceled += HandleUIKeycodeSpaceCanceled;
     }
 
     public void Dispose()
     {
         EnhancedTouchSupport.Disable();
-        
+
 #if UNITY_EDITOR
         UnityEngine.InputSystem.EnhancedTouch.TouchSimulation.Disable();
 #endif
@@ -79,6 +89,10 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
         Input.UI.KeycodeEnter.performed -= HandleUIKeycodeEnterPerformed;
         Input.UI.KeycodeEscape.performed -= HandleUIKeycodeEscapePerformed;
         Input.UI.KeycodeR.performed -= HandleUIKeycodeRPerformed;
+        Input.UI.KeycodeArrowRight.performed -= HandleUIKeycodeArrowRightPerformed;
+        Input.UI.KeycodeArrowLeft.performed -= HandleUIKeycodeArrowLeftPerformed;
+        Input.UI.KeycodeSpace.started -= HandleUIKeycodeSpaceStarted;
+        Input.UI.KeycodeSpace.canceled -= HandleUIKeycodeSpaceCanceled;
     }
 
     public void Tick()
@@ -98,8 +112,10 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
             else if (touch0.phase == UnityEngine.InputSystem.TouchPhase.Moved || touch1.phase == UnityEngine.InputSystem.TouchPhase.Moved)
             {
                 float pinchDelta = currentPinchDistance - previousPinchDistance;
+                float dpi = Screen.dpi > 0 ? Screen.dpi : 160f;
+                float normalizedPinchDelta = pinchDelta / dpi;
 
-                OnScrollPerformed?.Invoke(-pinchDelta * 0.1f);
+                OnScrollPerformed?.Invoke(-normalizedPinchDelta * config.inspectionPinchSensitivity);
 
                 previousPinchDistance = currentPinchDistance;
             }
@@ -121,10 +137,19 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
     private void HandleUIKeycodeEnterPerformed(InputAction.CallbackContext context) => OnUIKeycodeEnterPerformed?.Invoke();
     private void HandleUIKeycodeEscapePerformed(InputAction.CallbackContext context) => OnUIKeycodeEscapePerformed?.Invoke();
     private void HandleUIKeycodeRPerformed(InputAction.CallbackContext context) => OnUIKeycodeRPerformed?.Invoke();
+    private void HandleUIKeycodeArrowRightPerformed(InputAction.CallbackContext context) => OnUIKeycodeArrowRightPerformed?.Invoke();
+    private void HandleUIKeycodeArrowLeftPerformed(InputAction.CallbackContext context) => OnUIKeycodeArrowLeftPerformed?.Invoke();
+    private void HandleUIKeycodeSpaceStarted(InputAction.CallbackContext context) => OnUIKeycodeSpaceStarted?.Invoke();
+    private void HandleUIKeycodeSpaceCanceled(InputAction.CallbackContext context) => OnUIKeycodeSpaceCanceled?.Invoke();
 
     public Vector2 GetMousePosition()
     {
-        if (Touch.activeTouches.Count > 0) return Touch.activeTouches[0].screenPosition;
-        return Input.Player.ScreenPos.ReadValue<Vector2>();
+        if (Pointer.current != null)
+        {
+            Vector2 startPosition = Pointer.current.position.ReadValue();
+            return startPosition;
+        }
+
+        return Vector2.zero;
     }
 }

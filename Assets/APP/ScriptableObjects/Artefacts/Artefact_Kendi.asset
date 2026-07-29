@@ -66,19 +66,26 @@ MonoBehaviour:
     an Indonesian archeologist abroad when only a small amount of Indonesians were
     able to afford any kind of higher education back in her times!"
   customGameplayBGM: 4
-  preRestorationPagePrefab: {fileID: 8636906436748886089, guid: 59d4cec8c38bc594ea457d5bb96c16c0, type: 3}
-  postRestorationPagePrefab: {fileID: 8866635996392126511, guid: 0afd9824e5cbe134297ab0337b6d9c9b, type: 3}
+  preRestorationPagePrefab: {fileID: 8636906436748886089, guid: 85fab7291bb1e644ba52df88307e8821, type: 3}
+  postRestorationPagePrefabs:
+  - {fileID: 2216135398763275212, guid: e636b1c3d9d7dc04d8dc73b9880e73e6, type: 3}
+  - {fileID: 7019320291950340618, guid: b304b50b8de874448a931593f605d028, type: 3}
+  - {fileID: 7523998509569698876, guid: f727723c61922e64a88ad32f86cbdcd9, type: 3}
+  - {fileID: 3115583987557316374, guid: 493c49dda07ac914e85ca289713af480, type: 3}
+  - {fileID: 8884109989492254845, guid: a4fb43a3ee3540442883c5a241674fee, type: 3}
   unlockedByDefault: 0
   unlockRequirements:
-  - {fileID: 11400000, guid: 0e8f89b3d78714e47b3ec27879c20e78, type: 2}
-  allowedToolTypes: -1
+  - {fileID: 11400000, guid: a3924d72a67c0455eb511e7925877898, type: 2}
+  allowedToolTypes: 3
   artefactFragmentDatas:
   - prefab: {fileID: 6116740313426599018, guid: 7160a96b277fd4f8dad4104ea78bd8aa, type: 3}
     spawnTransform:
       rotation: {x: 0, y: 0, z: 0}
       position: {x: 0.19, y: 1.61, z: 2.56}
   finalRotation: {x: 50, y: 0, z: 0}
+  finalScaleMultiplier: 0
   clueTreshold: 80
+  zoomValue: 1.5
   references:
     version: 2
     RefIds: []

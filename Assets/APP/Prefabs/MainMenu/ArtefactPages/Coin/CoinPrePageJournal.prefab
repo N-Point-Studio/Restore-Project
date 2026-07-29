@@ -1,5 +1,94 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &231890499564953590
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3951553486749249955}
+  - component: {fileID: 9013391972163736709}
+  - component: {fileID: 6998449928940712072}
+  - component: {fileID: 5009276422972599060}
+  m_Layer: 5
+  m_Name: StickyNote2D (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &3951553486749249955
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 231890499564953590}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.00001613227}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 5557244093238920051}
+  m_Father: {fileID: 4983229867018499867}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -0.9998779, y: -228.49997}
+  m_SizeDelta: {x: 682, y: 435}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &9013391972163736709
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 231890499564953590}
+  m_CullTransparentMesh: 1
+--- !u!114 &6998449928940712072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 231890499564953590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 614182ac0c5b48c46b64cf900a9ca1e2, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 1
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!225 &5009276422972599060
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 231890499564953590}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &2452105284762346103
 GameObject:
   m_ObjectHideFlags: 0
@@ -13,7 +102,7 @@ GameObject:
   - component: {fileID: 8261841257554555946}
   - component: {fileID: 1731867647185635237}
   m_Layer: 5
-  m_Name: StickyNote2D
+  m_Name: StickyNote2D (0)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27,7 +116,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2452105284762346103}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.000042368985}
+  m_LocalPosition: {x: 0, y: 0, z: 0.000004250838}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -36,8 +125,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -91.755005, y: 154.54}
-  m_SizeDelta: {x: 280.49, y: 305.72}
+  m_AnchoredPosition: {x: -195.99994, y: 177.00003}
+  m_SizeDelta: {x: 434, y: 460}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1088357770515974574
 CanvasRenderer:
@@ -67,7 +156,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: d3ee5fe6f24d359459f3be1b3225dba7, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7651f8a59735cf54494076b00922c070, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -114,17 +203,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5274272406394012199}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.000025681}
+  m_LocalRotation: {x: 0, y: 0, z: 0.026176924, w: 0.99965733}
+  m_LocalPosition: {x: 0, y: 0, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6229348842589140171}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 3}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 16.512987, y: -28.273003}
-  m_SizeDelta: {x: -63.877, y: -86.546005}
+  m_AnchoredPosition: {x: 5, y: -35}
+  m_SizeDelta: {x: -80, y: -160}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6754475517997798808
 CanvasRenderer:
@@ -154,11 +243,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Here\u2019s your first artifact, Nova.\LI hope this is a beautiful start
-    to your journey here!\n\n-Mrs. Maya :)"
+  m_text: "Hello, Nova. Welcome to the museum! We\u2019re delighted to have you here.
+    I hope you\u2019ll have a wonderful time here!\n\n-Ms. Maya :)"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: fe2af6f2156f301439adaca31864db12, type: 2}
-  m_sharedMaterial: {fileID: -6446403116882279231, guid: fe2af6f2156f301439adaca31864db12, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 39b1bbea04b08e840b1f23c0dca88986, type: 2}
+  m_sharedMaterial: {fileID: 1341749201458778120, guid: 39b1bbea04b08e840b1f23c0dca88986, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -182,12 +271,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23
+  m_fontSize: 32
   m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 13.5
-  m_fontSizeMax: 23
+  m_fontSizeMin: 11
+  m_fontSizeMax: 32
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
@@ -256,6 +345,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 3951553486749249955}
   - {fileID: 6229348842589140171}
   - {fileID: 8787540573911664447}
   m_Father: {fileID: 0}
@@ -283,6 +373,10 @@ MonoBehaviour:
     revealStyle: 0
     textComponent: {fileID: 0}
     imageComponent: {fileID: 0}
+  - canvasGroup: {fileID: 5009276422972599060}
+    revealStyle: 0
+    textComponent: {fileID: 0}
+    imageComponent: {fileID: 0}
   - canvasGroup: {fileID: 7562388926122944462}
     revealStyle: 0
     textComponent: {fileID: 0}
@@ -291,8 +385,8 @@ MonoBehaviour:
   fadeDuration: 0.5
   uiNoteTexts:
   - {fileID: 3219662322298170474}
-  - {fileID: 540673308661812230}
---- !u!1 &6636638721529416232
+  - {fileID: 7836100299114512907}
+--- !u!1 &6298831498972271029
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -300,9 +394,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5466160082419446912}
-  - component: {fileID: 4796160544175303849}
-  - component: {fileID: 540673308661812230}
+  - component: {fileID: 5557244093238920051}
+  - component: {fileID: 3700499937800694769}
+  - component: {fileID: 7836100299114512907}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -310,40 +404,40 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &5466160082419446912
+--- !u!224 &5557244093238920051
 RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6636638721529416232}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -5.4769e-10}
+  m_GameObject: {fileID: 6298831498972271029}
+  m_LocalRotation: {x: 0, y: 0, z: 0.008726558, w: 0.999962}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8787540573911664447}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Father: {fileID: 3951553486749249955}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 1}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.147995, y: -18.912998}
-  m_SizeDelta: {x: -63.322, y: -67.826}
+  m_AnchoredPosition: {x: -4.499996, y: -12.5}
+  m_SizeDelta: {x: -135, y: -175}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &4796160544175303849
+--- !u!222 &3700499937800694769
 CanvasRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6636638721529416232}
+  m_GameObject: {fileID: 6298831498972271029}
   m_CullTransparentMesh: 1
---- !u!114 &540673308661812230
+--- !u!114 &7836100299114512907
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6636638721529416232}
+  m_GameObject: {fileID: 6298831498972271029}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
@@ -357,11 +451,12 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Here\u2019s your first artifact, Nova.\LI hope this is a beautiful start
-    to your journey here!\n\n-Mrs. Maya :)"
+  m_text: "P.S Amazing to see this project in the hands of someone so competent!\nHeard
+    from your Mama that you\u2019re happy to be here. Please send my hello to her.
+    It\u2019s been a while since I\u2019ve worked with her."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: fe2af6f2156f301439adaca31864db12, type: 2}
-  m_sharedMaterial: {fileID: -6446403116882279231, guid: fe2af6f2156f301439adaca31864db12, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 39b1bbea04b08e840b1f23c0dca88986, type: 2}
+  m_sharedMaterial: {fileID: 1341749201458778120, guid: 39b1bbea04b08e840b1f23c0dca88986, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -385,12 +480,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23
+  m_fontSize: 32
   m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 13.5
-  m_fontSizeMax: 23
+  m_fontSizeMin: 11
+  m_fontSizeMax: 32
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
@@ -443,7 +538,7 @@ GameObject:
   - component: {fileID: 1701851290263806664}
   - component: {fileID: 7562388926122944462}
   m_Layer: 5
-  m_Name: StickyNote2D (1)
+  m_Name: StickyNote2D (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -457,17 +552,16 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7058145392043192421}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.00002550501}
+  m_LocalPosition: {x: 0, y: 0, z: 0.000036062418}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 5466160082419446912}
+  m_Children: []
   m_Father: {fileID: 4983229867018499867}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 46.2, y: -177.18}
-  m_SizeDelta: {x: 276.35, y: 280.36}
+  m_AnchoredPosition: {x: 194.45557, y: 180.81653}
+  m_SizeDelta: {x: 403.089, y: 452.367}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &636702319851082821
 CanvasRenderer:
@@ -497,7 +591,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5980eb35c8c480440b0c65ac2130c682, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 70179e347a389074ea1da6c7e331db28, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1

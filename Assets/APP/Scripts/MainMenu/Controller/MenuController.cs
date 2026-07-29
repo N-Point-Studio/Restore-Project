@@ -1,6 +1,7 @@
 using UnityEngine;
 using VContainer;
 using UnityEngine.Localization;
+using UnityEngine.UI;
 
 public class MenuController : BaseMenuController
 {
@@ -8,8 +9,14 @@ public class MenuController : BaseMenuController
     [SerializeField] private ButtonItemUI buttonNewGame;
     [SerializeField] private ButtonItemUI buttonContinue;
     [SerializeField] private ButtonItemUI buttonSettings;
+    [SerializeField] private ButtonItemUI buttonCredits;
     [SerializeField] private ButtonItemUI buttonQuit;
 
+    [Header("Layout Settings")]
+    [SerializeField] private float mobileSpacing = 36f;
+    [SerializeField] private float desktopSpacing = 12f;
+    [SerializeField] private VerticalLayoutGroup verticalLayoutGroup;
+ 
     [Header("Localization")]
     [SerializeField] private LocalizedString newGameLabel;
     [SerializeField] private LocalizedString startLabel;
@@ -25,10 +32,17 @@ public class MenuController : BaseMenuController
     protected override void Awake()
     {
         base.Awake();
-        buttonNewGame.OnClick += OnButtonNewGameClick;
-        buttonContinue.OnClick += OnButtonContinueClick;
-        buttonSettings.OnClick += OnButtonSettingsClick;
-        buttonQuit.OnClick += OnButtonQuitClick;
+        if (buttonNewGame != null) buttonNewGame.OnClick += OnButtonNewGameClick;
+        if (buttonContinue != null) buttonContinue.OnClick += OnButtonContinueClick;
+        if (buttonSettings != null) buttonSettings.OnClick += OnButtonSettingsClick;
+        if (buttonQuit != null) buttonQuit.OnClick += OnButtonQuitClick;
+        if (buttonCredits != null) buttonCredits.OnClick += OnButtonCreditsClick;
+
+        bool isMobile = Application.isMobilePlatform;
+#if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+        isMobile = true;
+#endif
+        verticalLayoutGroup.spacing = isMobile ? mobileSpacing : desktopSpacing;
     }
 
     protected override void Start()
@@ -40,10 +54,11 @@ public class MenuController : BaseMenuController
     protected override void OnDestroy()
     {
         base.OnDestroy();
-        buttonNewGame.OnClick -= OnButtonNewGameClick;
-        buttonContinue.OnClick -= OnButtonContinueClick;
-        buttonSettings.OnClick -= OnButtonSettingsClick;
-        buttonQuit.OnClick -= OnButtonQuitClick;
+        if (buttonNewGame != null) buttonNewGame.OnClick -= OnButtonNewGameClick;
+        if (buttonContinue != null) buttonContinue.OnClick -= OnButtonContinueClick;
+        if (buttonSettings != null) buttonSettings.OnClick -= OnButtonSettingsClick;
+        if (buttonQuit != null) buttonQuit.OnClick -= OnButtonQuitClick;
+        if (buttonCredits != null) buttonCredits.OnClick -= OnButtonCreditsClick;
     }
 
     public void RefreshButtonVisibility()
@@ -51,8 +66,9 @@ public class MenuController : BaseMenuController
         if (playerProgressionData != null)
         {
             bool hasPlayed = playerProgressionData.HasPlayedBefore;
-            buttonContinue.gameObject.SetActive(hasPlayed);
-            buttonNewGame.SetLocalizedLabel(hasPlayed ? newGameLabel : startLabel);
+            if (buttonContinue != null) buttonContinue.gameObject.SetActive(hasPlayed);
+            if (buttonNewGame != null) buttonNewGame.SetLocalizedLabel(hasPlayed ? newGameLabel : startLabel);
+            if (buttonCredits != null) buttonCredits.gameObject.SetActive(playerProgressionData.HasFinishedGame);
         }
     }
 
@@ -74,5 +90,10 @@ public class MenuController : BaseMenuController
     private void OnButtonQuitClick()
     {
         MainMenuEvents.TriggerQuitGame();
+    }
+
+    private void OnButtonCreditsClick()
+    {
+        MainMenuEvents.TriggerOpenCredits();
     }
 }

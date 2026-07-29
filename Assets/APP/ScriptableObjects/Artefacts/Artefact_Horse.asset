@@ -19,7 +19,7 @@ MonoBehaviour:
       as a paperweight on a scholar\u2019s desk. The figure reflects both the refined
       metalwork and cultivated aesthetics valued by intellectuals of the period."
     itemIcon: {fileID: 21300000, guid: 0abd31fb384d64b42912f3299d32114f, type: 3}
-    exclude: 0
+    exclude: 1
   localizedItemName:
     m_TableReference:
       m_TableCollectionName: GUID:cb92ced7c936e1d488319505859ec2f0
@@ -67,7 +67,7 @@ MonoBehaviour:
   unlockedByDefault: 0
   unlockRequirements:
   - {fileID: 11400000, guid: a3924d72a67c0455eb511e7925877898, type: 2}
-  allowedToolTypes: -1
+  allowedToolTypes: 3
   artefactFragmentDatas:
   - prefab: {fileID: 924360214185747355, guid: c148e5a66c15f428293748fce72a4cf4, type: 3}
     spawnTransform:
@@ -75,6 +75,7 @@ MonoBehaviour:
       position: {x: 0.32, y: 1.39, z: 2.77}
   finalRotation: {x: 330, y: 0, z: -125}
   clueTreshold: 80
+  zoomValue: 1.4
   references:
     version: 2
     RefIds: []

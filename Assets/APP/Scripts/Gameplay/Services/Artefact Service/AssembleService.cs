@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
+using Modules;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -14,6 +15,8 @@ public class AssemblyService : IInitializable, IDisposable
     private readonly GameplayManager gameplayManager;
 
     private readonly List<IArtefactPart> currentAssembleList = new();
+
+    public bool isArtefactSlotAvailable = false;
 
     [Inject]
     public AssemblyService(Inspection inspectPoint, FragmentService fragmentService, TutorialService tutorialService, GameConfigData config, GameplayManager gameplayManager)
@@ -37,32 +40,19 @@ public class AssemblyService : IInitializable, IDisposable
 
     public Transform GetInspectPoint() => inspectPoint.transform;
 
-    public bool CanSnap(IArtefactPart checkPart, Vector3 worldPos)
+    public bool TryCheckSlot(IArtefactPart checkPart, Vector3 worldPos)
     {
         Camera cam = Camera.main;
+        bool isSlotAvailable = false;
 
         if (IsInspectEmpty())
         {
             float distance = GetFlattenedDistance(cam, worldPos, inspectPoint.transform.position);
-            return distance < config.assembleSnapDistance;
+            isSlotAvailable = distance < config.emptySlotDistance;
+
+            isArtefactSlotAvailable = isSlotAvailable;
+            return isSlotAvailable;
         }
-
-        foreach (var part in currentAssembleList)
-        {
-            var partSocket = part.GetAvailableSocketFor(checkPart.PieceId);
-            if (partSocket != null)
-            {
-                float distance = GetFlattenedDistance(cam, worldPos, partSocket.transform.position);
-                return distance <= config.socketSnapDistance;
-            }
-        }
-
-        return false;
-    }
-
-    public void TryCheckSlot(IArtefactPart checkPart, Vector3 worldPos)
-    {
-        Camera cam = Camera.main;
 
         foreach (var part in currentAssembleList)
         {
@@ -77,10 +67,17 @@ public class AssemblyService : IInitializable, IDisposable
                 {
                     checkPart.CorrectRotation(partSocket.transform.rotation);
                 }
-                renderer.enabled = distance <= config.socketSnapDistance;
-                return;
+
+                isSlotAvailable = distance <= config.socketSnapDistance;
+                renderer.enabled = isSlotAvailable;
+
+                isArtefactSlotAvailable = isSlotAvailable;
+                return isSlotAvailable;
             }
         }
+
+        isArtefactSlotAvailable = isSlotAvailable;
+        return false;
     }
 
     public void DismissCheckSlot()

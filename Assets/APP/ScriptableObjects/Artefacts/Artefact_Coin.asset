@@ -65,17 +65,22 @@ MonoBehaviour:
     I can trust you.
   customGameplayBGM: 3
   preRestorationPagePrefab: {fileID: 8636906436748886089, guid: 0ced2ee71da87fd4ba9f027556a9e73f, type: 3}
-  postRestorationPagePrefab: {fileID: 8866635996392126511, guid: b4b30d70204886846819ce23ac025ee4, type: 3}
+  postRestorationPagePrefabs:
+  - {fileID: 8866635996392126511, guid: b4b30d70204886846819ce23ac025ee4, type: 3}
+  - {fileID: 8379916005532532850, guid: b9a9eeda00bafa943b3dbbb260728b4f, type: 3}
+  - {fileID: 8419698412115665913, guid: 07cb9164b25ee524a941ffdb5d7c6c06, type: 3}
   unlockedByDefault: 1
   unlockRequirements: []
-  allowedToolTypes: -1
+  allowedToolTypes: 3
   artefactFragmentDatas:
   - prefab: {fileID: 8926846074902999173, guid: 8c45552c631944b4bb80d8d4c6fbf3d7, type: 3}
     spawnTransform:
       rotation: {x: 92.151, y: 0, z: 0}
       position: {x: 0.1, y: 0.86, z: 3.19}
   finalRotation: {x: 230, y: 0, z: 180}
-  clueTreshold: 80
+  finalScaleMultiplier: 1.5
+  clueTreshold: 60
+  zoomValue: 1
   references:
     version: 2
     RefIds: []

@@ -6,7 +6,7 @@ using UnityEngine;
 public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPressObject
 {
     [Header("Brush Information")]
-    [SerializeField] private string toolId = "Tool_";
+    [SerializeField] private ToolType toolType;
     [SerializeField] private Outline outline;
 
     [Header("Animation Settings")]
@@ -23,8 +23,6 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
     protected Sequence returnSequence;
     protected bool isReturning;
     protected bool isUsed;
-    protected bool isStickingToSurface;
-    protected bool isSfxOn = false;
     private int currentAudioId = -1;
 
     [Header("Audio settings")]
@@ -39,7 +37,7 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         initialPosition = transform.position;
         initialRotation = transform.rotation;
         col = GetComponent<Collider>();
-        animator.enabled = false;
+        if (animator != null) animator.enabled = false;
     }
 
     private void OnEnable()
@@ -51,18 +49,18 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
 
     private void OnDisable()
     {
-        TutorialService.OnTutorialHighlightOn += HandleTutorialHighlightOn;
-        TutorialService.OnTutorialHighlightOff += HandleTutorialHighlightOff;
+        TutorialService.OnTutorialHighlightOn -= HandleTutorialHighlightOn;
+        TutorialService.OnTutorialHighlightOff -= HandleTutorialHighlightOff;
     }
 
-    private void HandleTutorialHighlightOn(string obj)
+    private void HandleTutorialHighlightOn(ToolType toolType)
     {
-        if (toolId == obj) outline.enabled = true;
+        if (this.toolType == toolType) outline.enabled = true;
     }
 
-    private void HandleTutorialHighlightOff(string obj)
+    private void HandleTutorialHighlightOff(ToolType toolType)
     {
-        if (toolId == obj) outline.enabled = false;
+        if (this.toolType == toolType) outline.enabled = false;
     }
 
     public void OnPressStarted() => PressStarted();
@@ -75,7 +73,7 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
 
     public AudioKey ToolSFX => audioKey;
 
-    public string ToolId => toolId;
+    public ToolType ToolId => toolType;
 
     public IInteractObject GetOrigin() => origin;
 
@@ -87,11 +85,11 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
 
     public void Use()
     {
-        origin.SetCollider(true);
+        origin.SetColliderEnable(true);
         returnSequence?.Kill();
         col.enabled = false;
         isUsed = true;
-        animator.enabled = true;
+        if (animator != null) animator.enabled = true;
     }
 
     public void Return()
@@ -99,7 +97,7 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         col.enabled = true;
         isReturning = true;
         isUsed = false;
-        animator.enabled = false;
+        if (animator != null) animator.enabled = false;
 
         returnSequence?.Kill();
         returnSequence = DOTween.Sequence();
@@ -107,7 +105,7 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         returnSequence.Join(transform.DOMove(initialPosition, returnAnimDuration).SetEase(Ease.OutBack));
         returnSequence.Join(transform.DORotateQuaternion(initialRotation, returnAnimDuration).SetEase(Ease.OutBack));
         returnSequence.OnComplete(() => isReturning = false);
-        origin.SetCollider(false);
+        origin.SetColliderEnable(false);
     }
 
     public void FollowMouse(Vector3 worldPos)
@@ -122,11 +120,6 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         transform.DOKill();
         transform.DOMove(position, SurfaceMoveSpeed).SetEase(Ease.OutQuad);
         transform.DORotateQuaternion(rotation, SurfaceRotateSpeed).SetEase(Ease.OutQuad);
-    }
-
-    public void SetStickToSurface(bool isSticking)
-    {
-        isStickingToSurface = isSticking;
     }
 
     protected abstract void InteractDetected();

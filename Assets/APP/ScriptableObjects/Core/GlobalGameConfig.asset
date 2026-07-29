@@ -18,17 +18,20 @@ MonoBehaviour:
   holdDelay: 0.2
   holdDuration: 0.5
   holdMoveTolerance: 5
-  socketSnapDistance: 1
-  assembleSnapDistance: 1.5
+  socketSnapDistance: 2
+  emptySlotDistance: 7
   recenterAnimDuration: 0.5
   inspectionMinDistance: 2
-  inspectionZoomSpeed: 0.02
-  inspectionSmoothTime: 0.1
+  inspectionZoomSpeed: 15
+  inspectionSmoothTime: 0.15
   inspectionResetDuration: 1
+  inspectionPinchSensitivity: 1
+  toolTipOffset: 235
   autoSaveCooldown: 1
   minLoadingScreenDuration: 2
   bgmFadeDuration: 2
   tutorialItemId: Artefact_Coin
+  tutorialSecondItemId: Artefact_Keris
   displayArtefactString:
     m_TableReference:
       m_TableCollectionName: GUID:cb92ced7c936e1d488319505859ec2f0
@@ -56,6 +59,9 @@ MonoBehaviour:
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
+  steamURL: 
+  discordURL: https://discord.gg/QwGag999P
+  instagramURL: https://www.instagram.com/restoria.game/
   references:
     version: 2
     RefIds: []

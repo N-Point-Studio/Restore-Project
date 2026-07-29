@@ -258,6 +258,19 @@ public class ActiveArtefactData : ISaveable
         }
     }
 
+    public bool AreAllArtefactsCompleted()
+    {
+        var allData = artefactDatabase.GetAllArtefactDatas();
+        for (int i = 0; i < allData.Count; i++)
+        {
+            if (allData[i] != null && !IsArtefactCompleted(allData[i].BaseData.Id))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public JSONNode AsJSON()
     {
         JSONObject json = new JSONObject();
@@ -281,7 +294,7 @@ public class ActiveArtefactData : ISaveable
     public void LoadFromJSON(JSONNode json)
     {
         BuildDataCache();
-        
+
         artefactProgress.Clear();
 
         if (json.HasKey("artefacts"))

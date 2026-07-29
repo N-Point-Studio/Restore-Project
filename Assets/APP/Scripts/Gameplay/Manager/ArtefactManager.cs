@@ -87,6 +87,13 @@ public class ArtefactManager : IInitializable, IDisposable
     private void HandleDragStarted(IInteractObject interact, Vector3 worldPos)
     {
         currentDraggedPart = ResolveArtefactPart(interact);
+
+        // Prevent an already assembled piece from being flagged as a dragged piece for assembly
+        if (currentDraggedPart != null && currentDraggedPart.CurrentState == ArtefactPieceState.Assembled)
+        {
+            currentDraggedPart = null;
+        }
+
         if (interact is IDragObject drag) { drag.OnDragStarted(worldPos); }
     }
 
@@ -95,7 +102,7 @@ public class ArtefactManager : IInitializable, IDisposable
         if (interact is IDragObject drag) { drag.OnDragPerformed(worldPos); }
         if (currentDraggedPart != null) assemblyService.TryCheckSlot(currentDraggedPart, worldPos);
 
-        if (assemblyService.IsInspectEmpty())
+        if (assemblyService.IsInspectEmpty() && currentDraggedPart != null)
         {
             inspection.SetSphereRenderer(true);
         }
@@ -109,9 +116,7 @@ public class ArtefactManager : IInitializable, IDisposable
 
         if (toolService.IsOnToolMode || artefactPart == null) return;
 
-        bool isCloseEnough = assemblyService.CanSnap(artefactPart, worldPos);
-
-        if (isCloseEnough && assemblyService.TryAssemble(artefactPart))
+        if (assemblyService.isArtefactSlotAvailable && assemblyService.TryAssemble(artefactPart))
         {
             if (gameplayManager.CheckTutorialAvailability(2))
             {

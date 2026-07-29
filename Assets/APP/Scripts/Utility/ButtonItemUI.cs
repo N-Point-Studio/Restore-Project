@@ -14,6 +14,9 @@ public class ButtonItemUI : UIBehaviour, IPointerEnterHandler, IPointerExitHandl
     [SerializeField] private TMP_Text textLabel;
     [SerializeField] private Button button;
     [SerializeField] private RectTransform rectTransform;
+    
+    [Header("Platform Typography")]
+    [SerializeField] private TypographyStyle textStyle = TypographyStyle.PrimaryButton;
 
     [Header("Changers (Index 0: Normal, Index 1: Hover/Selected)")]
     [SerializeField] private TextFontChanger fontChangerLabel;
@@ -47,6 +50,16 @@ public class ButtonItemUI : UIBehaviour, IPointerEnterHandler, IPointerExitHandl
         base.Awake();
         if (button == null) button = GetComponent<Button>();
         if (rectTransform == null) rectTransform = GetComponent<RectTransform>();
+
+        if (textLabel != null)
+        {
+            bool isMobile = Application.isMobilePlatform;
+#if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+            isMobile = true;
+#endif
+            TypographyProfile profile = UIStyleData.Instance.GetProfile(textStyle);
+            textLabel.fontSize = isMobile ? profile.mobileSize : profile.desktopSize;
+        }
 
         originalSizeDelta = rectTransform.sizeDelta;
         originalScale = rectTransform.localScale;
@@ -132,7 +145,9 @@ public class ButtonItemUI : UIBehaviour, IPointerEnterHandler, IPointerExitHandl
     {
         if (!isInteractable || !enableHoverEffects) return;
 
-        bool isStillHovering = eventData.pointerCurrentRaycast.gameObject == gameObject;
+        bool isStillHovering = eventData.pointerCurrentRaycast.gameObject != null && 
+                                (eventData.pointerCurrentRaycast.gameObject == gameObject || 
+                                 eventData.pointerCurrentRaycast.gameObject.transform.IsChildOf(transform));
         ApplyVisualState(isStillHovering || isSelected);
     }
     #endregion

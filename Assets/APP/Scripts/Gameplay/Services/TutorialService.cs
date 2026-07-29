@@ -16,16 +16,47 @@ public class TutorialService
     public int CurrentStage => currentStage;
     public int CurrentModule => currentModule;
 
-    public static Action<string> OnTutorialHighlightOn;
-    public static Action<string> OnTutorialHighlightOff;
+    public static Action<ToolType> OnTutorialHighlightOn;
+    public static Action<ToolType> OnTutorialHighlightOff;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Init()
+    {
+        OnTutorialHighlightOn = null;
+        OnTutorialHighlightOff = null;
+    }
 
     [Inject]
     public TutorialService() { }
 
+    private bool IsMobilePlatform()
+    {
+        bool isMobile = Application.isMobilePlatform;
+#if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+        isMobile = true;
+#endif
+        return isMobile;
+    }
+
+    private int GetActualStageIndex(int baseStageIndex)
+    {
+        // if (IsMobilePlatform())
+        // {
+        //     AppLogger.Log($"[TutorialService] Mobile platform detected. Offsetting stage index by 4. Base: {baseStageIndex}, Actual: {baseStageIndex + 4}");
+        // }
+        // else
+        // {
+        //     AppLogger.Log($"[TutorialService] Non-mobile platform detected. Using base stage index: {baseStageIndex}");
+        // }
+
+        // If mobile, offset by 4 (Stage 0 becomes 4, Stage 1 becomes 5, etc.)
+        return IsMobilePlatform() ? baseStageIndex + 4 : baseStageIndex;
+    }
+
     public void StartTutorial(int sIndex, int mIndex, float initialDelay = 0.5f)
     {
         if (isProcessing) return;
-
+        // Debug.Log($"[TutorialService] Starting tutorial for Stage: {sIndex}, Module: {mIndex} with initial delay: {initialDelay}s");
         TutorialManager.Instance.StartCoroutine(StartTutorialRoutine(sIndex, mIndex, initialDelay));
     }
 
@@ -35,9 +66,11 @@ public class TutorialService
 
         currentStage = sIndex;
         currentModule = mIndex;
-        bool success = TutorialManager.Instance.ForceStageStarted(sIndex, mIndex);
 
-        AppLogger.Log("berhasil: " + success);
+        int actualStage = GetActualStageIndex(sIndex);
+        bool success = TutorialManager.Instance.ForceStageStarted(actualStage, mIndex);
+
+        // AppLogger.Log($"[Tutorial] Force starting stage: {actualStage}, module: {mIndex} | Success: {success}");
 
         if (success)
         {
@@ -54,7 +87,10 @@ public class TutorialService
         currentStage = sIndex;
         currentModule = mIndex;
 
-        bool success = TutorialManager.Instance.StageStarted(sIndex, mIndex);
+        int actualStage = GetActualStageIndex(sIndex);
+        bool success = TutorialManager.Instance.ForceStageStarted(actualStage, mIndex);
+        // Debug.Log($"[TutorialService] Instantly starting tutorial for Stage: {actualStage}, Module: {mIndex}, Success: {success}");
+
 
         if (success)
         {
@@ -80,7 +116,9 @@ public class TutorialService
     {
         isProcessing = true;
         isTutorialActive = false;
-        TutorialManager.Instance.StageCompleted(currentStage, currentModule);
+
+        int actualStage = GetActualStageIndex(currentStage);
+        TutorialManager.Instance.StageCompleted(actualStage, currentModule);
 
         yield return new WaitForSeconds(delay);
 
@@ -93,7 +131,8 @@ public class TutorialService
 
     public void CompleteStage()
     {
-        TutorialManager.Instance.StageCompleted(currentStage, currentModule);
+        int actualStage = GetActualStageIndex(currentStage);
+        TutorialManager.Instance.StageCompleted(actualStage, currentModule);
         currentStage++;
         currentModule = 0;
     }
@@ -105,15 +144,15 @@ public class TutorialService
         isProcessing = false;
     }
 
-    public void TriggerHighlight(bool isOn, string objId)
+    public void TriggerHighlight(bool isOn, ToolType toolType)
     {
         if (isOn)
         {
-            OnTutorialHighlightOn.Invoke(objId);
+            OnTutorialHighlightOn?.Invoke(toolType);
         }
         else
         {
-            OnTutorialHighlightOff.Invoke(objId);
+            OnTutorialHighlightOff?.Invoke(toolType);
         }
     }
 }

@@ -65,11 +65,14 @@ MonoBehaviour:
     this?"
   customGameplayBGM: 5
   preRestorationPagePrefab: {fileID: 8636906436748886089, guid: baf0f97423e7a6943b9110caf23df1b4, type: 3}
-  postRestorationPagePrefab: {fileID: 8866635996392126511, guid: dc0a3121fb20bf6448a8f50eafe3ac94, type: 3}
+  postRestorationPagePrefabs:
+  - {fileID: 8866635996392126511, guid: dc0a3121fb20bf6448a8f50eafe3ac94, type: 3}
+  - {fileID: 683276941396468826, guid: 1e3b5924764e35f4e8af318e205f75a1, type: 3}
+  - {fileID: 5872695661965174262, guid: 5ed9220d561394e47b805a7a04fe6965, type: 3}
   unlockedByDefault: 0
   unlockRequirements:
   - {fileID: 11400000, guid: 438a20ec48c10f140a4418156d10a0cd, type: 2}
-  allowedToolTypes: -1
+  allowedToolTypes: 3
   artefactFragmentDatas:
   - prefab: {fileID: 53471993624062409, guid: 95bc42bef9ac249ec97aa4481504590f, type: 3}
     spawnTransform:
@@ -84,7 +87,9 @@ MonoBehaviour:
       rotation: {x: 0, y: -12.307, z: 0}
       position: {x: 0.52, y: 0.805, z: 3.14}
   finalRotation: {x: 400, y: 180, z: 0}
-  clueTreshold: 80
+  finalScaleMultiplier: 1.25
+  clueTreshold: 85
+  zoomValue: 1.4
   references:
     version: 2
     RefIds: []

@@ -13,12 +13,10 @@ MonoBehaviour:
   m_Name: ArtefactDatabase
   m_EditorClassIdentifier: Assembly-CSharp::ArtefactDatabase
   searchFolders:
-  - Assets/[APP]/ScriptableObjects/Artefacts
+  - Assets/APP/ScriptableObjects/Artefacts
   items:
   - key: Artefact_Coin
     value: {fileID: 11400000, guid: be5bcc866d7c24e92a67ef37e57beff7, type: 2}
-  - key: Artefact_Horse
-    value: {fileID: 11400000, guid: 0e8f89b3d78714e47b3ec27879c20e78, type: 2}
   - key: Artefact_Jar
     value: {fileID: 11400000, guid: 1c3b6e9d8184949cf8925a6e79acfa83, type: 2}
   - key: Artefact_Kendi

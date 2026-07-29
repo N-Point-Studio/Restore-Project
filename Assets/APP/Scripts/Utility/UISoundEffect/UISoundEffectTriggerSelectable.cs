@@ -3,9 +3,14 @@ using UnityEngine;
 
 public class UISoundEffectTriggerSelectable : UISoundEffectTrigger
 {
-    [SerializeField] private bool isConfirm;
+    [SerializeField] private bool isConfirm = true;
 
     public void PlayTriggerSound()
+    {
+        PlaySound();
+    }
+
+    protected override void PlaySound()
     {
         base.PlaySound();
         if (customKey != AudioKey.None)

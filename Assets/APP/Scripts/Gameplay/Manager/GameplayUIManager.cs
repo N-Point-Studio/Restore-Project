@@ -10,7 +10,9 @@ using UnityEngine.InputSystem;
 public class GameplayUIManager : MonoBehaviour
 {
     [SerializeField] private List<ProgressBarUI> progressBars;
-    [SerializeField] private Camera toolCamera;
+
+    [Header("Cameras")]
+    [SerializeField] private Camera endCamera;
 
     [Header("Controllers")]
     [SerializeField] private MainUIController mainUIController;
@@ -19,9 +21,13 @@ public class GameplayUIManager : MonoBehaviour
     [SerializeField] private SettingsController settingsController;
     [SerializeField] private PopUpConfirmationController quitConfirmationController;
 
+    [Header("Tutorial Canvas Configuration")]
+    [SerializeField] private GameObject tutorialDesktopRoot;
+    [SerializeField] private GameObject tutorialMobileRoot;
+
     [Header("Settings")]
     [SerializeField] private float delayUntilAutoWrappedUp = 1.5f;
-    public float wrapUpThreshold = 95f;
+    [SerializeField] private float wrapUpThreshold = 95f;
 
     private CleaningService cleaningService;
     private FragmentService fragmentService;
@@ -69,6 +75,7 @@ public class GameplayUIManager : MonoBehaviour
     private void Awake()
     {
         mainUIController.OnWrapUp += OnWrapUp;
+        mainUIController.OnPauseRequest += PauseGame;
         endgameController.OnFinishedGame += OnFinishedGame;
 
         pauseController.OnResume += OnResume;
@@ -86,6 +93,15 @@ public class GameplayUIManager : MonoBehaviour
     private IEnumerator Start()
     {
         mainUIController.ShowButtonWrap(false);
+        endCamera.enabled = false;
+
+        bool isMobile = Application.isMobilePlatform;
+#if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+        isMobile = true;
+#endif
+
+        if (tutorialDesktopRoot != null) tutorialDesktopRoot.SetActive(!isMobile);
+        if (tutorialMobileRoot != null) tutorialMobileRoot.SetActive(isMobile);
 
         yield return null;
 
@@ -106,6 +122,7 @@ public class GameplayUIManager : MonoBehaviour
         input.OnUIKeycodeEscapePerformed -= OnUIKeycodeEscapePerformed;
 
         mainUIController.OnWrapUp -= OnWrapUp;
+        mainUIController.OnPauseRequest -= PauseGame;
         endgameController.OnFinishedGame -= OnFinishedGame;
 
         pauseController.OnResume -= OnResume;
@@ -190,7 +207,9 @@ public class GameplayUIManager : MonoBehaviour
         canWrapUp = overall >= wrapUpThreshold;
         bool isFullyCompleted = overall >= 99f;
 
-        if (surfaceProgress >= gameplayManager.clueTreshold)
+        bool shouldShowHintToggle = surfaceProgress >= gameplayManager.clueTreshold;
+
+        if (shouldShowHintToggle)
         {
             if (gameplayManager.isTutorialAvailable)
             {
@@ -207,6 +226,8 @@ public class GameplayUIManager : MonoBehaviour
                 }
             }
         }
+
+        mainUIController.ShowHintToggle(shouldShowHintToggle);
 
         bool showButton = canWrapUp && !isFullyCompleted && !isAutoWrapUpTriggered;
         mainUIController.EnableWrapUp(showButton);
@@ -238,33 +259,7 @@ public class GameplayUIManager : MonoBehaviour
         }
     }
 
-    private void HandleProgressUpdate(float progress)
-    {
-        // AppLogger.Log("Assemble should be");
-        UpdateProgress(ProgressType.Assemble, progress);
-    }
-
-    private void HandleHardCleaningUpdate(float progress)
-    {
-        UpdateProgress(ProgressType.Mud, progress);
-
-        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 4)
-        {
-            tutorialService.CompleteStage();
-        }
-    }
-
-    private void HandleSurfaceCleaningUpdate(float progress)
-    {
-        UpdateProgress(ProgressType.Dust, progress);
-        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 3)
-        {
-            tutorialService.CompleteAndAdvance(true);
-            tutorialService.TriggerHighlight(true, "Tool_Chisel");
-        }
-    }
-
-    private void OnPlayerKeycodeEscapePerformed()
+    private void PauseGame()
     {
         if (!isGamePaused)
         {
@@ -279,6 +274,43 @@ public class GameplayUIManager : MonoBehaviour
         }
     }
 
+    private void HandleProgressUpdate(float progress)
+    {
+        // AppLogger.Log("Assemble should be");
+        UpdateProgress(ProgressType.Assemble, progress);
+    }
+
+    private void HandleHardCleaningUpdate(float progress)
+    {
+        UpdateProgress(ProgressType.Mud, progress);
+
+        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 3)
+        {
+            tutorialService.CompleteAndAdvance(true);
+#if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
+            tutorialService.TriggerHighlight(false, ToolType.Chisel);
+#endif
+            tutorialService.TriggerHighlight(true, ToolType.Brush);
+        }
+    }
+
+    private void HandleSurfaceCleaningUpdate(float progress)
+    {
+        UpdateProgress(ProgressType.Dust, progress);
+        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 4)
+        {
+#if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
+            tutorialService.TriggerHighlight(false, ToolType.Brush);
+#endif
+            tutorialService.CompleteStage();
+        }
+    }
+
+    private void OnPlayerKeycodeEscapePerformed()
+    {
+        PauseGame();
+    }
+
     private void OnUIKeycodeEscapePerformed()
     {
         if (isGamePaused && pauseController.IsActive)
@@ -290,6 +322,7 @@ public class GameplayUIManager : MonoBehaviour
     private void OnWrapUp()
     {
         if (endgameController.IsActive) return;
+        endCamera.enabled = true;
 
         AppLogger.Log("Wrap up!");
         if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 1)
@@ -302,7 +335,6 @@ public class GameplayUIManager : MonoBehaviour
             cleaningService.ForceCleanAll();
         }
 
-        toolCamera.gameObject.SetActive(false);
         mainUIController.SetActive(false);
         endgameController.SetActive(true);
 
@@ -385,6 +417,19 @@ public class GameplayUIManager : MonoBehaviour
         if (isGamePaused)
         {
             pauseController.SetActive(true);
+        }
+    }
+
+    public void ShowTipPoint(bool isShowing)
+    {
+        mainUIController.ShowTipPoint(isShowing);
+    }
+
+    public void SetTipPointPosition(Vector2 screenPosition)
+    {
+        if (mainUIController != null)
+        {
+            mainUIController.SetTipPosition(screenPosition);
         }
     }
 }

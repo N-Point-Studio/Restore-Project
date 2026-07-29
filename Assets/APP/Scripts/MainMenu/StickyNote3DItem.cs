@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 using MoreMountains.Feedbacks;
 using DG.Tweening;
 using UnityEngine.Localization;
+using Modules.SoundSystems;
 
 [RequireComponent(typeof(Collider))]
 public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
@@ -22,6 +23,7 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     [Header("Feedbacks")]
     [SerializeField] private MMF_Player peelFeedback;
+    [SerializeField] protected AudioKey customKey = AudioKey.None;
     
     private Color originalColor;
     private Vector3 originalScale;
@@ -95,7 +97,7 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     private void UpdateText(string val)
     {
-        if (text3D != null) text3D.text = val;
+        // if (text3D != null) text3D.text = val;
     }
 
     public void ToggleCollider(bool isOn)
@@ -149,6 +151,11 @@ public class StickyNote3DItem : MonoBehaviour, IPointerEnterHandler, IPointerExi
         {
             gameObject.SetActive(false);
             OnNotePeeled?.Invoke(this);
+        }
+
+        if (customKey != AudioKey.None)
+        {
+            AudioEvents.TriggerPlayCustomSFX(customKey);
         }
     }
 

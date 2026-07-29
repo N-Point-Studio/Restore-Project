@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -10,7 +11,7 @@ public class GameplayLifetimeScope : LifetimeScope
     [SerializeField] private PlaneReference planeReference;
     [SerializeField] private HoldProgressUI holdProgressUI;
     [SerializeField] private string targetScene;
-    [SerializeField] private Light mainLight;
+    [SerializeField] private List<Light> mainLight;
 
     protected override void Configure(IContainerBuilder builder)
     {
@@ -41,11 +42,14 @@ public class GameplayLifetimeScope : LifetimeScope
         builder.RegisterEntryPoint<ObjectHoldService>(Lifetime.Scoped).AsSelf();
         builder.RegisterEntryPoint<ObjectZoomService>(Lifetime.Scoped).AsSelf();
 
+        // builder.RegisterEntryPoint<MobileInputSystemService>(Lifetime.Scoped).AsSelf();
+
         builder.RegisterEntryPoint<ObjectInteractionManager>(Lifetime.Scoped).AsSelf();
 
         builder.RegisterEntryPoint<ToolService>(Lifetime.Scoped).AsSelf();
 
         builder.RegisterComponentInHierarchy<GameplayUIManager>().AsSelf();
+        builder.RegisterComponentInHierarchy<GameplayToolManager>().AsSelf();
 
         builder.RegisterEntryPoint<GameplayManager>().AsSelf().WithParameter(targetScene);
     }

@@ -1,8 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
-using NINESOFT.TUTORIAL_SYSTEM;
 using VContainer;
-using System;
 
 public class Inspection : MonoBehaviour
 {
@@ -16,6 +14,7 @@ public class Inspection : MonoBehaviour
 
     private Vector3 InitialInspectPosition;
     private Quaternion InitialInspectRotation;
+    private Vector3 InitialInspectScale;
 
     public Transform assemblyRoot;
     private bool isContain = false;
@@ -37,6 +36,7 @@ public class Inspection : MonoBehaviour
         this.config = config;
         this.gameplayManager = gameplayManager;
         this.planeReference = plane;
+        this._zoomVelocity = config.inspectionZoomSpeed * Vector3.one;
     }
 
     void Start()
@@ -45,6 +45,7 @@ public class Inspection : MonoBehaviour
         _targetPosition = transform.position;
         InitialInspectPosition = transform.position;
         InitialInspectRotation = transform.rotation;
+        InitialInspectScale = transform.localScale;
     }
 
     void OnEnable()
@@ -67,6 +68,11 @@ public class Inspection : MonoBehaviour
         GameplayUIManager.OnGameWrapped += HandleGameWrapped;
     }
 
+    void OnDestroy()
+    {
+        transform.DOKill();
+    }
+
     void OnDisable()
     {
         InteractionEvents.OnRotatePerformed -= OnRotatePerformed;
@@ -80,11 +86,19 @@ public class Inspection : MonoBehaviour
 
     void Update()
     {
+        // if (isDragging) return;
+        // transform.position = Vector3.SmoothDamp(
+        //     transform.position,
+        //     _targetPosition,
+        //     ref _zoomVelocity,
+        //     config.inspectionSmoothTime
+        // );
         transform.position = Vector3.SmoothDamp(
             transform.position,
             _targetPosition,
             ref _zoomVelocity,
-            config.inspectionSmoothTime
+            config.inspectionSmoothTime,
+            config.inspectionZoomSpeed // Parameter batas kecepatan masuk di sini
         );
     }
 
@@ -98,6 +112,8 @@ public class Inspection : MonoBehaviour
 
     public void OnRotatePerformed(Vector2 delta)
     {
+        // if (isDragging) return;
+
         if (!isContain || isAssembling) return;
         if (_mainCamera == null) return;
 
@@ -118,12 +134,14 @@ public class Inspection : MonoBehaviour
         if (!tutorialService.IsProcessing && tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 2)
         {
             tutorialService.CompleteAndAdvance(true);
-            tutorialService.TriggerHighlight(true, "Tool_Brush");
+            tutorialService.TriggerHighlight(true, ToolType.Chisel);
         }
     }
 
     public void OnZoomPerformed(float zoomDelta)
     {
+        // if (isDragging) return;
+
         if (!isContain || isGameFinished || isAssembling) return;
         if (_mainCamera == null) _mainCamera = Camera.main;
 
@@ -134,11 +152,19 @@ public class Inspection : MonoBehaviour
             _targetPosition
         );
 
-        float targetDistance = currentDistance + (zoomDelta * config.inspectionZoomSpeed);
-        targetDistance = Mathf.Clamp(targetDistance, config.inspectionMinDistance, _initialDistance);
+        // 1. Tambahkan variabel ini untuk meredam respons input scroll (Coba angka 0.05f atau 0.1f)
+        float zoomStepSpeed = 0.05f;
+
+        // 2. Kalikan zoomDelta dengan zoomStepSpeed, BUKAN zoomValue
+        float targetDistance = currentDistance + (zoomDelta * zoomStepSpeed);
+
+        // 3. zoomValue tetap murni dipakai untuk batas kedekatan (agar tidak tembus pandang)
+        targetDistance = Mathf.Clamp(targetDistance, gameplayManager.zoomValue, _initialDistance);
+
         _targetPosition = _mainCamera.transform.position + direction * targetDistance;
 
         planeReference.SetReferencePosition(_targetPosition);
+
         //zoom tutorial
         if (!tutorialService.IsProcessing && tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 1)
         {
@@ -149,9 +175,21 @@ public class Inspection : MonoBehaviour
     public void ResetPosition()
     {
         transform.SetPositionAndRotation(InitialInspectPosition, InitialInspectRotation);
+        transform.localScale = InitialInspectScale;
         _targetPosition = InitialInspectPosition;
         planeReference.SetReferencePosition(_targetPosition);
         _zoomVelocity = Vector3.zero;
+    }
+
+    public void RotateHorizontally(float deltaX)
+    {
+        if (isGameFinished)
+        {
+            if (_mainCamera == null) _mainCamera = Camera.main;
+            Vector3 cameraUp = _mainCamera != null ? _mainCamera.transform.up : Vector3.up;
+            float rotateY = -deltaX * rotateSpeed * 0.2f;
+            transform.Rotate(cameraUp, rotateY, Space.World);
+        }
     }
 
     public void FinishPosition()
@@ -161,6 +199,7 @@ public class Inspection : MonoBehaviour
         transform.DOKill();
         transform.DOMove(InitialInspectPosition, config.inspectionResetDuration).SetEase(Ease.OutBack);
         transform.DORotateQuaternion(Quaternion.Euler(gameplayManager.finalRotation), config.inspectionResetDuration).SetEase(Ease.OutBack);
+        transform.DOScale(InitialInspectScale * gameplayManager.finalScaleMultiplier, config.inspectionResetDuration).SetEase(Ease.OutBack);
 
         _targetPosition = InitialInspectPosition;
         _zoomVelocity = Vector3.zero;
