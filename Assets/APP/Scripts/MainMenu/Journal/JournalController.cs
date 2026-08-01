@@ -360,44 +360,65 @@ public class JournalController : MonoBehaviour
         JournalSpread currentSpread = spreads[currentPageIndex];
         currentSpread.SetActive(true);
 
-        // This checks the flag! If it's true, it instantly shows!
         if (!currentSpread.hasBeenRevealed)
         {
             currentSpread.PrepareForReveal();
-            
-            int animationsToWait = 0;
-            Action checkComplete = () => 
-            {
-                animationsToWait--;
-                if (animationsToWait <= 0)
-                {
-                    currentSpread.hasBeenRevealed = true;
-                    onComplete?.Invoke();
-                }
-            };
 
+            // 1. First Page Edge Case (Pre-restoration left side is already revealed)
             if (isPostRestoration && currentPageIndex == 0)
             {
                 if (currentSpread.leftPage != null) currentSpread.leftPage.ShowInstant();
                 if (currentSpread.rightPage != null)
                 {
-                    animationsToWait++;
-                    currentSpread.rightPage.PlayRevealAnimation(checkComplete);
+                    currentSpread.rightPage.PlayRevealAnimation(() => 
+                    {
+                        currentSpread.hasBeenRevealed = true;
+                        onComplete?.Invoke();
+                    });
+                }
+                else
+                {
+                    currentSpread.hasBeenRevealed = true;
+                    onComplete?.Invoke();
                 }
             }
+            // 2. Sequential Reveal (Left page first, THEN Right page)
             else
             {
-                if (currentSpread.leftPage != null) animationsToWait++;
-                if (currentSpread.rightPage != null) animationsToWait++;
-
-                if (currentSpread.leftPage != null) currentSpread.leftPage.PlayRevealAnimation(checkComplete);
-                if (currentSpread.rightPage != null) currentSpread.rightPage.PlayRevealAnimation(checkComplete);
-            }
-
-            if (animationsToWait == 0)
-            {
-                currentSpread.hasBeenRevealed = true;
-                onComplete?.Invoke();
+                if (currentSpread.leftPage != null && currentSpread.rightPage != null)
+                {
+                    // Animate left page...
+                    currentSpread.leftPage.PlayRevealAnimation(() => 
+                    {
+                        // ...then animate right page when left is done
+                        currentSpread.rightPage.PlayRevealAnimation(() => 
+                        {
+                            currentSpread.hasBeenRevealed = true;
+                            onComplete?.Invoke();
+                        });
+                    });
+                }
+                else if (currentSpread.leftPage != null)
+                {
+                    currentSpread.leftPage.PlayRevealAnimation(() => 
+                    {
+                        currentSpread.hasBeenRevealed = true;
+                        onComplete?.Invoke();
+                    });
+                }
+                else if (currentSpread.rightPage != null)
+                {
+                    currentSpread.rightPage.PlayRevealAnimation(() => 
+                    {
+                        currentSpread.hasBeenRevealed = true;
+                        onComplete?.Invoke();
+                    });
+                }
+                else
+                {
+                    currentSpread.hasBeenRevealed = true;
+                    onComplete?.Invoke();
+                }
             }
         }
         else

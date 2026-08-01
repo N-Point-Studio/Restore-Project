@@ -14547,15 +14547,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 84516473952733204, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 66.07
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 84516473952733204, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 41.035
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 84516473952733204, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -20
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 228952981829176169, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_Color.b
@@ -14671,7 +14671,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4680592563667470313, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 23.405134
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4680592563667470313, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -14703,7 +14703,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6200343798872231526, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 82.07
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6200343798872231526, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -14760,6 +14760,18 @@ PrefabInstance:
     - target: {fileID: 6829846748616176537, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4294704123
+      objectReference: {fileID: 0}
+    - target: {fileID: 7886620813841669680, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
+      propertyPath: color.Array.data[0].b
+      value: 0.019607844
+      objectReference: {fileID: 0}
+    - target: {fileID: 7886620813841669680, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
+      propertyPath: color.Array.data[0].g
+      value: 0.09411765
+      objectReference: {fileID: 0}
+    - target: {fileID: 7886620813841669680, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
+      propertyPath: color.Array.data[0].r
+      value: 0.13725491
       objectReference: {fileID: 0}
     - target: {fileID: 8145693783818733333, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: info
@@ -19823,6 +19835,30 @@ PrefabInstance:
     - target: {fileID: 84516473952733204, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 341840768573615391, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
+      propertyPath: color.Array.data[0].b
+      value: 0.9843137
+      objectReference: {fileID: 0}
+    - target: {fileID: 341840768573615391, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
+      propertyPath: color.Array.data[0].g
+      value: 0.9843137
+      objectReference: {fileID: 0}
+    - target: {fileID: 341840768573615391, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
+      propertyPath: color.Array.data[0].r
+      value: 0.9843137
+      objectReference: {fileID: 0}
+    - target: {fileID: 341840768573615391, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
+      propertyPath: color.Array.data[1].b
+      value: 0.019607844
+      objectReference: {fileID: 0}
+    - target: {fileID: 341840768573615391, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
+      propertyPath: color.Array.data[1].g
+      value: 0.09411765
+      objectReference: {fileID: 0}
+    - target: {fileID: 341840768573615391, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
+      propertyPath: color.Array.data[1].r
+      value: 0.13725491
       objectReference: {fileID: 0}
     - target: {fileID: 745050917797228805, guid: 40714cbe1477f9d4f8874cc57df08804, type: 3}
       propertyPath: m_IsActive
@@ -33427,7 +33463,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.13725491, g: 0.09411765, b: 0.019607844, a: 1}
+  m_Color: {r: 0.8705883, g: 0.67058825, b: 0.3529412, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -46868,6 +46904,8 @@ GameObject:
   - component: {fileID: 2348453339028362367}
   - component: {fileID: 3597379135982285956}
   - component: {fileID: 6796718461211051945}
+  - component: {fileID: 7824044014719563737}
+  - component: {fileID: 7824044014719563738}
   m_Layer: 5
   m_Name: ButtonWrapUpMobile
   m_TagString: Untagged
@@ -46875,6 +46913,46 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!223 &7824044014719563737
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7824044014719563736}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 25
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 1
+  m_TargetDisplay: 0
+--- !u!114 &7824044014719563738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7824044014719563736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!1 &7843457896817704425
 GameObject:
   m_ObjectHideFlags: 0
