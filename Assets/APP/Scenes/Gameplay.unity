@@ -8940,7 +8940,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2596229567394185725, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 54.655
+      value: 36.010002
       objectReference: {fileID: 0}
     - target: {fileID: 2596229567394185725, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -8972,7 +8972,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3674775667344066674, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 84.31
+      value: 47.02
       objectReference: {fileID: 0}
     - target: {fileID: 3674775667344066674, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -10252,7 +10252,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2596229567394185725, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 38.559998
+      value: 34.864998
       objectReference: {fileID: 0}
     - target: {fileID: 2596229567394185725, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -10288,7 +10288,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3674775667344066674, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 52.12
+      value: 44.73
       objectReference: {fileID: 0}
     - target: {fileID: 3674775667344066674, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -13636,7 +13636,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2596229567394185725, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 38.559998
+      value: 34.864998
       objectReference: {fileID: 0}
     - target: {fileID: 2596229567394185725, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -13672,7 +13672,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3674775667344066674, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 52.12
+      value: 44.73
       objectReference: {fileID: 0}
     - target: {fileID: 3674775667344066674, guid: 12eee09b7721826499c95c9d4acebff0, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -16999,7 +16999,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Outline
   outlineMode: 0
-  outlineColor: {r: 1, g: 1, b: 1, a: 1}
+  outlineColor: {r: 1, g: 0.3529412, b: 0, a: 1}
   outlineWidth: 5
   precomputeOutline: 0
   bakeKeys: []
@@ -34826,6 +34826,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1695587443}
     m_Modifications:
+    - target: {fileID: 2064158174824890534, guid: 9a7972b1854e44bba87729d9ed2b258f, type: 3}
+      propertyPath: outlineColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2064158174824890534, guid: 9a7972b1854e44bba87729d9ed2b258f, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.3529412
+      objectReference: {fileID: 0}
     - target: {fileID: 2636125802536333229, guid: 9a7972b1854e44bba87729d9ed2b258f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.3130002
@@ -35136,7 +35144,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 43.370003, y: -80.5}
+  m_AnchoredPosition: {x: 38.934998, y: -80.5}
   m_SizeDelta: {x: 0, y: 21}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &2596229567048785605
@@ -35158,7 +35166,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 38.145, y: -49.5}
+  m_AnchoredPosition: {x: 38.434998, y: -49.5}
   m_SizeDelta: {x: 0, y: 21}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &2596229567911778449
@@ -35180,7 +35188,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 42.09, y: -18.5}
+  m_AnchoredPosition: {x: 40.309998, y: -18.5}
   m_SizeDelta: {x: 0, y: 21}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2671835270257957965
@@ -46846,7 +46854,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Outline
   outlineMode: 0
-  outlineColor: {r: 1, g: 1, b: 1, a: 1}
+  outlineColor: {r: 1, g: 0.3529412, b: 0, a: 1}
   outlineWidth: 5
   precomputeOutline: 0
   bakeKeys: []
@@ -47911,6 +47919,14 @@ PrefabInstance:
     - target: {fileID: 1944173485605952161, guid: 0ed5ea7f7837844c8bdfc3f063ab7489, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5697896912635630005, guid: 0ed5ea7f7837844c8bdfc3f063ab7489, type: 3}
+      propertyPath: outlineColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5697896912635630005, guid: 0ed5ea7f7837844c8bdfc3f063ab7489, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.3529412
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
