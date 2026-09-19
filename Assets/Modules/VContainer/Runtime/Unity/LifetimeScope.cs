@@ -136,11 +136,14 @@ namespace VContainer.Unity
         {
             if (VContainerSettings.DiagnosticsEnabled && string.IsNullOrEmpty(scopeName))
             {
+#if UNITY_6000_4_OR_NEWER
+                scopeName = $"{name} ({gameObject.GetEntityId()})";
+#else
                 scopeName = $"{name} ({gameObject.GetInstanceID()})";
+#endif
             }
             try
             {
-                Parent = GetRuntimeParent();
                 if (autoRun)
                 {
                     Build();
@@ -231,14 +234,8 @@ namespace VContainer.Unity
         {
             var childGameObject = new GameObject(childScopeName ?? "LifetimeScope (Child)");
             childGameObject.SetActive(false);
-            if (IsRoot)
-            {
-                DontDestroyOnLoad(childGameObject);
-            }
-            else
-            {
-                childGameObject.transform.SetParent(transform, false);
-            }
+            childGameObject.transform.SetParent(transform, false);
+
             var child = childGameObject.AddComponent<TScope>();
             if (installer != null)
             {
