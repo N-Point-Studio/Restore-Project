@@ -103,8 +103,8 @@ public class GameplayUIManager : MonoBehaviour
         if (tutorialDesktopRoot != null) tutorialDesktopRoot.SetActive(!isMobile);
         if (tutorialMobileRoot != null) tutorialMobileRoot.SetActive(isMobile);
 
-        yield return null;
-
+        yield return new WaitForSeconds(2f);
+        
         if (gameplayManager.isTutorialAvailable)
         {
             tutorialService.StartTutorial(0, 0);

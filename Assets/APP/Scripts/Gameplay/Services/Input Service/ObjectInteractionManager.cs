@@ -12,17 +12,19 @@ public class ObjectInteractionManager : IInitializable, IDisposable
     private readonly ObjectDragService dragService;
     private readonly ObjectHoldService holdService;
     private readonly CleaningService cleaningService;
+    private readonly TutorialService tutorialService;
     private IInteractObject currentInteract;
 
     [Inject]
     public ObjectInteractionManager(ObjectDetectionService detectionService, ObjectPressService press,
-        ObjectDragService swipe, ObjectHoldService hold, CleaningService cleaningService)
+        ObjectDragService swipe, ObjectHoldService hold, CleaningService cleaningService, TutorialService tutorialService)
     {
         this.detectionService = detectionService;
         this.pressService = press;
         this.dragService = swipe;
         this.holdService = hold;
         this.cleaningService = cleaningService;
+        this.tutorialService = tutorialService;
     }
 
     public void Initialize()
@@ -62,6 +64,8 @@ public class ObjectInteractionManager : IInitializable, IDisposable
 
     private void HandlePressStarted()
     {
+        if (tutorialService.IsInputBlocked) return;
+
         InteractionEvents.OnPressStart?.Invoke();
         detectionService.SetInteractObjectUsed(true);
     }
@@ -74,6 +78,7 @@ public class ObjectInteractionManager : IInitializable, IDisposable
 
     private void HandleDragStart(Vector2 vector)
     {
+        if (tutorialService.IsInputBlocked) return;
         if (!IsInteractValid()) return;
 
         detectionService.SetInteractObjectUsed(true);

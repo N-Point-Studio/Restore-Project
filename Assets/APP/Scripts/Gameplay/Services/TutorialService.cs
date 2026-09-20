@@ -15,9 +15,11 @@ public class TutorialService
     public bool IsProcessing => isProcessing;
     public int CurrentStage => currentStage;
     public int CurrentModule => currentModule;
+    public bool IsInputBlocked { get; private set; }
 
     public static Action<ToolType> OnTutorialHighlightOn;
     public static Action<ToolType> OnTutorialHighlightOff;
+
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
@@ -154,5 +156,10 @@ public class TutorialService
         {
             OnTutorialHighlightOff?.Invoke(toolType);
         }
+    }
+
+    public void SetInputBlock(bool isBlocked)
+    {
+        IsInputBlocked = isBlocked;
     }
 }

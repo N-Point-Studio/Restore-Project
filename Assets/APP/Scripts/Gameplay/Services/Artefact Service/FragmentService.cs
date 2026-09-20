@@ -54,4 +54,22 @@ public class FragmentService : IInitializable, IDisposable
     }
     public bool IsAssemblyRequired => registry.Count > 1;
     public int GetPieceCount() => registry.Count;
+
+    public ArtefactPieceStateMachine GetPieceById(string id)
+    {
+        foreach (var piece in registry)
+        {
+            if (piece.PieceId == id) return piece;
+        }
+        return null;
+    }
+
+    public ArtefactPieceStateMachine GetFirstAvailablePiece()
+    {
+        foreach (var piece in registry)
+        {
+            return piece;
+        }
+        return null;
+    }
 }

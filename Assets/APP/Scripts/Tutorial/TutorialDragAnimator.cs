@@ -12,44 +12,60 @@ public class TutorialDragAnimator : MonoBehaviour
     [SerializeField] private Sprite hoverCursorSprite;
     [SerializeField] private Sprite grabCursorSprite;
 
-    [Header("Rules Settings")]
-    [SerializeField] private float idleTimeout = 5f;
-    [SerializeField] private string targetPieceId = "Artefact_Coin";
+    [Header("Settings")]
+    [SerializeField] private float idleTimeout = 10f; 
 
     private Transform artefactStartTarget; 
-    private int currentLoopCount = 0;
     private Sequence dragSequence;
-    private float lastInputTime;
     
-    // Global flag to block input in ObjectInteractionManager
-    public static bool IsInputBlockedByTutorial { get; private set; } 
+    private int currentLoopCount = 0;
+    private bool isFirstPhase = true; 
+    private bool isTaskCompleted = false;
+    private bool isAnimationPlaying = false;
+    private float lastActivityTime;
 
     private ObjectDetectionService detectionService;
     private AssemblyService assemblyService;
+    private TutorialService tutorialService;
+    private FragmentService fragmentService;
+    private TutorialOverlayUI overlayController;
     private Camera mainCam;
 
     [Inject]
-    public void Construct(ObjectDetectionService detectionService, AssemblyService assemblyService, Camera cam)
+    public void Construct(
+        ObjectDetectionService detectionService, 
+        AssemblyService assemblyService, 
+        TutorialService tutorialService, 
+        FragmentService fragmentService,
+        TutorialOverlayUI overlayController,
+        Camera cam)
     {
         this.detectionService = detectionService;
         this.assemblyService = assemblyService;
+        this.tutorialService = tutorialService;
+        this.fragmentService = fragmentService;
+        this.overlayController = overlayController;
         this.mainCam = cam;
     }
 
     private void OnEnable()
     {
-        // Listen to standard input events to reset idle timer
         InteractionEvents.OnMouseMoved += ResetIdleTimer;
         InteractionEvents.OnPressStart += HandleAnyInput;
-        
-        // Listen to hover to dismiss the tutorial (Rule 3)
         detectionService.OnInteractDetected += HandleObjectHover;
-        
-        // Dynamically capture the artefact when it spawns
         ArtefactPieceStateMachine.OnCreated += HandlePieceSpawned;
+        AssembleEvents.OnAssemblePerformed += HandleAssemblyPerformed; 
         
-        lastInputTime = Time.time;
         fakeCursor.gameObject.SetActive(false);
+        isFirstPhase = true;
+        currentLoopCount = 0;
+
+        FindExistingArtefact();
+        
+        if (artefactStartTarget != null)
+        {
+            StartTutorialSequence(true); 
+        }
     }
 
     private void OnDisable()
@@ -58,68 +74,93 @@ public class TutorialDragAnimator : MonoBehaviour
         InteractionEvents.OnPressStart -= HandleAnyInput;
         detectionService.OnInteractDetected -= HandleObjectHover;
         ArtefactPieceStateMachine.OnCreated -= HandlePieceSpawned;
+        AssembleEvents.OnAssemblePerformed -= HandleAssemblyPerformed;
         
-        StopTutorialSequence();
-    }
-
-    private void OnDestroy()
-    {
-        InteractionEvents.OnMouseMoved -= ResetIdleTimer;
-        InteractionEvents.OnPressStart -= HandleAnyInput;
-        detectionService.OnInteractDetected -= HandleObjectHover;
-        ArtefactPieceStateMachine.OnCreated -= HandlePieceSpawned;
+        StopAnimation();
+        tutorialService.SetInputBlock(false); 
     }
 
     private void Update()
     {
-        // Rule 4: If no movement for 5 seconds, enter tutorial mode again
-        if (!IsInputBlockedByTutorial && artefactStartTarget != null && (Time.time - lastInputTime) >= idleTimeout)
+        if (isTaskCompleted || isFirstPhase || isAnimationPlaying || artefactStartTarget == null) return;
+
+        if (Time.time - lastActivityTime >= idleTimeout)
         {
-            StartTutorialSequence();
+            StartTutorialSequence(false); 
         }
     }
 
-    private void ResetIdleTimer(Vector2 pos) => lastInputTime = Time.time;
-    private void HandleAnyInput() => lastInputTime = Time.time;
+    private void RecordActivity()
+    {
+        lastActivityTime = Time.time;
+        if (!isFirstPhase && isAnimationPlaying) 
+        {
+            StopAnimation();
+        }
+    }
+
+    private void ResetIdleTimer(Vector2 pos) => RecordActivity();
+    private void HandleAnyInput() => RecordActivity();
+
+    private void FindExistingArtefact()
+    {
+        var targetPiece = fragmentService.GetFirstAvailablePiece();
+        if (targetPiece != null)
+        {
+            artefactStartTarget = targetPiece.transform;
+        }
+    }
 
     private void HandlePieceSpawned(ArtefactPieceStateMachine piece)
     {
-        // Capture the transform dynamically based on the target ID
-        if (piece.PieceId == targetPieceId)
+        if (artefactStartTarget == null) 
         {
             artefactStartTarget = piece.transform;
+            
+            if (gameObject.activeInHierarchy && !isAnimationPlaying && !isTaskCompleted && isFirstPhase)
+            {
+                StartTutorialSequence(true);
+            }
         }
     }
 
     private void HandleObjectHover(IInteractObject interactable)
     {
-        // Rule 3: When user hovers over the target object, dismiss tutorial
-        if (IsInputBlockedByTutorial && interactable != null)
+        if (interactable != null && interactable is IArtefactPart)
         {
-            if (interactable is IArtefactPart part && part.PieceId == targetPieceId)
-            {
-                StopTutorialSequence();
-            }
+            RecordActivity();
         }
     }
 
-    public void StartTutorialSequence()
+    private void HandleAssemblyPerformed()
     {
-        if (IsInputBlockedByTutorial || artefactStartTarget == null) return;
+        isTaskCompleted = true;
+        StopAnimation();
+        tutorialService.SetInputBlock(false);
+        gameObject.SetActive(false); 
+    }
 
-        IsInputBlockedByTutorial = true; // Rule 1: User input is blocked
-        currentLoopCount = 0;
-        fakeCursor.gameObject.SetActive(true);
+    public void StartTutorialSequence(bool blockInput)
+    {
+        if (artefactStartTarget == null || isTaskCompleted) return;
+
+        if (blockInput) tutorialService.SetInputBlock(true); 
         
+        fakeCursor.gameObject.SetActive(true);
+        isAnimationPlaying = true;
+
+        if (overlayController != null) overlayController.SetActive(true);
+
         PlayDragAnimation();
     }
 
-    private void StopTutorialSequence()
+    private void StopAnimation()
     {
-        IsInputBlockedByTutorial = false;
+        isAnimationPlaying = false;
         fakeCursor.gameObject.SetActive(false);
         dragSequence?.Kill();
-        lastInputTime = Time.time; 
+        
+        if (overlayController != null) overlayController.SetActive(false);
     }
 
     private void PlayDragAnimation()
@@ -127,44 +168,42 @@ public class TutorialDragAnimator : MonoBehaviour
         dragSequence?.Kill();
         dragSequence = DOTween.Sequence();
 
-        // Dynamically map the world positions to the screen
         Vector2 startPos = mainCam.WorldToScreenPoint(artefactStartTarget.position);
         Vector2 endPos = mainCam.WorldToScreenPoint(assemblyService.GetInspectPoint().position);
 
-        // Reset cursor to a starting offset
         fakeCursor.position = startPos + new Vector2(150, -150);
         cursorImage.sprite = defaultCursorSprite;
 
-        // 1. Move to Artefact
         dragSequence.Append(fakeCursor.DOMove(startPos, 1f).SetEase(Ease.OutQuad));
-
-        // 2. Hover (Change Sprite to Hand Open)
         dragSequence.AppendCallback(() => cursorImage.sprite = hoverCursorSprite);
         dragSequence.AppendInterval(0.3f);
-
-        // 3. Grab (Change Sprite to Hand Closed)
         dragSequence.AppendCallback(() => cursorImage.sprite = grabCursorSprite);
         dragSequence.AppendInterval(0.2f);
-
-        // 4. Drag to Inspection Center
         dragSequence.Append(fakeCursor.DOMove(endPos, 1.5f).SetEase(Ease.InOutSine));
-
-        // 5. Release
         dragSequence.AppendCallback(() => cursorImage.sprite = defaultCursorSprite);
         dragSequence.AppendInterval(0.5f);
 
-        // Evaluation
         dragSequence.OnComplete(() =>
         {
-            currentLoopCount++;
-            if (currentLoopCount < 2) 
+            if (isFirstPhase)
             {
-                // Rule 2: Loop 2x
-                PlayDragAnimation();
+                currentLoopCount++;
+                if (currentLoopCount < 2) 
+                {
+                    PlayDragAnimation(); 
+                }
+                else
+                {
+                    isFirstPhase = false;
+                    tutorialService.SetInputBlock(false); 
+                    StopAnimation();
+                    lastActivityTime = Time.time; 
+                }
             }
             else
             {
-                StopTutorialSequence();
+                StopAnimation();
+                lastActivityTime = Time.time;
             }
         });
     }
