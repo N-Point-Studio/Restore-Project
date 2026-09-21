@@ -12,6 +12,8 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
     private readonly GameConfigData config;
     private GameInput Input => inputSystem.Input;
 
+    public event Action<Vector2> OnMouseMoved;
+
     public event Action<Vector2> OnLeftPressStarted;
     public event Action<Vector2> OnLeftPressEnded;
     public event Action OnRightPressStarted;
@@ -44,7 +46,7 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
         EnhancedTouchSupport.Enable();
 
 #if UNITY_EDITOR
-        UnityEngine.InputSystem.EnhancedTouch.TouchSimulation.Enable();
+        TouchSimulation.Enable();
 #endif
 
         Input.Player.Press.started += HandleLeftPressStarted;
@@ -72,7 +74,7 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
         EnhancedTouchSupport.Disable();
 
 #if UNITY_EDITOR
-        UnityEngine.InputSystem.EnhancedTouch.TouchSimulation.Disable();
+        TouchSimulation.Disable();
 #endif
 
         Input.Player.Press.started -= HandleLeftPressStarted;
@@ -128,12 +130,25 @@ public class InputSystemService : IInitializable, IDisposable, ITickable
     private void HandleLeftPressCanceled(InputAction.CallbackContext context) => OnLeftPressEnded?.Invoke(GetMousePosition());
     private void HandleRightPressStarted(InputAction.CallbackContext context) => OnRightPressStarted?.Invoke();
     private void HandleRightPressCanceled(InputAction.CallbackContext context) => OnRightPressEnded?.Invoke();
-    private void HandleMouseMoved(InputAction.CallbackContext context) => InteractionEvents.OnMouseMoved?.Invoke(context.ReadValue<Vector2>());
+    private void HandleMouseMoved(InputAction.CallbackContext context)
+    {
+        Vector2 vectorValue = context.ReadValue<Vector2>();
+        OnMouseMoved?.Invoke(vectorValue);
+        InteractionEvents.OnMouseMoved?.Invoke(vectorValue);
+    }
     private void HandleScrollPerformed(InputAction.CallbackContext context) => OnScrollPerformed?.Invoke(context.ReadValue<float>());
     private void HandlePlayerKeycodeEscapePerformed(InputAction.CallbackContext context) => OnPlayerKeycodeEscapePerformed?.Invoke();
     private void HandlePlayerKeycodeEnterPerformed(InputAction.CallbackContext context) => OnPlayerKeycodeEnterPerformed?.Invoke();
-    private void HandlePlayerKeycodeTabPerformed(InputAction.CallbackContext context) => InteractionEvents.OnTabPerformed?.Invoke();
-    private void HandlePlayerKeycodeTabCanceled(InputAction.CallbackContext context) => InteractionEvents.OnTabCanceled?.Invoke();
+    private void HandlePlayerKeycodeTabPerformed(InputAction.CallbackContext context)
+    {
+        OnPlayerKeycodeTabPerformed?.Invoke();
+        InteractionEvents.OnTabPerformed?.Invoke();
+    }
+    private void HandlePlayerKeycodeTabCanceled(InputAction.CallbackContext context)
+    {
+        OnPlayerKeycodeTabCanceled?.Invoke();
+        InteractionEvents.OnTabCanceled?.Invoke();
+    }
     private void HandleUIKeycodeEnterPerformed(InputAction.CallbackContext context) => OnUIKeycodeEnterPerformed?.Invoke();
     private void HandleUIKeycodeEscapePerformed(InputAction.CallbackContext context) => OnUIKeycodeEscapePerformed?.Invoke();
     private void HandleUIKeycodeRPerformed(InputAction.CallbackContext context) => OnUIKeycodeRPerformed?.Invoke();
