@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using VContainer;
 
 [Serializable]
 class GameplayToolData
@@ -26,10 +27,39 @@ public class GameplayToolManager : MonoBehaviour
     [SerializeField] private GameObject mobileToolParent;
 
     private bool isInitialized = false;
+    private TutorialService tutorialService;
+
+    public bool IsTutorialAvailable { get; set; }
+
+    [Inject]
+    public void Construct(TutorialService tutorialService)
+    {
+        this.tutorialService = tutorialService;
+    }
 
     private void Awake()
     {
         InitializePlatformTools();
+    }
+
+    private void OnEnable()
+    {
+        if (tutorialService != null) tutorialService.OnTutorialStateChanged += UpdateTrayVisibility;
+    }
+    private void OnDisable()
+    {
+        if (tutorialService != null) tutorialService.OnTutorialStateChanged -= UpdateTrayVisibility;
+    }
+
+    private void UpdateTrayVisibility(int stage, int module)
+    {
+        if (!IsTutorialAvailable) return;
+
+        // Show Chisel starting at Stage 0, Module 3
+        SetToolVisibility(ToolType.Chisel, stage > 0 || module >= 3);
+        
+        // Show Brush starting at Stage 0, Module 4
+        SetToolVisibility(ToolType.Brush, stage > 0 || module >= 4);
     }
 
     private void InitializePlatformTools()

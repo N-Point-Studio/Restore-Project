@@ -5,12 +5,24 @@ using VContainer;
 
 public class TutorialDragAnimator : MonoBehaviour
 {
-    [Header("UI References")]
+    [Header("Fake Hand Cursor")]
     [SerializeField] private RectTransform fakeCursor;
     [SerializeField] private Image cursorImage;
     [SerializeField] private Sprite defaultCursorSprite;
     [SerializeField] private Sprite hoverCursorSprite;
     [SerializeField] private Sprite grabCursorSprite;
+
+    [Header("Physical Mouse Indicator")]
+    [SerializeField] private Image physicalMouseImage;
+    [SerializeField] private Sprite mouseDefaultSprite;
+    [SerializeField] private Sprite mouseLeftClickSprite;
+    [SerializeField] private GameObject clickIndicatorObject;
+
+    [Header("Dotted Line")]
+    [Tooltip("UI Image with a dotted sprite set to Tiled. Pivot should be (0, 0.5) so it stretches outward.")]
+    [SerializeField] private GameObject dottedGameObject;
+    [Tooltip("The impact/action lines Image that appears when clicking or releasing.")]
+    private RectTransform dottedRect;
 
     [Header("Settings")]
     [SerializeField] private float idleTimeout = 10f; 
@@ -48,6 +60,14 @@ public class TutorialDragAnimator : MonoBehaviour
         this.mainCam = cam;
     }
 
+    private void Awake()
+    {
+        if (dottedGameObject != null)
+        {
+            dottedRect = dottedGameObject.GetComponent<RectTransform>();
+        }
+    }
+
     private void OnEnable()
     {
         InteractionEvents.OnMouseMoved += ResetIdleTimer;
@@ -57,6 +77,8 @@ public class TutorialDragAnimator : MonoBehaviour
         AssembleEvents.OnAssemblePerformed += HandleAssemblyPerformed; 
         
         fakeCursor.gameObject.SetActive(false);
+        if (dottedGameObject != null) dottedGameObject.SetActive(false);
+
         isFirstPhase = true;
         currentLoopCount = 0;
 
@@ -147,9 +169,15 @@ public class TutorialDragAnimator : MonoBehaviour
         if (blockInput) tutorialService.SetInputBlock(true); 
         
         fakeCursor.gameObject.SetActive(true);
+        
+        // Reset sprites to default before starting
+        cursorImage.sprite = defaultCursorSprite;
+        if (physicalMouseImage != null) physicalMouseImage.sprite = mouseDefaultSprite;
+        if (dottedGameObject != null) dottedGameObject.SetActive(false);
+        
         isAnimationPlaying = true;
 
-        if (overlayController != null) overlayController.SetActive(true);
+        if (overlayController != null) overlayController.ShowOverlay(artefactStartTarget);
 
         PlayDragAnimation();
     }
@@ -158,9 +186,10 @@ public class TutorialDragAnimator : MonoBehaviour
     {
         isAnimationPlaying = false;
         fakeCursor.gameObject.SetActive(false);
+        if (dottedGameObject != null) dottedGameObject.SetActive(false);
         dragSequence?.Kill();
         
-        if (overlayController != null) overlayController.SetActive(false);
+        if (overlayController != null) overlayController.HideOverlay();
     }
 
     private void PlayDragAnimation()
@@ -172,16 +201,67 @@ public class TutorialDragAnimator : MonoBehaviour
         Vector2 endPos = mainCam.WorldToScreenPoint(assemblyService.GetInspectPoint().position);
 
         fakeCursor.position = startPos + new Vector2(150, -150);
-        cursorImage.sprite = defaultCursorSprite;
-
+        
+        // Ensure indicator is off at the start
+        if (clickIndicatorObject != null) clickIndicatorObject.SetActive(false);
+        
+        // 1. Move to Artefact
         dragSequence.Append(fakeCursor.DOMove(startPos, 1f).SetEase(Ease.OutQuad));
-        dragSequence.AppendCallback(() => cursorImage.sprite = hoverCursorSprite);
+        
+        // Setup Dotted Line Orientation
+        if (dottedRect != null)
+        {
+            dottedRect.position = startPos;
+            dottedRect.sizeDelta = new Vector2(dottedRect.sizeDelta.x, 0); 
+            Vector2 direction = endPos - startPos;
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            dottedRect.rotation = Quaternion.Euler(0, 0, angle - 90f);
+        }
+
+        // 2. Hover (Change Hand to Open)
+        dragSequence.AppendCallback(() => {
+            cursorImage.sprite = hoverCursorSprite;
+            if (physicalMouseImage != null) physicalMouseImage.sprite = mouseDefaultSprite;
+        });
         dragSequence.AppendInterval(0.3f);
-        dragSequence.AppendCallback(() => cursorImage.sprite = grabCursorSprite);
+        
+        // 3. Grab (Change Hand to Closed, Change Mouse to Left-Click, SHOW INDICATOR)
+        dragSequence.AppendCallback(() => {
+            cursorImage.sprite = grabCursorSprite;
+            if (physicalMouseImage != null) physicalMouseImage.sprite = mouseLeftClickSprite;
+            if (clickIndicatorObject != null) clickIndicatorObject.SetActive(true);
+        });
         dragSequence.AppendInterval(0.2f);
+        
+        // 4. Start Drag (Change mouse to hold, enable dotted line, HIDE INDICATOR)
+        dragSequence.AppendCallback(() => {
+            if (physicalMouseImage != null) physicalMouseImage.sprite = mouseLeftClickSprite;
+            if (dottedGameObject != null) dottedGameObject.SetActive(true);
+            if (clickIndicatorObject != null) clickIndicatorObject.SetActive(false);
+        });
+
+        // Drag cursor and stretch dotted line simultaneously
         dragSequence.Append(fakeCursor.DOMove(endPos, 1.5f).SetEase(Ease.InOutSine));
-        dragSequence.AppendCallback(() => cursorImage.sprite = defaultCursorSprite);
-        dragSequence.AppendInterval(0.5f);
+        if (dottedRect != null)
+        {
+            float totalDistance = Vector2.Distance(startPos, endPos);
+            dragSequence.Join(dottedRect.DOSizeDelta(new Vector2(dottedRect.sizeDelta.x, totalDistance), 1.5f).SetEase(Ease.InOutSine));
+        }
+        
+        // 5. Release (Reset sprites, hide line, SHOW INDICATOR for unclick)
+        dragSequence.AppendCallback(() => {
+            cursorImage.sprite = hoverCursorSprite;
+            if (physicalMouseImage != null) physicalMouseImage.sprite = mouseDefaultSprite;
+            if (dottedGameObject != null) dottedGameObject.SetActive(false);
+            if (clickIndicatorObject != null) clickIndicatorObject.SetActive(true);
+        });
+        
+        // Wait a tiny bit, then hide the indicator again
+        dragSequence.AppendInterval(0.2f);
+        dragSequence.AppendCallback(() => {
+            if (clickIndicatorObject != null) clickIndicatorObject.SetActive(false);
+        });
+        dragSequence.AppendInterval(0.3f);
 
         dragSequence.OnComplete(() =>
         {

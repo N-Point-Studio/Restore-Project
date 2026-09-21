@@ -194,6 +194,7 @@ public class GameplayManager : IInitializable, IDisposable
                 gameplayToolManager.SetToolVisibility(ToolType, true);
 
                 isTutorialAvailable = CheckTutorialAvailability(1);
+                gameplayToolManager.IsTutorialAvailable = isTutorialAvailable;
             }
         }
     }

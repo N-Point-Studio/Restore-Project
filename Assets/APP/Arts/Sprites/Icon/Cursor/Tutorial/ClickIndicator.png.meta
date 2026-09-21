@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 6fa6e12d814571645a6706a04e943b6f
+guid: 8f8eff9e29aad034386ab34917d9c46b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6574066452144857385
-    second: Property 1=Crosshair 1_0
+      213: 6579678120324201642
+    second: ClickIndicator_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -24,7 +24,7 @@ TextureImporter:
     heightScale: 0.25
     normalMapFilter: 0
     flipGreenChannel: 0
-  isReadable: 1
+  isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
@@ -74,11 +74,11 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 32
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
-    compressionQuality: 100
+    compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
@@ -98,30 +98,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: iOS
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Property 1=Crosshair 1_0
+      name: ClickIndicator_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 384
-        height: 384
+        width: 87
+        height: 87
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -130,8 +117,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 92128e97b96cb3b50800000000000000
-      internalID: 6574066452144857385
+      spriteID: aac755ac366bf4b50800000000000000
+      internalID: 6579678120324201642
       vertices: []
       indices: 
       edges: []

@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
-using NINESOFT.TUTORIAL_SYSTEM;
 using Modules;
 using System.Collections;
 using UnityEngine.InputSystem;
 
 public class GameplayUIManager : MonoBehaviour
 {
+    [SerializeField] private GameObject toDoListObject;
     [SerializeField] private List<ProgressBarUI> progressBars;
 
     [Header("Cameras")]
@@ -37,13 +37,11 @@ public class GameplayUIManager : MonoBehaviour
 
     private bool canWrapUp;
     private bool isAutoWrapUpTriggered = false;
-    private bool isTutorialTriggered = false;
     private bool isGamePaused = false;
 
     public static event Action OnGameWrapped;
     public static event Action<bool> OnGameFinished;
     public static event Action<float> OnOverallProgressUpdated;
-
 
     [Inject]
     public void Construct(
@@ -63,6 +61,7 @@ public class GameplayUIManager : MonoBehaviour
         fragmentService.OnProgressUpdate += HandleProgressUpdate;
         cleaningService.OnHardCleaningUpdate += HandleHardCleaningUpdate;
         cleaningService.OnSurfaceCleaningUpdate += HandleSurfaceCleaningUpdate;
+        tutorialService.OnTutorialStateChanged += UpdateUIVisibility;
 
         this.input.OnPlayerKeycodeEscapePerformed += OnPlayerKeycodeEscapePerformed;
         this.input.OnUIKeycodeEscapePerformed += OnUIKeycodeEscapePerformed;
@@ -133,6 +132,11 @@ public class GameplayUIManager : MonoBehaviour
         quitConfirmationController.OnCancel -= OnCancelQuit;
 
         settingsController.OnSettingsClosed -= OnSettingsClosed;
+        
+        fragmentService.OnProgressUpdate -= HandleProgressUpdate;
+        cleaningService.OnHardCleaningUpdate -= HandleHardCleaningUpdate;
+        cleaningService.OnSurfaceCleaningUpdate -= HandleSurfaceCleaningUpdate;
+        tutorialService.OnTutorialStateChanged -= UpdateUIVisibility;
     }
 
     private void Update()
@@ -236,7 +240,6 @@ public class GameplayUIManager : MonoBehaviour
         // 2. TRIGGER TUTORIAL
         if (canWrapUp)
         {
-            isTutorialTriggered = true;
             if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 1)
             {
                 tutorialService.StartTutorial(1, 1);
@@ -431,5 +434,15 @@ public class GameplayUIManager : MonoBehaviour
         {
             mainUIController.SetTipPosition(screenPosition);
         }
+    }
+
+    private void UpdateUIVisibility(int stage, int module)
+    {
+        if (!gameplayManager.isTutorialAvailable) return;
+
+        // Hide Progress Bars (To-Do List) until Zoom (Module 1) or Rotate (Module 2) begins
+        bool showTodoList = stage > 0 || module >= 1; 
+        
+        toDoListObject.SetActive(showTodoList); 
     }
 }

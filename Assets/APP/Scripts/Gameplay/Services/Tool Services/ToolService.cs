@@ -123,6 +123,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
         switch (currentInteract)
         {
             case IToolObject tool:
+                if (gameplayManager.isTutorialAvailable && !tutorialService.CanUseTool(tool.ToolId)) return;
                 EquipTool(tool);
                 break;
             case IClean clean when clean.IsCleanable():

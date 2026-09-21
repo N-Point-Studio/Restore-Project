@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 98e650d5353357f4794bb6451f1c03ec
+guid: 1e4da2e101cff39469abcf2404291e4b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1304824545494394689
-    second: Property 1=GrabClose 1_0
+      213: -5341740535320620599
+    second: MouseScrollDown_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -24,7 +24,7 @@ TextureImporter:
     heightScale: 0.25
     normalMapFilter: 0
     flipGreenChannel: 0
-  isReadable: 1
+  isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
@@ -74,11 +74,11 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 32
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
-    compressionQuality: 100
+    compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
@@ -98,30 +98,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: iOS
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Property 1=GrabClose 1_0
+      name: MouseScrollDown_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 384
-        height: 384
+        width: 203
+        height: 203
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -130,8 +117,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: fb898973df454ede0800000000000000
-      internalID: -1304824545494394689
+      spriteID: 9c1d8ede8435ed5b0800000000000000
+      internalID: -5341740535320620599
       vertices: []
       indices: 
       edges: []

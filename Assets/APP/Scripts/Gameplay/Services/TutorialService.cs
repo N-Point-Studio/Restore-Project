@@ -19,8 +19,8 @@ public class TutorialService
 
     public static Action<ToolType> OnTutorialHighlightOn;
     public static Action<ToolType> OnTutorialHighlightOff;
-
-
+    public event Action<int, int> OnTutorialStateChanged;
+    
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
@@ -55,11 +55,17 @@ public class TutorialService
         return IsMobilePlatform() ? baseStageIndex + 4 : baseStageIndex;
     }
 
+    private void NotifyStateChange()
+    {
+        OnTutorialStateChanged?.Invoke(currentStage, currentModule);
+    }
+
     public void StartTutorial(int sIndex, int mIndex, float initialDelay = 0.5f)
     {
         if (isProcessing) return;
         // Debug.Log($"[TutorialService] Starting tutorial for Stage: {sIndex}, Module: {mIndex} with initial delay: {initialDelay}s");
         TutorialManager.Instance.StartCoroutine(StartTutorialRoutine(sIndex, mIndex, initialDelay));
+        NotifyStateChange();
     }
 
     public void StartInstantTutorial(int sIndex, int mIndex)
@@ -79,6 +85,7 @@ public class TutorialService
             isTutorialActive = true;
             isProcessing = false;
         }
+        NotifyStateChange();
     }
 
     private IEnumerator StartTutorialRoutine(int sIndex, int mIndex, float delay)
@@ -105,6 +112,7 @@ public class TutorialService
         {
             isProcessing = false;
         }
+        NotifyStateChange();
     }
 
     public void CompleteAndAdvance(bool isNext, float transitionDelay = 0.5f)
@@ -129,6 +137,8 @@ public class TutorialService
         isProcessing = false;
 
         if (isNext) StartTutorial(currentStage, currentModule);
+        
+        NotifyStateChange();
     }
 
     public void CompleteStage()
@@ -161,5 +171,30 @@ public class TutorialService
     public void SetInputBlock(bool isBlocked)
     {
         IsInputBlocked = isBlocked;
+    }
+
+    // --- GATEKEEPER METHODS ---
+    // Stage 0 (Tutorial 1): 0=Drag, 1=Zoom, 2=Rotate, 3=Chisel, 4=Brush
+    // Stage 3 (Tutorial 4): 0=Attach, 1=Detach
+    
+    public bool CanZoom() => currentStage > 0 || currentModule >= 1;
+    public bool CanRotate() => currentStage > 0 || currentModule >= 2;
+    
+    public bool CanUseTool(ToolType toolType)
+    {
+        if (currentStage > 0) return true; // Unlocked after Tutorial 1
+        
+        if (toolType == ToolType.Chisel) return currentModule >= 3;
+        if (toolType == ToolType.Brush) return currentModule >= 4;
+        
+        return false;
+    }
+
+    public bool CanDetach()
+    {
+        // Detach is taught in Tutorial 4 (Stage 3), Module 1
+        if (currentStage < 3) return false; 
+        if (currentStage == 3 && currentModule < 1) return false;
+        return true; 
     }
 }

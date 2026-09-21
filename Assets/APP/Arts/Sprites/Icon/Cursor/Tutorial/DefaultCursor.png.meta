@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 3335320dbff546c4aaa200263cd55a6d
+guid: 8e8e97a0f282bdc45a59a458ae090b25
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5871127956451084736
-    second: Property 1=Rotate 1_0
+      213: -2240818435815579780
+    second: DefaultCursor_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -24,7 +24,7 @@ TextureImporter:
     heightScale: 0.25
     normalMapFilter: 0
     flipGreenChannel: 0
-  isReadable: 1
+  isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
@@ -74,11 +74,11 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 32
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
-    compressionQuality: 100
+    compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
@@ -98,30 +98,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: iOS
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Property 1=Rotate 1_0
+      name: DefaultCursor_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 441
-        height: 414
+        width: 163
+        height: 164
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -130,8 +117,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 0463edcea30958ea0800000000000000
-      internalID: -5871127956451084736
+      spriteID: c7fd017418307e0e0800000000000000
+      internalID: -2240818435815579780
       vertices: []
       indices: 
       edges: []

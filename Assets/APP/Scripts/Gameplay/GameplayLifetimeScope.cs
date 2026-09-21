@@ -16,6 +16,7 @@ public class GameplayLifetimeScope : LifetimeScope
     [Header("Tutorial Section")]
     [SerializeField] private TutorialOverlayUI tutorialOverlay;
     [SerializeField] private TutorialDragAnimator tutorialDragAnimator;
+    [SerializeField] private TutorialZoomAnimator tutorialZoomAnimator;
 
 
     protected override void Configure(IContainerBuilder builder)
@@ -32,8 +33,9 @@ public class GameplayLifetimeScope : LifetimeScope
         builder.RegisterInstance(holdProgressUI);
         builder.RegisterInstance(mainLight);
 
-        builder.RegisterComponent(tutorialDragAnimator);
         builder.RegisterComponent(tutorialOverlay);
+        builder.RegisterComponent(tutorialDragAnimator);
+        builder.RegisterComponent(tutorialZoomAnimator);
 
         builder.RegisterEntryPoint<FragmentService>(Lifetime.Scoped).AsSelf();
         builder.RegisterEntryPoint<AssemblyService>(Lifetime.Scoped).AsSelf();
