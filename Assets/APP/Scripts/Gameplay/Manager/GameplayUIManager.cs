@@ -141,24 +141,25 @@ public class GameplayUIManager : MonoBehaviour
 
     private void Update()
     {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-        // [DEBUG CHEAT] Press F1 to instantly show the Wrap Up button
-        if (Keyboard.current != null && Keyboard.current.f1Key.wasPressedThisFrame)
+        if (Debug.isDebugBuild)
         {
-            // AppLogger.Log("[Cheat] F1 Pressed! Forcing Wrap Up button to appear.");
-
-            // Bypass the normal progress checks
-            canWrapUp = true;
-            isAutoWrapUpTriggered = false; // Ensure auto-wrap doesn't conflict
-
-            // Force the UI controller to show and enable the button
-            if (mainUIController != null)
+            // [DEBUG CHEAT] Press F1 to instantly show the Wrap Up button
+            if (Keyboard.current != null && Keyboard.current.f1Key.wasPressedThisFrame)
             {
-                mainUIController.EnableWrapUp(true);
-                mainUIController.ShowButtonWrap(true);
+                // AppLogger.Log("[Cheat] F1 Pressed! Forcing Wrap Up button to appear.");
+
+                // Bypass the normal progress checks
+                canWrapUp = true;
+                isAutoWrapUpTriggered = false; // Ensure auto-wrap doesn't conflict
+
+                // Force the UI controller to show and enable the button
+                if (mainUIController != null)
+                {
+                    mainUIController.EnableWrapUp(true);
+                    mainUIController.ShowButtonWrap(true);
+                }
             }
         }
-#endif
     }
     private void UpdateProgress(ProgressType type, float value)
     {
