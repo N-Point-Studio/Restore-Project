@@ -5,10 +5,12 @@ using VContainer;
 using Modules;
 using System.Collections;
 using UnityEngine.InputSystem;
+using DG.Tweening;
 
 public class GameplayUIManager : MonoBehaviour
 {
     [SerializeField] private GameObject toDoListObject;
+    [SerializeField] private CanvasGroup toDoListCanvasGroup;
     [SerializeField] private List<ProgressBarUI> progressBars;
 
     [Header("Cameras")]
@@ -73,6 +75,9 @@ public class GameplayUIManager : MonoBehaviour
 
     private void Awake()
     {
+        if (toDoListCanvasGroup != null) toDoListCanvasGroup.alpha = 0f;
+        if (toDoListObject != null) toDoListObject.SetActive(false);
+
         mainUIController.OnWrapUp += OnWrapUp;
         mainUIController.OnPauseRequest += PauseGame;
         endgameController.OnFinishedGame += OnFinishedGame;
@@ -103,12 +108,22 @@ public class GameplayUIManager : MonoBehaviour
         if (tutorialMobileRoot != null) tutorialMobileRoot.SetActive(isMobile);
 
         yield return new WaitForSeconds(2f);
-        
+
         if (gameplayManager.isTutorialAvailable)
         {
             tutorialService.StartTutorial(0, 0);
         }
         HandleAssembleAvailability();
+    }
+
+    private void OnEnable()
+    {
+        ClipBoardUI.OnClipboardHovered += HandleToDoListHovered;
+    }
+
+    private void OnDisable()
+    {
+        ClipBoardUI.OnClipboardHovered -= HandleToDoListHovered;
     }
 
     private void OnDestroy()
@@ -132,7 +147,7 @@ public class GameplayUIManager : MonoBehaviour
         quitConfirmationController.OnCancel -= OnCancelQuit;
 
         settingsController.OnSettingsClosed -= OnSettingsClosed;
-        
+
         fragmentService.OnProgressUpdate -= HandleProgressUpdate;
         cleaningService.OnHardCleaningUpdate -= HandleHardCleaningUpdate;
         cleaningService.OnSurfaceCleaningUpdate -= HandleSurfaceCleaningUpdate;
@@ -161,6 +176,7 @@ public class GameplayUIManager : MonoBehaviour
             }
         }
     }
+
     private void UpdateProgress(ProgressType type, float value)
     {
         for (int i = 0; i < progressBars.Count; i++)
@@ -298,15 +314,26 @@ public class GameplayUIManager : MonoBehaviour
         }
     }
 
+    private void HandleToDoListHovered()
+    {
+        if (!gameplayManager.isTutorialAvailable) return;
+
+        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 5)
+        {
+            tutorialService.CompleteStage();
+        }
+    }
+
     private void HandleSurfaceCleaningUpdate(float progress)
     {
         UpdateProgress(ProgressType.Dust, progress);
+
         if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 4)
         {
 #if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
             tutorialService.TriggerHighlight(false, ToolType.Brush);
 #endif
-            tutorialService.CompleteStage();
+            tutorialService.CompleteAndAdvance(true);
         }
     }
 
@@ -437,13 +464,35 @@ public class GameplayUIManager : MonoBehaviour
         }
     }
 
+    public void OnToDoListHovered()
+    {
+        if (!gameplayManager.isTutorialAvailable) return;
+
+        // If we are on the To-Do List tutorial (Stage 0, Module 5), finish the stage!
+        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 5)
+        {
+            tutorialService.CompleteStage();
+        }
+    }
+
     private void UpdateUIVisibility(int stage, int module)
     {
         if (!gameplayManager.isTutorialAvailable) return;
 
-        // Hide Progress Bars (To-Do List) until Zoom (Module 1) or Rotate (Module 2) begins
-        bool showTodoList = stage > 0 || module >= 1; 
-        
-        toDoListObject.SetActive(showTodoList); 
+        // Show To-Do List after the Brush tutorial (Stage 0, Module 4)
+        bool showTodoList = stage > 0 || (stage == 0 && module >= 5);
+
+        if (showTodoList && !toDoListObject.activeSelf)
+        {
+            // Turn the object on, but keep it transparent
+            toDoListObject.SetActive(true);
+
+            // Fade it in smoothly over 0.5 seconds
+            if (toDoListCanvasGroup != null)
+            {
+                toDoListCanvasGroup.alpha = 0f;
+                toDoListCanvasGroup.DOFade(1f, 0.5f).SetEase(Ease.OutQuad);
+            }
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
@@ -5,6 +6,8 @@ using UnityEngine.InputSystem;
 
 public class ClipBoardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
+    public static event Action OnClipboardHovered;
+
     [Header("References")]
     [SerializeField] private RectTransform animatedRect; 
     [SerializeField] private GameObject desktopControlsInfo;
@@ -85,6 +88,8 @@ public class ClipBoardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             MoveTo(hoverPosition);
             
             if (activeInfoPanel != null) activeInfoPanel.SetActive(true);
+
+            OnClipboardHovered?.Invoke();
         }
     }
 
@@ -127,6 +132,8 @@ public class ClipBoardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         }
         
         CursorController.instance?.SetCursorState(CursorState.Hover);
+
+        OnClipboardHovered?.Invoke();
     }
 
     public void OnPointerExit(PointerEventData eventData)

@@ -59,7 +59,7 @@ public class ObjectRotateService : IInitializable, IDisposable
 
     private void HandleLeftStarted(Vector2 pos)
     {
-#if UNITY_IOS || UNITY_ANDROID || UNITY_EDITOR
+#if UNITY_IOS || UNITY_ANDROID
         // 1-Finger Mobile Rotation Logic
 
         // 1. Prevent rotation if the player is using a PC tool or holding a Mobile tool
@@ -76,7 +76,7 @@ public class ObjectRotateService : IInitializable, IDisposable
 
     private void HandleLeftEnded(Vector2 pos)
     {
-#if UNITY_IOS || UNITY_ANDROID || UNITY_EDITOR
+#if UNITY_IOS || UNITY_ANDROID
         StopRotation();
 #endif
     }
