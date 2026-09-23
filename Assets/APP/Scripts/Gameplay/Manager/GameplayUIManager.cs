@@ -9,6 +9,7 @@ using DG.Tweening;
 
 public class GameplayUIManager : MonoBehaviour
 {
+    [SerializeField] private Canvas clipboardCanvas;
     [SerializeField] private GameObject toDoListObject;
     [SerializeField] private CanvasGroup toDoListCanvasGroup;
     [SerializeField] private List<ProgressBarUI> progressBars;
@@ -479,19 +480,34 @@ public class GameplayUIManager : MonoBehaviour
     {
         if (!gameplayManager.isTutorialAvailable) return;
 
-        // Show To-Do List after the Brush tutorial (Stage 0, Module 4)
-        bool showTodoList = stage > 0 || (stage == 0 && module >= 5);
-
-        if (showTodoList && !toDoListObject.activeSelf)
+        // 1. VISIBILITY: Hidden before Module 5. Visible during and after Module 5.
+        bool shouldBeVisible = stage > 0 || (stage == 0 && module >= 5);
+        
+        if (toDoListObject != null)
         {
-            // Turn the object on, but keep it transparent
-            toDoListObject.SetActive(true);
-
-            // Fade it in smoothly over 0.5 seconds
-            if (toDoListCanvasGroup != null)
+            if (shouldBeVisible && !toDoListObject.activeSelf)
             {
-                toDoListCanvasGroup.alpha = 0f;
-                toDoListCanvasGroup.DOFade(1f, 0.5f).SetEase(Ease.OutQuad);
+                toDoListObject.SetActive(true);
+                toDoListCanvasGroup?.DOFade(1f, 0.5f).SetEase(Ease.OutQuad); // Smooth fade in
+            }
+            else if (!shouldBeVisible && toDoListObject.activeSelf)
+            {
+                toDoListObject.SetActive(false);
+            }
+        }
+
+        // 2. LAYERING: On top ONLY during its specific tutorial (Stage 0, Module 5). Behind otherwise.
+        if (clipboardCanvas != null)
+        {
+            if (stage == 0 && module == 5)
+            {
+                // It is the To-Do list's turn! Pop it OVER the dark mask (Order 10)
+                clipboardCanvas.sortingOrder = 11;
+            }
+            else
+            {
+                // It is another tutorial's turn. Push it BEHIND the dark mask.
+                clipboardCanvas.sortingOrder = 5;
             }
         }
     }
