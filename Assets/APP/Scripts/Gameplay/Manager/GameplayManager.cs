@@ -191,7 +191,7 @@ public class GameplayManager : IInitializable, IDisposable
                     Spawn(artefact.Prefab, artefact.SpawnTransform.Position, artefact.SpawnTransform.Rotation);
                 }
 
-                gameplayToolManager.SetToolVisibility(ToolType, true);
+                // gameplayToolManager.SetToolVisibility(ToolType, true);
 
                 isTutorialAvailable = CheckTutorialAvailability(1);
                 gameplayToolManager.IsTutorialAvailable = isTutorialAvailable;

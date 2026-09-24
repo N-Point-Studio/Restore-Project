@@ -99,6 +99,8 @@ public class ObjectInteractionManager : IInitializable, IDisposable
 
     private void HandleDragPerformed(Vector2 vector)
     {
+        if (tutorialService.IsInputBlocked) return;
+
         if (!IsInteractValid()) return;
 
         if (currentInteract is not IDraggableTool)
@@ -115,6 +117,8 @@ public class ObjectInteractionManager : IInitializable, IDisposable
 
     private void HandleDragEnded(Vector2 vector)
     {
+        if (tutorialService.IsInputBlocked) return;
+        
         if (IsInteractValid())
         {
             Vector3 worldPos = detectionService.GetCachedDragWorldPos(vector);

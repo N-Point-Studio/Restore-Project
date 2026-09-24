@@ -9,17 +9,19 @@ public class ObjectRotateService : IInitializable, IDisposable
     private readonly GameConfigData config;
     private readonly ObjectDetectionService detectionService;
     private readonly ToolService toolService;
+    private readonly TutorialService tutorialService;
     private bool isRotating;
     private Vector2 lastMousePos;
     private IInteractObject currentInteract;
 
     [Inject]
-    public ObjectRotateService(InputSystemService inputSystemService, GameConfigData config, ObjectDetectionService detectionService, ToolService toolService)
+    public ObjectRotateService(InputSystemService inputSystemService, GameConfigData config, ObjectDetectionService detectionService, ToolService toolService, TutorialService tutorialService)
     {
         this.inputSystemService = inputSystemService;
         this.config = config;
         this.detectionService = detectionService;
         this.toolService = toolService;
+        this.tutorialService = tutorialService;
     }
 
     public void Initialize()
@@ -48,7 +50,7 @@ public class ObjectRotateService : IInitializable, IDisposable
 
     private void HandleRightStarted()
     {
-        // PC Right Click Rotation
+        if (tutorialService.IsInputBlocked) return;
         StartRotation(inputSystemService.GetMousePosition());
     }
 
@@ -63,6 +65,7 @@ public class ObjectRotateService : IInitializable, IDisposable
         // 1-Finger Mobile Rotation Logic
 
         // 1. Prevent rotation if the player is using a PC tool or holding a Mobile tool
+        if (tutorialService.IsInputBlocked) return;
         if (toolService.IsOnToolMode) return;
         if (currentInteract is IToolObject || currentInteract is IDraggableTool) return;
 
