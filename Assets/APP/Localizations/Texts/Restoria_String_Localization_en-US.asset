@@ -338,20 +338,16 @@ MonoBehaviour:
     m_Localized: Press "Tab" to find the remaining dust.
     m_Metadata:
       m_Items: []
-  - m_Id: 722153502019584
-    m_Localized: Press "Tab" to find the remaining dust.
-    m_Metadata:
-      m_Items: []
   - m_Id: 722369328320512
     m_Localized: "Nice work. The artifact is ready for display in the museum.\\nYou can tap <b>Wrap Up</b> in the bottom-right to finish, or keep restoring until it\u2019s perfect."
     m_Metadata:
       m_Items: []
   - m_Id: 2027892690116608
-    m_Localized: You can assemble all the pieces by dragging the correct part to the current inspected artifact
+    m_Localized: Drag each piece to the correct spot to reassemble the artifact.
     m_Metadata:
       m_Items: []
   - m_Id: 2027892694310912
-    m_Localized: You can detach the part by hold the left button to the part. But you need to return your tool first!
+    m_Localized: Hold a piece to detach it from the artifact.
     m_Metadata:
       m_Items: []
   - m_Id: 9730903877488640
@@ -403,10 +399,6 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 11919552463376384
-    m_Localized: Hint Mode is now unlocked. Tap the toggle button in the top-right corner\nto switch to UV View and spot hidden dust more easily.
-    m_Metadata:
-      m_Items: []
-  - m_Id: 11919685057908736
     m_Localized: Hint Mode is now unlocked. Tap the toggle button in the top-right corner\nto switch to UV View and spot hidden dust more easily.
     m_Metadata:
       m_Items: []
@@ -563,11 +555,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 49636632817963008
-    m_Localized: 'Tip: Hover over the clipboard if you forget the controls.'
+    m_Localized: Check the clipboard in the bottom-left corner for your restoration progress.
     m_Metadata:
       m_Items: []
   - m_Id: 49996563693834240
     m_Localized: 'Tip: Click the clipboard if you forget the controls.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 51116466513514496
+    m_Localized: 'Tip: Hover over the clipboard if you forget the controls.'
     m_Metadata:
       m_Items: []
   references:

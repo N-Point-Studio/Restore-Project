@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using VContainer;
 
-public class TutorialChiselAnimator : TutorialAnimatorBase
+public class TutorialBrushAnimator : TutorialAnimatorBase
 {
     [Header("UI Hand Cursor")]
     [SerializeField] private RectTransform uiCursorRect; 
@@ -18,8 +19,9 @@ public class TutorialChiselAnimator : TutorialAnimatorBase
     [SerializeField] private GameObject clickIndicator; 
 
     [Header("3D Targets (Dynamic Positioning)")]
-    [SerializeField] private Transform chisel3DTransform;
-    [Tooltip("Moves the dot to the left! (-40 is slightly left of center)")]
+    [Tooltip("Drag the actual 3D Brush GameObject from your scene here")]
+    [SerializeField] private Transform brush3DTransform;
+    [Tooltip("Adjust this to nudge the target dot (0,0 is dead center)")]
     [SerializeField] private Vector2 targetDirtOffset = new Vector2(-40, 0);
     
     [Header("UI Elements")]
@@ -30,10 +32,18 @@ public class TutorialChiselAnimator : TutorialAnimatorBase
     [Header("Animation Settings")]
     [SerializeField] private float moveDuration = 1.2f;
 
-    private Sequence chiselSequence;
+    private ToolService toolService;
+    private Sequence brushSequence;
     private float defaultLineHeight;
     private Vector2 cachedStartPos;
     private Vector2 cachedEndPos;
+
+    // Inject the ToolService so we can force the player to drop the Chisel
+    [Inject]
+    public void ConstructChild(ToolService toolService)
+    {
+        this.toolService = toolService;
+    }
 
     private void Awake()
     {
@@ -43,6 +53,12 @@ public class TutorialChiselAnimator : TutorialAnimatorBase
     protected override void OnEnable()
     {
         base.OnEnable();
+        
+        if (toolService != null)
+        {
+            toolService.ForceReturnTool();
+        }
+
         HideUIElements();
         StartTutorialSequence(true); 
     }
@@ -56,21 +72,22 @@ public class TutorialChiselAnimator : TutorialAnimatorBase
         {
             if (assemblyService != null) 
                 overlayController.ShowOverlay(assemblyService.GetInspectPoint());
-
-            if (chisel3DTransform != null)
-                overlayController.ShowOverlay(chisel3DTransform);
+                
+            if (brush3DTransform != null)
+                overlayController.ShowOverlay(brush3DTransform);
         }
 
-        TutorialService.OnTutorialHighlightOn?.Invoke(ToolType.Chisel);
+        // Force the Brush outline to turn on
+        TutorialService.OnTutorialHighlightOn?.Invoke(ToolType.Brush);
 
         if (mainCam != null && dottedLine != null)
         {
             RectTransform parentRect = (RectTransform)dottedLine.parent;
 
-            if (chisel3DTransform != null)
+            if (brush3DTransform != null)
             {
-                Vector2 chiselScreen = mainCam.WorldToScreenPoint(chisel3DTransform.position);
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, chiselScreen, null, out cachedStartPos);
+                Vector2 brushScreen = mainCam.WorldToScreenPoint(brush3DTransform.position);
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, brushScreen, null, out cachedStartPos);
             }
 
             if (assemblyService != null)
@@ -89,7 +106,7 @@ public class TutorialChiselAnimator : TutorialAnimatorBase
             targetCircleDot.localScale = Vector3.zero;
         }
 
-        PlayChiselAnimation();
+        PlayBrushAnimation();
     }
 
     protected override void HideUIElements()
@@ -98,16 +115,17 @@ public class TutorialChiselAnimator : TutorialAnimatorBase
         if (dottedLine != null) dottedLine.gameObject.SetActive(false);
         if (clickIndicator != null) clickIndicator.SetActive(false);
         if (targetCircleDot != null) targetCircleDot.gameObject.SetActive(false);
+        
+        // Clean up the highlighted Coin and Brush!
         if (overlayController != null) overlayController.HideOverlay();
     }
 
-    protected override void KillSequence() => chiselSequence?.Kill();
+    protected override void KillSequence() => brushSequence?.Kill();
 
-    private void PlayChiselAnimation()
+    private void PlayBrushAnimation()
     {
         KillSequence();
 
-        // Setup Initial State
         if (physicalMouseImage != null) physicalMouseImage.sprite = mouseDefaultSprite;
         if (clickIndicator != null) clickIndicator.SetActive(false);
         if (targetCircleDot != null) targetCircleDot.localScale = Vector3.zero;
@@ -117,7 +135,6 @@ public class TutorialChiselAnimator : TutorialAnimatorBase
         
         if (dottedLine != null)
         {
-            // Instantly reset line size at the very start of the loop
             dottedLine.anchoredPosition = cachedStartPos;
             dottedLine.sizeDelta = new Vector2(0, defaultLineHeight);
             
@@ -126,62 +143,62 @@ public class TutorialChiselAnimator : TutorialAnimatorBase
             dottedLine.localRotation = Quaternion.Euler(0, 0, angle);
         }
 
-        chiselSequence = DOTween.Sequence();
-        chiselSequence.AppendInterval(0.3f);
+        brushSequence = DOTween.Sequence();
+        brushSequence.AppendInterval(0.3f);
 
         // 1. CHANGE TO POINT CURSOR
-        chiselSequence.AppendCallback(() => {
+        brushSequence.AppendCallback(() => {
             if (uiCursorImage != null) uiCursorImage.sprite = cursorPointSprite;
         });
         
-        chiselSequence.AppendInterval(0.3f);
+        brushSequence.AppendInterval(0.3f);
 
-        // 2. CLICK AND GRAB THE CHISEL
-        chiselSequence.AppendCallback(() => {
+        // 2. CLICK AND GRAB THE BRUSH
+        brushSequence.AppendCallback(() => {
             if (physicalMouseImage != null) physicalMouseImage.sprite = mouseLeftClickSprite;
             if (uiCursorImage != null) uiCursorImage.sprite = cursorGrabSprite;
             if (clickIndicator != null) clickIndicator.SetActive(true);
         });
         
-        chiselSequence.AppendInterval(0.2f);
+        brushSequence.AppendInterval(0.2f);
 
         // 3. SHOW THE TARGET DOT
         if (targetCircleDot != null)
         {
-            chiselSequence.Append(targetCircleDot.DOScale(Vector3.one, 0.2f).SetEase(Ease.OutBack));
+            brushSequence.Append(targetCircleDot.DOScale(Vector3.one, 0.2f).SetEase(Ease.OutBack));
         }
 
         // 4. START MOVE
-        chiselSequence.AppendCallback(() => {
+        brushSequence.AppendCallback(() => {
             if (clickIndicator != null) clickIndicator.SetActive(false);
         });
 
-        chiselSequence.Append(uiCursorRect.DOAnchorPos(cachedEndPos, moveDuration).SetEase(Ease.InOutSine));
+        brushSequence.Append(uiCursorRect.DOAnchorPos(cachedEndPos, moveDuration).SetEase(Ease.InOutSine));
         
         if (dottedLine != null)
         {
             float totalDistance = Vector2.Distance(cachedStartPos, cachedEndPos);
-            chiselSequence.Join(dottedLine.DOSizeDelta(new Vector2(totalDistance, defaultLineHeight), moveDuration).SetEase(Ease.InOutSine));
+            brushSequence.Join(dottedLine.DOSizeDelta(new Vector2(totalDistance, defaultLineHeight), moveDuration).SetEase(Ease.InOutSine));
         }
 
-        // 5. ARRIVE AT COIN & TAP
-        chiselSequence.AppendCallback(() => {
+        // 5. ARRIVE AT COIN & SCRUB (Horizontal brushing motion)
+        brushSequence.AppendCallback(() => {
             if (physicalMouseImage != null) physicalMouseImage.sprite = mouseLeftClickSprite;
             if (clickIndicator != null) clickIndicator.SetActive(true);
         });
 
-        chiselSequence.Append(uiCursorRect.DOPunchAnchorPos(new Vector2(15, -15), 0.35f, 15, 1f));
+        // Horizontal back-and-forth punch to simulate sweeping dust
+        brushSequence.Append(uiCursorRect.DOPunchAnchorPos(new Vector2(40, 0), 0.6f, 6, 0.5f));
 
-        chiselSequence.AppendCallback(() => {
+        brushSequence.AppendCallback(() => {
             if (physicalMouseImage != null) physicalMouseImage.sprite = mouseDefaultSprite;
             if (clickIndicator != null) clickIndicator.SetActive(false);
         });
 
         // 6. CLEANUP 
-        // Notice we do NOT shrink the dotted line anymore! It stays stretched until the loop restarts.
-        if (targetCircleDot != null) chiselSequence.Append(targetCircleDot.DOScale(Vector3.zero, 0.2f));
+        if (targetCircleDot != null) brushSequence.Append(targetCircleDot.DOScale(Vector3.zero, 0.2f));
 
-        chiselSequence.AppendInterval(0.5f);
-        chiselSequence.OnComplete(OnSequenceLoopComplete);
+        brushSequence.AppendInterval(0.5f);
+        brushSequence.OnComplete(OnSequenceLoopComplete);
     }
 }

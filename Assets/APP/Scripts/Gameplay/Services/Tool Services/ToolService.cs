@@ -13,6 +13,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
     private readonly InputSystemService inputSystemService;
     private readonly GameplayUIManager gameplayUIManager;
     private readonly GameConfigData gameConfigData;
+    private readonly ObjectInteractionManager objectInteractionManager;
 
     public bool isCleaning { get; private set; }
     public bool isFinished { get; set; } = false;
@@ -38,7 +39,8 @@ public class ToolService : IInitializable, IDisposable, ITickable
         GameplayManager gameplayManager,
         InputSystemService inputSystemService,
         GameplayUIManager gameplayUIManager,
-        GameConfigData gameConfigData)
+        GameConfigData gameConfigData,
+        ObjectInteractionManager objectInteractionManager)
     {
         this.objectDetectionService = objectDetectionService;
         this.surfaceDetectionService = surfaceDetectionService;
@@ -48,6 +50,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
         this.inputSystemService = inputSystemService;
         this.gameplayUIManager = gameplayUIManager;
         this.gameConfigData = gameConfigData;
+        this.objectInteractionManager = objectInteractionManager;
     }
 
     public void Initialize()
@@ -425,10 +428,36 @@ public class ToolService : IInitializable, IDisposable, ITickable
         }
     }
 
+    public void ForceReturnTool()
+    {
+        // 1. Force Return PC Tool
+        objectInteractionManager.ForceDropCurrentObject(); // (Make sure you have a reference to the manager!)
+
+        // 2. Return PC Tool
+        ReturnCurrentTool();
+
+        // 2. Force Return Mobile / Draggable Tool
+#if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
+        if (draggableTool != null)
+        {
+            if (draggableTool is IDragObject tool) 
+            {
+                // This triggers the DOTween animation back to the tray!
+                tool.OnDragEnded(draggableTool.GetTransform().position);
+            }
+                
+            gameplayUIManager.ShowTipPoint(false);
+            PlayToolSfx(false);
+            PlayToolVfx(false);
+            draggableTool = null;
+        }
+#endif
+    }
+
     private void HandleGameWrapped()
     {
         PlayToolSfx(false);
         PlayToolVfx(false);
-        ReturnCurrentTool();
+        ForceReturnTool();
     }
 }

@@ -53,6 +53,23 @@ public class ObjectInteractionManager : IInitializable, IDisposable
         holdService.OnHoldCanceled -= HandleHoldCanceled;
     }
 
+    public void ForceDropCurrentObject()
+    {
+        if (currentInteract != null)
+        {
+            Vector3 dropPosition = Vector3.zero;
+            if (currentInteract is MonoBehaviour monoBehaviour)
+            {
+                dropPosition = monoBehaviour.transform.position;
+            }
+
+            InteractionEvents.OnDragEnded?.Invoke(currentInteract, dropPosition);
+            currentInteract = null;
+        }
+        
+        detectionService.SetInteractObjectUsed(false);
+    }
+
     private void HandleInteractDetected(IInteractObject interact) { currentInteract = interact; }
 
     private bool IsInteractValid()
@@ -117,7 +134,7 @@ public class ObjectInteractionManager : IInitializable, IDisposable
 
     private void HandleDragEnded(Vector2 vector)
     {
-        if (tutorialService.IsInputBlocked) return;
+        // if (tutorialService.IsInputBlocked) return;
         
         if (IsInteractValid())
         {

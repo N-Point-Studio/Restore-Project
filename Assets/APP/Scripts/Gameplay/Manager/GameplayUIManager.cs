@@ -117,16 +117,6 @@ public class GameplayUIManager : MonoBehaviour
         HandleAssembleAvailability();
     }
 
-    private void OnEnable()
-    {
-        ClipBoardUI.OnClipboardHovered += HandleToDoListHovered;
-    }
-
-    private void OnDisable()
-    {
-        ClipBoardUI.OnClipboardHovered -= HandleToDoListHovered;
-    }
-
     private void OnDestroy()
     {
         fragmentService.OnProgressUpdate -= HandleProgressUpdate;
@@ -305,9 +295,11 @@ public class GameplayUIManager : MonoBehaviour
     {
         UpdateProgress(ProgressType.Mud, progress);
 
-        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 3)
+        // Wait until progress > 0 (meaning at least 1 chunk is fully destroyed)
+        // Change to "progress >= 1f" if you want them to destroy ALL chunks before the brush tutorial!
+        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 3 && progress > 0f)
         {
-            tutorialService.CompleteAndAdvance(true);
+            tutorialService.CompleteAndAdvance(true); 
 #if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
             tutorialService.TriggerHighlight(false, ToolType.Chisel);
 #endif
@@ -315,21 +307,12 @@ public class GameplayUIManager : MonoBehaviour
         }
     }
 
-    private void HandleToDoListHovered()
-    {
-        if (!gameplayManager.isTutorialAvailable) return;
-
-        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 5)
-        {
-            tutorialService.CompleteStage();
-        }
-    }
-
     private void HandleSurfaceCleaningUpdate(float progress)
     {
         UpdateProgress(ProgressType.Dust, progress);
-
-        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 4)
+        
+        // Wait until they have scrubbed away at least 5% of the dust
+        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 4 && progress >= 0.01f)
         {
 #if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
             tutorialService.TriggerHighlight(false, ToolType.Brush);

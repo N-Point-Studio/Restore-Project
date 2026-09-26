@@ -9,7 +9,6 @@ public class TutorialOverlayUI : BaseMenuController
 
     private int highlightLayerIndex;
     private Dictionary<GameObject, int> originalLayers = new Dictionary<GameObject, int>();
-    private Transform currentTarget;
 
     protected override void Awake()
     {
@@ -21,9 +20,7 @@ public class TutorialOverlayUI : BaseMenuController
     {
         if (target3DObject != null)
         {
-            currentTarget = target3DObject;
-            originalLayers.Clear();
-            SetLayerRecursive(currentTarget.gameObject, highlightLayerIndex);
+            SetLayerRecursive(target3DObject.gameObject, highlightLayerIndex);
         }
         
         SetActive(true); 
@@ -31,21 +28,18 @@ public class TutorialOverlayUI : BaseMenuController
 
     public void HideOverlay()
     {
-        if (currentTarget != null)
-        {
-            RestoreLayers();
-            currentTarget = null;
-        }
-        
+        RestoreLayers();
         SetActive(false); 
     }
 
     private void SetLayerRecursive(GameObject obj, int newLayer)
     {
         if (obj == null) return;
+        if (!originalLayers.ContainsKey(obj))
+        {
+            originalLayers[obj] = obj.layer;
+        }
         
-        // Cache original layer
-        originalLayers[obj] = obj.layer;
         obj.layer = newLayer;
 
         foreach (Transform child in obj.transform)

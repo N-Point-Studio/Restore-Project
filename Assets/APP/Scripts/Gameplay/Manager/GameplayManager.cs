@@ -123,6 +123,12 @@ public class GameplayManager : IInitializable, IDisposable
             light.enabled = true;
         }
 
+        if (tutorialService != null)
+        {
+            tutorialService.TriggerHighlight(false, ToolType.Chisel);
+            tutorialService.TriggerHighlight(false, ToolType.Brush);
+        }
+
         SaveObjectCompletion();
     }
 

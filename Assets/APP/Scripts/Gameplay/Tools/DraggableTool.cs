@@ -104,19 +104,26 @@ public abstract class DraggableTool : MonoBehaviour, IInteractObject, IDragObjec
         isDragging = false;
         isReturning = true;
         if (animator != null) animator.enabled = false;
-
-        SetColliderEnable(true);
+        
+        SetColliderEnable(false);
+        
         transform.DOKill();
         returnSequence?.Kill();
-
         returnSequence = DOTween.Sequence();
-        returnSequence.Join(transform.DOMove(initialPosition, returnAnimDuration).SetEase(Ease.OutBack));
-        returnSequence.Join(transform.DORotate(initialRotation.eulerAngles, returnAnimDuration).SetEase(Ease.OutBack));
-        returnSequence.OnComplete(() => isReturning = false);
+        
+        returnSequence.Join(transform.DOMove(initialPosition, returnAnimDuration).SetEase(Ease.OutBack).SetUpdate(true));
+        returnSequence.Join(transform.DORotate(initialRotation.eulerAngles, returnAnimDuration).SetEase(Ease.OutBack).SetUpdate(true));
+        
+        returnSequence.OnComplete(() => {
+            isReturning = false;
+            SetColliderEnable(true);
+        });
     }
 
     public void StickToSurface(Vector3 position, Quaternion rotation)
     {
+        if (isReturning) return;
+
         transform.DOKill();
         transform.DOMove(position, surfaceMoveSpeed).SetEase(Ease.OutQuad);
         transform.DORotate(rotation.eulerAngles, surfaceRotateSpeed).SetEase(Ease.OutQuad);

@@ -50,4 +50,20 @@ public class TutorialLocalizationBridge : MonoBehaviour
             }
         }
     }
+
+    public void SetLocalizedString(LocalizedString newString)
+    {
+        if (localizedText != null)
+        {
+            localizedText.StringChanged -= OnStringChanged;
+        }
+
+        localizedText = newString;
+
+        if (localizedText != null)
+        {
+            localizedText.StringChanged += OnStringChanged;
+            localizedText.RefreshString();
+        }
+    }
 }

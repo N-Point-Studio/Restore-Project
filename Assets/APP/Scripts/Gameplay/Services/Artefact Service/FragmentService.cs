@@ -9,6 +9,7 @@ public class FragmentService : IInitializable, IDisposable
     private readonly HashSet<ArtefactPieceStateMachine> registry = new();
 
     public event Action<float> OnProgressUpdate;
+    public IEnumerable<ArtefactPieceStateMachine> GetAllPieces() => registry;
 
     public void Initialize() => ArtefactPieceStateMachine.OnCreated += Register;
     public void Dispose() => ArtefactPieceStateMachine.OnCreated -= Register;

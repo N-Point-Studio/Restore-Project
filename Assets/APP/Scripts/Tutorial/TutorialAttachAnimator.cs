@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using DG.Tweening;
 using VContainer;
 
-public class TutorialDragAnimator : TutorialAnimatorBase
+public class TutorialAttachAnimator : TutorialAnimatorBase
 {
     [Header("Fake Hand Cursor")]
     [SerializeField] private RectTransform fakeCursor;
@@ -22,16 +22,19 @@ public class TutorialDragAnimator : TutorialAnimatorBase
     [SerializeField] private GameObject dottedGameObject;
     private RectTransform dottedRect;
 
-    private Transform artefactStartTarget;
-    private Sequence dragSequence;
+    private Transform sourcePiece;
+    private Transform targetPiece;
+    private Sequence attachSequence;
     private ObjectDetectionService detectionService;
     private FragmentService fragmentService;
+    private Inspection inspection;
 
     [Inject]
-    public void ConstructChild(ObjectDetectionService detectionService, FragmentService fragmentService)
+    public void ConstructChild(ObjectDetectionService detectionService, FragmentService fragmentService, Inspection inspection)
     {
         this.detectionService = detectionService;
         this.fragmentService = fragmentService;
+        this.inspection = inspection;
     }
 
     private void Awake()
@@ -43,14 +46,15 @@ public class TutorialDragAnimator : TutorialAnimatorBase
     {
         base.OnEnable();
         detectionService.OnInteractDetected += HandleObjectHover;
-        ArtefactPieceStateMachine.OnCreated += HandlePieceSpawned;
-        AssembleEvents.OnAssemblePerformed += HandleAssemblyPerformed;
-        HideUIElements();
-        FindExistingArtefact();
+        AssembleEvents.OnAssembleFinished += HandleAssembleFinished;
         
-        if (artefactStartTarget != null && !isTaskCompleted)
+        HideUIElements();
+        FindPieces();
+        
+        if (sourcePiece != null && targetPiece != null && !isTaskCompleted)
         {
-            StartTutorialSequence(true);
+            // Block input as per the rule document
+            StartTutorialSequence(true); 
         }
     }
 
@@ -58,52 +62,7 @@ public class TutorialDragAnimator : TutorialAnimatorBase
     {
         base.OnDisable();
         detectionService.OnInteractDetected -= HandleObjectHover;
-        ArtefactPieceStateMachine.OnCreated -= HandlePieceSpawned;
-        AssembleEvents.OnAssemblePerformed -= HandleAssemblyPerformed;
-    }
-
-    protected override void Update()
-    {
-        if (artefactStartTarget == null) return;
-        base.Update();
-    }
-
-    private void FindExistingArtefact()
-    {
-        var targetPiece = fragmentService.GetFirstAvailablePiece();
-        if (targetPiece != null) 
-        {
-            artefactStartTarget = targetPiece.transform;
-            
-            // EDGE CASE FIX: Check the physical distance! 
-            // If it's already at the inspect point, the player beat us to it.
-            float distance = Vector3.Distance(artefactStartTarget.position, assemblyService.GetInspectPoint().position);
-            if (distance <= 0.1f) 
-            {
-                CompleteTutorial();
-            }
-        }
-    }
-
-    private void HandlePieceSpawned(ArtefactPieceStateMachine piece)
-    {
-        if (artefactStartTarget == null)
-        {
-            artefactStartTarget = piece.transform;
-
-            // EDGE CASE FIX: Safety check for dynamically spawned pieces
-            float distance = Vector3.Distance(artefactStartTarget.position, assemblyService.GetInspectPoint().position);
-            if (distance <= 0.1f) 
-            {
-                CompleteTutorial();
-                return;
-            }
-
-            if (gameObject.activeInHierarchy && !isAnimationPlaying && !isTaskCompleted && isFirstPhase)
-            {
-                StartTutorialSequence(true);
-            }
-        }
+        AssembleEvents.OnAssembleFinished -= HandleAssembleFinished;
     }
 
     private void HandleObjectHover(IInteractObject interactable)
@@ -111,11 +70,38 @@ public class TutorialDragAnimator : TutorialAnimatorBase
         if (interactable is IArtefactPart) RecordActivity();
     }
 
-    private void HandleAssemblyPerformed() => CompleteTutorial();
+    private void HandleAssembleFinished()
+    {
+        CompleteTutorial();
+    }
+
+    private void FindPieces()
+    {
+        if (inspection == null || fragmentService == null) return;
+        
+        Transform assemblyRoot = inspection.GetAssemblyRoot();
+
+        foreach (ArtefactPieceStateMachine piece in fragmentService.GetAllPieces())
+        {
+            if (piece.transform.parent == assemblyRoot)
+            {
+                targetPiece = piece.transform;
+            }
+            else
+            {
+                sourcePiece = piece.transform;
+            }
+        }
+
+        if (sourcePiece == null) 
+        {
+            CompleteTutorial();
+        }
+    }
 
     public override void StartTutorialSequence(bool blockInput)
     {
-        if (artefactStartTarget == null || isTaskCompleted) return;
+        if (sourcePiece == null || targetPiece == null || isTaskCompleted) return;
         base.StartTutorialSequence(blockInput);
     }
 
@@ -126,9 +112,10 @@ public class TutorialDragAnimator : TutorialAnimatorBase
         if (physicalMouseImage != null) physicalMouseImage.sprite = mouseDefaultSprite;
         if (dottedGameObject != null) dottedGameObject.SetActive(false);
 
-        if (overlayController != null) overlayController.ShowOverlay(artefactStartTarget);
+        // Highlight the piece still on the table so they know what to grab
+        if (overlayController != null) overlayController.ShowOverlay(sourcePiece);
 
-        PlayDragAnimation();
+        PlayAttachAnimation();
     }
 
     protected override void HideUIElements()
@@ -138,21 +125,21 @@ public class TutorialDragAnimator : TutorialAnimatorBase
         if (overlayController != null) overlayController.HideOverlay();
     }
 
-    protected override void KillSequence() => dragSequence?.Kill();
+    protected override void KillSequence() => attachSequence?.Kill();
 
-    private void PlayDragAnimation()
+    private void PlayAttachAnimation()
     {
         KillSequence();
-        dragSequence = DOTween.Sequence();
+        attachSequence = DOTween.Sequence();
 
-        Vector2 startPos = mainCam.WorldToScreenPoint(artefactStartTarget.position);
-        Vector2 endPos = mainCam.WorldToScreenPoint(assemblyService.GetInspectPoint().position);
+        Vector2 startPos = mainCam.WorldToScreenPoint(sourcePiece.position);
+        Vector2 endPos = mainCam.WorldToScreenPoint(targetPiece.position);
+        
         fakeCursor.position = startPos + new Vector2(150, -150);
-
         if (clickIndicatorObject != null) clickIndicatorObject.SetActive(false);
 
-        // 1. Move to Artefact
-        dragSequence.Append(fakeCursor.DOMove(startPos, 1f).SetEase(Ease.OutQuad));
+        // 1. Move to Source Piece
+        attachSequence.Append(fakeCursor.DOMove(startPos, 1f).SetEase(Ease.OutQuad));
 
         if (dottedRect != null)
         {
@@ -164,48 +151,51 @@ public class TutorialDragAnimator : TutorialAnimatorBase
         }
 
         // 2. Hover
-        dragSequence.AppendCallback(() => {
+        attachSequence.AppendCallback(() => {
             cursorImage.sprite = hoverCursorSprite;
             if (physicalMouseImage != null) physicalMouseImage.sprite = mouseDefaultSprite;
         });
-        dragSequence.AppendInterval(0.3f);
+        attachSequence.AppendInterval(0.3f);
 
         // 3. Grab
-        dragSequence.AppendCallback(() => {
+        attachSequence.AppendCallback(() => {
             cursorImage.sprite = grabCursorSprite;
             if (physicalMouseImage != null) physicalMouseImage.sprite = mouseLeftClickSprite;
             if (clickIndicatorObject != null) clickIndicatorObject.SetActive(true);
         });
-        dragSequence.AppendInterval(0.2f);
+        attachSequence.AppendInterval(0.2f);
 
-        // 4. Start Drag
-        dragSequence.AppendCallback(() => {
+        // 4. Start Drag to Target Piece
+        attachSequence.AppendCallback(() => {
             if (physicalMouseImage != null) physicalMouseImage.sprite = mouseLeftClickSprite;
             if (dottedGameObject != null) dottedGameObject.SetActive(true);
             if (clickIndicatorObject != null) clickIndicatorObject.SetActive(false);
         });
         
-        dragSequence.Append(fakeCursor.DOMove(endPos, 1.5f).SetEase(Ease.InOutSine));
+        attachSequence.Append(fakeCursor.DOMove(endPos, 1.5f).SetEase(Ease.InOutSine));
+        
         if (dottedRect != null)
         {
             float totalDistance = Vector2.Distance(startPos, endPos);
-            dragSequence.Join(dottedRect.DOSizeDelta(new Vector2(dottedRect.sizeDelta.x, totalDistance), 1.5f).SetEase(Ease.InOutSine));
+            attachSequence.Join(dottedRect.DOSizeDelta(new Vector2(dottedRect.sizeDelta.x, totalDistance), 1.5f).SetEase(Ease.InOutSine));
         }
 
-        // 5. Release
-        dragSequence.AppendCallback(() => {
+        // 5. Release at Target Piece
+        attachSequence.AppendCallback(() => {
             cursorImage.sprite = hoverCursorSprite;
             if (physicalMouseImage != null) physicalMouseImage.sprite = mouseDefaultSprite;
             if (dottedGameObject != null) dottedGameObject.SetActive(false);
             if (clickIndicatorObject != null) clickIndicatorObject.SetActive(true);
         });
 
-        dragSequence.AppendInterval(0.2f);
-        dragSequence.AppendCallback(() => {
+        attachSequence.AppendInterval(0.2f);
+        attachSequence.AppendCallback(() => {
             if (clickIndicatorObject != null) clickIndicatorObject.SetActive(false);
         });
         
-        dragSequence.AppendInterval(0.3f);
-        dragSequence.OnComplete(OnSequenceLoopComplete);
+        attachSequence.AppendInterval(0.3f);
+        
+        // Loop the sequence using the base class method you used in TutorialDragAnimator
+        attachSequence.OnComplete(OnSequenceLoopComplete);
     }
 }

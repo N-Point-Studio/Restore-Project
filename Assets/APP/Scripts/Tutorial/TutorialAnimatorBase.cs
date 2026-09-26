@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using VContainer;
 
@@ -34,6 +35,8 @@ public abstract class TutorialAnimatorBase : MonoBehaviour
     {
         InteractionEvents.OnMouseMoved += ResetIdleTimer;
         InteractionEvents.OnPressStart += HandleAnyInput;
+        GameplayUIManager.OnGameFinished += HandleGameForceFinished;
+        GameplayUIManager.OnGameWrapped += HandleGameForceFinished;
 
         isFirstPhase = true;
         currentLoopCount = 0;
@@ -44,9 +47,21 @@ public abstract class TutorialAnimatorBase : MonoBehaviour
     {
         InteractionEvents.OnMouseMoved -= ResetIdleTimer;
         InteractionEvents.OnPressStart -= HandleAnyInput;
+        GameplayUIManager.OnGameFinished -= HandleGameForceFinished;
+        GameplayUIManager.OnGameWrapped -= HandleGameForceFinished;
 
         StopAnimation();
         if (tutorialService != null) tutorialService.SetInputBlock(false);
+    }
+
+    private void HandleGameForceFinished(bool isCompleted)
+    {
+        CompleteTutorial();
+    }
+
+    private void HandleGameForceFinished()
+    {
+        CompleteTutorial();
     }
 
     protected virtual void Update()

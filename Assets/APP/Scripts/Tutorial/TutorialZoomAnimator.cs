@@ -56,6 +56,7 @@ public class TutorialZoomAnimator : TutorialAnimatorBase
     {
         if (mouseRect != null) mouseRect.gameObject.SetActive(false);
         if (ringsCanvasGroup != null) ringsCanvasGroup.alpha = 0f;
+        if (overlayController != null) overlayController.HideOverlay();
     }
 
     protected override void KillSequence() => zoomSequence?.Kill();

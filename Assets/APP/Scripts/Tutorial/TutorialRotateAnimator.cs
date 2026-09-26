@@ -83,6 +83,7 @@ public class TutorialRotateAnimator : TutorialAnimatorBase
         if (mouseRect != null) mouseRect.gameObject.SetActive(false);
         if (rotateIconRect != null) rotateIconRect.gameObject.SetActive(false);
         if (lineMask != null) lineMask.gameObject.SetActive(false);
+        if (overlayController != null) overlayController.HideOverlay();
     }
 
     protected override void KillSequence() => rotateSequence?.Kill();
