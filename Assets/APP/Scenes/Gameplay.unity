@@ -470,7 +470,7 @@ Canvas:
   m_GameObject: {fileID: 11996101}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 1
+  m_RenderMode: 0
   m_Camera: {fileID: 1227058985}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
@@ -18347,7 +18347,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 785b24261e7dc5c4595463ea2c742be2, type: 3}
-  m_Type: 0
+  m_Type: 2
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -25995,6 +25995,7 @@ MonoBehaviour:
   physicalMouseImage: {fileID: 1238924624}
   mouseDefaultSprite: {fileID: 21300000, guid: a6effb3a1f977414083f660b989102c0, type: 3}
   mouseLeftClickSprite: {fileID: 21300000, guid: 26751c0096124a44bb20d50eb9ad62dd, type: 3}
+  clickIndicatorObject: {fileID: 1574950886}
   holdFillImage: {fileID: 1718344886}
   holdIndicatorRoot: {fileID: 658771625}
   arrowRect: {fileID: 1712162375}
@@ -26446,7 +26447,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: e284f7ecd2c669b429a9af64a4faca31, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -35865,7 +35866,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 38.434998, y: -49.5}
+  m_AnchoredPosition: {x: 37.065002, y: -49.5}
   m_SizeDelta: {x: 0, y: 21}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &2596229567911778449
@@ -35887,7 +35888,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 40.315002, y: -18.5}
+  m_AnchoredPosition: {x: 41.465, y: -18.5}
   m_SizeDelta: {x: 0, y: 21}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2671835270257957965

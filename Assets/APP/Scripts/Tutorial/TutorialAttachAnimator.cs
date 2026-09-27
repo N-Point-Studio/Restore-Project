@@ -28,6 +28,10 @@ public class TutorialAttachAnimator : TutorialAnimatorBase
     private ObjectDetectionService detectionService;
     private FragmentService fragmentService;
     private Inspection inspection;
+    
+    // Added for safe UI positioning
+    private RectTransform canvasRect;
+    private Canvas parentCanvas;
 
     [Inject]
     public void ConstructChild(ObjectDetectionService detectionService, FragmentService fragmentService, Inspection inspection)
@@ -45,6 +49,12 @@ public class TutorialAttachAnimator : TutorialAnimatorBase
     protected override void OnEnable()
     {
         base.OnEnable();
+        mainCam = Camera.main;
+        
+        // Cache canvas components
+        parentCanvas = GetComponentInParent<Canvas>();
+        if (parentCanvas != null) canvasRect = parentCanvas.GetComponent<RectTransform>();
+        
         detectionService.OnInteractDetected += HandleObjectHover;
         AssembleEvents.OnAssembleFinished += HandleAssembleFinished;
         
@@ -53,7 +63,6 @@ public class TutorialAttachAnimator : TutorialAnimatorBase
         
         if (sourcePiece != null && targetPiece != null && !isTaskCompleted)
         {
-            // Block input as per the rule document
             StartTutorialSequence(true); 
         }
     }
@@ -72,7 +81,10 @@ public class TutorialAttachAnimator : TutorialAnimatorBase
 
     private void HandleAssembleFinished()
     {
-        CompleteTutorial();
+        if (assemblyService != null && assemblyService.TotalCurrentParts() > 1)
+        {
+            CompleteTutorial();
+        }
     }
 
     private void FindPieces()
@@ -81,7 +93,7 @@ public class TutorialAttachAnimator : TutorialAnimatorBase
         
         Transform assemblyRoot = inspection.GetAssemblyRoot();
 
-        foreach (ArtefactPieceStateMachine piece in fragmentService.GetAllPieces())
+        foreach (var piece in fragmentService.GetAllPieces())
         {
             if (piece.transform.parent == assemblyRoot)
             {
@@ -112,7 +124,6 @@ public class TutorialAttachAnimator : TutorialAnimatorBase
         if (physicalMouseImage != null) physicalMouseImage.sprite = mouseDefaultSprite;
         if (dottedGameObject != null) dottedGameObject.SetActive(false);
 
-        // Highlight the piece still on the table so they know what to grab
         if (overlayController != null) overlayController.ShowOverlay(sourcePiece);
 
         PlayAttachAnimation();
@@ -130,34 +141,44 @@ public class TutorialAttachAnimator : TutorialAnimatorBase
     private void PlayAttachAnimation()
     {
         KillSequence();
+        if (sourcePiece == null || targetPiece == null || mainCam == null || parentCanvas == null) return;
+
         attachSequence = DOTween.Sequence();
 
-        Vector2 startPos = mainCam.WorldToScreenPoint(sourcePiece.position);
-        Vector2 endPos = mainCam.WorldToScreenPoint(targetPiece.position);
+        // 1. Convert Screen Pixels to safe Canvas Coordinates
+        Vector2 startScreen = mainCam.WorldToScreenPoint(sourcePiece.position);
+        Vector2 endScreen = mainCam.WorldToScreenPoint(targetPiece.position);
         
-        fakeCursor.position = startPos + new Vector2(150, -150);
+        Camera uiCam = parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : mainCam;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, startScreen, uiCam, out Vector2 startLocal);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, endScreen, uiCam, out Vector2 endLocal);
+
+        // Use anchoredPosition instead of position!
+        fakeCursor.anchoredPosition = startLocal + new Vector2(150, -150);
         if (clickIndicatorObject != null) clickIndicatorObject.SetActive(false);
 
-        // 1. Move to Source Piece
-        attachSequence.Append(fakeCursor.DOMove(startPos, 1f).SetEase(Ease.OutQuad));
+        // 2. Move to Source Piece (using DOAnchorPos)
+        attachSequence.Append(fakeCursor.DOAnchorPos(startLocal, 1f).SetEase(Ease.OutQuad));
 
         if (dottedRect != null)
         {
-            dottedRect.position = startPos;
+            dottedRect.anchoredPosition = startLocal;
             dottedRect.sizeDelta = new Vector2(dottedRect.sizeDelta.x, 0);
-            Vector2 direction = endPos - startPos;
+            
+            // Calculate distance and rotation based on CANVAS coordinates, not screen pixels
+            Vector2 direction = endLocal - startLocal;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            dottedRect.rotation = Quaternion.Euler(0, 0, angle - 90f);
+            dottedRect.localRotation = Quaternion.Euler(0, 0, angle - 90f);
         }
 
-        // 2. Hover
+        // 3. Hover
         attachSequence.AppendCallback(() => {
             cursorImage.sprite = hoverCursorSprite;
             if (physicalMouseImage != null) physicalMouseImage.sprite = mouseDefaultSprite;
         });
         attachSequence.AppendInterval(0.3f);
 
-        // 3. Grab
+        // 4. Grab
         attachSequence.AppendCallback(() => {
             cursorImage.sprite = grabCursorSprite;
             if (physicalMouseImage != null) physicalMouseImage.sprite = mouseLeftClickSprite;
@@ -165,22 +186,45 @@ public class TutorialAttachAnimator : TutorialAnimatorBase
         });
         attachSequence.AppendInterval(0.2f);
 
-        // 4. Start Drag to Target Piece
+        // 5. Start Drag to Target Piece
         attachSequence.AppendCallback(() => {
             if (physicalMouseImage != null) physicalMouseImage.sprite = mouseLeftClickSprite;
             if (dottedGameObject != null) dottedGameObject.SetActive(true);
             if (clickIndicatorObject != null) clickIndicatorObject.SetActive(false);
         });
         
-        attachSequence.Append(fakeCursor.DOMove(endPos, 1.5f).SetEase(Ease.InOutSine));
-        
-        if (dottedRect != null)
-        {
-            float totalDistance = Vector2.Distance(startPos, endPos);
-            attachSequence.Join(dottedRect.DOSizeDelta(new Vector2(dottedRect.sizeDelta.x, totalDistance), 1.5f).SetEase(Ease.InOutSine));
-        }
+        attachSequence.Append(DOVirtual.Float(0f, 1f, 1.5f, (val) => {
+            if (sourcePiece == null || targetPiece == null) return;
+            
+            Camera uiCam = parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : mainCam;
+            
+            // Recalculate safe local positions every single frame
+            Vector2 currentStartScreen = mainCam.WorldToScreenPoint(sourcePiece.position);
+            Vector2 currentEndScreen = mainCam.WorldToScreenPoint(targetPiece.position);
+            
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, currentStartScreen, uiCam, out Vector2 dynamicStartLocal);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, currentEndScreen, uiCam, out Vector2 dynamicEndLocal);
 
-        // 5. Release at Target Piece
+            // Move the hand
+            fakeCursor.anchoredPosition = Vector2.Lerp(dynamicStartLocal, dynamicEndLocal, val);
+
+            // Stretch and rotate the line dynamically
+            if (dottedRect != null)
+            {
+                dottedRect.anchoredPosition = dynamicStartLocal;
+                
+                Vector2 direction = dynamicEndLocal - dynamicStartLocal;
+                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                
+                dottedRect.localRotation = Quaternion.Euler(0, 0, angle - 90f);
+                
+                // Multiply total distance by 'val' so it visually grows alongside the hand
+                float currentDistance = direction.magnitude * val;
+                dottedRect.sizeDelta = new Vector2(dottedRect.sizeDelta.x, currentDistance);
+            }
+        }).SetEase(Ease.InOutSine));
+
+        // 6. Release at Target Piece
         attachSequence.AppendCallback(() => {
             cursorImage.sprite = hoverCursorSprite;
             if (physicalMouseImage != null) physicalMouseImage.sprite = mouseDefaultSprite;
@@ -195,7 +239,6 @@ public class TutorialAttachAnimator : TutorialAnimatorBase
         
         attachSequence.AppendInterval(0.3f);
         
-        // Loop the sequence using the base class method you used in TutorialDragAnimator
         attachSequence.OnComplete(OnSequenceLoopComplete);
     }
 }

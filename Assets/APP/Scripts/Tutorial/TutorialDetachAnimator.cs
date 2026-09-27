@@ -18,6 +18,7 @@ public class TutorialDetachAnimator : TutorialAnimatorBase
     [SerializeField] private Image physicalMouseImage;
     [SerializeField] private Sprite mouseDefaultSprite;
     [SerializeField] private Sprite mouseLeftClickSprite;
+    [SerializeField] private GameObject clickIndicatorObject;
 
     [Header("Hold Indicator")]
     [SerializeField] private Image holdFillImage; 
@@ -29,12 +30,18 @@ public class TutorialDetachAnimator : TutorialAnimatorBase
 
     private Transform targetPiece;
     private Sequence detachSequence;
+    private ObjectDetectionService detectionService;
     private FragmentService fragmentService;
     private Inspection inspection;
+    
+    // Canvas fields for safe UI positioning
+    private RectTransform canvasRect;
+    private Canvas parentCanvas;
 
     [Inject]
-    public void ConstructChild(FragmentService fragmentService, Inspection inspection)
+    public void ConstructChild(ObjectDetectionService detectionService, FragmentService fragmentService, Inspection inspection)
     {
+        this.detectionService = detectionService;
         this.fragmentService = fragmentService;
         this.inspection = inspection;
     }
@@ -42,7 +49,10 @@ public class TutorialDetachAnimator : TutorialAnimatorBase
     protected override void OnEnable()
     {
         base.OnEnable();
-        mainCam = Camera.main;
+        
+        // Cache the canvas components for coordinate conversion
+        parentCanvas = GetComponentInParent<Canvas>();
+        if (parentCanvas != null) canvasRect = parentCanvas.GetComponent<RectTransform>();
         
         InteractionEvents.OnHoldCompleted += HandleHoldCompleted;
         
@@ -81,10 +91,7 @@ public class TutorialDetachAnimator : TutorialAnimatorBase
             }
         }
 
-        if (targetPiece == null) 
-        {
-            CompleteTutorial();
-        }
+        if (targetPiece == null) CompleteTutorial();
     }
 
     protected override void SetupUIAndPlayAnimation()
@@ -107,16 +114,14 @@ public class TutorialDetachAnimator : TutorialAnimatorBase
     private void PlayDetachAnimation()
     {
         KillSequence();
-        if (targetPiece == null || mainCam == null) return;
+        if (targetPiece == null || mainCam == null || parentCanvas == null) return;
 
         detachSequence = DOTween.Sequence();
+        RectTransform holdRect = holdIndicatorRoot != null ? holdIndicatorRoot.GetComponent<RectTransform>() : null;
 
-        // 1. Reset states and calculate positions dynamically at the start of each loop
+        // 1. Reset states
         detachSequence.AppendCallback(() => {
             if (tutorialCanvasGroup != null) tutorialCanvasGroup.alpha = 0f;
-            
-            Vector2 targetPos = mainCam.WorldToScreenPoint(targetPiece.position);
-            fakeCursor.position = targetPos + new Vector2(100, -100);
             
             cursorImage.sprite = hoverCursorSprite;
             if (physicalMouseImage != null) physicalMouseImage.sprite = mouseDefaultSprite;
@@ -127,29 +132,43 @@ public class TutorialDetachAnimator : TutorialAnimatorBase
             if (arrowRect != null) 
             {
                 arrowRect.gameObject.SetActive(false);
-                arrowRect.sizeDelta = new Vector2(0, arrowRect.sizeDelta.y);
+                // Reset the Y size (length) to 0
+                arrowRect.sizeDelta = new Vector2(arrowRect.sizeDelta.x, 0); 
             }
         });
 
-        // 2. Fade in and move cursor to the piece
+        // 2. Fade in
         if (tutorialCanvasGroup != null) detachSequence.Append(tutorialCanvasGroup.DOFade(1f, 0.3f));
         
+        // Dynamically move cursor using safe Canvas Local coordinates
         detachSequence.Append(DOVirtual.Float(0f, 1f, 0.8f, (val) => {
-            Vector2 targetPos = mainCam.WorldToScreenPoint(targetPiece.position);
-            Vector2 startCursorPos = targetPos + new Vector2(100, -100);
-            fakeCursor.position = Vector2.Lerp(startCursorPos, targetPos, val);
+            if (targetPiece == null) return;
+            Vector2 targetScreenPos = mainCam.WorldToScreenPoint(targetPiece.position);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, targetScreenPos, parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : mainCam, out Vector2 targetLocalPos);
+            
+            Vector2 startCursorPos = targetLocalPos + new Vector2(100, -100);
+            
+            // Assign to anchoredPosition instead of position!
+            fakeCursor.anchoredPosition = Vector2.Lerp(startCursorPos, targetLocalPos, val);
         }).SetEase(Ease.OutQuad));
 
         // 3. Press and Hold
+        // 3. Press and Hold (Trigger the click flash)
         detachSequence.AppendCallback(() => {
             cursorImage.sprite = grabCursorSprite;
             if (physicalMouseImage != null) physicalMouseImage.sprite = mouseLeftClickSprite;
+            if (holdIndicatorRoot != null) holdIndicatorRoot.SetActive(true);
             
-            if (holdIndicatorRoot != null)
-            {
-                holdIndicatorRoot.SetActive(true);
-                holdIndicatorRoot.transform.position = mainCam.WorldToScreenPoint(targetPiece.position);
-            }
+            // Turn ON the click flash
+            if (clickIndicatorObject != null) clickIndicatorObject.SetActive(true);
+        });
+
+        // Wait just 0.1 seconds so the click flash is visible to the human eye
+        detachSequence.AppendInterval(0.1f);
+
+        // Turn OFF the click flash right before the ring starts filling
+        detachSequence.AppendCallback(() => {
+            if (clickIndicatorObject != null) clickIndicatorObject.SetActive(false);
         });
 
         // 4. Animate the circular fill over 1.5 seconds
@@ -158,51 +177,53 @@ public class TutorialDetachAnimator : TutorialAnimatorBase
             detachSequence.Append(DOVirtual.Float(0f, 1f, 1.5f, (val) => {
                 holdFillImage.fillAmount = val;
                 
-                // Keep it anchored to the piece in case the camera is moving
-                if (holdIndicatorRoot != null) 
+                if (holdRect != null && targetPiece != null) 
                 {
-                    holdIndicatorRoot.transform.position = mainCam.WorldToScreenPoint(targetPiece.position);
+                    Vector2 targetScreen = mainCam.WorldToScreenPoint(targetPiece.position);
+                    RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, targetScreen, parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : mainCam, out Vector2 localPos);
+                    holdRect.anchoredPosition = localPos;
                 }
             }).SetEase(Ease.Linear));
         }
-        else
-        {
-            detachSequence.AppendInterval(1.5f);
-        }
 
-        // 5. Hide hold ring, show dynamic arrow pointing to the tray
+        // 5. Hide hold ring, show dynamically rotating and stretching arrow
         detachSequence.AppendCallback(() => {
             if (holdIndicatorRoot != null) holdIndicatorRoot.SetActive(false);
+            if (clickIndicatorObject != null) clickIndicatorObject.SetActive(false);
             
-            if (arrowRect != null)
+            if (arrowRect != null && targetPiece != null)
             {
-                Vector2 targetPos = mainCam.WorldToScreenPoint(targetPiece.position);
+                Vector2 targetScreen = mainCam.WorldToScreenPoint(targetPiece.position);
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, targetScreen, parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : mainCam, out Vector2 targetLocal);
                 
-                // Use the real tray transform if assigned, otherwise fallback to an offset
-                Vector2 trayPos = artefactTray != null 
-                    ? (Vector2)mainCam.WorldToScreenPoint(artefactTray.position) 
-                    : targetPos + new Vector2(-200, 200);
+                Vector2 trayLocal = targetLocal + new Vector2(-200, 200);
+                if (artefactTray != null) {
+                    Vector2 trayScreen = mainCam.WorldToScreenPoint(artefactTray.position);
+                    RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, trayScreen, parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : mainCam, out trayLocal);
+                }
 
                 arrowRect.gameObject.SetActive(true);
-                arrowRect.position = targetPos;
+                arrowRect.anchoredPosition = targetLocal;
                 
-                Vector2 direction = trayPos - targetPos;
+                Vector2 direction = trayLocal - targetLocal;
                 float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-                arrowRect.rotation = Quaternion.Euler(0, 0, angle);
                 
-                // Tween the stretch instantly in the callback so it renders correctly next frame
-                arrowRect.DOSizeDelta(new Vector2(direction.magnitude, arrowRect.sizeDelta.y), 0.5f).SetEase(Ease.OutBack);
+                // Subtract 90 degrees so the Up-pointing sprite aligns correctly
+                arrowRect.localRotation = Quaternion.Euler(0, 0, angle - 90f);
+                
+                // Stretch the Y-axis (height) instead of X-axis
+                arrowRect.DOSizeDelta(new Vector2(arrowRect.sizeDelta.x, direction.magnitude), 0.5f).SetEase(Ease.OutBack);
             }
         });
 
-        // 6. Give the arrow stretch time to finish, then briefly pause
-        detachSequence.AppendInterval(1.0f);
+        // 6. Generous Pause before looping so it looks like a clear instruction
+        detachSequence.AppendInterval(2.0f);
         
         // 7. Fade out
         if (tutorialCanvasGroup != null) detachSequence.Append(tutorialCanvasGroup.DOFade(0f, 0.3f));
         detachSequence.AppendInterval(0.5f);
 
-        detachSequence.SetLoops(-1).SetUpdate(true);
+        detachSequence.OnComplete(OnSequenceLoopComplete);
     }
 
     protected override void HideUIElements()
