@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
+using MoreMountains.Feedbacks;
 using UnityEngine;
 
 public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDragObject, IClean, IArtefactPart
 {
     private Collider col;
-    private Renderer rd;
     public ArtefactPieceState state = ArtefactPieceState.None;
     public static event Action<ArtefactPieceStateMachine> OnCreated;
 
@@ -16,10 +16,12 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
     public float punchDuration = 0.4f;
     public Vector3 punchRotation = new Vector3(5, 5, 0);
 
+    [Header("Feedbacks")]
+    [SerializeField] private MMF_Player artefactFeedback;
+
     private void Awake()
     {
         col = GetComponent<Collider>();
-        rd = GetComponent<Renderer>();
     }
     private void Start()
     {
@@ -36,6 +38,7 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
     //=== IInteractObject, IDragObject ===
     public void OnInteractDetected() => (currentState as IInteractObject)?.OnInteractDetected();
     public void OnInteractEnded() => (currentState as IInteractObject)?.OnInteractEnded();
+    public void SetColliderEnable(bool isActive) => col.enabled = isActive;
     public void OnDragStarted(Vector3 worldPos) => (currentState as IDragObject)?.OnDragStarted(worldPos);
     public void OnDragPerformed(Vector3 worldPos) => (currentState as IDragObject)?.OnDragPerformed(worldPos);
     public void OnDragEnded(Vector3 worldPos) => (currentState as IDragObject)?.OnDragEnded(worldPos);
@@ -44,10 +47,7 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
     public Transform GetTransform() => transform;
     public string PieceId => pieceId;
     public ArtefactPieceState CurrentState => state;
-    public ConnectionSocket GetAvailableSocketFor(string id)
-    {
-        return sockets.Find(s => s.targetPieceId == id && !s.isOccupied);
-    }
+    public ConnectionSocket GetAvailableSocketFor(string id) => sockets.Find(s => s.targetPieceId == id && !s.isOccupied);
     public void OnAssembled(Transform targetTransform) => (currentState as IAssemble)?.OnAssembled(targetTransform);
     public void OnDetached() => (currentState as IAssemble)?.OnDetached();
     public void ReleaseSocketWith(string otherId)
@@ -56,27 +56,8 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
         if (socket != null) socket.isOccupied = false;
     }
 
-    public void SetColliderEnable(bool isActive)
-    {
-        col.enabled = isActive;
-    }
-
+    //=== IArtefactPart ===
     public List<ConnectionSocket> GetSockets() => sockets;
-
-    public void CorrectRotation(Quaternion rotation)
-    {
-        transform.DORotateQuaternion(rotation, moveDuration).SetEase(Ease.OutCubic);
-    }
-
-    public bool IsCleanable()
-    {
-        return state == ArtefactPieceState.Assembled;
-    }
-
-    public void ForceClean()
-    {
-    }
-
     public bool IsSlotEmpty()
     {
         foreach (var socket in sockets)
@@ -85,4 +66,9 @@ public class ArtefactPieceStateMachine : PartStateMachine, IInteractObject, IDra
         }
         return true;
     }
+    public void CorrectRotation(Quaternion rotation) => transform.DORotateQuaternion(rotation, moveDuration).SetEase(Ease.OutCubic);
+
+    //=== IClean ===
+    public bool IsCleanable() => state == ArtefactPieceState.Assembled;
+    public void ForceClean() { }
 }
