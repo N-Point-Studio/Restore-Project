@@ -120,10 +120,10 @@ public class AssemblyService : IInitializable, IDisposable
             inspectPoint.SetInspectionUsage(true);
             fragmentService.ProgressUpdate();
 
-            if (gameplayManager.isTutorialAvailable)
-            {
-                tutorialService.CompleteAndAdvance(true);
-            }
+            // if (gameplayManager.isTutorialAvailable)
+            // {
+            //     tutorialService.CompleteAndAdvance(true);
+            // }
 
             return true;
         }

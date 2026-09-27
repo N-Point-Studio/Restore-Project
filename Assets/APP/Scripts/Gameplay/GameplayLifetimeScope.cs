@@ -13,6 +13,10 @@ public class GameplayLifetimeScope : LifetimeScope
     [SerializeField] private string targetScene;
     [SerializeField] private List<Light> mainLight;
 
+    [Header("Tutorial Section")]
+    [SerializeField] private TutorialOverlayUI tutorialOverlay;
+    [SerializeField] private TutorialAnimatorBase[] tutorialAnimators;
+
     protected override void Configure(IContainerBuilder builder)
     {
         // Plane dragPlane = new(planeReference.up, planeReference.position);
@@ -26,6 +30,22 @@ public class GameplayLifetimeScope : LifetimeScope
         builder.RegisterInstance(pivotPoint);
         builder.RegisterInstance(holdProgressUI);
         builder.RegisterInstance(mainLight);
+
+        builder.RegisterComponent(tutorialOverlay);
+        if (tutorialAnimators != null)
+        {
+            builder.RegisterBuildCallback(resolver =>
+            {
+                for (int i = 0; i < tutorialAnimators.Length; i++)
+                {
+                    TutorialAnimatorBase animator = tutorialAnimators[i];
+                    if (animator != null)
+                    {
+                        resolver.Inject(animator); 
+                    }
+                }
+            });
+        }
 
         builder.RegisterEntryPoint<FragmentService>(Lifetime.Scoped).AsSelf();
         builder.RegisterEntryPoint<AssemblyService>(Lifetime.Scoped).AsSelf();

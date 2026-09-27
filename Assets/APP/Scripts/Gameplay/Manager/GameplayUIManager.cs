@@ -2,13 +2,16 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
-using NINESOFT.TUTORIAL_SYSTEM;
 using Modules;
 using System.Collections;
 using UnityEngine.InputSystem;
+using DG.Tweening;
 
 public class GameplayUIManager : MonoBehaviour
 {
+    [SerializeField] private Canvas clipboardCanvas;
+    [SerializeField] private GameObject toDoListObject;
+    [SerializeField] private CanvasGroup toDoListCanvasGroup;
     [SerializeField] private List<ProgressBarUI> progressBars;
 
     [Header("Cameras")]
@@ -37,13 +40,11 @@ public class GameplayUIManager : MonoBehaviour
 
     private bool canWrapUp;
     private bool isAutoWrapUpTriggered = false;
-    private bool isTutorialTriggered = false;
     private bool isGamePaused = false;
 
     public static event Action OnGameWrapped;
     public static event Action<bool> OnGameFinished;
     public static event Action<float> OnOverallProgressUpdated;
-
 
     [Inject]
     public void Construct(
@@ -63,6 +64,7 @@ public class GameplayUIManager : MonoBehaviour
         fragmentService.OnProgressUpdate += HandleProgressUpdate;
         cleaningService.OnHardCleaningUpdate += HandleHardCleaningUpdate;
         cleaningService.OnSurfaceCleaningUpdate += HandleSurfaceCleaningUpdate;
+        tutorialService.OnTutorialStateChanged += UpdateUIVisibility;
 
         this.input.OnPlayerKeycodeEscapePerformed += OnPlayerKeycodeEscapePerformed;
         this.input.OnUIKeycodeEscapePerformed += OnUIKeycodeEscapePerformed;
@@ -74,6 +76,9 @@ public class GameplayUIManager : MonoBehaviour
 
     private void Awake()
     {
+        if (toDoListCanvasGroup != null) toDoListCanvasGroup.alpha = 0f;
+        if (toDoListObject != null) toDoListObject.SetActive(false);
+
         mainUIController.OnWrapUp += OnWrapUp;
         mainUIController.OnPauseRequest += PauseGame;
         endgameController.OnFinishedGame += OnFinishedGame;
@@ -103,7 +108,7 @@ public class GameplayUIManager : MonoBehaviour
         if (tutorialDesktopRoot != null) tutorialDesktopRoot.SetActive(!isMobile);
         if (tutorialMobileRoot != null) tutorialMobileRoot.SetActive(isMobile);
 
-        yield return null;
+        yield return new WaitForSeconds(2f);
 
         if (gameplayManager.isTutorialAvailable)
         {
@@ -133,29 +138,36 @@ public class GameplayUIManager : MonoBehaviour
         quitConfirmationController.OnCancel -= OnCancelQuit;
 
         settingsController.OnSettingsClosed -= OnSettingsClosed;
+
+        fragmentService.OnProgressUpdate -= HandleProgressUpdate;
+        cleaningService.OnHardCleaningUpdate -= HandleHardCleaningUpdate;
+        cleaningService.OnSurfaceCleaningUpdate -= HandleSurfaceCleaningUpdate;
+        tutorialService.OnTutorialStateChanged -= UpdateUIVisibility;
     }
 
     private void Update()
     {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-        // [DEBUG CHEAT] Press F1 to instantly show the Wrap Up button
-        if (Keyboard.current != null && Keyboard.current.f1Key.wasPressedThisFrame)
+        if (Debug.isDebugBuild)
         {
-            // AppLogger.Log("[Cheat] F1 Pressed! Forcing Wrap Up button to appear.");
-
-            // Bypass the normal progress checks
-            canWrapUp = true;
-            isAutoWrapUpTriggered = false; // Ensure auto-wrap doesn't conflict
-
-            // Force the UI controller to show and enable the button
-            if (mainUIController != null)
+            // [DEBUG CHEAT] Press F1 to instantly show the Wrap Up button
+            if (Keyboard.current != null && Keyboard.current.f1Key.wasPressedThisFrame)
             {
-                mainUIController.EnableWrapUp(true);
-                mainUIController.ShowButtonWrap(true);
+                // AppLogger.Log("[Cheat] F1 Pressed! Forcing Wrap Up button to appear.");
+
+                // Bypass the normal progress checks
+                canWrapUp = true;
+                isAutoWrapUpTriggered = false; // Ensure auto-wrap doesn't conflict
+
+                // Force the UI controller to show and enable the button
+                if (mainUIController != null)
+                {
+                    mainUIController.EnableWrapUp(true);
+                    mainUIController.ShowButtonWrap(true);
+                }
             }
         }
-#endif
     }
+
     private void UpdateProgress(ProgressType type, float value)
     {
         for (int i = 0; i < progressBars.Count; i++)
@@ -236,7 +248,6 @@ public class GameplayUIManager : MonoBehaviour
         // 2. TRIGGER TUTORIAL
         if (canWrapUp)
         {
-            isTutorialTriggered = true;
             if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 1)
             {
                 tutorialService.StartTutorial(1, 1);
@@ -284,9 +295,11 @@ public class GameplayUIManager : MonoBehaviour
     {
         UpdateProgress(ProgressType.Mud, progress);
 
-        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 3)
+        // Wait until progress > 0 (meaning at least 1 chunk is fully destroyed)
+        // Change to "progress >= 1f" if you want them to destroy ALL chunks before the brush tutorial!
+        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 3 && progress > 0f)
         {
-            tutorialService.CompleteAndAdvance(true);
+            tutorialService.CompleteAndAdvance(true); 
 #if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
             tutorialService.TriggerHighlight(false, ToolType.Chisel);
 #endif
@@ -297,12 +310,14 @@ public class GameplayUIManager : MonoBehaviour
     private void HandleSurfaceCleaningUpdate(float progress)
     {
         UpdateProgress(ProgressType.Dust, progress);
-        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 4)
+        
+        // Wait until they have scrubbed away at least 5% of the dust
+        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 4 && progress >= 0.01f)
         {
 #if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
             tutorialService.TriggerHighlight(false, ToolType.Brush);
 #endif
-            tutorialService.CompleteStage();
+            tutorialService.CompleteAndAdvance(true);
         }
     }
 
@@ -430,6 +445,53 @@ public class GameplayUIManager : MonoBehaviour
         if (mainUIController != null)
         {
             mainUIController.SetTipPosition(screenPosition);
+        }
+    }
+
+    public void OnToDoListHovered()
+    {
+        if (!gameplayManager.isTutorialAvailable) return;
+
+        // If we are on the To-Do List tutorial (Stage 0, Module 5), finish the stage!
+        if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 5)
+        {
+            tutorialService.CompleteStage();
+        }
+    }
+
+    private void UpdateUIVisibility(int stage, int module)
+    {
+        if (!gameplayManager.isTutorialAvailable) return;
+
+        // 1. VISIBILITY: Hidden before Module 5. Visible during and after Module 5.
+        bool shouldBeVisible = stage > 0 || (stage == 0 && module >= 5);
+        
+        if (toDoListObject != null)
+        {
+            if (shouldBeVisible && !toDoListObject.activeSelf)
+            {
+                toDoListObject.SetActive(true);
+                toDoListCanvasGroup?.DOFade(1f, 0.5f).SetEase(Ease.OutQuad); // Smooth fade in
+            }
+            else if (!shouldBeVisible && toDoListObject.activeSelf)
+            {
+                toDoListObject.SetActive(false);
+            }
+        }
+
+        // 2. LAYERING: On top ONLY during its specific tutorial (Stage 0, Module 5). Behind otherwise.
+        if (clipboardCanvas != null)
+        {
+            if (stage == 0 && module == 5)
+            {
+                // It is the To-Do list's turn! Pop it OVER the dark mask (Order 10)
+                clipboardCanvas.sortingOrder = 11;
+            }
+            else
+            {
+                // It is another tutorial's turn. Push it BEHIND the dark mask.
+                clipboardCanvas.sortingOrder = 5;
+            }
         }
     }
 }

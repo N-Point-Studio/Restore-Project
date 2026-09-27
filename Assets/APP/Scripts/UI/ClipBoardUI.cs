@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
@@ -5,6 +6,8 @@ using UnityEngine.InputSystem;
 
 public class ClipBoardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
+    public static event Action OnClipboardHovered;
+
     [Header("References")]
     [SerializeField] private RectTransform animatedRect; 
     [SerializeField] private GameObject desktopControlsInfo;
@@ -16,12 +19,16 @@ public class ClipBoardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     [SerializeField] private float stayDuration = 0.5f;
     [SerializeField] private Ease ease = Ease.OutCubic;
 
+    [Header("Tutorial")]
+    [SerializeField] private GameObject arrowTutorial;
+
     private Vector2 startPosition;
     private Tween moveTween;
     private bool isHovering = false;
     private bool isClickedOpen = false; 
     
     private GameObject activeInfoPanel;
+    private Tween arrowTween;
 
     private void Awake()
     {
@@ -45,6 +52,35 @@ public class ClipBoardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         {
             activeInfoPanel = desktopControlsInfo;
             if (mobileControlsInfo != null) mobileControlsInfo.SetActive(false); // Hide Mobile forever
+        }
+    }
+
+    private void OnEnable()
+    {
+        TutorialEvents.OnShowClipBoardArrow += HandleShowArrow;
+    }
+
+    private void OnDisable()
+    {
+        TutorialEvents.OnShowClipBoardArrow -= HandleShowArrow;
+        arrowTween?.Kill();
+    }
+
+    private void HandleShowArrow(bool isShowing)
+    {
+        if (arrowTutorial != null)
+        {
+            arrowTutorial.SetActive(isShowing);
+            
+            arrowTween?.Kill();
+            
+            if (isShowing)
+            {
+                arrowTutorial.transform.localScale = Vector3.one;
+                arrowTween = arrowTutorial.transform.DOPunchScale(new Vector3(0.15f, 0.15f, 0), 1f, 2, 0.5f)
+                    .SetLoops(-1)
+                    .SetUpdate(true);
+            }
         }
     }
 
@@ -85,6 +121,8 @@ public class ClipBoardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             MoveTo(hoverPosition);
             
             if (activeInfoPanel != null) activeInfoPanel.SetActive(true);
+
+            OnClipboardHovered?.Invoke();
         }
     }
 
@@ -127,6 +165,8 @@ public class ClipBoardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         }
         
         CursorController.instance?.SetCursorState(CursorState.Hover);
+
+        OnClipboardHovered?.Invoke();
     }
 
     public void OnPointerExit(PointerEventData eventData)

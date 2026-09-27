@@ -149,6 +149,7 @@ public class ArtefactManager : IInitializable, IDisposable
     private void HandleHoldPerformed(IInteractObject interact, float holdTime, Vector2 position)
     {
         if (toolService.IsOnToolMode || isGameFinished) return;
+        if (gameplayManager.isTutorialAvailable && !tutorialService.CanDetach()) return;
 
         if (currentHoldInteract != interact)
         {

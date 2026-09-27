@@ -3,169 +3,209 @@ using UnityEngine.UI;
 using DG.Tweening;
 using VContainer;
 
-public class TutorialDragAnimator : MonoBehaviour
+public class TutorialDragAnimator : TutorialAnimatorBase
 {
-    [Header("UI References")]
+    [Header("Fake Hand Cursor")]
     [SerializeField] private RectTransform fakeCursor;
     [SerializeField] private Image cursorImage;
     [SerializeField] private Sprite defaultCursorSprite;
     [SerializeField] private Sprite hoverCursorSprite;
     [SerializeField] private Sprite grabCursorSprite;
 
-    [Header("Rules Settings")]
-    [SerializeField] private float idleTimeout = 5f;
-    [SerializeField] private string targetPieceId = "Artefact_Coin";
+    [Header("Physical Mouse Indicator")]
+    [SerializeField] private Image physicalMouseImage;
+    [SerializeField] private Sprite mouseDefaultSprite;
+    [SerializeField] private Sprite mouseLeftClickSprite;
+    [SerializeField] private GameObject clickIndicatorObject;
 
-    private Transform artefactStartTarget; 
-    private int currentLoopCount = 0;
+    [Header("Dotted Line")]
+    [SerializeField] private GameObject dottedGameObject;
+    private RectTransform dottedRect;
+
+    private Transform artefactStartTarget;
     private Sequence dragSequence;
-    private float lastInputTime;
-    
-    // Global flag to block input in ObjectInteractionManager
-    public static bool IsInputBlockedByTutorial { get; private set; } 
-
     private ObjectDetectionService detectionService;
-    private AssemblyService assemblyService;
-    private Camera mainCam;
+    private FragmentService fragmentService;
 
     [Inject]
-    public void Construct(ObjectDetectionService detectionService, AssemblyService assemblyService, Camera cam)
+    public void ConstructChild(ObjectDetectionService detectionService, FragmentService fragmentService)
     {
         this.detectionService = detectionService;
-        this.assemblyService = assemblyService;
-        this.mainCam = cam;
+        this.fragmentService = fragmentService;
     }
 
-    private void OnEnable()
+    private void Awake()
     {
-        // Listen to standard input events to reset idle timer
-        InteractionEvents.OnMouseMoved += ResetIdleTimer;
-        InteractionEvents.OnPressStart += HandleAnyInput;
-        
-        // Listen to hover to dismiss the tutorial (Rule 3)
+        if (dottedGameObject != null) dottedRect = dottedGameObject.GetComponent<RectTransform>();
+    }
+
+    protected override void OnEnable()
+    {
+        base.OnEnable();
         detectionService.OnInteractDetected += HandleObjectHover;
-        
-        // Dynamically capture the artefact when it spawns
         ArtefactPieceStateMachine.OnCreated += HandlePieceSpawned;
+        AssembleEvents.OnAssemblePerformed += HandleAssemblyPerformed;
+        HideUIElements();
+        FindExistingArtefact();
         
-        lastInputTime = Time.time;
-        fakeCursor.gameObject.SetActive(false);
-    }
-
-    private void OnDisable()
-    {
-        InteractionEvents.OnMouseMoved -= ResetIdleTimer;
-        InteractionEvents.OnPressStart -= HandleAnyInput;
-        detectionService.OnInteractDetected -= HandleObjectHover;
-        ArtefactPieceStateMachine.OnCreated -= HandlePieceSpawned;
-        
-        StopTutorialSequence();
-    }
-
-    private void OnDestroy()
-    {
-        InteractionEvents.OnMouseMoved -= ResetIdleTimer;
-        InteractionEvents.OnPressStart -= HandleAnyInput;
-        detectionService.OnInteractDetected -= HandleObjectHover;
-        ArtefactPieceStateMachine.OnCreated -= HandlePieceSpawned;
-    }
-
-    private void Update()
-    {
-        // Rule 4: If no movement for 5 seconds, enter tutorial mode again
-        if (!IsInputBlockedByTutorial && artefactStartTarget != null && (Time.time - lastInputTime) >= idleTimeout)
+        if (artefactStartTarget != null && !isTaskCompleted)
         {
-            StartTutorialSequence();
+            StartTutorialSequence(true);
         }
     }
 
-    private void ResetIdleTimer(Vector2 pos) => lastInputTime = Time.time;
-    private void HandleAnyInput() => lastInputTime = Time.time;
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+        detectionService.OnInteractDetected -= HandleObjectHover;
+        ArtefactPieceStateMachine.OnCreated -= HandlePieceSpawned;
+        AssembleEvents.OnAssemblePerformed -= HandleAssemblyPerformed;
+    }
+
+    protected override void Update()
+    {
+        if (artefactStartTarget == null) return;
+        base.Update();
+    }
+
+    private void FindExistingArtefact()
+    {
+        var targetPiece = fragmentService.GetFirstAvailablePiece();
+        if (targetPiece != null) 
+        {
+            artefactStartTarget = targetPiece.transform;
+            
+            // EDGE CASE FIX: Check the physical distance! 
+            // If it's already at the inspect point, the player beat us to it.
+            float distance = Vector3.Distance(artefactStartTarget.position, assemblyService.GetInspectPoint().position);
+            if (distance <= 0.1f) 
+            {
+                CompleteTutorial();
+            }
+        }
+    }
 
     private void HandlePieceSpawned(ArtefactPieceStateMachine piece)
     {
-        // Capture the transform dynamically based on the target ID
-        if (piece.PieceId == targetPieceId)
+        if (artefactStartTarget == null)
         {
             artefactStartTarget = piece.transform;
+
+            // EDGE CASE FIX: Safety check for dynamically spawned pieces
+            float distance = Vector3.Distance(artefactStartTarget.position, assemblyService.GetInspectPoint().position);
+            if (distance <= 0.1f) 
+            {
+                CompleteTutorial();
+                return;
+            }
+
+            if (gameObject.activeInHierarchy && !isAnimationPlaying && !isTaskCompleted && isFirstPhase)
+            {
+                StartTutorialSequence(true);
+            }
         }
     }
 
     private void HandleObjectHover(IInteractObject interactable)
     {
-        // Rule 3: When user hovers over the target object, dismiss tutorial
-        if (IsInputBlockedByTutorial && interactable != null)
-        {
-            if (interactable is IArtefactPart part && part.PieceId == targetPieceId)
-            {
-                StopTutorialSequence();
-            }
-        }
+        if (interactable is IArtefactPart) RecordActivity();
     }
 
-    public void StartTutorialSequence()
-    {
-        if (IsInputBlockedByTutorial || artefactStartTarget == null) return;
+    private void HandleAssemblyPerformed() => CompleteTutorial();
 
-        IsInputBlockedByTutorial = true; // Rule 1: User input is blocked
-        currentLoopCount = 0;
+    public override void StartTutorialSequence(bool blockInput)
+    {
+        if (artefactStartTarget == null || isTaskCompleted) return;
+        base.StartTutorialSequence(blockInput);
+    }
+
+    protected override void SetupUIAndPlayAnimation()
+    {
         fakeCursor.gameObject.SetActive(true);
-        
+        cursorImage.sprite = defaultCursorSprite;
+        if (physicalMouseImage != null) physicalMouseImage.sprite = mouseDefaultSprite;
+        if (dottedGameObject != null) dottedGameObject.SetActive(false);
+
+        if (overlayController != null) overlayController.ShowOverlay(artefactStartTarget);
+
         PlayDragAnimation();
     }
 
-    private void StopTutorialSequence()
+    protected override void HideUIElements()
     {
-        IsInputBlockedByTutorial = false;
-        fakeCursor.gameObject.SetActive(false);
-        dragSequence?.Kill();
-        lastInputTime = Time.time; 
+        if (fakeCursor != null) fakeCursor.gameObject.SetActive(false);
+        if (dottedGameObject != null) dottedGameObject.SetActive(false);
+        if (overlayController != null) overlayController.HideOverlay();
     }
+
+    protected override void KillSequence() => dragSequence?.Kill();
 
     private void PlayDragAnimation()
     {
-        dragSequence?.Kill();
+        KillSequence();
         dragSequence = DOTween.Sequence();
 
-        // Dynamically map the world positions to the screen
         Vector2 startPos = mainCam.WorldToScreenPoint(artefactStartTarget.position);
         Vector2 endPos = mainCam.WorldToScreenPoint(assemblyService.GetInspectPoint().position);
-
-        // Reset cursor to a starting offset
         fakeCursor.position = startPos + new Vector2(150, -150);
-        cursorImage.sprite = defaultCursorSprite;
+
+        if (clickIndicatorObject != null) clickIndicatorObject.SetActive(false);
 
         // 1. Move to Artefact
         dragSequence.Append(fakeCursor.DOMove(startPos, 1f).SetEase(Ease.OutQuad));
 
-        // 2. Hover (Change Sprite to Hand Open)
-        dragSequence.AppendCallback(() => cursorImage.sprite = hoverCursorSprite);
+        if (dottedRect != null)
+        {
+            dottedRect.position = startPos;
+            dottedRect.sizeDelta = new Vector2(dottedRect.sizeDelta.x, 0);
+            Vector2 direction = endPos - startPos;
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            dottedRect.rotation = Quaternion.Euler(0, 0, angle - 90f);
+        }
+
+        // 2. Hover
+        dragSequence.AppendCallback(() => {
+            cursorImage.sprite = hoverCursorSprite;
+            if (physicalMouseImage != null) physicalMouseImage.sprite = mouseDefaultSprite;
+        });
         dragSequence.AppendInterval(0.3f);
 
-        // 3. Grab (Change Sprite to Hand Closed)
-        dragSequence.AppendCallback(() => cursorImage.sprite = grabCursorSprite);
+        // 3. Grab
+        dragSequence.AppendCallback(() => {
+            cursorImage.sprite = grabCursorSprite;
+            if (physicalMouseImage != null) physicalMouseImage.sprite = mouseLeftClickSprite;
+            if (clickIndicatorObject != null) clickIndicatorObject.SetActive(true);
+        });
         dragSequence.AppendInterval(0.2f);
 
-        // 4. Drag to Inspection Center
+        // 4. Start Drag
+        dragSequence.AppendCallback(() => {
+            if (physicalMouseImage != null) physicalMouseImage.sprite = mouseLeftClickSprite;
+            if (dottedGameObject != null) dottedGameObject.SetActive(true);
+            if (clickIndicatorObject != null) clickIndicatorObject.SetActive(false);
+        });
+        
         dragSequence.Append(fakeCursor.DOMove(endPos, 1.5f).SetEase(Ease.InOutSine));
+        if (dottedRect != null)
+        {
+            float totalDistance = Vector2.Distance(startPos, endPos);
+            dragSequence.Join(dottedRect.DOSizeDelta(new Vector2(dottedRect.sizeDelta.x, totalDistance), 1.5f).SetEase(Ease.InOutSine));
+        }
 
         // 5. Release
-        dragSequence.AppendCallback(() => cursorImage.sprite = defaultCursorSprite);
-        dragSequence.AppendInterval(0.5f);
-
-        // Evaluation
-        dragSequence.OnComplete(() =>
-        {
-            currentLoopCount++;
-            if (currentLoopCount < 2) 
-            {
-                // Rule 2: Loop 2x
-                PlayDragAnimation();
-            }
-            else
-            {
-                StopTutorialSequence();
-            }
+        dragSequence.AppendCallback(() => {
+            cursorImage.sprite = hoverCursorSprite;
+            if (physicalMouseImage != null) physicalMouseImage.sprite = mouseDefaultSprite;
+            if (dottedGameObject != null) dottedGameObject.SetActive(false);
+            if (clickIndicatorObject != null) clickIndicatorObject.SetActive(true);
         });
+
+        dragSequence.AppendInterval(0.2f);
+        dragSequence.AppendCallback(() => {
+            if (clickIndicatorObject != null) clickIndicatorObject.SetActive(false);
+        });
+        
+        dragSequence.AppendInterval(0.3f);
+        dragSequence.OnComplete(OnSequenceLoopComplete);
     }
 }

@@ -12,17 +12,19 @@ public class ObjectInteractionManager : IInitializable, IDisposable
     private readonly ObjectDragService dragService;
     private readonly ObjectHoldService holdService;
     private readonly CleaningService cleaningService;
+    private readonly TutorialService tutorialService;
     private IInteractObject currentInteract;
 
     [Inject]
     public ObjectInteractionManager(ObjectDetectionService detectionService, ObjectPressService press,
-        ObjectDragService swipe, ObjectHoldService hold, CleaningService cleaningService)
+        ObjectDragService swipe, ObjectHoldService hold, CleaningService cleaningService, TutorialService tutorialService)
     {
         this.detectionService = detectionService;
         this.pressService = press;
         this.dragService = swipe;
         this.holdService = hold;
         this.cleaningService = cleaningService;
+        this.tutorialService = tutorialService;
     }
 
     public void Initialize()
@@ -51,6 +53,23 @@ public class ObjectInteractionManager : IInitializable, IDisposable
         holdService.OnHoldCanceled -= HandleHoldCanceled;
     }
 
+    public void ForceDropCurrentObject()
+    {
+        if (currentInteract != null)
+        {
+            Vector3 dropPosition = Vector3.zero;
+            if (currentInteract is MonoBehaviour monoBehaviour)
+            {
+                dropPosition = monoBehaviour.transform.position;
+            }
+
+            InteractionEvents.OnDragEnded?.Invoke(currentInteract, dropPosition);
+            currentInteract = null;
+        }
+        
+        detectionService.SetInteractObjectUsed(false);
+    }
+
     private void HandleInteractDetected(IInteractObject interact) { currentInteract = interact; }
 
     private bool IsInteractValid()
@@ -62,6 +81,8 @@ public class ObjectInteractionManager : IInitializable, IDisposable
 
     private void HandlePressStarted()
     {
+        if (tutorialService.IsInputBlocked) return;
+
         InteractionEvents.OnPressStart?.Invoke();
         detectionService.SetInteractObjectUsed(true);
     }
@@ -74,6 +95,7 @@ public class ObjectInteractionManager : IInitializable, IDisposable
 
     private void HandleDragStart(Vector2 vector)
     {
+        if (tutorialService.IsInputBlocked) return;
         if (!IsInteractValid()) return;
 
         detectionService.SetInteractObjectUsed(true);
@@ -94,6 +116,8 @@ public class ObjectInteractionManager : IInitializable, IDisposable
 
     private void HandleDragPerformed(Vector2 vector)
     {
+        if (tutorialService.IsInputBlocked) return;
+
         if (!IsInteractValid()) return;
 
         if (currentInteract is not IDraggableTool)
@@ -110,6 +134,8 @@ public class ObjectInteractionManager : IInitializable, IDisposable
 
     private void HandleDragEnded(Vector2 vector)
     {
+        // if (tutorialService.IsInputBlocked) return;
+        
         if (IsInteractValid())
         {
             Vector3 worldPos = detectionService.GetCachedDragWorldPos(vector);

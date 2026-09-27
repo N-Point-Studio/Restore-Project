@@ -8,6 +8,7 @@ public class TutorialEvents : MonoBehaviour
     public static System.Action<Tutorial> OnTutorialFinished;
     public static System.Action<TutorialStage> OnStageStarted;
     public static System.Action<TutorialStage> OnStageFinished;
+    public static System.Action<bool> OnShowClipBoardArrow;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
@@ -17,6 +18,7 @@ public class TutorialEvents : MonoBehaviour
         OnTutorialFinished = null;
         OnStageStarted = null;
         OnStageFinished = null;
+        OnShowClipBoardArrow = null;
     }
 
     public void TutorialStart(Tutorial tutorial)
@@ -37,5 +39,10 @@ public class TutorialEvents : MonoBehaviour
     public void StageFinish(TutorialStage tutorialStage)
     {
         OnStageFinished?.Invoke(tutorialStage);
+    }
+
+    public void ShowClipboardArrow(bool isShowing)
+    {
+        OnShowClipBoardArrow?.Invoke(isShowing);
     }
 }

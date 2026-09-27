@@ -6,12 +6,14 @@ public class ObjectZoomService : IInitializable, IDisposable
 {
     private readonly InputSystemService inputSystemService;
     private readonly GameConfigData config;
+    private readonly TutorialService tutorialService;
 
     [Inject]
-    public ObjectZoomService(InputSystemService inputSystemService, GameConfigData config)
+    public ObjectZoomService(InputSystemService inputSystemService, GameConfigData config, TutorialService tutorialService)
     {
         this.inputSystemService = inputSystemService;
         this.config = config;
+        this.tutorialService = tutorialService;
     }
 
     public void Initialize()
@@ -27,6 +29,7 @@ public class ObjectZoomService : IInitializable, IDisposable
 
     private void HandleScrollPerformed(float value)
     {
+        if (tutorialService.IsInputBlocked) return;
         float zoomDelta = value * config.scrollSensitivity;
         InteractionEvents.OnZoomPerformed(zoomDelta);
     }

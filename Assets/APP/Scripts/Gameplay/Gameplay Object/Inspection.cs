@@ -113,7 +113,7 @@ public class Inspection : MonoBehaviour
     public void OnRotatePerformed(Vector2 delta)
     {
         // if (isDragging) return;
-
+        if (gameplayManager.isTutorialAvailable && !tutorialService.CanRotate()) return;
         if (!isContain || isAssembling) return;
         if (_mainCamera == null) return;
 
@@ -141,7 +141,7 @@ public class Inspection : MonoBehaviour
     public void OnZoomPerformed(float zoomDelta)
     {
         // if (isDragging) return;
-
+        if (gameplayManager.isTutorialAvailable && !tutorialService.CanZoom()) return;
         if (!isContain || isGameFinished || isAssembling) return;
         if (_mainCamera == null) _mainCamera = Camera.main;
 
@@ -152,13 +152,9 @@ public class Inspection : MonoBehaviour
             _targetPosition
         );
 
-        // 1. Tambahkan variabel ini untuk meredam respons input scroll (Coba angka 0.05f atau 0.1f)
         float zoomStepSpeed = 0.05f;
-
-        // 2. Kalikan zoomDelta dengan zoomStepSpeed, BUKAN zoomValue
         float targetDistance = currentDistance + (zoomDelta * zoomStepSpeed);
 
-        // 3. zoomValue tetap murni dipakai untuk batas kedekatan (agar tidak tembus pandang)
         targetDistance = Mathf.Clamp(targetDistance, gameplayManager.zoomValue, _initialDistance);
 
         _targetPosition = _mainCamera.transform.position + direction * targetDistance;

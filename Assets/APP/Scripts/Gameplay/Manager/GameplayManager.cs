@@ -123,6 +123,12 @@ public class GameplayManager : IInitializable, IDisposable
             light.enabled = true;
         }
 
+        if (tutorialService != null)
+        {
+            tutorialService.TriggerHighlight(false, ToolType.Chisel);
+            tutorialService.TriggerHighlight(false, ToolType.Brush);
+        }
+
         SaveObjectCompletion();
     }
 
@@ -191,9 +197,15 @@ public class GameplayManager : IInitializable, IDisposable
                     Spawn(artefact.Prefab, artefact.SpawnTransform.Position, artefact.SpawnTransform.Rotation);
                 }
 
-                gameplayToolManager.SetToolVisibility(ToolType, true);
+                // gameplayToolManager.SetToolVisibility(ToolType, true);
 
                 isTutorialAvailable = CheckTutorialAvailability(1);
+                gameplayToolManager.IsTutorialAvailable = isTutorialAvailable;
+
+                if (!isTutorialAvailable)
+                {
+                    gameplayToolManager.SetToolVisibility(ToolType, true);
+                }
             }
         }
     }

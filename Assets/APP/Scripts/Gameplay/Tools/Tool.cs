@@ -94,7 +94,10 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
 
     public void Return()
     {
-        col.enabled = true;
+        transform.DOKill();
+
+        if (col != null) col.enabled = false;
+        
         isReturning = true;
         isUsed = false;
         if (animator != null) animator.enabled = false;
@@ -102,10 +105,15 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         returnSequence?.Kill();
         returnSequence = DOTween.Sequence();
 
-        returnSequence.Join(transform.DOMove(initialPosition, returnAnimDuration).SetEase(Ease.OutBack));
-        returnSequence.Join(transform.DORotateQuaternion(initialRotation, returnAnimDuration).SetEase(Ease.OutBack));
-        returnSequence.OnComplete(() => isReturning = false);
-        origin.SetColliderEnable(false);
+        returnSequence.Join(transform.DOMove(initialPosition, returnAnimDuration).SetEase(Ease.OutBack).SetUpdate(true));
+        returnSequence.Join(transform.DORotateQuaternion(initialRotation, returnAnimDuration).SetEase(Ease.OutBack).SetUpdate(true));
+        
+        returnSequence.OnComplete(() => {
+            isReturning = false;
+            if (col != null) col.enabled = true; 
+        });
+        
+        if (origin != null) origin.SetColliderEnable(false);
     }
 
     public void FollowMouse(Vector3 worldPos)
@@ -117,6 +125,8 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
 
     public void StickToSurface(Vector3 position, Quaternion rotation)
     {
+        if (isReturning) return;
+
         transform.DOKill();
         transform.DOMove(position, SurfaceMoveSpeed).SetEase(Ease.OutQuad);
         transform.DORotateQuaternion(rotation, SurfaceRotateSpeed).SetEase(Ease.OutQuad);

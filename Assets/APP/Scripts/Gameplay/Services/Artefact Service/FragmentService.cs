@@ -9,6 +9,7 @@ public class FragmentService : IInitializable, IDisposable
     private readonly HashSet<ArtefactPieceStateMachine> registry = new();
 
     public event Action<float> OnProgressUpdate;
+    public IEnumerable<ArtefactPieceStateMachine> GetAllPieces() => registry;
 
     public void Initialize() => ArtefactPieceStateMachine.OnCreated += Register;
     public void Dispose() => ArtefactPieceStateMachine.OnCreated -= Register;
@@ -54,4 +55,22 @@ public class FragmentService : IInitializable, IDisposable
     }
     public bool IsAssemblyRequired => registry.Count > 1;
     public int GetPieceCount() => registry.Count;
+
+    public ArtefactPieceStateMachine GetPieceById(string id)
+    {
+        foreach (var piece in registry)
+        {
+            if (piece.PieceId == id) return piece;
+        }
+        return null;
+    }
+
+    public ArtefactPieceStateMachine GetFirstAvailablePiece()
+    {
+        foreach (var piece in registry)
+        {
+            return piece;
+        }
+        return null;
+    }
 }
