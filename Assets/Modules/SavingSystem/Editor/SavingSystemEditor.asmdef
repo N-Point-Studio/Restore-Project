@@ -1,3 +1,19 @@
 {
-	"name": "SavingSystemEditor"
+    "name": "SavingSystemEditor",
+    "rootNamespace": "",
+    "references": [
+        "AppModuleSavingSystem",
+        "SimpleJSON"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
