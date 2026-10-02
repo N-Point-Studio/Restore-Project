@@ -223,13 +223,13 @@ public class ToolService : IInitializable, IDisposable, ITickable
     {
         if (currentToolObject == null) return;
 
-        currentToolObject.Return();
-        currentToolObject = null;
-
         isCleaning = false;
         PlayToolSfx(false);
         PlayToolVfx(false);
 
+        currentToolObject.Return();
+        currentToolObject = null;
+        
         CursorController.instance?.UnlockCursorState();
         CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
     }
@@ -430,25 +430,22 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
     public void ForceReturnTool()
     {
-        // 1. Force Return PC Tool
-        objectInteractionManager.ForceDropCurrentObject(); // (Make sure you have a reference to the manager!)
+        objectInteractionManager.ForceDropCurrentObject(); 
+        ReturnCurrentTool(); 
 
-        // 2. Return PC Tool
-        ReturnCurrentTool();
-
-        // 2. Force Return Mobile / Draggable Tool
 #if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
         if (draggableTool != null)
         {
-            if (draggableTool is IDragObject tool) 
-            {
-                // This triggers the DOTween animation back to the tray!
-                tool.OnDragEnded(draggableTool.GetTransform().position);
-            }
-                
-            gameplayUIManager.ShowTipPoint(false);
             PlayToolSfx(false);
             PlayToolVfx(false);
+
+            if (draggableTool is IDragObject tool) 
+            {
+                tool.OnDragEnded(draggableTool.GetTransform().position);
+            }
+                             
+            gameplayUIManager.ShowTipPoint(false);
+            
             draggableTool = null;
         }
 #endif

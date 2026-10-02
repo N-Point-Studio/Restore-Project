@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using VContainer;
+using System.Collections; // Needed for Coroutines
 
 public class TutorialDragAnimator : TutorialAnimatorBase
 {
@@ -27,6 +28,11 @@ public class TutorialDragAnimator : TutorialAnimatorBase
     private ObjectDetectionService detectionService;
     private FragmentService fragmentService;
 
+    private RectTransform canvasRect;
+    private Canvas parentCanvas;
+    
+    private bool isAdvancing = false;
+
     [Inject]
     public void ConstructChild(ObjectDetectionService detectionService, FragmentService fragmentService)
     {
@@ -42,13 +48,20 @@ public class TutorialDragAnimator : TutorialAnimatorBase
     protected override void OnEnable()
     {
         base.OnEnable();
+        mainCam = Camera.main;
+
+        parentCanvas = GetComponentInParent<Canvas>();
+        if (parentCanvas != null) canvasRect = parentCanvas.GetComponent<RectTransform>();
+
         detectionService.OnInteractDetected += HandleObjectHover;
         ArtefactPieceStateMachine.OnCreated += HandlePieceSpawned;
         AssembleEvents.OnAssemblePerformed += HandleAssemblyPerformed;
+        
         HideUIElements();
+        isAdvancing = false;
         FindExistingArtefact();
         
-        if (artefactStartTarget != null && !isTaskCompleted)
+        if (artefactStartTarget != null && !isTaskCompleted && !isAdvancing)
         {
             StartTutorialSequence(true);
         }
@@ -68,6 +81,31 @@ public class TutorialDragAnimator : TutorialAnimatorBase
         base.Update();
     }
 
+    // --- NEW: Safe Advancement Logic ---
+    private void TriggerSafeAdvancement()
+    {
+        if (isAdvancing || isTaskCompleted) return;
+        isAdvancing = true;
+        StartCoroutine(AdvanceWhenReadyRoutine());
+    }
+
+    private IEnumerator AdvanceWhenReadyRoutine()
+    {
+        // Wait patiently if the TutorialService is currently locked/loading
+        while (tutorialService != null && tutorialService.IsProcessing)
+        {
+            yield return null;
+        }
+
+        // Now that it's ready, trigger the advancement!
+        if (tutorialService != null) 
+        {
+            tutorialService.CompleteAndAdvance(true);
+        }
+        CompleteTutorial();
+    }
+    // ------------------------------------
+
     private void FindExistingArtefact()
     {
         var targetPiece = fragmentService.GetFirstAvailablePiece();
@@ -75,12 +113,10 @@ public class TutorialDragAnimator : TutorialAnimatorBase
         {
             artefactStartTarget = targetPiece.transform;
             
-            // EDGE CASE FIX: Check the physical distance! 
-            // If it's already at the inspect point, the player beat us to it.
             float distance = Vector3.Distance(artefactStartTarget.position, assemblyService.GetInspectPoint().position);
             if (distance <= 0.1f) 
             {
-                CompleteTutorial();
+                TriggerSafeAdvancement();
             }
         }
     }
@@ -91,15 +127,14 @@ public class TutorialDragAnimator : TutorialAnimatorBase
         {
             artefactStartTarget = piece.transform;
 
-            // EDGE CASE FIX: Safety check for dynamically spawned pieces
             float distance = Vector3.Distance(artefactStartTarget.position, assemblyService.GetInspectPoint().position);
             if (distance <= 0.1f) 
             {
-                CompleteTutorial();
+                TriggerSafeAdvancement();
                 return;
             }
 
-            if (gameObject.activeInHierarchy && !isAnimationPlaying && !isTaskCompleted && isFirstPhase)
+            if (gameObject.activeInHierarchy && !isAnimationPlaying && !isTaskCompleted && isFirstPhase && !isAdvancing)
             {
                 StartTutorialSequence(true);
             }
@@ -111,11 +146,14 @@ public class TutorialDragAnimator : TutorialAnimatorBase
         if (interactable is IArtefactPart) RecordActivity();
     }
 
-    private void HandleAssemblyPerformed() => CompleteTutorial();
+    private void HandleAssemblyPerformed()
+    {
+        TriggerSafeAdvancement();
+    }
 
     public override void StartTutorialSequence(bool blockInput)
     {
-        if (artefactStartTarget == null || isTaskCompleted) return;
+        if (artefactStartTarget == null || isTaskCompleted || isAdvancing) return;
         base.StartTutorialSequence(blockInput);
     }
 
@@ -125,9 +163,9 @@ public class TutorialDragAnimator : TutorialAnimatorBase
         cursorImage.sprite = defaultCursorSprite;
         if (physicalMouseImage != null) physicalMouseImage.sprite = mouseDefaultSprite;
         if (dottedGameObject != null) dottedGameObject.SetActive(false);
-
+        
         if (overlayController != null) overlayController.ShowOverlay(artefactStartTarget);
-
+        
         PlayDragAnimation();
     }
 
@@ -143,34 +181,39 @@ public class TutorialDragAnimator : TutorialAnimatorBase
     private void PlayDragAnimation()
     {
         KillSequence();
+        if (artefactStartTarget == null || mainCam == null || parentCanvas == null) return;
+
         dragSequence = DOTween.Sequence();
 
-        Vector2 startPos = mainCam.WorldToScreenPoint(artefactStartTarget.position);
-        Vector2 endPos = mainCam.WorldToScreenPoint(assemblyService.GetInspectPoint().position);
-        fakeCursor.position = startPos + new Vector2(150, -150);
+        Camera uiCam = parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : mainCam;
+        
+        Vector2 startScreen = mainCam.WorldToScreenPoint(artefactStartTarget.position);
+        Vector2 endScreen = mainCam.WorldToScreenPoint(assemblyService.GetInspectPoint().position);
 
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, startScreen, uiCam, out Vector2 startLocal);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, endScreen, uiCam, out Vector2 endLocal);
+
+        fakeCursor.anchoredPosition = startLocal + new Vector2(150, -150);
         if (clickIndicatorObject != null) clickIndicatorObject.SetActive(false);
 
-        // 1. Move to Artefact
-        dragSequence.Append(fakeCursor.DOMove(startPos, 1f).SetEase(Ease.OutQuad));
+        dragSequence.Append(fakeCursor.DOAnchorPos(startLocal, 1f).SetEase(Ease.OutQuad));
 
         if (dottedRect != null)
         {
-            dottedRect.position = startPos;
+            dottedRect.anchoredPosition = startLocal;
             dottedRect.sizeDelta = new Vector2(dottedRect.sizeDelta.x, 0);
-            Vector2 direction = endPos - startPos;
+            
+            Vector2 direction = endLocal - startLocal;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            dottedRect.rotation = Quaternion.Euler(0, 0, angle - 90f);
+            dottedRect.localRotation = Quaternion.Euler(0, 0, angle - 90f);
         }
 
-        // 2. Hover
         dragSequence.AppendCallback(() => {
             cursorImage.sprite = hoverCursorSprite;
             if (physicalMouseImage != null) physicalMouseImage.sprite = mouseDefaultSprite;
         });
         dragSequence.AppendInterval(0.3f);
 
-        // 3. Grab
         dragSequence.AppendCallback(() => {
             cursorImage.sprite = grabCursorSprite;
             if (physicalMouseImage != null) physicalMouseImage.sprite = mouseLeftClickSprite;
@@ -178,28 +221,43 @@ public class TutorialDragAnimator : TutorialAnimatorBase
         });
         dragSequence.AppendInterval(0.2f);
 
-        // 4. Start Drag
         dragSequence.AppendCallback(() => {
             if (physicalMouseImage != null) physicalMouseImage.sprite = mouseLeftClickSprite;
             if (dottedGameObject != null) dottedGameObject.SetActive(true);
             if (clickIndicatorObject != null) clickIndicatorObject.SetActive(false);
         });
-        
-        dragSequence.Append(fakeCursor.DOMove(endPos, 1.5f).SetEase(Ease.InOutSine));
-        if (dottedRect != null)
-        {
-            float totalDistance = Vector2.Distance(startPos, endPos);
-            dragSequence.Join(dottedRect.DOSizeDelta(new Vector2(dottedRect.sizeDelta.x, totalDistance), 1.5f).SetEase(Ease.InOutSine));
-        }
 
-        // 5. Release
+        dragSequence.Append(DOVirtual.Float(0f, 1f, 1.5f, (val) => {
+            if (artefactStartTarget == null) return;
+            
+            Vector2 currentStartScreen = mainCam.WorldToScreenPoint(artefactStartTarget.position);
+            Vector2 currentEndScreen = mainCam.WorldToScreenPoint(assemblyService.GetInspectPoint().position);
+            
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, currentStartScreen, uiCam, out Vector2 dynamicStartLocal);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, currentEndScreen, uiCam, out Vector2 dynamicEndLocal);
+
+            fakeCursor.anchoredPosition = Vector2.Lerp(dynamicStartLocal, dynamicEndLocal, val);
+
+            if (dottedRect != null)
+            {
+                dottedRect.anchoredPosition = dynamicStartLocal;
+                
+                Vector2 direction = dynamicEndLocal - dynamicStartLocal;
+                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                dottedRect.localRotation = Quaternion.Euler(0, 0, angle - 90f);
+                
+                float currentDistance = direction.magnitude * val;
+                dottedRect.sizeDelta = new Vector2(dottedRect.sizeDelta.x, currentDistance);
+            }
+        }).SetEase(Ease.InOutSine));
+
         dragSequence.AppendCallback(() => {
             cursorImage.sprite = hoverCursorSprite;
             if (physicalMouseImage != null) physicalMouseImage.sprite = mouseDefaultSprite;
             if (dottedGameObject != null) dottedGameObject.SetActive(false);
             if (clickIndicatorObject != null) clickIndicatorObject.SetActive(true);
         });
-
+        
         dragSequence.AppendInterval(0.2f);
         dragSequence.AppendCallback(() => {
             if (clickIndicatorObject != null) clickIndicatorObject.SetActive(false);
