@@ -86,7 +86,6 @@ public class DraggableToolBrush : DraggableTool, IDraggableBrushTool
 
     protected override void ToolVFX(bool isPlaying)
     {
-        Debug.Log($"ToolVFX called with isPlaying: {isPlaying}");
         if (isPlaying)
         {
             SetVfxEmission(2f, 8f);

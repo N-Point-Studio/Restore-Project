@@ -106,7 +106,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
         }
         else
         {
-            var worldPos = objectDetectionService.ScreenToWorld(mousePos, currentToolObject as IInteractObject);
+            Vector3 worldPos = objectDetectionService.GetInspectionPlaneWorldPosition(mousePos);
             currentToolObject.FollowMouse(worldPos);
             PlayToolSfx(false);
             PlayToolVfx(false);
@@ -229,7 +229,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
         currentToolObject.Return();
         currentToolObject = null;
-        
+
         CursorController.instance?.UnlockCursorState();
         CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
     }
@@ -333,8 +333,6 @@ public class ToolService : IInitializable, IDisposable, ITickable
     private void CleanChunk()
     {
         if (isFinished || currentInteract == null) return;
-        Debug.Log("Attempting to clean chunk...");
-
         var chunk = surfaceDetectionService.CleanableChunk;
         if (chunk == null) return;
 
@@ -383,7 +381,6 @@ public class ToolService : IInitializable, IDisposable, ITickable
         }
         else if (draggableTool != null)
         {
-            Debug.Log("Playing tool VFX for draggable tool: " + draggableTool.GetType().Name);
             if (play && !isVfxPlaying)
             {
                 draggableTool.PlayVfx(true);
@@ -399,7 +396,6 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
     private void PlayToolSfx(bool play)
     {
-        Debug.Log("PlayToolSfx called with play = " + play);
         if (currentToolObject != null)
         {
             if (play && !isSfxPlaying)
@@ -430,8 +426,8 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
     public void ForceReturnTool()
     {
-        objectInteractionManager.ForceDropCurrentObject(); 
-        ReturnCurrentTool(); 
+        objectInteractionManager.ForceDropCurrentObject();
+        ReturnCurrentTool();
 
 #if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
         if (draggableTool != null)
@@ -439,13 +435,13 @@ public class ToolService : IInitializable, IDisposable, ITickable
             PlayToolSfx(false);
             PlayToolVfx(false);
 
-            if (draggableTool is IDragObject tool) 
+            if (draggableTool is IDragObject tool)
             {
                 tool.OnDragEnded(draggableTool.GetTransform().position);
             }
-                             
+
             gameplayUIManager.ShowTipPoint(false);
-            
+
             draggableTool = null;
         }
 #endif

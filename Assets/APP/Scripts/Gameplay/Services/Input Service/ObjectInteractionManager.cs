@@ -66,7 +66,7 @@ public class ObjectInteractionManager : IInitializable, IDisposable
             InteractionEvents.OnDragEnded?.Invoke(currentInteract, dropPosition);
             currentInteract = null;
         }
-        
+
         detectionService.SetInteractObjectUsed(false);
     }
 
@@ -99,19 +99,10 @@ public class ObjectInteractionManager : IInitializable, IDisposable
         if (!IsInteractValid()) return;
 
         detectionService.SetInteractObjectUsed(true);
-
         detectionService.CacheDragDepth(currentInteract);
 
-        if (currentInteract is not IDraggableTool)
-        {
-            Vector3 worldPos = detectionService.ScreenToWorld(vector);
-            InteractionEvents.OnDragStarted?.Invoke(currentInteract, worldPos);
-        }
-        else
-        {
-            Vector3 worldPos = detectionService.ScreenToWorld(vector, currentInteract);
-            InteractionEvents.OnDragStarted?.Invoke(currentInteract, worldPos);
-        }
+        Vector3 worldPos = detectionService.GetInspectionPlaneWorldPosition(vector);
+        InteractionEvents.OnDragStarted?.Invoke(currentInteract, worldPos);
     }
 
     private void HandleDragPerformed(Vector2 vector)
@@ -119,23 +110,12 @@ public class ObjectInteractionManager : IInitializable, IDisposable
         if (tutorialService.IsInputBlocked) return;
 
         if (!IsInteractValid()) return;
-
-        if (currentInteract is not IDraggableTool)
-        {
-            Vector3 worldPos = detectionService.ScreenToWorld(vector);
-            InteractionEvents.OnDragPerformed?.Invoke(currentInteract, worldPos);
-        }
-        else
-        {
-            Vector3 worldPos = detectionService.ScreenToWorld(vector, currentInteract);
-            InteractionEvents.OnDragPerformed?.Invoke(currentInteract, worldPos);
-        }
+        Vector3 worldPos = detectionService.GetInspectionPlaneWorldPosition(vector);
+        InteractionEvents.OnDragPerformed?.Invoke(currentInteract, worldPos);
     }
 
     private void HandleDragEnded(Vector2 vector)
     {
-        // if (tutorialService.IsInputBlocked) return;
-        
         if (IsInteractValid())
         {
             Vector3 worldPos = detectionService.GetCachedDragWorldPos(vector);

@@ -65,13 +65,11 @@ public abstract class DraggableTool : MonoBehaviour, IInteractObject, IDragObjec
 
     private void HandleTutorialHighlightOn(ToolType toolType)
     {
-        Debug.Log("Tutorial ON highlight: " + toolType);
         if (this.toolType == toolType) outline.enabled = true;
     }
 
     private void HandleTutorialHighlightOff(ToolType toolType)
     {
-        Debug.Log("Tutorial OFF highlight: " + toolType);
         if (this.toolType == toolType) outline.enabled = false;
     }
 
@@ -104,17 +102,18 @@ public abstract class DraggableTool : MonoBehaviour, IInteractObject, IDragObjec
         isDragging = false;
         isReturning = true;
         if (animator != null) animator.enabled = false;
-        
+
         SetColliderEnable(false);
-        
+
         transform.DOKill();
         returnSequence?.Kill();
         returnSequence = DOTween.Sequence();
-        
+
         returnSequence.Join(transform.DOMove(initialPosition, returnAnimDuration).SetEase(Ease.OutBack).SetUpdate(true));
         returnSequence.Join(transform.DORotate(initialRotation.eulerAngles, returnAnimDuration).SetEase(Ease.OutBack).SetUpdate(true));
-        
-        returnSequence.OnComplete(() => {
+
+        returnSequence.OnComplete(() =>
+        {
             isReturning = false;
             SetColliderEnable(true);
         });

@@ -6,22 +6,24 @@ using VContainer.Unity;
 
 public class ObjectDetectionService : IInitializable, IDisposable, ITickable
 {
-    private readonly Camera cam;
     private IInteractObject interactable;
     public Action<IInteractObject> OnInteractDetected;
     private readonly InputSystemService inputSystemService;
 
-    private PlaneReference plane;
+    private readonly PlaneReference planeReference;
+    private readonly Camera camera;
+    private Vector3 inspectionUp = Vector3.up;
+
     private bool isUsed = false;
     private Vector2 mousePos;
 
     private float cachedDragDepth;
 
     [Inject]
-    public ObjectDetectionService(InputSystemService inputSystemService, Camera cam, PlaneReference plane)
+    public ObjectDetectionService(InputSystemService inputSystemService, Camera camera, PlaneReference planeReference)
     {
-        this.cam = cam;
-        this.plane = plane;
+        this.camera = camera;
+        this.planeReference = planeReference;
         this.inputSystemService = inputSystemService;
     }
 
@@ -58,33 +60,15 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
         }
     }
 
-    public IInteractObject GetCurrentInteract()
-    {
-        if (interactable != null)
-        {
-            if (interactable is IDragObject) CursorController.instance?.SetCursorState(CursorState.GrabOpen);
-            else CursorController.instance?.SetCursorState(CursorState.Hover);
-        }
-        else CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
-
-        // [BUG FIX]: Simpan dulu nilainya sebelum di-null-kan agar tidak mereturn null
-        IInteractObject current = interactable;
-        interactable = null;
-        return current;
-    }
-
     private void HandlePressStarted(Vector2 screenPos)
     {
         if (!IsValidPosition(screenPos) || isUsed) return;
 
-        // Berlaku untuk PC (Klik) maupun Mobile (Tap/Touch)
         IInteractObject newTarget = null;
         if (TryRaycast(screenPos, out var hit))
         {
             hit.collider.TryGetComponent(out newTarget);
         }
-
-        // Debug.Log("Press Started " + screenPos + " Hit: " + hit.collider?.name + " NewTarget: " + newTarget);
 
         if (newTarget != interactable)
         {
@@ -100,8 +84,6 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
         if (!IsValidPosition(screenPos)) return;
 
 #if UNITY_IOS || UNITY_ANDROID
-        // Khusus Mobile: Saat jari diangkat, otomatis interaksi berakhir
-        // karena tidak ada konsep "hover" di touch screen.
         if (interactable != null && !isUsed)
         {
             interactable.OnInteractEnded();
@@ -149,8 +131,6 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
     public void Tick()
     {
 #if UNITY_EDITOR || UNITY_STANDALONE
-        // Tick hanya mendeteksi hover secara terus-menerus di PC/Editor.
-        // Di Mobile ini dimatikan agar hemat performa (karena tidak ada mouse hover).
         if (isUsed || !IsValidPosition(mousePos)) return;
 
         IInteractObject newTarget = null;
@@ -171,7 +151,7 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
         hit = default;
         if (!IsValidPosition(screenPos)) return false;
 
-        Ray ray = cam.ScreenPointToRay(screenPos);
+        Ray ray = camera.ScreenPointToRay(screenPos);
         return Physics.Raycast(ray, out hit);
     }
 
@@ -179,7 +159,7 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
     {
         if (target is Component targetComp && targetComp != null)
         {
-            Camera camera = this.cam != null ? this.cam : Camera.main;
+            Camera camera = this.camera != null ? this.camera : Camera.main;
             cachedDragDepth = camera.WorldToScreenPoint(targetComp.transform.position).z;
         }
     }
@@ -188,32 +168,21 @@ public class ObjectDetectionService : IInitializable, IDisposable, ITickable
     {
         if (!IsValidPosition(screenPos)) return Vector3.zero;
 
-        Camera camera = this.cam != null ? this.cam : Camera.main;
+        Camera camera = this.camera != null ? this.camera : Camera.main;
         Vector3 screenPosWithDepth = new Vector3(screenPos.x, screenPos.y, cachedDragDepth);
         return camera.ScreenToWorldPoint(screenPosWithDepth);
     }
 
-    public Vector3 ScreenToWorld(Vector2 screenPos, IInteractObject target)
+    public Vector3 GetInspectionPlaneWorldPosition(Vector2 screenPos)
     {
-        if (!IsValidPosition(screenPos)) return Vector3.zero;
+        if (camera == null || planeReference == null) return Vector3.zero;
+        Ray ray = camera.ScreenPointToRay(screenPos);
+        Plane dragPlane = new(inspectionUp, planeReference.transform.position);
 
-        if (target is Component targetComp && targetComp != null)
+        if (dragPlane.Raycast(ray, out float distance))
         {
-            Camera camera = this.cam != null ? this.cam : Camera.main;
-            float zDistance = camera.WorldToScreenPoint(targetComp.transform.position).z;
-            Vector3 screenPosWithDepth = new Vector3(screenPos.x, screenPos.y, zDistance);
-            return camera.ScreenToWorldPoint(screenPosWithDepth);
+            return ray.GetPoint(distance);
         }
-        return Vector3.zero;
-    }
-
-    public Vector3 ScreenToWorld(Vector2 screenPos)
-    {
-        if (!IsValidPosition(screenPos)) return Vector3.zero;
-
-        Ray ray = cam.ScreenPointToRay(screenPos);
-        Plane dragPlane = new(plane.transform.up, plane.transform.position);
-        if (dragPlane.Raycast(ray, out float distance)) return ray.GetPoint(distance);
         return Vector3.zero;
     }
 }

@@ -7,21 +7,21 @@ using VContainer;
 class GameplayToolData
 {
     public ToolType toolType;
-    
+
     [Header("Scene References")]
     [Tooltip("Drag the tool that is ALREADY in the scene for Desktop here")]
     public GameObject desktopTool;
 
     [Tooltip("Drag the tool that is ALREADY in the scene for Mobile here")]
     public GameObject mobileTool;
-    
-    [HideInInspector] public GameObject activeTool; 
+
+    [HideInInspector] public GameObject activeTool;
 }
 
 public class GameplayToolManager : MonoBehaviour
 {
     [SerializeField] private List<GameplayToolData> gameplayToolDataArray;
-    
+
     [Header("Tool Parents")]
     [SerializeField] private GameObject desktopToolParent;
     [SerializeField] private GameObject mobileToolParent;
@@ -57,7 +57,7 @@ public class GameplayToolManager : MonoBehaviour
 
         // Show Chisel starting at Stage 0, Module 3
         SetToolVisibility(ToolType.Chisel, stage > 0 || module >= 3);
-        
+
         // Show Brush starting at Stage 0, Module 4
         SetToolVisibility(ToolType.Brush, stage > 0 || module >= 4);
     }
@@ -81,12 +81,12 @@ public class GameplayToolManager : MonoBehaviour
             if (isMobile)
             {
                 data.activeTool = data.mobileTool;
-                if (data.desktopTool != null) data.desktopTool.SetActive(false); 
+                if (data.desktopTool != null) data.desktopTool.SetActive(false);
             }
             else
             {
                 data.activeTool = data.desktopTool;
-                if (data.mobileTool != null) data.mobileTool.SetActive(false); 
+                if (data.mobileTool != null) data.mobileTool.SetActive(false);
             }
 
             if (data.activeTool != null)
@@ -106,7 +106,6 @@ public class GameplayToolManager : MonoBehaviour
             {
                 if (typeTarget.HasFlag(toolData.toolType))
                 {
-                    Debug.Log($"Setting visibility of {toolData.activeTool.name} to {isVisible}");
                     toolData.activeTool.SetActive(isVisible);
                 }
             }

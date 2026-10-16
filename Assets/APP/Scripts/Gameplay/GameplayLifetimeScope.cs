@@ -19,8 +19,6 @@ public class GameplayLifetimeScope : LifetimeScope
 
     protected override void Configure(IContainerBuilder builder)
     {
-        // Plane dragPlane = new(planeReference.up, planeReference.position);
-        // builder.RegisterInstance(dragPlane);
         builder.RegisterInstance(planeReference);
 
         builder.Register<TutorialService>(Lifetime.Scoped);
@@ -41,7 +39,7 @@ public class GameplayLifetimeScope : LifetimeScope
                     TutorialAnimatorBase animator = tutorialAnimators[i];
                     if (animator != null)
                     {
-                        resolver.Inject(animator); 
+                        resolver.Inject(animator);
                     }
                 }
             });
