@@ -237,7 +237,6 @@ GameObject:
   - component: {fileID: 2941069313676154847}
   - component: {fileID: 6901143297962382007}
   - component: {fileID: 3302294455981651909}
-  - component: {fileID: 5294340318800313802}
   - component: {fileID: 3142831002316285836}
   m_Layer: 6
   m_Name: Jar_Crack_New_3
@@ -370,21 +369,6 @@ MonoBehaviour:
   - targetPieceId: Jar_Crack_2
     transform: {fileID: 747989076142618228}
     isOccupied: 0
---- !u!114 &5294340318800313802
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5819122582146555224}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5422eacc06655479682795d970b9af86, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CleaningObject
-  dirtMaskBase: {fileID: 2800000, guid: d353fb521aefa455b8008cb3c49778c1, type: 3}
-  material: {fileID: 2100000, guid: e884e1fc267694d3ba8f681bcdfd2c84, type: 2}
-  maxPaintDistance: 7
 --- !u!114 &3142831002316285836
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -406,6 +390,7 @@ MonoBehaviour:
   paintedPixel: 0
   progress: 0
   isDirtRemoved: 0
+  forceClearTreshold: 99
   maskTexturePropertyName: _SubMask
   maskTexture: {fileID: 2800000, guid: d353fb521aefa455b8008cb3c49778c1, type: 3}
 --- !u!1001 &198869881812734419
