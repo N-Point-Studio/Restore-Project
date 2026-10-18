@@ -15,12 +15,7 @@ MonoBehaviour:
   baseData:
     id: Artefact_Kendi
     itemName: Kendi
-    itemDescription: Kendi is a traditional water container, often made of earthenware,
-      used for storing and drinking water, and also served ritual and ceremonial
-      purposes. It is an ancient object, with archaeological evidence of similar
-      vessels existing in the region before the Majapahit era and even appearing
-      in reliefs at Borobudur Temple. The term is derived from the Sanskrit word
-      "kundika," which refers to a water vessel.
+    itemDescription: Kendi is a traditional water container, often made of earthenware, used for storing and drinking water, and also served ritual and ceremonial purposes. It is an ancient object, with archaeological evidence of similar vessels existing in the region before the Majapahit era and even appearing in reliefs at Borobudur Temple. The term is derived from the Sanskrit word "kundika," which refers to a water vessel.
     itemIcon: {fileID: 21300000, guid: 0e9d767a9cde89f4aa9a742d79e697a3, type: 3}
     exclude: 0
   localizedItemName:
@@ -59,12 +54,8 @@ MonoBehaviour:
     m_WaitForCompletion: 0
     m_LocalVariables: []
   stickyNoteTexts:
-  - "Here\u2019s your next artifact. Another Indonesian artifact! Take good care
-    of this one, Nova :)\n\nGood luck!\n\n-Ms. Maya"
-  - "p.s I want to make sure of something: did your mom really move to the Netherlands
-    in the 80\u2019s for work? She always sounded so cool to me... Like, she\u2019s
-    an Indonesian archeologist abroad when only a small amount of Indonesians were
-    able to afford any kind of higher education back in her times!"
+  - "Here\u2019s your next artifact. Another Indonesian artifact! Take good care of this one, Nova :)\n\nGood luck!\n\n-Ms. Maya"
+  - "p.s I want to make sure of something: did your mom really move to the Netherlands in the 80\u2019s for work? She always sounded so cool to me... Like, she\u2019s an Indonesian archeologist abroad when only a small amount of Indonesians were able to afford any kind of higher education back in her times!"
   customGameplayBGM: 4
   preRestorationPagePrefab: {fileID: 8636906436748886089, guid: 85fab7291bb1e644ba52df88307e8821, type: 3}
   postRestorationPagePrefabs:
@@ -76,7 +67,7 @@ MonoBehaviour:
   unlockedByDefault: 0
   unlockRequirements:
   - {fileID: 11400000, guid: a3924d72a67c0455eb511e7925877898, type: 2}
-  allowedToolTypes: 3
+  allowedToolTypes: 11
   artefactFragmentDatas:
   - prefab: {fileID: 6116740313426599018, guid: 7160a96b277fd4f8dad4104ea78bd8aa, type: 3}
     spawnTransform:

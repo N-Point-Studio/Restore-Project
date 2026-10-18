@@ -37,11 +37,6 @@ public class GameplayToolManager : MonoBehaviour
         this.tutorialService = tutorialService;
     }
 
-    private void Awake()
-    {
-        InitializePlatformTools();
-    }
-
     private void OnEnable()
     {
         if (tutorialService != null) tutorialService.OnTutorialStateChanged += UpdateTrayVisibility;

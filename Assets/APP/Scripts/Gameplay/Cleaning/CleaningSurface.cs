@@ -130,12 +130,13 @@ public class CleaningSurface : MonoBehaviour, ICleanSurface, IInteractObject, ID
     public void CleanSurface(Vector3 hitPoint, Texture2D brush, Vector3 hitNormal, Vector3 direction, float scale = 0.5f, float strength = 0.5f)
     {
         var tempPercentage = paintedPixel;
+        float actualStrength = strength * 0.05f;
 
         paintingMaterial.SetTexture("_BrushTexture", brush);
         paintingMaterial.SetVector("_BrushPosition", hitPoint);
         paintingMaterial.SetVector("_PaintDirection", hitNormal);
         paintingMaterial.SetFloat("_BrushScale", scale);
-        paintingMaterial.SetFloat("_BrushStrength", strength);
+        paintingMaterial.SetFloat("_BrushStrength", actualStrength);
         paintingMaterial.SetColor("_PaintingColor", paintingColor);
         paintingMaterial.SetVector("_ToolDirection", direction);
 

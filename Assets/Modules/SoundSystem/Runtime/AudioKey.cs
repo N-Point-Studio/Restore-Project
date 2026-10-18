@@ -13,6 +13,7 @@ namespace Modules.SoundSystems
         SFX_Camera,
         SFX_Brush,
         SFX_Chisel,
+        SFX_Cloth,
         SFX_Finish,
         UI_Click,
         UI_Hover,

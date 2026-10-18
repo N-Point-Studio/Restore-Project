@@ -11,15 +11,15 @@ void CSInit(uint3 id : SV_DispatchThreadID)
     ResultBuffer[0] = 0;
 }
 
-
 [numthreads(8, 8, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
-    uint4 col = InputImage[id.xy];
+    float4 col = InputImage[id.xy];
 
+    int pixelCleanValue = (int)(col.g * 255.0);
 
-    if(col.g == 1)
+    if(pixelCleanValue > 0)
     {
-        InterlockedAdd(ResultBuffer[0], 1);
+        InterlockedAdd(ResultBuffer[0], pixelCleanValue);
     }
 }

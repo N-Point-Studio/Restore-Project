@@ -77,7 +77,10 @@ public class GameplayUIManager : MonoBehaviour
     private void Awake()
     {
         if (toDoListCanvasGroup != null) toDoListCanvasGroup.alpha = 0f;
-        if (toDoListObject != null) toDoListObject.SetActive(false);
+        if (toDoListObject != null)
+        {
+            toDoListObject.SetActive(false);
+        }
 
         mainUIController.OnWrapUp += OnWrapUp;
         mainUIController.OnPauseRequest += PauseGame;
@@ -299,7 +302,7 @@ public class GameplayUIManager : MonoBehaviour
         // Change to "progress >= 1f" if you want them to destroy ALL chunks before the brush tutorial!
         if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 3 && progress > 0f)
         {
-            tutorialService.CompleteAndAdvance(true); 
+            tutorialService.CompleteAndAdvance(true);
 #if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
             tutorialService.TriggerHighlight(false, ToolType.Chisel);
 #endif
@@ -310,7 +313,7 @@ public class GameplayUIManager : MonoBehaviour
     private void HandleSurfaceCleaningUpdate(float progress)
     {
         UpdateProgress(ProgressType.Dust, progress);
-        
+
         // Wait until they have scrubbed away at least 5% of the dust
         if (tutorialService.CurrentStage == 0 && tutorialService.CurrentModule == 4 && progress >= 0.01f)
         {
@@ -465,7 +468,7 @@ public class GameplayUIManager : MonoBehaviour
 
         // 1. VISIBILITY: Hidden before Module 5. Visible during and after Module 5.
         bool shouldBeVisible = stage > 0 || (stage == 0 && module >= 5);
-        
+
         if (toDoListObject != null)
         {
             if (shouldBeVisible && !toDoListObject.activeSelf)

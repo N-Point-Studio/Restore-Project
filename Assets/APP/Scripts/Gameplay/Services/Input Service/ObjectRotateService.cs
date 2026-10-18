@@ -8,19 +8,17 @@ public class ObjectRotateService : IInitializable, IDisposable
     private readonly InputSystemService inputSystemService;
     private readonly GameConfigData config;
     private readonly ObjectDetectionService detectionService;
-    private readonly ToolService toolService;
     private readonly TutorialService tutorialService;
     private bool isRotating;
     private Vector2 lastMousePos;
     private IInteractObject currentInteract;
 
     [Inject]
-    public ObjectRotateService(InputSystemService inputSystemService, GameConfigData config, ObjectDetectionService detectionService, ToolService toolService, TutorialService tutorialService)
+    public ObjectRotateService(InputSystemService inputSystemService, GameConfigData config, ObjectDetectionService detectionService, TutorialService tutorialService)
     {
         this.inputSystemService = inputSystemService;
         this.config = config;
         this.detectionService = detectionService;
-        this.toolService = toolService;
         this.tutorialService = tutorialService;
     }
 
@@ -28,10 +26,10 @@ public class ObjectRotateService : IInitializable, IDisposable
     {
         inputSystemService.OnRightPressStarted += HandleRightStarted;
         inputSystemService.OnRightPressEnded += HandleRightEnded;
-        
+
         inputSystemService.OnLeftPressStarted += HandleLeftStarted;
         inputSystemService.OnLeftPressEnded += HandleLeftEnded;
-        
+
         InteractionEvents.OnMouseMoved += HandleMouseMove;
         detectionService.OnInteractDetected += HandleInteractDetected;
     }
@@ -40,10 +38,10 @@ public class ObjectRotateService : IInitializable, IDisposable
     {
         inputSystemService.OnRightPressStarted -= HandleRightStarted;
         inputSystemService.OnRightPressEnded -= HandleRightEnded;
-        
+
         inputSystemService.OnLeftPressStarted -= HandleLeftStarted;
         inputSystemService.OnLeftPressEnded -= HandleLeftEnded;
-        
+
         InteractionEvents.OnMouseMoved -= HandleMouseMove;
         detectionService.OnInteractDetected -= HandleInteractDetected;
     }
