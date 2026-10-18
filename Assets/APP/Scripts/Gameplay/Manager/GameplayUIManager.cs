@@ -107,7 +107,6 @@ public class GameplayUIManager : MonoBehaviour
 #if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
         isMobile = true;
 #endif
-
         if (tutorialDesktopRoot != null) tutorialDesktopRoot.SetActive(!isMobile);
         if (tutorialMobileRoot != null) tutorialMobileRoot.SetActive(isMobile);
 
@@ -117,6 +116,19 @@ public class GameplayUIManager : MonoBehaviour
         {
             tutorialService.StartTutorial(0, 0);
         }
+        else
+        {
+            if (toDoListObject != null)
+            {
+                toDoListObject.SetActive(true);
+                if (toDoListCanvasGroup != null) 
+                {
+                    toDoListCanvasGroup.alpha = 0f;
+                    toDoListCanvasGroup.DOFade(1f, 1f).SetEase(Ease.OutQuad);
+                }
+            }
+        }
+
         HandleAssembleAvailability();
     }
 
