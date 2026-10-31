@@ -16,7 +16,7 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
     [SerializeField] protected float SurfaceRotateSpeed = 0.1f;
 
     [Header("Initial Placement")]
-    [SerializeField] protected ToolOrigin origin;
+    // [SerializeField] protected ToolOrigin origin;
     protected Vector3 initialPosition;
     protected Quaternion initialRotation;
     protected Collider col;
@@ -75,7 +75,7 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
 
     public ToolType ToolId => toolType;
 
-    public IInteractObject GetOrigin() => origin;
+    // public IInteractObject GetOrigin() => origin;
 
 
     public void SetColliderEnable(bool isActive)
@@ -85,7 +85,7 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
 
     public void Use()
     {
-        origin.SetColliderEnable(true);
+        // origin.SetColliderEnable(true);
         returnSequence?.Kill();
         col.enabled = false;
         isUsed = true;
@@ -97,7 +97,7 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
         transform.DOKill();
 
         if (col != null) col.enabled = false;
-        
+
         isReturning = true;
         isUsed = false;
         if (animator != null) animator.enabled = false;
@@ -107,13 +107,14 @@ public abstract class Tool : MonoBehaviour, IInteractObject, IToolObject, IPress
 
         returnSequence.Join(transform.DOMove(initialPosition, returnAnimDuration).SetEase(Ease.OutBack).SetUpdate(true));
         returnSequence.Join(transform.DORotateQuaternion(initialRotation, returnAnimDuration).SetEase(Ease.OutBack).SetUpdate(true));
-        
-        returnSequence.OnComplete(() => {
+
+        returnSequence.OnComplete(() =>
+        {
             isReturning = false;
-            if (col != null) col.enabled = true; 
+            if (col != null) col.enabled = true;
         });
-        
-        if (origin != null) origin.SetColliderEnable(false);
+
+        // if (origin != null) origin.SetColliderEnable(false);
     }
 
     public void FollowMouse(Vector3 worldPos)

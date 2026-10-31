@@ -23,6 +23,7 @@ public class GameplayUIManager : MonoBehaviour
     [SerializeField] private PauseController pauseController;
     [SerializeField] private SettingsController settingsController;
     [SerializeField] private PopUpConfirmationController quitConfirmationController;
+    [SerializeField] private ToolUIController toolUiController;
 
     [Header("Tutorial Canvas Configuration")]
     [SerializeField] private GameObject tutorialDesktopRoot;
@@ -72,6 +73,7 @@ public class GameplayUIManager : MonoBehaviour
         container.Inject(settingsController);
         container.Inject(endgameController);
         container.Inject(mainUIController);
+        container.Inject(toolUiController);
     }
 
     private void Awake()
@@ -94,12 +96,11 @@ public class GameplayUIManager : MonoBehaviour
         quitConfirmationController.OnCancel += OnCancelQuit;
 
         settingsController.OnSettingsClosed += OnSettingsClosed;
-
-        mainUIController.SetActive(true);
     }
 
     private IEnumerator Start()
     {
+        toolUiController.SetActive(true);
         mainUIController.ShowButtonWrap(false);
         endCamera.enabled = false;
 
@@ -121,7 +122,7 @@ public class GameplayUIManager : MonoBehaviour
             if (toDoListObject != null)
             {
                 toDoListObject.SetActive(true);
-                if (toDoListCanvasGroup != null) 
+                if (toDoListCanvasGroup != null)
                 {
                     toDoListCanvasGroup.alpha = 0f;
                     toDoListCanvasGroup.DOFade(1f, 1f).SetEase(Ease.OutQuad);

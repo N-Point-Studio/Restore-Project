@@ -26,16 +26,16 @@ public struct CursorConfig
 {
     public CursorState state;
     public Texture2D texture;
-    
+
     [Header("Hotspot Settings")]
     public CursorAlignment alignment;
-    
-    public Vector2 customClickPosition; 
+
+    public Vector2 customClickPosition;
 
     public Vector2 GetHotspot()
     {
         if (texture == null) return Vector2.zero;
-        
+
         switch (alignment)
         {
             case CursorAlignment.Center: return new Vector2(texture.width / 2f, texture.height / 2f);
@@ -57,9 +57,9 @@ public class CursorController : MonoBehaviour
     private PlayerInput playerInput;
     private bool usingController;
     private bool cursorVisible = true;
-    
+
     private CursorState currentState = CursorState.DefaultRounded;
-    private bool isCursorLocked = false; 
+    private bool isCursorLocked = false;
 
     private bool hasOverride = false;
     private CursorState overrideState;
@@ -92,7 +92,7 @@ public class CursorController : MonoBehaviour
 #if !UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
         return;
 #endif
-        SetCursorState(CursorState.DefaultRounded); 
+        SetCursorState(CursorState.DefaultRounded);
         UpdateControllerStatus();
     }
 
@@ -103,8 +103,8 @@ public class CursorController : MonoBehaviour
 
     public void SetCursorState(CursorState newState)
     {
-        if (isCursorLocked) return; 
-        
+        if (isCursorLocked) return;
+
         currentState = newState;
         UpdateCursorVisuals();
     }
@@ -138,9 +138,9 @@ public class CursorController : MonoBehaviour
     private void UpdateCursorVisuals()
     {
         CursorState stateToShow = hasOverride ? overrideState : currentState;
-        
+
         int index = cursorConfigs.FindIndex(c => c.state == stateToShow);
-        
+
         if (index >= 0)
         {
             CursorConfig config = cursorConfigs[index];
@@ -150,15 +150,15 @@ public class CursorController : MonoBehaviour
             }
             else
             {
-                Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto); 
+                Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
             }
         }
     }
 
     private void HandleOnInputChanged(InputUser user, InputUserChange change, InputDevice device)
     {
-        if (change == InputUserChange.ControlSchemeChanged || 
-            change == InputUserChange.DevicePaired || 
+        if (change == InputUserChange.ControlSchemeChanged ||
+            change == InputUserChange.DevicePaired ||
             change == InputUserChange.DeviceUnpaired)
         {
             UpdateControllerStatus();

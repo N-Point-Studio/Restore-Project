@@ -10,17 +10,14 @@ public class ToolService : IInitializable, IDisposable, ITickable
     private readonly CleaningService cleaningService;
     private readonly TutorialService tutorialService;
     private readonly GameplayManager gameplayManager;
-    private readonly InputSystemService inputSystemService;
-    private readonly GameplayUIManager gameplayUIManager;
-    private readonly GameConfigData gameConfigData;
     private readonly ObjectInteractionManager objectInteractionManager;
+    private readonly GameplayToolUIManager gameplayToolUIManager;
 
     public bool isCleaning { get; private set; }
     public bool isFinished { get; set; } = false;
     public bool IsOnToolMode => currentToolObject != null;
 
     private IToolObject currentToolObject;
-    private IDraggableTool draggableTool;
     private IInteractObject currentInteract;
     private Vector2 mousePos;
 
@@ -30,55 +27,45 @@ public class ToolService : IInitializable, IDisposable, ITickable
     private float movementTimer = 0f;
     private const float MOVEMENT_TIMEOUT = 0.15f;
 
-
     [Inject]
-    public ToolService(ObjectDetectionService objectDetectionService,
+    public ToolService(
+        ObjectDetectionService objectDetectionService,
         SurfaceDetectionService surfaceDetectionService,
         CleaningService cleaningService,
         TutorialService tutorialService,
         GameplayManager gameplayManager,
-        InputSystemService inputSystemService,
-        GameplayUIManager gameplayUIManager,
-        GameConfigData gameConfigData,
-        ObjectInteractionManager objectInteractionManager)
+        ObjectInteractionManager objectInteractionManager,
+        GameplayToolUIManager gameplayToolUIManager)
     {
         this.objectDetectionService = objectDetectionService;
         this.surfaceDetectionService = surfaceDetectionService;
         this.cleaningService = cleaningService;
         this.tutorialService = tutorialService;
         this.gameplayManager = gameplayManager;
-        this.inputSystemService = inputSystemService;
-        this.gameplayUIManager = gameplayUIManager;
-        this.gameConfigData = gameConfigData;
         this.objectInteractionManager = objectInteractionManager;
+        this.gameplayToolUIManager = gameplayToolUIManager;
     }
 
     public void Initialize()
     {
+        gameplayToolUIManager.OnActiveToolChanged += HandleActiveToolChanged;
         objectDetectionService.OnInteractDetected += HandleObjectDetected;
 
         InteractionEvents.OnPressStart += HandlePressStart;
         InteractionEvents.OnPressEnd += HandlePressEnd;
         InteractionEvents.OnMouseMoved += HandleMouseMove;
 
-        InteractionEvents.OnDragStarted += HandleDragStarted;
-        InteractionEvents.OnDragPerformed += HandleDragPerformed;
-        InteractionEvents.OnDragEnded += HandleDragEnded;
-
         GameplayUIManager.OnGameWrapped += HandleGameWrapped;
     }
 
     public void Dispose()
     {
+        gameplayToolUIManager.OnActiveToolChanged -= HandleActiveToolChanged;
         objectDetectionService.OnInteractDetected -= HandleObjectDetected;
 
         InteractionEvents.OnPressStart -= HandlePressStart;
         InteractionEvents.OnPressEnd -= HandlePressEnd;
         InteractionEvents.OnMouseMoved -= HandleMouseMove;
-
-        InteractionEvents.OnDragStarted -= HandleDragStarted;
-        InteractionEvents.OnDragPerformed -= HandleDragPerformed;
-        InteractionEvents.OnDragEnded -= HandleDragEnded;
 
         GameplayUIManager.OnGameWrapped -= HandleGameWrapped;
     }
@@ -113,6 +100,23 @@ public class ToolService : IInitializable, IDisposable, ITickable
         }
     }
 
+    private void HandleActiveToolChanged(ToolType type)
+    {
+        if (type == ToolType.None)
+        {
+            ReturnCurrentTool();
+            return;
+        }
+
+        GameObject toolObj = gameplayToolUIManager.GetToolObject(type);
+
+        if (toolObj != null && toolObj.TryGetComponent(out IToolObject tool))
+        {
+            if (gameplayManager.isTutorialAvailable && !tutorialService.CanUseTool(tool.ToolId)) return;
+            EquipTool(tool);
+        }
+    }
+
     private void HandleObjectDetected(IInteractObject obj)
     {
         currentInteract = obj;
@@ -120,15 +124,10 @@ public class ToolService : IInitializable, IDisposable, ITickable
 
     private void HandlePressStart()
     {
-#if UNITY_STANDALONE
         if (isFinished && currentInteract == null) return;
 
         switch (currentInteract)
         {
-            case IToolObject tool:
-                if (gameplayManager.isTutorialAvailable && !tutorialService.CanUseTool(tool.ToolId)) return;
-                EquipTool(tool);
-                break;
             case IClean clean when clean.IsCleanable():
                 isCleaning = true;
                 movementTimer = MOVEMENT_TIMEOUT;
@@ -138,16 +137,11 @@ public class ToolService : IInitializable, IDisposable, ITickable
                 isCleaning = false;
                 ReturnCurrentTool();
                 break;
-            case var _ when IsOnToolMode && currentInteract == currentToolObject.GetOrigin():
-                ReturnCurrentTool();
-                break;
         }
-#endif
     }
 
     private void HandleMouseMove(Vector2 newMousePos)
     {
-#if UNITY_STANDALONE
         float delta = Vector2.Distance(mousePos, newMousePos);
         mousePos = newMousePos;
 
@@ -156,50 +150,14 @@ public class ToolService : IInitializable, IDisposable, ITickable
             movementTimer = MOVEMENT_TIMEOUT;
             ProcessCleaning();
         }
-#endif
     }
 
     private void HandlePressEnd()
     {
-#if UNITY_STANDALONE
         if (isFinished) return;
         isCleaning = false;
         PlayToolSfx(false);
         PlayToolVfx(false);
-#endif
-    }
-
-    private void HandleDragStarted(IInteractObject interact, Vector3 vector)
-    {
-#if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
-        if (interact is IDraggableTool tool) draggableTool = tool;
-        if (draggableTool != null && draggableTool is IDragObject drag)
-        {
-            gameplayUIManager.ShowTipPoint(true);
-            drag.OnDragStarted(vector);
-        }
-#endif
-    }
-
-    private void HandleDragPerformed(IInteractObject interact, Vector3 vector)
-    {
-#if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
-        if (interact is not IDraggableTool) { return; }
-        PerformRaycastTouch(inputSystemService.GetMousePosition(), vector);
-#endif
-
-    }
-
-    private void HandleDragEnded(IInteractObject interact, Vector3 vector)
-    {
-#if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
-        if (interact is not IDraggableTool) { return; }
-        if (draggableTool != null && draggableTool is IDragObject tool) tool.OnDragEnded(vector);
-        gameplayUIManager.ShowTipPoint(false);
-        PlayToolSfx(false);
-        PlayToolVfx(false);
-        draggableTool = null;
-#endif
     }
 
     private void EquipTool(IToolObject tool)
@@ -234,42 +192,12 @@ public class ToolService : IInitializable, IDisposable, ITickable
         CursorController.instance?.SetCursorState(CursorState.DefaultRounded);
     }
 
-    void PerformRaycastTouch(Vector2 screenPos, Vector3 worldPos)
-    {
-        if (draggableTool == null) return;
-        var tipPoint = new Vector2(screenPos.x, screenPos.y + gameConfigData.toolTipOffset);
-        gameplayUIManager.SetTipPointPosition(tipPoint);
-
-        if (surfaceDetectionService.DetectSurface(tipPoint))
-        {
-            if (draggableTool is IDragObject tool) tool.OnDragPerformed(worldPos);
-            StickToSurfaces();
-        }
-        else
-        {
-            PlayToolSfx(false);
-            PlayToolVfx(false);
-            float distanceFromCamera = Camera.main.WorldToScreenPoint(draggableTool.GetTransform().position).z;
-            Vector3 screenPosWithDepth = new Vector3(tipPoint.x, tipPoint.y, distanceFromCamera);
-            Vector3 worldPosRelativeToCamera = Camera.main.ScreenToWorldPoint(screenPosWithDepth);
-            if (draggableTool is IDragObject tool)
-            {
-                tool.OnDragPerformed(worldPosRelativeToCamera);
-            }
-        }
-    }
-
     private void StickToSurfaces()
     {
         Vector3 targetPos = surfaceDetectionService.RaycastPos;
         Vector3 targetNormal = surfaceDetectionService.RaycastNormal;
         Quaternion targetRotation = Quaternion.LookRotation(-targetNormal, Vector3.up);
-#if UNITY_STANDALONE
         currentToolObject.StickToSurface(targetPos, targetRotation);
-#elif UNITY_IOS || UNITY_ANDROID || UNITY_EDITOR
-        draggableTool?.StickToSurface(targetPos, targetRotation);
-        ProcessCleaning();
-#endif
     }
 
     private void CleanSurface(IBrushTool brushTool)
@@ -301,35 +229,6 @@ public class ToolService : IInitializable, IDisposable, ITickable
         }
     }
 
-    private void CleanSurface(IDraggableBrushTool brushTool)
-    {
-        var surface = surfaceDetectionService.CleanableSurface;
-
-        if (surface == null) return;
-
-        PlayToolSfx(true);
-        cleaningService.CleanSurface(
-            surface,
-            brushTool.GetBrush(),
-            surfaceDetectionService.RaycastPos,
-            surfaceDetectionService.RaycastNormal,
-            brushTool.GetBrushTransform().up,
-            brushTool.GetBrushScale(),
-            brushTool.GetBrushStrength(),
-            brushTool.GetBrushColor(),
-            brushTool.GetBrushDepth()
-        );
-
-        if (cleaningService.IsDustRemoved(surface))
-        {
-            PlayToolVfx(true);
-        }
-        else
-        {
-            PlayToolVfx(false);
-        }
-    }
-
     private void CleanChunk()
     {
         if (isFinished || currentInteract == null) return;
@@ -340,7 +239,6 @@ public class ToolService : IInitializable, IDisposable, ITickable
         PlayToolSfx(true);
 
         if (currentToolObject is IChiselTool tool) tool?.PlayGouge();
-        if (draggableTool is IDraggableChiselTool draggableChisel) draggableChisel?.PlayGouge();
 
         cleaningService.CleanChunk(chunk);
         PlayToolSfx(false);
@@ -353,10 +251,6 @@ public class ToolService : IInitializable, IDisposable, ITickable
         if (currentToolObject != null && currentToolObject is IBrushTool brush)
         {
             CleanSurface(brush);
-        }
-        else if (draggableTool != null && draggableTool is IDraggableBrushTool draggableBrush)
-        {
-            CleanSurface(draggableBrush);
         }
         else
         {
@@ -379,19 +273,6 @@ public class ToolService : IInitializable, IDisposable, ITickable
                 isVfxPlaying = false;
             }
         }
-        else if (draggableTool != null)
-        {
-            if (play && !isVfxPlaying)
-            {
-                draggableTool.PlayVfx(true);
-                isVfxPlaying = true;
-            }
-            else if (!play && isVfxPlaying)
-            {
-                draggableTool.PlayVfx(false);
-                isVfxPlaying = false;
-            }
-        }
     }
 
     private void PlayToolSfx(bool play)
@@ -409,42 +290,12 @@ public class ToolService : IInitializable, IDisposable, ITickable
                 isSfxPlaying = false;
             }
         }
-        if (draggableTool != null)
-        {
-            if (play && !isSfxPlaying)
-            {
-                draggableTool.PlaySfx(true);
-                isSfxPlaying = true;
-            }
-            else if (!play && isSfxPlaying)
-            {
-                draggableTool.PlaySfx(false);
-                isSfxPlaying = false;
-            }
-        }
     }
 
     public void ForceReturnTool()
     {
         objectInteractionManager.ForceDropCurrentObject();
         ReturnCurrentTool();
-
-#if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
-        if (draggableTool != null)
-        {
-            PlayToolSfx(false);
-            PlayToolVfx(false);
-
-            if (draggableTool is IDragObject tool)
-            {
-                tool.OnDragEnded(draggableTool.GetTransform().position);
-            }
-
-            gameplayUIManager.ShowTipPoint(false);
-
-            draggableTool = null;
-        }
-#endif
     }
 
     private void HandleGameWrapped()

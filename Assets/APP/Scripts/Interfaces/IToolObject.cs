@@ -9,7 +9,7 @@ public interface IToolObject
     void Return();
     void StickToSurface(Vector3 position, Quaternion rotation);
     bool IsStickingToSurface { get; }
-    IInteractObject GetOrigin();
+    // IInteractObject GetOrigin();
     void PlaySfx(bool isPlaying);
     void PlayVfx(bool isPlaying);
 }

@@ -14,7 +14,8 @@ public class GameplayManager : IInitializable, IDisposable
     private readonly TutorialService tutorialService;
     private readonly List<Light> firstDirectionalLight;
 
-    private readonly GameplayToolManager gameplayToolManager;
+
+    private readonly GameplayToolUIManager gameplayToolUIManager;
 
     private ArtefactData artefactData;
     public bool isTutorialAvailable;
@@ -35,7 +36,7 @@ public class GameplayManager : IInitializable, IDisposable
     TutorialService tutorialService,
      List<Light> firstDirectionalLight,
     GameConfigData config,
-    GameplayToolManager gameplayToolManager)
+    GameplayToolUIManager gameplayToolUIManager)
     {
         this.playerProgressionData = playerProgressionData;
         this.activeArtefactData = activeArtefactData;
@@ -45,7 +46,7 @@ public class GameplayManager : IInitializable, IDisposable
         this.config = config;
         this.tutorialService = tutorialService;
         this.firstDirectionalLight = firstDirectionalLight;
-        this.gameplayToolManager = gameplayToolManager;
+        this.gameplayToolUIManager = gameplayToolUIManager;
 
         InitializeSession();
     }
@@ -198,13 +199,17 @@ public class GameplayManager : IInitializable, IDisposable
                 }
 
                 // gameplayToolManager.SetToolVisibility(ToolType, true);
+                // gameplayToolUIManager.SetToolVisibility(ToolType, true);
+
 
                 isTutorialAvailable = CheckTutorialAvailability(1);
-                gameplayToolManager.IsTutorialAvailable = isTutorialAvailable;
+                // gameplayToolManager.IsTutorialAvailable = isTutorialAvailable;
+                // gameplayToolUIManager.IsTutorialAvailable = isTutorialAvailable;
 
                 if (!isTutorialAvailable)
                 {
-                    gameplayToolManager.SetToolVisibility(ToolType, true);
+                    // gameplayToolManager.SetToolVisibility(ToolType, true);
+                    // gameplayToolUIManager.SetToolVisibility(ToolType, true);
                 }
             }
         }
