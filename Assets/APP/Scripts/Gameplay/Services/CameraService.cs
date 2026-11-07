@@ -53,7 +53,7 @@ public class CameraService : IInitializable, ITickable, IDisposable
         {
             currentPitch = Mathf.MoveTowards(currentPitch, boardPitch, rotationSpeed * Time.deltaTime);
         }
-        else if (currentMousePosition.y <= Screen.height - (Screen.height / 3))
+        else if (currentMousePosition.y <= Screen.height - (Screen.height / 2))
         {
             currentPitch = Mathf.MoveTowards(currentPitch, initialPitch, rotationSpeed * Time.deltaTime);
         }
