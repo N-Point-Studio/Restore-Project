@@ -23,7 +23,7 @@ public class GameplayUIManager : MonoBehaviour
     [SerializeField] private PauseController pauseController;
     [SerializeField] private SettingsController settingsController;
     [SerializeField] private PopUpConfirmationController quitConfirmationController;
-    [SerializeField] private ToolUIController toolUiController;
+    [SerializeField] private ToolUIController toolUIController;
 
     [Header("Tutorial Canvas Configuration")]
     [SerializeField] private GameObject tutorialDesktopRoot;
@@ -32,6 +32,7 @@ public class GameplayUIManager : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private float delayUntilAutoWrappedUp = 1.5f;
     [SerializeField] private float wrapUpThreshold = 95f;
+    private float lastEscapeTime;
 
     private CleaningService cleaningService;
     private FragmentService fragmentService;
@@ -73,7 +74,6 @@ public class GameplayUIManager : MonoBehaviour
         container.Inject(settingsController);
         container.Inject(endgameController);
         container.Inject(mainUIController);
-        container.Inject(toolUiController);
     }
 
     private void Awake()
@@ -96,19 +96,14 @@ public class GameplayUIManager : MonoBehaviour
         quitConfirmationController.OnCancel += OnCancelQuit;
 
         settingsController.OnSettingsClosed += OnSettingsClosed;
+
+        mainUIController.SetActive(true);
     }
 
     private IEnumerator Start()
     {
-        mainUIController.SetActive(true);
-        toolUiController.SetActive(true);
         mainUIController.ShowButtonWrap(false);
         endCamera.enabled = false;
-
-        if (toolUiController != null)
-        {
-            toolUiController.SetupToolUiController();
-        }
 
         bool isMobile = Application.isMobilePlatform;
 #if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
@@ -128,6 +123,8 @@ public class GameplayUIManager : MonoBehaviour
             if (toDoListObject != null)
             {
                 toDoListObject.SetActive(true);
+                toolUIController.SetActive(true);
+
                 if (toDoListCanvasGroup != null)
                 {
                     toDoListCanvasGroup.alpha = 0f;
@@ -298,8 +295,9 @@ public class GameplayUIManager : MonoBehaviour
         {
             isGamePaused = true;
             Time.timeScale = 0f;
+
+            toolUIController.SetActive(false);
             pauseController.SetActive(true);
-            toolUiController.SetActive(false);
 
             if (input != null)
             {
@@ -307,6 +305,7 @@ public class GameplayUIManager : MonoBehaviour
             }
         }
     }
+
 
     private void HandleProgressUpdate(float progress)
     {
@@ -346,13 +345,11 @@ public class GameplayUIManager : MonoBehaviour
 
     private void OnPlayerKeycodeEscapePerformed()
     {
-        Debug.Log("Player Escape pressed");
         PauseGame();
     }
 
     private void OnUIKeycodeEscapePerformed()
     {
-        Debug.Log("UI Escape pressed");
         if (isGamePaused && pauseController.IsActive)
         {
             OnResume();
@@ -376,7 +373,6 @@ public class GameplayUIManager : MonoBehaviour
         }
 
         mainUIController.SetActive(false);
-        toolUiController.SetActive(false);
         endgameController.SetActive(true);
 
         if (input != null)
@@ -399,7 +395,9 @@ public class GameplayUIManager : MonoBehaviour
         isGamePaused = false;
         Time.timeScale = 1f;
         pauseController.SetActive(false);
-        toolUiController.SetActive(true);
+
+        // SHOW TOOL UI DI SINI SAJA
+        toolUIController.SetActive(true);
 
         if (endgameController.IsActive)
         {
@@ -417,7 +415,6 @@ public class GameplayUIManager : MonoBehaviour
             return;
 
         pauseController.SetActive(false);
-        toolUiController.SetActive(false);
         settingsController.SetActive(true);
     }
 
@@ -427,7 +424,6 @@ public class GameplayUIManager : MonoBehaviour
             return;
 
         pauseController.SetActive(false);
-        toolUiController.SetActive(false); // <--- TAMBAHKAN INI agar hilang saat popup quit muncul
 
         quitConfirmationController.SetActive(true);
     }

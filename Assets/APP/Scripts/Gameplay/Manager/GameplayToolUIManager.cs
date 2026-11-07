@@ -42,7 +42,6 @@ public class GameplayToolUIManager : MonoBehaviour
         foreach (var data in toolDataList)
         {
             if (data.tool != null) data.tool.SetActive(false);
-            // if (data.toolUI != null) data.toolUI.SetVisibility(false);
         }
     }
 
@@ -84,11 +83,16 @@ public class GameplayToolUIManager : MonoBehaviour
 
     public void SetToolVisibility(ToolType typeTarget, bool isVisible)
     {
+        Debug.Log($"GameplayToolUIManager: Setting visibility of tools with type {typeTarget} to {isVisible}");
         foreach (var data in toolDataList)
         {
             if (data.toolUI != null && typeTarget.HasFlag(data.toolType))
             {
                 data.toolUI.SetVisibility(isVisible);
+            }
+            else
+            {
+                data.toolUI.SetVisibility(!isVisible);
             }
         }
     }

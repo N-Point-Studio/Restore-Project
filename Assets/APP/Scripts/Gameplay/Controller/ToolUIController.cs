@@ -6,15 +6,15 @@ using Modules;
 public class ToolUIController : BaseMenuController
 {
     [Header("Tool UI List")]
-    [Tooltip("Kosongkan jika script ini ada di Parent objek yang sama dengan kumpulan ToolUI")]
     [SerializeField] private List<ToolUI> tools = new List<ToolUI>();
 
     public event Action<ToolType> OnActiveToolChanged;
 
     private ToolUI currentActiveTool;
 
-    public void SetupToolUiController()
+    protected override void Awake()
     {
+        base.Awake();
         if (tools.Count == 0)
         {
             tools.AddRange(GetComponentsInChildren<ToolUI>(true));
@@ -30,6 +30,7 @@ public class ToolUIController : BaseMenuController
     protected override void OnDestroy()
     {
         base.OnDestroy();
+
         foreach (var tool in tools)
         {
             tool.OnToolClicked -= HandleToolClicked;
@@ -40,21 +41,18 @@ public class ToolUIController : BaseMenuController
     {
         if (currentActiveTool == clickedTool)
         {
-            currentActiveTool.SetActiveState(false);
-            currentActiveTool = null;
-            OnActiveToolChanged?.Invoke(ToolType.None);
+            DeselectAllTools();
+            return;
         }
-        else
-        {
-            if (currentActiveTool != null)
-            {
-                currentActiveTool.SetActiveState(false);
-            }
 
-            clickedTool.SetActiveState(true);
-            currentActiveTool = clickedTool;
-            OnActiveToolChanged?.Invoke(currentActiveTool.ToolType);
+        if (currentActiveTool != null)
+        {
+            currentActiveTool.SetActiveState(false);
         }
+
+        clickedTool.SetActiveState(true);
+        currentActiveTool = clickedTool;
+        OnActiveToolChanged?.Invoke(currentActiveTool.ToolType);
     }
 
     public void DeselectAllTools()
@@ -65,11 +63,5 @@ public class ToolUIController : BaseMenuController
             currentActiveTool = null;
             OnActiveToolChanged?.Invoke(ToolType.None);
         }
-    }
-
-    override public void SetActive(bool isActive)
-    {
-        base.SetActive(isActive);
-        Debug.Log("is tooluicontroller active?" + isActive);
     }
 }
