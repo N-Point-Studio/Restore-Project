@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Modules;
 
 public class ToolUIController : BaseMenuController
 {
@@ -12,9 +13,8 @@ public class ToolUIController : BaseMenuController
 
     private ToolUI currentActiveTool;
 
-    protected override void Start()
+    public void SetupToolUiController()
     {
-        base.Start();
         if (tools.Count == 0)
         {
             tools.AddRange(GetComponentsInChildren<ToolUI>(true));
@@ -67,19 +67,9 @@ public class ToolUIController : BaseMenuController
         }
     }
 
-    // Tambahkan ini di dalam ToolUIController.cs
-    public override void SetActive(bool isActive)
+    override public void SetActive(bool isActive)
     {
-        if (root == null) return;
-
-        // Panggil logikanya secara manual tanpa tween
-        root.SetActive(isActive);
-
-        if (canvasGroup != null)
-        {
-            canvasGroup.alpha = isActive ? 1f : 0f;
-            canvasGroup.interactable = isActive;
-            canvasGroup.blocksRaycasts = isActive;
-        }
+        base.SetActive(isActive);
+        Debug.Log("is tooluicontroller active?" + isActive);
     }
 }

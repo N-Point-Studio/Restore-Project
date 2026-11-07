@@ -100,9 +100,15 @@ public class GameplayUIManager : MonoBehaviour
 
     private IEnumerator Start()
     {
+        mainUIController.SetActive(true);
         toolUiController.SetActive(true);
         mainUIController.ShowButtonWrap(false);
         endCamera.enabled = false;
+
+        if (toolUiController != null)
+        {
+            toolUiController.SetupToolUiController();
+        }
 
         bool isMobile = Application.isMobilePlatform;
 #if UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
@@ -293,6 +299,7 @@ public class GameplayUIManager : MonoBehaviour
             isGamePaused = true;
             Time.timeScale = 0f;
             pauseController.SetActive(true);
+            toolUiController.SetActive(false);
 
             if (input != null)
             {
@@ -339,11 +346,13 @@ public class GameplayUIManager : MonoBehaviour
 
     private void OnPlayerKeycodeEscapePerformed()
     {
+        Debug.Log("Player Escape pressed");
         PauseGame();
     }
 
     private void OnUIKeycodeEscapePerformed()
     {
+        Debug.Log("UI Escape pressed");
         if (isGamePaused && pauseController.IsActive)
         {
             OnResume();
@@ -367,6 +376,7 @@ public class GameplayUIManager : MonoBehaviour
         }
 
         mainUIController.SetActive(false);
+        toolUiController.SetActive(false);
         endgameController.SetActive(true);
 
         if (input != null)
@@ -389,6 +399,7 @@ public class GameplayUIManager : MonoBehaviour
         isGamePaused = false;
         Time.timeScale = 1f;
         pauseController.SetActive(false);
+        toolUiController.SetActive(true);
 
         if (endgameController.IsActive)
         {
@@ -406,6 +417,7 @@ public class GameplayUIManager : MonoBehaviour
             return;
 
         pauseController.SetActive(false);
+        toolUiController.SetActive(false);
         settingsController.SetActive(true);
     }
 
@@ -415,6 +427,7 @@ public class GameplayUIManager : MonoBehaviour
             return;
 
         pauseController.SetActive(false);
+        toolUiController.SetActive(false); // <--- TAMBAHKAN INI agar hilang saat popup quit muncul
 
         quitConfirmationController.SetActive(true);
     }
