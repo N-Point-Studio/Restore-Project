@@ -105,6 +105,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
         if (type == ToolType.None)
         {
             ReturnCurrentTool();
+            gameplayToolUIManager.ReleaseAllTool();
             return;
         }
 
@@ -135,6 +136,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
                 break;
             case IClean clean when !clean.IsCleanable():
                 isCleaning = false;
+                gameplayToolUIManager.ReleaseAllTool();
                 ReturnCurrentTool();
                 break;
         }
@@ -180,13 +182,13 @@ public class ToolService : IInitializable, IDisposable, ITickable
     private void ReturnCurrentTool()
     {
         if (currentToolObject == null) return;
+        Debug.Log("cek return tool: " + currentToolObject.ToolId);
 
         isCleaning = false;
         PlayToolSfx(false);
         PlayToolVfx(false);
 
         currentToolObject.Return();
-        gameplayToolUIManager.ReleaseAllTool();
         currentToolObject = null;
 
         CursorController.instance?.UnlockCursorState();
