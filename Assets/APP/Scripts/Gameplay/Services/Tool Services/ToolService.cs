@@ -186,6 +186,7 @@ public class ToolService : IInitializable, IDisposable, ITickable
         PlayToolVfx(false);
 
         currentToolObject.Return();
+        gameplayToolUIManager.ReleaseAllTool();
         currentToolObject = null;
 
         CursorController.instance?.UnlockCursorState();

@@ -34,6 +34,8 @@ public class GameplayUIManager : MonoBehaviour
     [SerializeField] private float wrapUpThreshold = 95f;
     private float lastEscapeTime;
 
+    private bool isHintShown = false;
+
     private CleaningService cleaningService;
     private FragmentService fragmentService;
     private InputSystemService input;
@@ -239,6 +241,12 @@ public class GameplayUIManager : MonoBehaviour
         bool isFullyCompleted = overall >= 99f;
 
         bool shouldShowHintToggle = surfaceProgress >= gameplayManager.clueTreshold;
+
+        if (!isHintShown && shouldShowHintToggle)
+        {
+            AudioEvents.TriggerPlayCustomSFX(Modules.SoundSystems.AudioKey.SFX_Hint);
+            isHintShown = true;
+        }
 
         if (shouldShowHintToggle)
         {

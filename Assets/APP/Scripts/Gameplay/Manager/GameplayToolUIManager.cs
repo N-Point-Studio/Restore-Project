@@ -96,4 +96,9 @@ public class GameplayToolUIManager : MonoBehaviour
             }
         }
     }
+
+    public void ReleaseAllTool()
+    {
+        toolUIController.DeselectAllTools();
+    }
 }

@@ -15,6 +15,7 @@ namespace Modules.SoundSystems
         SFX_Chisel,
         SFX_Cloth,
         SFX_Finish,
+        SFX_Hint,
         UI_Click,
         UI_Hover,
         UI_Cancel,
