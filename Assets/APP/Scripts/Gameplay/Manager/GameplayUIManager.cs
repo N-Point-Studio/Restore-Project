@@ -125,7 +125,6 @@ public class GameplayUIManager : MonoBehaviour
             if (toDoListObject != null)
             {
                 toDoListObject.SetActive(true);
-                toolUIController.SetActive(true);
 
                 if (toDoListCanvasGroup != null)
                 {
@@ -134,6 +133,8 @@ public class GameplayUIManager : MonoBehaviour
                 }
             }
         }
+
+        toolUIController.SetActive(true);
 
         HandleAssembleAvailability();
     }

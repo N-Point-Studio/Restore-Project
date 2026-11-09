@@ -166,6 +166,8 @@ public class GameplayManager : IInitializable, IDisposable
 
     private void InitializeSession()
     {
+        gameplayToolUIManager.InitializeTools();
+
         if (inputSystemService != null)
         {
             inputSystemService.ChangeInputState(InputStateType.Player);
@@ -199,17 +201,18 @@ public class GameplayManager : IInitializable, IDisposable
                 }
 
                 // gameplayToolManager.SetToolVisibility(ToolType, true);
-                gameplayToolUIManager.SetToolVisibility(ToolType, true);
+                // gameplayToolUIManager.SetToolVisibility(ToolType, true);
 
 
                 isTutorialAvailable = CheckTutorialAvailability(1);
                 // gameplayToolManager.IsTutorialAvailable = isTutorialAvailable;
-                // gameplayToolUIManager.IsTutorialAvailable = isTutorialAvailable;
+                gameplayToolUIManager.IsTutorialAvailable = isTutorialAvailable;
 
                 if (!isTutorialAvailable)
                 {
                     // gameplayToolManager.SetToolVisibility(ToolType, true);
-                    // gameplayToolUIManager.SetToolVisibility(ToolType, true);
+                    Debug.Log("SetToolVisibility tool ya");
+                    gameplayToolUIManager.SetToolVisibility(ToolType, true);
                 }
             }
         }

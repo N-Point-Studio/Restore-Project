@@ -108,6 +108,7 @@ public class ToolUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, 
 
     public void SetVisibility(bool isShown)
     {
+        Debug.Log($"SetVisibility called for {toolType} with isShown: {isShown}");
         if (gameObject.activeSelf != isShown)
         {
             gameObject.SetActive(isShown);

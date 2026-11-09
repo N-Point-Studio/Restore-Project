@@ -184,7 +184,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3014359}
   - component: {fileID: 3014360}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: Feedback_ShowMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3024,7 +3024,7 @@ GameObject:
   - component: {fileID: 165696597}
   - component: {fileID: 165696599}
   - component: {fileID: 165696598}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: Tool_Img
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3268,7 +3268,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 190566772}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: MenuMMFPlayers
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5698,7 +5698,7 @@ GameObject:
   - component: {fileID: 334644996}
   - component: {fileID: 334644995}
   - component: {fileID: 334644997}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: Tool_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6622,7 +6622,7 @@ GameObject:
   - component: {fileID: 404301558}
   - component: {fileID: 404301560}
   - component: {fileID: 404301559}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: Tool_Img
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12246,7 +12246,7 @@ GameObject:
   m_Component:
   - component: {fileID: 740406041}
   - component: {fileID: 740406042}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: Root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12728,7 +12728,7 @@ GameObject:
   m_Component:
   - component: {fileID: 782381816}
   - component: {fileID: 782381817}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: Feedback_HideMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14783,7 +14783,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 931328101}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -17500,9 +17500,8 @@ GameObject:
   - component: {fileID: 1131951642}
   - component: {fileID: 1131951641}
   - component: {fileID: 1131951640}
-  - component: {fileID: 1131951644}
   - component: {fileID: 1131951643}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: CanvasTool
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17579,7 +17578,7 @@ Canvas:
   m_GameObject: {fileID: 1131951638}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_Camera: {fileID: 358412146}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
@@ -17592,7 +17591,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 5
   m_TargetDisplay: 0
 --- !u!114 &1131951643
 MonoBehaviour:
@@ -17615,18 +17614,6 @@ MonoBehaviour:
   - {fileID: 1434932800}
   - {fileID: 1642402157}
   - {fileID: 334644997}
---- !u!114 &1131951644
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1131951638}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7e6fe4adacbfcf24eb64cc63fa103fb4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CanvasWidthAndHeightController
 --- !u!1 &1135400583
 GameObject:
   m_ObjectHideFlags: 0
@@ -19821,7 +19808,7 @@ GameObject:
   - component: {fileID: 1237387159}
   - component: {fileID: 1237387161}
   - component: {fileID: 1237387160}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: Tool_Img
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22430,7 +22417,7 @@ GameObject:
   - component: {fileID: 1434932799}
   - component: {fileID: 1434932798}
   - component: {fileID: 1434932800}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: Tool_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24748,7 +24735,7 @@ GameObject:
   - component: {fileID: 1642402156}
   - component: {fileID: 1642402155}
   - component: {fileID: 1642402157}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: Tool_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25347,7 +25334,7 @@ GameObject:
   - component: {fileID: 1691160912}
   - component: {fileID: 1691160914}
   - component: {fileID: 1691160913}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: ToolList
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25559,7 +25546,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1703319705}
   - component: {fileID: 1703319708}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: ToolTray
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27953,7 +27940,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1832726952}
   - component: {fileID: 1832726953}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: SafeArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -182,7 +182,6 @@ public class ToolService : IInitializable, IDisposable, ITickable
     private void ReturnCurrentTool()
     {
         if (currentToolObject == null) return;
-        Debug.Log("cek return tool: " + currentToolObject.ToolId);
 
         isCleaning = false;
         PlayToolSfx(false);
@@ -298,7 +297,8 @@ public class ToolService : IInitializable, IDisposable, ITickable
     public void ForceReturnTool()
     {
         objectInteractionManager.ForceDropCurrentObject();
-        ReturnCurrentTool();
+        gameplayToolUIManager.ReleaseAllTool();
+        // ReturnCurrentTool();
     }
 
     private void HandleGameWrapped()

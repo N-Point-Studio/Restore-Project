@@ -137,7 +137,6 @@ public class ArtefactManager : IInitializable, IDisposable
                     }
                 }
             }
-
             return;
         }
 

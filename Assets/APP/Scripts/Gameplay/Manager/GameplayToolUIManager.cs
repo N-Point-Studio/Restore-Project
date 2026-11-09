@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using VContainer;
 
 [Serializable]
 public class ToolData
@@ -19,10 +20,28 @@ public class GameplayToolUIManager : MonoBehaviour
     private GameObject currentActiveToolObj;
     public event Action<ToolType> OnActiveToolChanged;
 
+    private TutorialService tutorialService;
+
+    public bool IsTutorialAvailable { get; set; }
+
+
+    [Inject]
+    public void Construct(TutorialService tutorialService)
+    {
+        this.tutorialService = tutorialService;
+    }
+
+    private void OnEnable()
+    {
+        if (tutorialService != null) tutorialService.OnTutorialStateChanged += UpdateTrayVisibility;
+    }
+    private void OnDisable()
+    {
+        if (tutorialService != null) tutorialService.OnTutorialStateChanged -= UpdateTrayVisibility;
+    }
+
     private void Start()
     {
-        InitializeTools();
-
         if (toolUIController != null)
         {
             toolUIController.OnActiveToolChanged += HandleToolSelected;
@@ -37,16 +56,28 @@ public class GameplayToolUIManager : MonoBehaviour
         }
     }
 
-    private void InitializeTools()
+    public void InitializeTools()
     {
         foreach (var data in toolDataList)
         {
-            if (data.tool != null) data.tool.SetActive(false);
+            if (data.tool != null)
+            {
+                data.tool.SetActive(false);
+                data.toolUI.SetVisibility(false);
+            }
         }
+    }
+
+    private void UpdateTrayVisibility(int stage, int module)
+    {
+        if (!IsTutorialAvailable) return;
+        SetToolVisibility(ToolType.Chisel, stage > 0 || module >= 3);
+        SetToolVisibility(ToolType.Brush, stage > 0 || module >= 4);
     }
 
     private void HandleToolSelected(ToolType selectedType)
     {
+
         if (currentActiveToolObj != null)
         {
             currentActiveToolObj.SetActive(false);
@@ -83,16 +114,12 @@ public class GameplayToolUIManager : MonoBehaviour
 
     public void SetToolVisibility(ToolType typeTarget, bool isVisible)
     {
-        Debug.Log($"GameplayToolUIManager: Setting visibility of tools with type {typeTarget} to {isVisible}");
         foreach (var data in toolDataList)
         {
             if (data.toolUI != null && typeTarget.HasFlag(data.toolType))
             {
+                Debug.Log($"Setting visibility for {data.toolType} to {isVisible}");
                 data.toolUI.SetVisibility(isVisible);
-            }
-            else
-            {
-                data.toolUI.SetVisibility(!isVisible);
             }
         }
     }
