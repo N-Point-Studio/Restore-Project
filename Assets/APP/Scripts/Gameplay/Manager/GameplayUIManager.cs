@@ -245,6 +245,7 @@ public class GameplayUIManager : MonoBehaviour
         if (!isHintShown && shouldShowHintToggle)
         {
             AudioEvents.TriggerPlayCustomSFX(Modules.SoundSystems.AudioKey.SFX_Hint);
+            mainUIController.ShowHintInfoTemporarily();
             isHintShown = true;
         }
 
@@ -367,7 +368,6 @@ public class GameplayUIManager : MonoBehaviour
         if (endgameController.IsActive) return;
         endCamera.enabled = true;
 
-        AppLogger.Log("Wrap up!");
         if (tutorialService.CurrentStage == 1 && tutorialService.CurrentModule == 1)
         {
             tutorialService.CompleteStage();
@@ -386,6 +386,7 @@ public class GameplayUIManager : MonoBehaviour
             input.ChangeInputState(InputStateType.UI);
         }
 
+        toolUIController.SetActive(false);
         OnGameWrapped?.Invoke();
         AudioEvents.TriggerPlayCustomSFX(Modules.SoundSystems.AudioKey.SFX_Finish);
     }

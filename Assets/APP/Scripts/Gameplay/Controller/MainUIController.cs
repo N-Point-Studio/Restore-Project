@@ -13,6 +13,11 @@ public class MainUIController : BaseMenuController
     [SerializeField] private Toggle hintToggle;
     [SerializeField] private Button buttonPause;
     [SerializeField] private Image tipPoint;
+    [SerializeField] private CanvasGroup hintInfoGroup;
+    [Header("Hint Info Animation Settings")]
+    [SerializeField] private float hintFadeDuration = 0.5f;
+    [SerializeField] private float showDuration = 1.5f;
+    private Coroutine hintInfoCoroutine;
 
     private InputSystemService input;
     private bool canWrapUp;
@@ -187,5 +192,42 @@ public class MainUIController : BaseMenuController
         {
             tipPoint.rectTransform.position = screenPosition;
         }
+    }
+
+    public void ShowHintInfoTemporarily()
+    {
+        if (hintInfoGroup == null) return;
+        if (hintInfoCoroutine != null)
+        {
+            StopCoroutine(hintInfoCoroutine);
+        }
+        hintInfoCoroutine = StartCoroutine(HintInfoFadeRoutine());
+    }
+
+    private System.Collections.IEnumerator HintInfoFadeRoutine()
+    {
+        hintInfoGroup.gameObject.SetActive(true);
+        float timer = 0f;
+        float startAlpha = hintInfoGroup.alpha;
+
+        while (timer < hintFadeDuration)
+        {
+            timer += Time.deltaTime;
+            hintInfoGroup.alpha = Mathf.Lerp(startAlpha, 1f, timer / hintFadeDuration);
+            yield return null;
+        }
+        hintInfoGroup.alpha = 1f;
+        yield return new WaitForSeconds(showDuration);
+        timer = 0f;
+        while (timer < hintFadeDuration)
+        {
+            timer += Time.deltaTime;
+            hintInfoGroup.alpha = Mathf.Lerp(1f, 0f, timer / hintFadeDuration);
+            yield return null;
+        }
+        hintInfoGroup.alpha = 0f;
+        hintInfoGroup.gameObject.SetActive(false);
+
+        hintInfoCoroutine = null;
     }
 }
